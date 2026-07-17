@@ -258,25 +258,41 @@ const StudentTest = () => {
 
   const getUnansweredCount = () => {
     let total = 0;
-    assessment.sections.forEach((sec) => {
-      total += sec.questions.length;
+    (assessment?.sections || []).filter(Boolean).forEach((sec) => {
+      total += (sec?.questions || []).filter(Boolean).length;
     });
-    return total - studentAnswers.filter((ans) => ans.answerText.trim() !== '').length;
+    return total - (studentAnswers || []).filter((ans) => ans && ans.answerText && ans.answerText.trim() !== '').length;
   };
 
   const getPercentageCompleted = () => {
     let total = 0;
-    assessment.sections.forEach((sec) => {
-      total += sec.questions.length;
+    (assessment?.sections || []).filter(Boolean).forEach((sec) => {
+      total += (sec?.questions || []).filter(Boolean).length;
     });
     if (total === 0) return 0;
-    const answered = studentAnswers.filter((ans) => ans.answerText.trim() !== '').length;
+    const answered = (studentAnswers || []).filter((ans) => ans && ans.answerText && ans.answerText.trim() !== '').length;
     return Math.round((answered / total) * 100);
   };
 
   // Onboard / Entrance screens
   if (loading) {
     return <Loader fullPage message="Entering assessment lobby..." />;
+  }
+
+  if (!assessment || !school || !enquiry) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-5">
+          <div className="h-14 w-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+            <AlertTriangle className="h-7 w-7" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">Invalid Assessment</h2>
+          <p className="text-xs text-slate-505 leading-normal">
+            This test assignment link is invalid, expired, or has been revoked by the school administration.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // 1. Take Later View
@@ -418,14 +434,14 @@ const StudentTest = () => {
   }
 
   // 4. Active Exam Lounge
-  const currentSectionData = assessment.sections[currentSection];
-  const currentQuestionData = currentSectionData.questions[currentQuestion];
+  const currentSectionData = assessment?.sections?.[currentSection] || { name: 'Section', questions: [] };
+  const currentQuestionData = currentSectionData?.questions?.[currentQuestion] || { question: '', type: '', options: [] };
   const qAnswer = getAnswerText(currentSection, currentQuestion);
 
   // Global flattening of questions to map palette indexing
   const questionMap = [];
-  assessment.sections.forEach((sec, sIdx) => {
-    sec.questions.forEach((_, qIdx) => {
+  (assessment?.sections || []).filter(Boolean).forEach((sec, sIdx) => {
+    (sec?.questions || []).filter(Boolean).forEach((_, qIdx) => {
       questionMap.push({ sIdx, qIdx });
     });
   });

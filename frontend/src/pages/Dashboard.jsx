@@ -74,9 +74,15 @@ const Dashboard = () => {
 
   // Helper: Get month label
   const getMonthLabel = (dateStr) => {
+    if (!dateStr || typeof dateStr !== 'string' || !dateStr.includes('-')) {
+      return dateStr || 'Unknown';
+    }
     const [year, month] = dateStr.split('-');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${months[parseInt(month) - 1]} '${year.slice(2)}`;
+    const monthIdx = parseInt(month, 10) - 1;
+    const monthLabel = months[monthIdx] || 'Jan';
+    const yearLabel = year ? year.slice(2) : '';
+    return `${monthLabel} '${yearLabel}`;
   };
 
   // Render Monthly Registrations Bar Chart (SVG side-by-side vertical bar trend)

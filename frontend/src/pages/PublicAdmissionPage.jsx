@@ -91,21 +91,21 @@ const PublicAdmissionPage = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* School Header Banner */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          {schoolInfo.logo ? (
+          {schoolInfo?.logo ? (
             <img
               src={schoolInfo.logo}
-              alt={schoolInfo.name}
+              alt={schoolInfo.name || 'School'}
               className="h-16 w-16 rounded-xl object-cover border border-slate-100"
             />
           ) : (
             <div className="h-16 w-16 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 text-2xl">
-              {schoolInfo.name.charAt(0).toUpperCase()}
+              {(schoolInfo?.name || 'S').charAt(0).toUpperCase()}
             </div>
           )}
           
           <div className="space-y-1">
             <h2 className="text-lg font-bold text-slate-800 leading-tight">
-              {schoolInfo.name}
+              {schoolInfo?.name || 'School Portal'}
             </h2>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <span className="inline-flex items-center text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
@@ -135,7 +135,7 @@ const PublicAdmissionPage = () => {
           onSubmit={handlePublicSubmit}
           isLoading={submitting}
           isPublic={true}
-          schoolName={schoolInfo.name}
+          schoolName={schoolInfo?.name || ''}
         />
       </div>
     </div>

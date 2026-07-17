@@ -108,24 +108,24 @@ const PublicThankYouPage = () => {
                 />
               )}
               <span className="font-bold text-white text-sm tracking-wide truncate max-w-[200px]">
-                {schoolInfo.name}
+                {schoolInfo?.name || 'School'}
               </span>
             </div>
           </div>
         ) : (
           <div className="bg-indigo-650 p-6 flex flex-col items-center text-center space-y-2 text-white bg-indigo-600">
-            {schoolInfo.logo ? (
+            {schoolInfo?.logo ? (
               <img
                 src={schoolInfo.logo}
-                alt={schoolInfo.name}
+                alt={schoolInfo.name || 'School'}
                 className="h-12 w-12 rounded-xl object-cover bg-white p-0.5 mb-1"
               />
             ) : (
               <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center font-extrabold text-white text-xl">
-                {schoolInfo.name.charAt(0).toUpperCase()}
+                {(schoolInfo?.name || 'S').charAt(0).toUpperCase()}
               </div>
             )}
-            <h3 className="font-bold text-base">{schoolInfo.name}</h3>
+            <h3 className="font-bold text-base">{schoolInfo?.name || 'School'}</h3>
           </div>
         )}
 

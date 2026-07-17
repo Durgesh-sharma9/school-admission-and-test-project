@@ -15,7 +15,8 @@ import {
   Sparkles,
   Save,
   Grid,
-  Edit
+  Edit,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -38,6 +39,7 @@ const AssessmentBuilder = () => {
   // Loading states
   const [fetching, setFetching] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   // active inline question editor states
   // We keep track of which section & question index is currently being edited/added
@@ -55,17 +57,19 @@ const AssessmentBuilder = () => {
       try {
         setFetching(true);
         const response = await api.get(`/assessments/${id}`);
-        if (response.success) {
+        if (response.success && response.data) {
           const asm = response.data;
-          setName(asm.name);
-          setClassName(asm.class);
-          setDuration(asm.duration);
+          setName(asm.name || '');
+          setClassName(asm.class || '');
+          setDuration(asm.duration || 30);
           setInstructions(asm.instructions || '');
           setSections(asm.sections || []);
+        } else {
+          setNotFound(true);
         }
       } catch (error) {
         toast.error(error.message || 'Failed to load assessment details');
-        navigate('/assessments');
+        setNotFound(true);
       } finally {
         setFetching(false);
       }
@@ -77,17 +81,17 @@ const AssessmentBuilder = () => {
   }, [id, isEditMode, navigate]);
 
   // Calculate dynamic live totals
-  const totalQuestions = (sections || []).reduce((acc, sec) => acc + ((sec && sec.questions) ? sec.questions.length : 0), 0);
-  const totalMarks = (sections || []).reduce(
+  const totalQuestions = (sections || []).filter(Boolean).reduce((acc, sec) => acc + ((sec && sec.questions) ? sec.questions.filter(Boolean).length : 0), 0);
+  const totalMarks = (sections || []).filter(Boolean).reduce(
     (acc, sec) =>
       acc +
-      ((sec && sec.questions) ? sec.questions.reduce((qAcc, q) => qAcc + (parseFloat(q ? q.marks : 0) || 0), 0) : 0),
+      ((sec && sec.questions) ? sec.questions.filter(Boolean).reduce((qAcc, q) => qAcc + (parseFloat(q ? q.marks : 0) || 0), 0) : 0),
     0
   );
 
   const getSectionTotalMarks = (section) => {
     if (!section || !section.questions) return 0;
-    return section.questions.reduce((qAcc, q) => qAcc + (parseFloat(q ? q.marks : 0) || 0), 0);
+    return section.questions.filter(Boolean).reduce((qAcc, q) => qAcc + (parseFloat(q ? q.marks : 0) || 0), 0);
   };
 
   // Section CRUD
@@ -277,6 +281,30 @@ const AssessmentBuilder = () => {
     return <Loader message="Fetching assessment questionnaire blueprint..." />;
   }
 
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-5">
+          <div className="h-14 w-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+            <AlertCircle className="h-7 w-7" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800">Assessment not found</h2>
+          <p className="text-xs text-slate-505 leading-normal">
+            The requested assessment blueprint does not exist or has been deleted.
+          </p>
+          <div className="pt-2">
+            <Link
+              to="/assessments"
+              className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold bg-indigo-650 hover:bg-indigo-700 text-white transition-colors shadow-md shadow-indigo-600/10"
+            >
+              Go to Assessments
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 relative pb-24 text-left">
       {/* Back button header */}
@@ -355,7 +383,7 @@ const AssessmentBuilder = () => {
           </Button>
         </div>
 
-        {sections.map((sec, sIdx) => (
+        {sections && sections.filter(Boolean).map((sec, sIdx) => (
           <div key={sIdx} className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
             {/* Section Header bar */}
             <div className="bg-slate-50/70 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
@@ -370,7 +398,7 @@ const AssessmentBuilder = () => {
                   {sec ? sec.name : ''}
                 </span>
                 <span className="text-xs text-slate-400 font-medium">
-                  ({(sec && sec.questions) ? sec.questions.length : 0} questions • {getSectionTotalMarks(sec)} marks)
+                  ({(sec && sec.questions) ? sec.questions.filter(Boolean).length : 0} questions • {getSectionTotalMarks(sec)} marks)
                 </span>
               </div>
 
@@ -396,33 +424,33 @@ const AssessmentBuilder = () => {
 
             {/* Questions list within Section */}
             <div className="p-6 divide-y divide-slate-50">
-              {(!sec || !sec.questions || sec.questions.length === 0) && activeEditor?.sectionIndex !== sIdx && (
+              {(!sec || !sec.questions || sec.questions.filter(Boolean).length === 0) && activeEditor?.sectionIndex !== sIdx && (
                 <div className="py-8 text-center text-slate-400 text-xs">
                   This section has no questions yet. Click "Add Question" above to start building.
                 </div>
               )}
 
               {/* Loop Questions */}
-              {sec && (sec.questions || []).map((q, qIdx) => (
+              {sec && (sec.questions || []).filter(Boolean).map((q, qIdx) => (
                 <div key={qIdx} className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-4">
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="inline-flex items-center text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                        Q{qIdx + 1} • {q.type}
+                        Q{qIdx + 1} • {q?.type}
                       </span>
                       <span className="inline-flex items-center text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
-                        {q.marks} Marks
+                        {q?.marks} Marks
                       </span>
                     </div>
 
-                    <p className="font-semibold text-slate-800 text-sm">{q.question}</p>
+                    <p className="font-semibold text-slate-800 text-sm">{q?.question}</p>
 
                     {/* Show correct answers for builder view */}
-                    {q.type === 'MCQ' && q.options && (
+                    {q?.type === 'MCQ' && q?.options && (
                       <div className="grid grid-cols-2 gap-2 max-w-lg mt-2 text-xs text-slate-500">
-                        {(q.options || []).map((opt, oIdx) => {
+                        {(q?.options || []).map((opt, oIdx) => {
                           const optionLetter = ['A', 'B', 'C', 'D'][oIdx];
-                          const isCorrect = optionLetter === q.correctAnswer;
+                          const isCorrect = optionLetter === q?.correctAnswer;
                           return (
                             <div key={oIdx} className={`p-1.5 rounded-lg border ${isCorrect ? 'bg-emerald-50 border-emerald-100 text-emerald-800 font-bold' : 'border-slate-50 bg-slate-50/50'}`}>
                               {optionLetter}. {opt}
@@ -432,15 +460,15 @@ const AssessmentBuilder = () => {
                       </div>
                     )}
 
-                    {['One Word', 'True / False', 'Fill Blank'].includes(q.type) && (
+                    {['One Word', 'True / False', 'Fill Blank'].includes(q?.type) && (
                       <p className="text-xs text-slate-500 mt-1">
-                        Correct Answer: <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{q.correctAnswer}</span>
+                        Correct Answer: <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{q?.correctAnswer}</span>
                       </p>
                     )}
 
-                    {q.type === 'Descriptive' && q.referenceAnswer && (
+                    {q?.type === 'Descriptive' && q?.referenceAnswer && (
                       <p className="text-xs text-slate-450 italic mt-1 line-clamp-2">
-                        Reference Answer: {q.referenceAnswer}
+                        Reference Answer: {q?.referenceAnswer}
                       </p>
                     )}
                   </div>

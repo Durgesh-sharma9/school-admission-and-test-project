@@ -5,6 +5,7 @@ import Badge from '../components/Badge';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import {
   Search,
   Filter,
@@ -17,12 +18,21 @@ import {
   MoreVertical,
   Check,
   FileQuestion,
-  Trash2
+  Trash2,
+  AlertCircle,
+  Eye,
+  Edit,
+  X,
+  User,
+  Users,
+  MapPin,
+  Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
 
 const Enquiries = () => {
+  const { school } = useAuth();
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -36,6 +46,7 @@ const Enquiries = () => {
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [selectedIds, setSelectedIds] = useState([]);
+
   
   // Communication Modal States
   const [messageModalOpen, setMessageModalOpen] = useState(false);
@@ -44,6 +55,13 @@ const Enquiries = () => {
     'Dear [Parent Name], thank you for your admission enquiry for [Student Name] (ID: [Enquiry ID]) at our school. We would love to discuss the details further. Please let us know a suitable time to connect. Regards.'
   );
   const [selectedEnquiryForAssessment, setSelectedEnquiryForAssessment] = useState(null);
+
+  // View & Edit Modal States
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedEnquiryForView, setSelectedEnquiryForView] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
+  const [editStatus, setEditStatus] = useState('');
 
   const fetchEnquiries = async () => {
     try {
@@ -510,35 +528,61 @@ const Enquiries = () => {
                       <span className="block text-[10px]">{enq.saveTime}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* Assessments Portal Modal Trigger */}
+                      <div className="flex items-center justify-center gap-1.5">
+                        {/* View Button */}
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-md px-2.5 py-1 text-xs"
+                          className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                          onClick={() => {
+                            setSelectedEnquiryForView(enq);
+                            setViewModalOpen(true);
+                          }}
+                          title="View Complete Details"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
+
+                        {/* Edit Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                          onClick={() => {
+                            setSelectedEnquiryForEdit(enq);
+                            setEditStatus(enq.status);
+                            setEditModalOpen(true);
+                          }}
+                          title="Edit Status"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </Button>
+
+                        {/* Assign Assessment Button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-md p-1.5"
                           onClick={() => setSelectedEnquiryForAssessment(enq)}
-                          title="Manage Assessments"
+                          title="Assign/Manage Assessments"
                         >
                           <FileQuestion className="h-3.5 w-3.5 text-indigo-500" />
-                          <span className="hidden sm:inline ml-1 font-semibold">Assessments</span>
                         </Button>
 
                         {/* Convert to Admission Button */}
                         {!enq.isConvertedToAdmission ? (
                           <Button
-                            variant="primary"
+                            variant="outline"
                             size="sm"
-                            className="bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:border-transparent text-indigo-700 hover:text-white rounded-md px-2.5 py-1 text-xs"
+                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-md p-1.5"
                             onClick={() => handleConvertAdmission(enq._id)}
                             title="Convert to Registered Admission"
                           >
-                            <UserCheck className="h-3.5 w-3.5" />
-                            <span className="hidden sm:inline ml-1 font-semibold">Convert</span>
+                            <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
                           </Button>
                         ) : (
-                          <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                            <Check className="h-3 w-3 mr-1" />
-                            Converted
+                          <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-md border border-emerald-100/50" title="Admission Confirmed">
+                            <Check className="h-3.5 w-3.5 text-emerald-600" />
                           </span>
                         )}
 
@@ -546,7 +590,7 @@ const Enquiries = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-md p-1"
+                          className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-md p-1.5"
                           onClick={() => handleDeleteEnquiry(enq._id)}
                           title="Delete Enquiry"
                         >
@@ -638,7 +682,7 @@ const Enquiries = () => {
                   </label>
                   <select
                     onChange={(e) => {
-                      const selected = school.communicationTemplates.find(t => t._id === e.target.value);
+                      const selected = school?.communicationTemplates?.find(t => t._id === e.target.value);
                       if (selected) {
                         setMessageTemplate(selected.body);
                       }
@@ -646,8 +690,8 @@ const Enquiries = () => {
                     className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-950 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   >
                     <option value="">Select a saved template blueprint</option>
-                    {school.communicationTemplates
-                      .filter(t => t.type === messageType)
+                    {school?.communicationTemplates
+                      ?.filter(t => t.type === messageType)
                       .map(t => (
                         <option key={t._id} value={t._id}>{t.name}</option>
                       ))
@@ -739,6 +783,288 @@ const Enquiries = () => {
           enquiry={selectedEnquiryForAssessment}
           onClose={() => setSelectedEnquiryForAssessment(null)}
         />
+      )}
+
+      {/* View Enquiry Details Modal */}
+      {viewModalOpen && selectedEnquiryForView && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-3xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-8 animate-in fade-in-50 duration-200"
+          >
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                <Eye className="h-4.5 w-4.5 text-indigo-650" />
+                Enquiry Details: {selectedEnquiryForView.enquiryId}
+              </h3>
+              <button
+                onClick={() => {
+                  setViewModalOpen(false);
+                  setSelectedEnquiryForView(null);
+                }}
+                className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto text-left">
+              {/* Category 1: Student Information */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                  <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                    Student Information
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Student Name</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.studentName || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Gender</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.gender || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Date of Birth</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                      {selectedEnquiryForView.dob ? new Date(selectedEnquiryForView.dob).toLocaleDateString() : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Class Seeking</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.classSeeking || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Current School</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.currentSchool || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Current Class</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.currentClass || '—'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category 2: Parent / Guardian Information */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                    Parent / Guardian Information
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Parent Name</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.parentName || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Mobile Number</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.mobile || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">WhatsApp Number</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.whatsapp || '—'}</span>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <span className="text-slate-400 font-semibold block uppercase">Email Address</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.email || '—'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category 3: Address Information */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                  <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                    Address Details
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">State</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.state || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">City</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.city || '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Area / Locality</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.area || '—'}</span>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <span className="text-slate-400 font-semibold block uppercase">Full Address</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.fullAddress || '—'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category 4: Other / Metadata */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                  <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+                    <Calendar className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                    Enquiry Metadata & Info
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Source</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.source || 'Direct Enquiry'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Current Status</span>
+                    <div className="mt-0.5">
+                      <span className="inline-flex px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        {selectedEnquiryForView.status || 'New Enquiry'}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Submission Date</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                      {selectedEnquiryForView.saveDate || '—'} ({selectedEnquiryForView.saveTime || '—'})
+                    </span>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <span className="text-slate-400 font-semibold block uppercase">Notes</span>
+                    <p className="font-semibold text-slate-700 text-sm mt-1 p-3 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed whitespace-pre-wrap">
+                      {selectedEnquiryForView.notes || 'No notes added for this enquiry.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category 5: Automatically Detected Future/Custom Fields */}
+              {(() => {
+                const knownKeys = ['_id', 'schoolId', 'studentName', 'gender', 'dob', 'classSeeking', 'currentSchool', 'currentClass', 'parentName', 'mobile', 'whatsapp', 'email', 'state', 'city', 'area', 'fullAddress', 'notes', 'source', 'enquiryId', 'saveDate', 'saveTime', 'status', 'isConvertedToAdmission', 'convertedAt', 'isDeleted', 'createdAt', 'updatedAt', '__v'];
+                const customFields = Object.keys(selectedEnquiryForView).filter(key => !knownKeys.includes(key));
+                if (customFields.length === 0) return null;
+                return (
+                  <div className="space-y-4 pt-2">
+                    <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                      <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                        Custom / Dynamic Fields
+                      </h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                      {customFields.map(key => (
+                        <div key={key}>
+                          <span className="text-slate-400 font-semibold block uppercase">{key}</span>
+                          <span className="font-bold text-slate-700 text-sm mt-0.5 block text-left">
+                            {typeof selectedEnquiryForView[key] === 'object' 
+                              ? JSON.stringify(selectedEnquiryForView[key]) 
+                              : String(selectedEnquiryForView[key]) || '—'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setViewModalOpen(false);
+                  setSelectedEnquiryForView(null);
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Edit Enquiry Modal */}
+      {editModalOpen && selectedEnquiryForEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+          >
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                <Edit className="h-4.5 w-4.5 text-indigo-650" />
+                Edit Enquiry Status
+              </h3>
+              <button
+                onClick={() => {
+                  setEditModalOpen(false);
+                  setSelectedEnquiryForEdit(null);
+                }}
+                className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 text-left">
+              <p className="text-xs text-slate-500 leading-normal">
+                Updating status for <span className="font-bold text-slate-700">{selectedEnquiryForEdit.studentName}</span> (ID: {selectedEnquiryForEdit.enquiryId}).
+              </p>
+              
+              <div className="flex flex-col gap-1.5">
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Enquiry Status
+                </label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  <option value="New Enquiry">New Enquiry</option>
+                  <option value="Hold">Hold</option>
+                  <option value="Not Interested">Not Interested</option>
+                  <option value="Admission Confirmed">Admission Confirmed</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditModalOpen(false);
+                  setSelectedEnquiryForEdit(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                className="bg-indigo-600 hover:bg-indigo-700"
+                onClick={async () => {
+                  await handleStatusChange(selectedEnquiryForEdit._id, editStatus);
+                  setEditModalOpen(false);
+                  setSelectedEnquiryForEdit(null);
+                }}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   );
