@@ -21,13 +21,13 @@ const storage = multer.diskStorage({
 
 // File filter (images and PDFs only)
 const fileFilter = (req, file, cb) => {
-  const allowedExtensions = ['.png', '.jpg', '.jpeg', '.pdf'];
+  const allowedExtensions = ['.png', '.jpg', '.jpeg', '.pdf', '.webp'];
   const ext = path.extname(file.originalname).toLowerCase();
   
   if (allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Only PNG, JPG, JPEG, and PDF files are allowed'), false);
+    cb(new Error('Only PNG, JPG, JPEG, WEBP, and PDF files are allowed'), false);
   }
 };
 

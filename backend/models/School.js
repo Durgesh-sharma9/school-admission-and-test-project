@@ -71,12 +71,34 @@ const schoolSchema = new mongoose.Schema({
     default: '',
   },
 
-  // Thank You Page CMS Configuration (max 2 social links, 1 PDF, 1 image)
+  // Thank You Page CMS Configuration (max 4 social links, PDF/Image brochure, PDF/Image fee structure, image banner)
   thankYouCms: {
+    // Keep backward compatibility fields
     socialLink1: { type: String, default: '' },
     socialLink2: { type: String, default: '' },
     pdfUrl: { type: String, default: '' },
     imageUrl: { type: String, default: '' },
+
+    // Upgraded fields
+    socialLinks: [
+      {
+        platform: { type: String, required: true },
+        url: { type: String, required: true }
+      }
+    ],
+    admissionBrochure: {
+      url: { type: String, default: '' },
+      type: { type: String, default: '' }, // 'pdf' or 'image'
+      mimeType: { type: String, default: '' },
+      filename: { type: String, default: '' }
+    },
+    feeStructure: {
+      url: { type: String, default: '' },
+      type: { type: String, default: '' }, // 'pdf' or 'image'
+      mimeType: { type: String, default: '' },
+      filename: { type: String, default: '' }
+    },
+    banner: { type: String, default: '' }
   },
   settings: {
     minorTypingValidation: { type: Boolean, default: false }

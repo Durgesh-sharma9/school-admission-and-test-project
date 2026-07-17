@@ -1,6 +1,7 @@
 const School = require('../models/School');
 const { uploadFile, deleteFile } = require('../services/uploadService');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 
 // @desc    Update School Details Settings
 // @route   PUT /api/v1/settings
@@ -55,14 +56,81 @@ const updateSettings = async (req, res) => {
 // @access  Private (School Admin)
 const updateThankYouCms = async (req, res) => {
   try {
-    const { socialLink1, socialLink2, pdfUrl, imageUrl } = req.body;
+    const { 
+      socialLinks, 
+      admissionBrochure, 
+      feeStructure, 
+      banner,
+      // legacy fields for backward compatibility
+      socialLink1,
+      socialLink2,
+      pdfUrl,
+      imageUrl
+    } = req.body;
 
     const school = await School.findById(req.school.id);
     if (!school) {
       return res.status(404).json({ success: false, message: 'School not found' });
     }
 
-    // Clean up files if they are replaced or deleted
+    // 1. Validation checks
+    if (socialLinks !== undefined) {
+      if (!Array.isArray(socialLinks)) {
+        return res.status(400).json({ success: false, message: 'Social links must be an array' });
+      }
+      if (socialLinks.length > 4) {
+        return res.status(400).json({ success: false, message: 'Maximum 4 social links allowed' });
+      }
+
+      // Validate each social link
+      const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
+      const allowedPlatforms = ['Instagram', 'Facebook', 'YouTube', 'WhatsApp', 'LinkedIn', 'X (Twitter)', 'Telegram', 'School Website', 'Other'];
+      
+      for (const link of socialLinks) {
+        if (!link.platform || !link.url) {
+          return res.status(400).json({ success: false, message: 'Each social link must contain both platform and URL fields' });
+        }
+        if (!allowedPlatforms.includes(link.platform)) {
+          return res.status(400).json({ success: false, message: `Invalid platform selected: ${link.platform}` });
+        }
+        if (!urlRegex.test(link.url)) {
+          return res.status(400).json({ success: false, message: `Invalid URL format: ${link.url}` });
+        }
+      }
+    }
+
+    // Validate brochure & fee structure structure
+    const fileValidate = (field, name) => {
+      if (field && field.url) {
+        const allowedTypes = ['pdf', 'image'];
+        if (field.type && !allowedTypes.includes(field.type)) {
+          return `${name} type must be either 'pdf' or 'image'`;
+        }
+      }
+      return null;
+    };
+
+    let brochureErr = fileValidate(admissionBrochure, 'Admission Brochure');
+    if (brochureErr) return res.status(400).json({ success: false, message: brochureErr });
+
+    let feeErr = fileValidate(feeStructure, 'Fee Structure');
+    if (feeErr) return res.status(400).json({ success: false, message: feeErr });
+
+    // 2. Clean up old files if they are replaced or deleted
+    // Admission Brochure cleanup
+    if (admissionBrochure !== undefined && school.thankYouCms.admissionBrochure && school.thankYouCms.admissionBrochure.url && school.thankYouCms.admissionBrochure.url !== admissionBrochure.url) {
+      await deleteFile(school.thankYouCms.admissionBrochure.url);
+    }
+    // Fee Structure cleanup
+    if (feeStructure !== undefined && school.thankYouCms.feeStructure && school.thankYouCms.feeStructure.url && school.thankYouCms.feeStructure.url !== feeStructure.url) {
+      await deleteFile(school.thankYouCms.feeStructure.url);
+    }
+    // Banner cleanup
+    if (banner !== undefined && school.thankYouCms.banner && school.thankYouCms.banner !== banner) {
+      await deleteFile(school.thankYouCms.banner);
+    }
+
+    // Clean up legacy fields as well if they are replaced
     if (pdfUrl !== undefined && school.thankYouCms.pdfUrl && school.thankYouCms.pdfUrl !== pdfUrl) {
       await deleteFile(school.thankYouCms.pdfUrl);
     }
@@ -70,7 +138,13 @@ const updateThankYouCms = async (req, res) => {
       await deleteFile(school.thankYouCms.imageUrl);
     }
 
-    // Update object fields
+    // 3. Update fields
+    if (socialLinks !== undefined) school.thankYouCms.socialLinks = socialLinks;
+    if (admissionBrochure !== undefined) school.thankYouCms.admissionBrochure = admissionBrochure;
+    if (feeStructure !== undefined) school.thankYouCms.feeStructure = feeStructure;
+    if (banner !== undefined) school.thankYouCms.banner = banner;
+
+    // Legacy fields update for backward compatibility
     if (socialLink1 !== undefined) school.thankYouCms.socialLink1 = socialLink1;
     if (socialLink2 !== undefined) school.thankYouCms.socialLink2 = socialLink2;
     if (pdfUrl !== undefined) school.thankYouCms.pdfUrl = pdfUrl;
@@ -101,10 +175,18 @@ const uploadMedia = async (req, res) => {
     // Upload using service
     const fileUrl = await uploadFile(req.file);
 
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const type = ext === '.pdf' ? 'pdf' : 'image';
+    const mimeType = req.file.mimetype;
+    const filename = req.file.originalname;
+
     return res.json({
       success: true,
       message: 'File uploaded successfully',
       fileUrl,
+      type,
+      mimeType,
+      filename,
     });
   } catch (error) {
     console.error('Upload media error:', error);
