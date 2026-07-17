@@ -42,6 +42,16 @@ const enquirySchema = new mongoose.Schema({
     trim: true,
     default: '',
   },
+  previousSchool: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  previousClass: {
+    type: String,
+    trim: true,
+    default: '',
+  },
 
   // Parent Information
   parentName: {
@@ -66,6 +76,11 @@ const enquirySchema = new mongoose.Schema({
   },
 
   // Address
+  state: {
+    type: String,
+    required: [true, 'State is required'],
+    trim: true,
+  },
   city: {
     type: String,
     required: [true, 'City is required'],
@@ -76,7 +91,24 @@ const enquirySchema = new mongoose.Schema({
     required: [true, 'Area / Locality is required'],
     trim: true,
   },
+  society: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   fullAddress: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+
+  // Expectations & Source
+  source: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  expectations: {
     type: String,
     trim: true,
     default: '',

@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import AdmissionForm from '../components/AdmissionForm';
 import {
   Search,
   Filter,
@@ -62,6 +63,7 @@ const Enquiries = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
   const [editStatus, setEditStatus] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const fetchEnquiries = async () => {
     try {
@@ -128,7 +130,7 @@ const Enquiries = () => {
           return;
         }
 
-        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'City', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
+        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'State', 'Locality', 'City', 'Society', 'Previous School', 'Previous Class', 'Source', 'Expectations', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
         const csvRows = [headers.join(',')];
 
         data.forEach(item => {
@@ -139,7 +141,14 @@ const Enquiries = () => {
             `"${item.mobile || ''}"`,
             `"${item.email || ''}"`,
             `"${item.classSeeking || ''}"`,
+            `"${item.state || ''}"`,
+            `"${item.area || ''}"`,
             `"${item.city || ''}"`,
+            `"${item.society || ''}"`,
+            `"${item.previousSchool || item.currentSchool || ''}"`,
+            `"${item.previousClass || item.currentClass || ''}"`,
+            `"${item.source || ''}"`,
+            `"${(item.expectations || '').replace(/"/g, '""')}"`,
             `"${item.status || ''}"`,
             `"${item.saveDate || ''}"`,
             `"${item.saveTime || ''}"`,
@@ -202,6 +211,26 @@ const Enquiries = () => {
       }
     } catch (error) {
       toast.error(error.message || 'Failed to update status');
+    }
+  };
+
+  // Save full enquiry changes from Edit modal
+  const handleEditEnquiry = async (formData) => {
+    try {
+      setSaving(true);
+      // Clean up previous/current fields mapping before sending
+      const payload = { ...formData };
+      const response = await api.put(`/enquiries/${selectedEnquiryForEdit._id}`, payload);
+      if (response.success) {
+        toast.success('Enquiry updated successfully!');
+        setEditModalOpen(false);
+        setSelectedEnquiryForEdit(null);
+        fetchEnquiries();
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to update enquiry');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -840,12 +869,12 @@ const Enquiries = () => {
                     <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.classSeeking || '—'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Current School</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.currentSchool || '—'}</span>
+                    <span className="text-slate-400 font-semibold block uppercase">Previous School</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.previousSchool || selectedEnquiryForView.currentSchool || '—'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Current Class</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.currentClass || '—'}</span>
+                    <span className="text-slate-400 font-semibold block uppercase">Previous Class</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.previousClass || selectedEnquiryForView.currentClass || '—'}</span>
                   </div>
                 </div>
               </div>
@@ -896,12 +925,16 @@ const Enquiries = () => {
                     <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.state || '—'}</span>
                   </div>
                   <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Locality / Area</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.area || '—'}</span>
+                  </div>
+                  <div>
                     <span className="text-slate-400 font-semibold block uppercase">City</span>
                     <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.city || '—'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Area / Locality</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.area || '—'}</span>
+                    <span className="text-slate-400 font-semibold block uppercase">Society / Township</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.society || '—'}</span>
                   </div>
                   <div className="sm:col-span-3">
                     <span className="text-slate-400 font-semibold block uppercase">Full Address</span>
@@ -923,7 +956,7 @@ const Enquiries = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   <div>
                     <span className="text-slate-400 font-semibold block uppercase">Source</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.source || 'Direct Enquiry'}</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.source || '—'}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block uppercase">Current Status</span>
@@ -939,6 +972,28 @@ const Enquiries = () => {
                       {selectedEnquiryForView.saveDate || '—'} ({selectedEnquiryForView.saveTime || '—'})
                     </span>
                   </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Created Date</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                      {selectedEnquiryForView.createdAt ? new Date(selectedEnquiryForView.createdAt).toLocaleString() : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Updated Date</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                      {selectedEnquiryForView.updatedAt ? new Date(selectedEnquiryForView.updatedAt).toLocaleString() : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block uppercase">Enquiry ID</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.enquiryId || '—'}</span>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <span className="text-slate-400 font-semibold block uppercase">Parent Expectations</span>
+                    <p className="font-semibold text-slate-700 text-sm mt-1 p-3 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed whitespace-pre-wrap">
+                      {selectedEnquiryForView.expectations || 'No expectations provided.'}
+                    </p>
+                  </div>
                   <div className="sm:col-span-3">
                     <span className="text-slate-400 font-semibold block uppercase">Notes</span>
                     <p className="font-semibold text-slate-700 text-sm mt-1 p-3 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed whitespace-pre-wrap">
@@ -950,7 +1005,7 @@ const Enquiries = () => {
 
               {/* Category 5: Automatically Detected Future/Custom Fields */}
               {(() => {
-                const knownKeys = ['_id', 'schoolId', 'studentName', 'gender', 'dob', 'classSeeking', 'currentSchool', 'currentClass', 'parentName', 'mobile', 'whatsapp', 'email', 'state', 'city', 'area', 'fullAddress', 'notes', 'source', 'enquiryId', 'saveDate', 'saveTime', 'status', 'isConvertedToAdmission', 'convertedAt', 'isDeleted', 'createdAt', 'updatedAt', '__v'];
+                const knownKeys = ['_id', 'schoolId', 'studentName', 'gender', 'dob', 'classSeeking', 'currentSchool', 'currentClass', 'previousSchool', 'previousClass', 'parentName', 'mobile', 'whatsapp', 'email', 'state', 'city', 'area', 'society', 'fullAddress', 'notes', 'source', 'expectations', 'enquiryId', 'saveDate', 'saveTime', 'status', 'isConvertedToAdmission', 'convertedAt', 'isDeleted', 'createdAt', 'updatedAt', '__v'];
                 const customFields = Object.keys(selectedEnquiryForView).filter(key => !knownKeys.includes(key));
                 if (customFields.length === 0) return null;
                 return (
@@ -997,16 +1052,16 @@ const Enquiries = () => {
 
       {/* Edit Enquiry Modal */}
       {editModalOpen && selectedEnquiryForEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden"
+            className="w-full max-w-4xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-8"
           >
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                 <Edit className="h-4.5 w-4.5 text-indigo-650" />
-                Edit Enquiry Status
+                Edit Enquiry: {selectedEnquiryForEdit.studentName}
               </h3>
               <button
                 onClick={() => {
@@ -1019,29 +1074,16 @@ const Enquiries = () => {
               </button>
             </div>
 
-            <div className="p-6 space-y-4 text-left">
-              <p className="text-xs text-slate-500 leading-normal">
-                Updating status for <span className="font-bold text-slate-700">{selectedEnquiryForEdit.studentName}</span> (ID: {selectedEnquiryForEdit.enquiryId}).
-              </p>
-              
-              <div className="flex flex-col gap-1.5">
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Enquiry Status
-                </label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                >
-                  <option value="New Enquiry">New Enquiry</option>
-                  <option value="Hold">Hold</option>
-                  <option value="Not Interested">Not Interested</option>
-                  <option value="Admission Confirmed">Admission Confirmed</option>
-                </select>
-              </div>
+            <div className="p-6 max-h-[70vh] overflow-y-auto bg-slate-50/30">
+              <AdmissionForm
+                initialData={selectedEnquiryForEdit}
+                onSubmit={handleEditEnquiry}
+                isLoading={saving}
+                isPublic={false}
+              />
             </div>
 
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -1050,17 +1092,6 @@ const Enquiries = () => {
                 }}
               >
                 Cancel
-              </Button>
-              <Button
-                variant="primary"
-                className="bg-indigo-600 hover:bg-indigo-700"
-                onClick={async () => {
-                  await handleStatusChange(selectedEnquiryForEdit._id, editStatus);
-                  setEditModalOpen(false);
-                  setSelectedEnquiryForEdit(null);
-                }}
-              >
-                Save Changes
               </Button>
             </div>
           </motion.div>

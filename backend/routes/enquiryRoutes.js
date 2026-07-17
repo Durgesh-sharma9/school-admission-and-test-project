@@ -5,6 +5,7 @@ const {
   getDashboardStats,
   createEnquiryManual,
   createEnquiryPublic,
+  updateEnquiry,
   updateEnquiryStatus,
   convertToAdmission,
   deleteEnquiry,
@@ -15,6 +16,7 @@ const { protect } = require('../middleware/auth');
 router.get('/', protect, getEnquiries);
 router.get('/stats', protect, getDashboardStats);
 router.post('/', protect, createEnquiryManual);
+router.put('/:id', protect, updateEnquiry);
 router.patch('/:id/status', protect, updateEnquiryStatus);
 router.post('/:id/convert', protect, convertToAdmission);
 router.delete('/:id', protect, deleteEnquiry);

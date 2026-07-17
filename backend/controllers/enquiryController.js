@@ -48,14 +48,19 @@ const getEnquiries = async (req, res) => {
       if (endDate) query.saveDate.$lte = endDate;
     }
 
-    // Apply search filter if provided (matching name, parent, mobile, city, or enquiryId)
+    // Apply search filter if provided (matching name, parent, mobile, state, city, area, society, previousSchool, source, or enquiryId)
     if (search) {
       query.$or = [
         { studentName: { $regex: search, $options: 'i' } },
         { parentName: { $regex: search, $options: 'i' } },
         { mobile: { $regex: search, $options: 'i' } },
         { enquiryId: { $regex: search, $options: 'i' } },
+        { state: { $regex: search, $options: 'i' } },
         { city: { $regex: search, $options: 'i' } },
+        { area: { $regex: search, $options: 'i' } },
+        { society: { $regex: search, $options: 'i' } },
+        { previousSchool: { $regex: search, $options: 'i' } },
+        { source: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -243,6 +248,48 @@ const createEnquiryPublic = async (req, res) => {
   }
 };
 
+// @desc    Update full enquiry details
+// @route   PUT /api/v1/enquiries/:id
+// @access  Private (School Admin)
+const updateEnquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const schoolId = req.school.id;
+    const updateData = req.body;
+
+    const enquiry = await Enquiry.findOneAndUpdate(
+      { _id: id, schoolId: new mongoose.Types.ObjectId(schoolId) },
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!enquiry) {
+      return res.status(404).json({ success: false, message: 'Enquiry not found or unauthorized' });
+    }
+
+    // Trigger Notification Log
+    await createNotification(
+      schoolId,
+      'Enquiry Updated',
+      `Enquiry details updated for student ${enquiry.studentName} (ID: ${enquiry.enquiryId})`,
+      'status_changed'
+    );
+
+    return res.json({
+      success: true,
+      message: 'Enquiry updated successfully',
+      data: enquiry,
+    });
+  } catch (error) {
+    console.error('Update enquiry error:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ success: false, message: messages.join(', ') });
+    }
+    return res.status(500).json({ success: false, message: 'Server error updating enquiry' });
+  }
+};
+
 // @desc    Update enquiry status
 // @route   PATCH /api/v1/enquiries/:id/status
 // @access  Private (School Admin)
@@ -364,6 +411,7 @@ module.exports = {
   getDashboardStats,
   createEnquiryManual,
   createEnquiryPublic,
+  updateEnquiry,
   updateEnquiryStatus,
   convertToAdmission,
   deleteEnquiry,

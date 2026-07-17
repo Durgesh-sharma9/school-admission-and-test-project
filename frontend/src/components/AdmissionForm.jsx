@@ -4,11 +4,51 @@ import Input from './Input';
 import Button from './Button';
 import { User, Users, MapPin, FileText } from 'lucide-react';
 
+const INDIAN_STATES = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry"
+];
+
 const AdmissionForm = ({
   onSubmit,
   isLoading = false,
   isPublic = false,
   schoolName = '',
+  initialData = null,
 }) => {
   const {
     register,
@@ -23,21 +63,86 @@ const AdmissionForm = ({
       gender: '',
       dob: '',
       classSeeking: '',
-      currentSchool: '',
-      currentClass: '',
+      previousSchool: '',
+      previousClass: '',
       parentName: '',
       mobile: '',
       whatsapp: '',
       email: '',
-      city: '',
+      state: '',
       area: '',
+      city: '',
+      society: '',
       fullAddress: '',
+      source: '',
+      expectations: '',
       notes: '',
       status: 'New Enquiry',
     },
   });
 
   const watchMobile = watch('mobile');
+  const watchState = watch('state');
+
+  const [stateSearch, setStateSearch] = React.useState('');
+  const [showStateDropdown, setShowStateDropdown] = React.useState(false);
+  const dropdownRef = React.useRef(null);
+
+  // Sync state search input on load/change
+  React.useEffect(() => {
+    setStateSearch(watchState || '');
+  }, [watchState]);
+
+  // Click outside listener for dropdown
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStateDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Sync initialData in Edit mode
+  React.useEffect(() => {
+    if (initialData) {
+      const formattedData = { ...initialData };
+      if (formattedData.dob) {
+        formattedData.dob = new Date(formattedData.dob).toISOString().split('T')[0];
+      }
+      // Populate previous fields from current fields for old records
+      if (formattedData.currentSchool && !formattedData.previousSchool) {
+        formattedData.previousSchool = formattedData.currentSchool;
+      }
+      if (formattedData.currentClass && !formattedData.previousClass) {
+        formattedData.previousClass = formattedData.currentClass;
+      }
+      reset(formattedData);
+    } else {
+      reset({
+        studentName: '',
+        gender: '',
+        dob: '',
+        classSeeking: '',
+        previousSchool: '',
+        previousClass: '',
+        parentName: '',
+        mobile: '',
+        whatsapp: '',
+        email: '',
+        state: '',
+        area: '',
+        city: '',
+        society: '',
+        fullAddress: '',
+        source: '',
+        expectations: '',
+        notes: '',
+        status: 'New Enquiry',
+      });
+    }
+  }, [initialData, reset]);
 
   // Copy mobile number to WhatsApp number if requested
   const copyMobileToWhatsapp = () => {
@@ -53,6 +158,10 @@ const AdmissionForm = ({
       console.error(error);
     }
   };
+
+  const filteredStates = INDIAN_STATES.filter(st =>
+    st.toLowerCase().includes(stateSearch.toLowerCase())
+  );
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-4xl mx-auto">
@@ -111,19 +220,19 @@ const AdmissionForm = ({
           />
 
           <Input
-            label="Current School (Optional)"
-            name="currentSchool"
+            label="Previous School (Optional)"
+            name="previousSchool"
             placeholder="e.g. Greenwood Nursery"
-            error={errors.currentSchool}
-            {...register('currentSchool')}
+            error={errors.previousSchool}
+            {...register('previousSchool')}
           />
 
           <Input
-            label="Current Class (Optional)"
-            name="currentClass"
+            label="Previous Class (Optional)"
+            name="previousClass"
             placeholder="e.g. Grade 4"
-            error={errors.currentClass}
-            {...register('currentClass')}
+            error={errors.previousClass}
+            {...register('previousClass')}
           />
         </div>
       </div>
@@ -220,6 +329,64 @@ const AdmissionForm = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Autocomplete State Input */}
+          <div className="relative flex flex-col gap-1.5 text-left" ref={dropdownRef}>
+            <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase">
+              State <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Type to search State... e.g. Rajasthan"
+              value={stateSearch}
+              onChange={(e) => {
+                const val = e.target.value;
+                setStateSearch(val);
+                setValue('state', val, { shouldValidate: true });
+                setShowStateDropdown(true);
+              }}
+              onFocus={() => setShowStateDropdown(true)}
+              className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${
+                errors.state ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+              }`}
+            />
+            <input
+              type="hidden"
+              {...register('state', { required: 'State is required' })}
+            />
+            {showStateDropdown && filteredStates.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 divide-y divide-slate-100">
+                {filteredStates.map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => {
+                      setValue('state', st, { shouldValidate: true });
+                      setStateSearch(st);
+                      setShowStateDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-semibold"
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            )}
+            {errors.state && (
+              <span className="text-xs text-red-500 font-medium mt-0.5">
+                {errors.state.message}
+              </span>
+            )}
+          </div>
+
+          <Input
+            label="Locality / Area"
+            name="area"
+            placeholder="e.g. Andheri West"
+            required
+            error={errors.area}
+            {...register('area', { required: 'Locality/Area is required' })}
+          />
+
           <Input
             label="City"
             name="city"
@@ -230,12 +397,11 @@ const AdmissionForm = ({
           />
 
           <Input
-            label="Area / Locality"
-            name="area"
-            placeholder="e.g. Andheri West"
-            required
-            error={errors.area}
-            {...register('area', { required: 'Area/Locality is required' })}
+            label="Society / Township (Optional)"
+            name="society"
+            placeholder="e.g. Mahima Panorama"
+            error={errors.society}
+            {...register('society')}
           />
 
           <div className="sm:col-span-2">
@@ -251,7 +417,71 @@ const AdmissionForm = ({
         </div>
       </div>
 
-      {/* Section 4: Admin Options or Additional Notes */}
+      {/* Section 4: How did you hear about us? */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+          <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+            <Users className="h-4.5 w-4.5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+            How did you hear about us?
+          </h3>
+        </div>
+
+        <div className="max-w-xs text-left">
+          <Input
+            label="Source (Optional)"
+            name="source"
+            type="select"
+            placeholder="Select Source"
+            error={errors.source}
+            options={[
+              { value: 'Google Search', label: 'Google Search' },
+              { value: 'Facebook', label: 'Facebook' },
+              { value: 'Instagram', label: 'Instagram' },
+              { value: 'YouTube', label: 'YouTube' },
+              { value: 'School Website', label: 'School Website' },
+              { value: 'Friend / Relative', label: 'Friend / Relative' },
+              { value: 'Existing Parent', label: 'Existing Parent' },
+              { value: 'Teacher Reference', label: 'Teacher Reference' },
+              { value: 'Newspaper', label: 'Newspaper' },
+              { value: 'Banner / Hoarding', label: 'Banner / Hoarding' },
+              { value: 'Pamphlet', label: 'Pamphlet' },
+              { value: 'Walk-in', label: 'Walk-in' },
+              { value: 'Reception', label: 'Reception' },
+              { value: 'Education Fair', label: 'Education Fair' },
+              { value: 'WhatsApp', label: 'WhatsApp' },
+              { value: 'Other', label: 'Other' },
+            ]}
+            {...register('source')}
+          />
+        </div>
+      </div>
+
+      {/* Section 5: Parent Expectations */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+          <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+            <FileText className="h-4.5 w-4.5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+            Parent Expectations
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 text-left">
+          <Input
+            label="What do you expect from the school? (Optional)"
+            name="expectations"
+            type="textarea"
+            placeholder="Please tell us what you expect from the school... e.g. Academic Excellence, Sports, Discipline, Transportation, Activities, Safety, Good Teachers, Other expectations"
+            error={errors.expectations}
+            {...register('expectations')}
+          />
+        </div>
+      </div>
+
+      {/* Section 6: Admin Options or Additional Notes */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
         <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
           <div className="p-1.5 bg-slate-50 text-slate-600 rounded-lg">
@@ -266,7 +496,7 @@ const AdmissionForm = ({
           {!isPublic && (
             <div className="max-w-xs">
               <Input
-                label="Enquiry Initial Status"
+                label="Enquiry Status"
                 name="status"
                 type="select"
                 required
