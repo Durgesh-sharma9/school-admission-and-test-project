@@ -65,6 +65,31 @@ const Enquiries = () => {
   const [editStatus, setEditStatus] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Parent History States
+  const [viewingParentMobile, setViewingParentMobile] = useState(null);
+  const [parentHistoryData, setParentHistoryData] = useState(null);
+  const [parentHistoryLoading, setParentHistoryLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchParentHistory = async () => {
+      if (!viewingParentMobile) return;
+      setParentHistoryLoading(true);
+      try {
+        const response = await api.get(`/enquiries/parent-recognition/${viewingParentMobile}`);
+        if (response.success) {
+          setParentHistoryData(response);
+        } else {
+          toast.error('Failed to load parent history details');
+        }
+      } catch (error) {
+        toast.error(error.message || 'Error fetching parent history');
+      } finally {
+        setParentHistoryLoading(false);
+      }
+    };
+    fetchParentHistory();
+  }, [viewingParentMobile]);
+
   const fetchEnquiries = async () => {
     try {
       setLoading(true);
@@ -304,6 +329,144 @@ const Enquiries = () => {
     setMessageModalOpen(false);
   };
 
+  if (viewingParentMobile) {
+    if (parentHistoryLoading) {
+      return <Loader message="Loading Parent History Profile..." />;
+    }
+
+    const parent = parentHistoryData?.parent || {};
+    const enquiriesList = parentHistoryData?.enquiries || [];
+    const childrenList = parentHistoryData?.children || [];
+
+    return (
+      <div className="space-y-6 text-left">
+        {/* Header with back trigger */}
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => {
+              setViewingParentMobile(null);
+              setParentHistoryData(null);
+            }}
+            className="p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded-xl text-slate-550 hover:text-slate-800 transition-colors shadow-xs"
+          >
+            <ChevronLeft className="h-4.5 w-4.5" />
+          </button>
+          <div>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Parent Family History Profile</h2>
+            <p className="text-slate-500 text-sm mt-0.5 font-semibold">
+              Comprehensive registry of family members, siblings, and academic applications.
+            </p>
+          </div>
+        </div>
+
+        {/* Parent Information Card */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Parent Name</span>
+            <span className="text-sm font-bold text-slate-800">{parent.parentName || 'N/A'}</span>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Mobile Number</span>
+            <span className="text-sm font-bold text-slate-800">{parent.mobile || 'N/A'}</span>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">WhatsApp Number</span>
+            <span className="text-sm font-bold text-slate-800">{parent.whatsapp || 'N/A'}</span>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Email Address</span>
+            <span className="text-sm font-bold text-slate-800">{parent.email || 'N/A'}</span>
+          </div>
+          {parent.fullAddress && (
+            <div className="md:col-span-4 border-t border-slate-50 pt-4">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Address</span>
+              <span className="text-xs font-semibold text-slate-650">
+                {parent.fullAddress}, {parent.area}, {parent.city}, {parent.state}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Children Tagged list */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-3">
+          <h4 className="text-xs font-bold text-slate-700 uppercase">Children Registered</h4>
+          <div className="flex flex-wrap gap-2">
+            {childrenList.map((child, cIdx) => (
+              <span
+                key={cIdx}
+                className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-bold"
+              >
+                👦 {child}
+              </span>
+            ))}
+            {childrenList.length === 0 && (
+              <span className="text-xs text-slate-400 italic">No child profiles linked yet.</span>
+            )}
+          </div>
+        </div>
+
+        {/* Enquiries history table */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-700 uppercase">Previous Enquiries History</h3>
+            <span className="text-xs font-bold text-indigo-650 bg-indigo-50/50 px-2 py-0.5 rounded-lg border border-indigo-100">
+              {enquiriesList.length} Applications
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-455 font-bold uppercase">
+                <tr>
+                  <th className="px-6 py-4">Enquiry ID</th>
+                  <th className="px-6 py-4">Student Name</th>
+                  <th className="px-6 py-4">Class</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Created Date</th>
+                  <th className="px-6 py-4 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 font-medium">
+                {enquiriesList.map((enq) => (
+                  <tr key={enq._id} className="hover:bg-slate-50/30 transition-colors">
+                    <td className="px-6 py-4 font-bold text-slate-800">{enq.enquiryId}</td>
+                    <td className="px-6 py-4 font-bold text-slate-850">{enq.studentName}</td>
+                    <td className="px-6 py-4 text-slate-600">{enq.classSeeking}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                        enq.status === 'Admission Confirmed'
+                          ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                          : enq.status === 'Hold'
+                          ? 'bg-amber-50 border-amber-100 text-amber-705'
+                          : enq.status === 'Not Interested'
+                          ? 'bg-rose-50 border-rose-100 text-rose-700'
+                          : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+                      }`}>
+                        {enq.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-400">{enq.saveDate}</td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => {
+                          setSelectedEnquiryForView(enq);
+                          setViewModalOpen(true);
+                        }}
+                        className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-colors text-[10px]"
+                      >
+                        Open Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Top action header */}
@@ -533,7 +696,13 @@ const Enquiries = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-slate-700 block">{enq.parentName}</span>
+                      <span
+                        onClick={() => setViewingParentMobile(enq.mobile)}
+                        className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline"
+                        title="View Parent & Family History Profile"
+                      >
+                        {enq.parentName}
+                      </span>
                       <span className="text-[10px] text-slate-400 font-medium block">
                         📞 {enq.mobile}
                       </span>

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Enquiry = require('../models/Enquiry');
 const School = require('../models/School');
+const ParentProfile = require('../models/ParentProfile');
 const generateEnquiryId = require('../utils/enquiryIdGenerator');
 const createNotification = require('../utils/createNotification');
 
@@ -145,6 +146,32 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// Helper to upsert parent profile
+const upsertParentProfile = async (schoolId, data) => {
+  try {
+    if (!data.mobile) return;
+    
+    await ParentProfile.findOneAndUpdate(
+      { schoolId: new mongoose.Types.ObjectId(schoolId), mobile: data.mobile.trim() },
+      {
+        $set: {
+          parentName: data.parentName ? data.parentName.trim() : '',
+          whatsapp: data.whatsapp ? data.whatsapp.trim() : '',
+          email: data.email ? data.email.trim() : '',
+          state: data.state ? data.state.trim() : '',
+          city: data.city ? data.city.trim() : '',
+          area: data.area ? data.area.trim() : '',
+          society: data.society ? data.society.trim() : '',
+          fullAddress: data.fullAddress ? data.fullAddress.trim() : ''
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch (error) {
+    console.error('Failed to upsert ParentProfile:', error);
+  }
+};
+
 // @desc    Admin creates an enquiry manually
 // @route   POST /api/v1/enquiries
 // @access  Private (School Admin)
@@ -166,6 +193,9 @@ const createEnquiryManual = async (req, res) => {
     });
 
     await enquiry.save();
+
+    // Upsert parent profile
+    await upsertParentProfile(schoolId, enquiryData);
 
     // Trigger Notification Log
     await createNotification(
@@ -217,6 +247,9 @@ const createEnquiryPublic = async (req, res) => {
     });
 
     await enquiry.save();
+
+    // Upsert parent profile
+    await upsertParentProfile(schoolId, enquiryData);
 
     // Trigger Notification Log
     await createNotification(
@@ -407,6 +440,80 @@ const deleteEnquiry = async (req, res) => {
   }
 };
 
+// @desc    Check parent history by mobile number
+// @route   GET /api/v1/enquiries/parent-recognition/:mobile
+// @access  Public
+const parentRecognition = async (req, res) => {
+  try {
+    const { mobile } = req.params;
+    const schoolId = req.query.schoolId || (req.school && req.school.id);
+
+    if (!schoolId) {
+      return res.status(400).json({ success: false, message: 'School identification is mandatory' });
+    }
+
+    if (!mobile || mobile.trim().length !== 10) {
+      return res.status(400).json({ success: false, message: 'A valid 10-digit mobile number is required' });
+    }
+
+    // Find parent profile or check enquiries
+    let parent = await ParentProfile.findOne({
+      schoolId: new mongoose.Types.ObjectId(schoolId),
+      mobile: mobile.trim()
+    });
+
+    // Fallback: If parent profile doesn't exist yet, search in existing enquiries
+    if (!parent) {
+      const existingEnquiry = await Enquiry.findOne({
+        schoolId: new mongoose.Types.ObjectId(schoolId),
+        mobile: mobile.trim(),
+        isDeleted: { $ne: true }
+      });
+
+      if (existingEnquiry) {
+        parent = new ParentProfile({
+          schoolId: new mongoose.Types.ObjectId(schoolId),
+          mobile: mobile.trim(),
+          parentName: existingEnquiry.parentName,
+          whatsapp: existingEnquiry.whatsapp || '',
+          email: existingEnquiry.email || '',
+          state: existingEnquiry.state || '',
+          city: existingEnquiry.city || '',
+          area: existingEnquiry.area || '',
+          society: existingEnquiry.society || '',
+          fullAddress: existingEnquiry.fullAddress || ''
+        });
+        await parent.save();
+      }
+    }
+
+    if (!parent) {
+      return res.json({ success: true, exists: false });
+    }
+
+    // Fetch previous enquiries
+    const enquiries = await Enquiry.find({
+      schoolId: new mongoose.Types.ObjectId(schoolId),
+      mobile: mobile.trim(),
+      isDeleted: { $ne: true }
+    }).sort({ createdAt: -1 });
+
+    const children = [...new Set(enquiries.map(e => e.studentName))];
+
+    return res.json({
+      success: true,
+      exists: true,
+      parent,
+      enquiriesCount: enquiries.length,
+      children,
+      enquiries
+    });
+  } catch (error) {
+    console.error('Parent recognition lookup error:', error);
+    return res.status(500).json({ success: false, message: 'Server error during parent recognition' });
+  }
+};
+
 module.exports = {
   getEnquiries,
   getDashboardStats,
@@ -416,4 +523,5 @@ module.exports = {
   updateEnquiryStatus,
   convertToAdmission,
   deleteEnquiry,
+  parentRecognition,
 };

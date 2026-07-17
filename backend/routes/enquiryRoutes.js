@@ -9,6 +9,7 @@ const {
   updateEnquiryStatus,
   convertToAdmission,
   deleteEnquiry,
+  parentRecognition,
 } = require('../controllers/enquiryController');
 const { protect } = require('../middleware/auth');
 
@@ -23,5 +24,6 @@ router.delete('/:id', protect, deleteEnquiry);
 
 // Public Routes (used for QR code & Reception Link)
 router.post('/public/:schoolId', createEnquiryPublic);
+router.get('/parent-recognition/:mobile', parentRecognition);
 
 module.exports = router;
