@@ -43,6 +43,25 @@ const INDIAN_STATES = [
   "Puducherry"
 ];
 
+const MARKETING_SOURCES = [
+  "Google Search",
+  "Facebook",
+  "Instagram",
+  "YouTube",
+  "School Website",
+  "Friend / Relative",
+  "Existing Parent",
+  "Teacher Reference",
+  "Newspaper",
+  "Banner / Hoarding",
+  "Pamphlet",
+  "Walk-in",
+  "Reception",
+  "Education Fair",
+  "WhatsApp",
+  "Other"
+];
+
 const AdmissionForm = ({
   onSubmit,
   isLoading = false,
@@ -75,6 +94,7 @@ const AdmissionForm = ({
       society: '',
       fullAddress: '',
       source: '',
+      sourceOtherSpecify: '',
       expectations: '',
       notes: '',
       status: 'New Enquiry',
@@ -83,21 +103,34 @@ const AdmissionForm = ({
 
   const watchMobile = watch('mobile');
   const watchState = watch('state');
+  const watchSource = watch('source');
 
   const [stateSearch, setStateSearch] = React.useState('');
   const [showStateDropdown, setShowStateDropdown] = React.useState(false);
   const dropdownRef = React.useRef(null);
+
+  const [sourceSearch, setSourceSearch] = React.useState('');
+  const [showSourceDropdown, setShowSourceDropdown] = React.useState(false);
+  const sourceDropdownRef = React.useRef(null);
 
   // Sync state search input on load/change
   React.useEffect(() => {
     setStateSearch(watchState || '');
   }, [watchState]);
 
-  // Click outside listener for dropdown
+  // Sync source search input on load/change
+  React.useEffect(() => {
+    setSourceSearch(watchSource || '');
+  }, [watchSource]);
+
+  // Click outside listener for dropdowns
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowStateDropdown(false);
+      }
+      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(event.target)) {
+        setShowSourceDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -137,6 +170,7 @@ const AdmissionForm = ({
         society: '',
         fullAddress: '',
         source: '',
+        sourceOtherSpecify: '',
         expectations: '',
         notes: '',
         status: 'New Enquiry',
@@ -163,11 +197,15 @@ const AdmissionForm = ({
     st.toLowerCase().includes(stateSearch.toLowerCase())
   );
 
+  const filteredSources = MARKETING_SOURCES.filter(src =>
+    src.toLowerCase().includes(sourceSearch.toLowerCase())
+  );
+
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-4xl mx-auto">
       {/* Section 1: Student Information */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
           <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
             <User className="h-4.5 w-4.5" />
           </div>
@@ -220,26 +258,28 @@ const AdmissionForm = ({
           />
 
           <Input
-            label="Previous School (Optional)"
+            label="Previous School *"
             name="previousSchool"
             placeholder="e.g. Greenwood Nursery"
+            required
             error={errors.previousSchool}
-            {...register('previousSchool')}
+            {...register('previousSchool', { required: 'Previous school is required' })}
           />
 
           <Input
-            label="Previous Class (Optional)"
+            label="Previous Class *"
             name="previousClass"
             placeholder="e.g. Grade 4"
+            required
             error={errors.previousClass}
-            {...register('previousClass')}
+            {...register('previousClass', { required: 'Previous class is required' })}
           />
         </div>
       </div>
 
       {/* Section 2: Parent / Guardian Information */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
           <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
             <Users className="h-4.5 w-4.5" />
           </div>
@@ -319,7 +359,7 @@ const AdmissionForm = ({
 
       {/* Section 3: Address Details */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
           <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
             <MapPin className="h-4.5 w-4.5" />
           </div>
@@ -417,50 +457,89 @@ const AdmissionForm = ({
         </div>
       </div>
 
-      {/* Section 4: How did you hear about us? */}
+      {/* Section 4: Where did you hear about us? */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
-          <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
+          <div className="p-1.5 bg-purple-50 text-purple-605 rounded-lg">
             <Users className="h-4.5 w-4.5" />
           </div>
           <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
-            How did you hear about us?
+            Where did you hear about us? *
           </h3>
         </div>
 
-        <div className="max-w-xs text-left">
-          <Input
-            label="Source (Optional)"
-            name="source"
-            type="select"
-            placeholder="Select Source"
-            error={errors.source}
-            options={[
-              { value: 'Google Search', label: 'Google Search' },
-              { value: 'Facebook', label: 'Facebook' },
-              { value: 'Instagram', label: 'Instagram' },
-              { value: 'YouTube', label: 'YouTube' },
-              { value: 'School Website', label: 'School Website' },
-              { value: 'Friend / Relative', label: 'Friend / Relative' },
-              { value: 'Existing Parent', label: 'Existing Parent' },
-              { value: 'Teacher Reference', label: 'Teacher Reference' },
-              { value: 'Newspaper', label: 'Newspaper' },
-              { value: 'Banner / Hoarding', label: 'Banner / Hoarding' },
-              { value: 'Pamphlet', label: 'Pamphlet' },
-              { value: 'Walk-in', label: 'Walk-in' },
-              { value: 'Reception', label: 'Reception' },
-              { value: 'Education Fair', label: 'Education Fair' },
-              { value: 'WhatsApp', label: 'WhatsApp' },
-              { value: 'Other', label: 'Other' },
-            ]}
-            {...register('source')}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Autocomplete Source Input */}
+          <div className="relative flex flex-col gap-1.5 text-left animate-in fade-in duration-200" ref={sourceDropdownRef}>
+            <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase">
+              Source <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Type to search Source... e.g. Facebook"
+              value={sourceSearch}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSourceSearch(val);
+                setValue('source', val, { shouldValidate: true });
+                setShowSourceDropdown(true);
+              }}
+              onFocus={() => setShowSourceDropdown(true)}
+              className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${
+                errors.source ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+              }`}
+            />
+            <input
+              type="hidden"
+              {...register('source', { 
+                required: 'Source selection is required',
+                validate: value => MARKETING_SOURCES.includes(value) || 'Please select a valid option from the dropdown'
+              })}
+            />
+            {showSourceDropdown && filteredSources.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 divide-y divide-slate-100">
+                {filteredSources.map((src) => (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => {
+                      setValue('source', src, { shouldValidate: true });
+                      setSourceSearch(src);
+                      setShowSourceDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors font-semibold"
+                  >
+                    {src}
+                  </button>
+                ))}
+              </div>
+            )}
+            {errors.source && (
+              <span className="text-xs text-red-500 font-medium mt-0.5">
+                {errors.source.message}
+              </span>
+            )}
+          </div>
+
+          {/* Conditional "Other" specify field */}
+          {watchSource === 'Other' && (
+            <div className="text-left animate-in slide-in-from-top-2 duration-200">
+              <Input
+                label="Please specify *"
+                name="sourceOtherSpecify"
+                placeholder="e.g. Local Ad Campaign"
+                required
+                error={errors.sourceOtherSpecify}
+                {...register('sourceOtherSpecify', { required: 'Please specify the source details' })}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Section 5: Parent Expectations */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
           <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
             <FileText className="h-4.5 w-4.5" />
           </div>
@@ -483,7 +562,7 @@ const AdmissionForm = ({
 
       {/* Section 6: Admin Options or Additional Notes */}
       <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
-        <div className="flex items-center space-x-2 pb-4 border-b border-slate-50">
+        <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
           <div className="p-1.5 bg-slate-50 text-slate-600 rounded-lg">
             <FileText className="h-4.5 w-4.5" />
           </div>

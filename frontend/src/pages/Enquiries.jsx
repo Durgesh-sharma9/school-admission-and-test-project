@@ -130,7 +130,7 @@ const Enquiries = () => {
           return;
         }
 
-        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'State', 'Locality', 'City', 'Society', 'Previous School', 'Previous Class', 'Source', 'Expectations', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
+        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'State', 'Locality', 'City', 'Society', 'Previous School', 'Previous Class', 'Source', 'Source Details', 'Expectations', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
         const csvRows = [headers.join(',')];
 
         data.forEach(item => {
@@ -148,6 +148,7 @@ const Enquiries = () => {
             `"${item.previousSchool || item.currentSchool || ''}"`,
             `"${item.previousClass || item.currentClass || ''}"`,
             `"${item.source || ''}"`,
+            `"${item.sourceOtherSpecify || ''}"`,
             `"${(item.expectations || '').replace(/"/g, '""')}"`,
             `"${item.status || ''}"`,
             `"${item.saveDate || ''}"`,
@@ -956,7 +957,11 @@ const Enquiries = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   <div>
                     <span className="text-slate-400 font-semibold block uppercase">Source</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.source || '—'}</span>
+                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                      {selectedEnquiryForView.source === 'Other' && selectedEnquiryForView.sourceOtherSpecify
+                        ? `Other (${selectedEnquiryForView.sourceOtherSpecify})`
+                        : selectedEnquiryForView.source || '—'}
+                    </span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block uppercase">Current Status</span>

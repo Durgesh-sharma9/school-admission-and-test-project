@@ -44,13 +44,13 @@ const enquirySchema = new mongoose.Schema({
   },
   previousSchool: {
     type: String,
+    required: [true, 'Previous school is required'],
     trim: true,
-    default: '',
   },
   previousClass: {
     type: String,
+    required: [true, 'Previous class is required'],
     trim: true,
-    default: '',
   },
 
   // Parent Information
@@ -105,6 +105,11 @@ const enquirySchema = new mongoose.Schema({
   // Expectations & Source
   source: {
     type: String,
+    required: [true, 'Source (Where did you hear about us?) is required'],
+    trim: true,
+  },
+  sourceOtherSpecify: {
+    type: String,
     trim: true,
     default: '',
   },
@@ -152,6 +157,19 @@ const enquirySchema = new mongoose.Schema({
   },
 }, {
   timestamps: true,
+});
+
+enquirySchema.pre('validate', function(next) {
+  if (this.currentSchool && !this.previousSchool) {
+    this.previousSchool = this.currentSchool;
+  }
+  if (this.currentClass && !this.previousClass) {
+    this.previousClass = this.currentClass;
+  }
+  if (this.source === 'Other' && (!this.sourceOtherSpecify || this.sourceOtherSpecify.trim() === '')) {
+    this.invalidate('sourceOtherSpecify', 'Please specify details for other source');
+  }
+  next();
 });
 
 module.exports = mongoose.model('Enquiry', enquirySchema);

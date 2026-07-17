@@ -48,7 +48,7 @@ const getEnquiries = async (req, res) => {
       if (endDate) query.saveDate.$lte = endDate;
     }
 
-    // Apply search filter if provided (matching name, parent, mobile, state, city, area, society, previousSchool, source, or enquiryId)
+    // Apply search filter if provided (matching name, parent, mobile, state, city, area, society, previousSchool, source, sourceOtherSpecify, or enquiryId)
     if (search) {
       query.$or = [
         { studentName: { $regex: search, $options: 'i' } },
@@ -61,6 +61,7 @@ const getEnquiries = async (req, res) => {
         { society: { $regex: search, $options: 'i' } },
         { previousSchool: { $regex: search, $options: 'i' } },
         { source: { $regex: search, $options: 'i' } },
+        { sourceOtherSpecify: { $regex: search, $options: 'i' } },
       ];
     }
 
