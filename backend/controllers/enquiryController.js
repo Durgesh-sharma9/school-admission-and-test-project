@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Enquiry = require('../models/Enquiry');
 const School = require('../models/School');
 const generateEnquiryId = require('../utils/enquiryIdGenerator');
@@ -102,7 +103,7 @@ const getDashboardStats = async (req, res) => {
     const schoolId = req.school.id;
 
     const stats = await Enquiry.aggregate([
-      { $match: { schoolId: new Object(schoolId), isDeleted: { $ne: true } } },
+      { $match: { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } } },
       {
         $group: {
           _id: '$status',

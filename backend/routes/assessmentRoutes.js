@@ -20,6 +20,7 @@ const {
 // ==========================================
 // PUBLIC EXAM LOUNGE ROUTES (NO AUTH REQ)
 // ==========================================
+router.get('/assignments/stats', protect, getAssessmentStats);
 router.get('/assignments/:id', getAssignmentById);
 router.put('/assignments/:id/save-progress', saveProgress);
 router.post('/assignments/:id/submit', submitAssessment);
@@ -29,7 +30,6 @@ router.post('/assignments/:id/submit', submitAssessment);
 // ==========================================
 router.get('/', protect, getAssessments);
 router.post('/', protect, createAssessment);
-router.get('/assignments/stats', protect, getAssessmentStats);
 router.get('/assignments/enquiry/:enquiryId', protect, getAssignmentsByEnquiry);
 router.post('/assign', protect, assignAssessment);
 router.put('/assignments/:id/grade', protect, gradeDescriptiveAssessment);
