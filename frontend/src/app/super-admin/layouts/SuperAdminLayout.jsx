@@ -24,8 +24,8 @@ const SuperAdminLayout = () => {
     { name: 'Schools', href: '/super-admin/schools', icon: Building2 },
     { name: 'Plans', href: '/super-admin/plans', icon: CreditCard },
     { name: 'Payments', href: '/super-admin/payments', icon: DollarSign },
+    { name: 'Announcements', href: '/super-admin/announcements', icon: MessageSquare },
     { name: 'Landing CMS', href: '/super-admin/cms', icon: FileText },
-    { name: 'Notifications', href: '/super-admin/notifications', icon: MessageSquare },
     { name: 'Settings', href: '/super-admin/settings', icon: Settings },
     { name: 'Profile', href: '/super-admin/profile', icon: BarChart3 },
   ];

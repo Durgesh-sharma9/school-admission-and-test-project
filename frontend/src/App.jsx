@@ -35,6 +35,7 @@ const SuperAdminSchools = lazy(() => import('./app/super-admin/pages/Schools'));
 const SuperAdminPlans = lazy(() => import('./app/super-admin/pages/Plans'));
 const SuperAdminPayments = lazy(() => import('./app/super-admin/pages/Payments'));
 const SuperAdminLandingCMS = lazy(() => import('./app/super-admin/pages/LandingCMS'));
+const SuperAdminAnnouncements = lazy(() => import('./app/super-admin/pages/Announcements'));
 const SuperAdminNotifications = lazy(() => import('./app/super-admin/pages/Notifications'));
 const SuperAdminSettings = lazy(() => import('./app/super-admin/pages/Settings'));
 const SuperAdminProfile = lazy(() => import('./app/super-admin/pages/Profile'));
@@ -85,6 +86,7 @@ function App() {
                   <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
                   <Route path="/super-admin/payments" element={<SuperAdminPayments />} />
                   <Route path="/super-admin/cms" element={<SuperAdminLandingCMS />} />
+                  <Route path="/super-admin/announcements" element={<SuperAdminAnnouncements />} />
                   <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
                   <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
                   <Route path="/super-admin/profile" element={<SuperAdminProfile />} />
