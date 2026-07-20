@@ -1,4 +1,5 @@
 const School = require('../models/School');
+const SuperAdmin = require('../models/SuperAdmin');
 const generateToken = require('../utils/generateToken');
 const { generateSchoolQrCode } = require('../services/qrService');
 
@@ -40,9 +41,18 @@ const signup = async (req, res) => {
     school.admissionFormLink = admissionFormLink;
     await school.save();
 
+    const token = generateToken(school._id);
+
     return res.status(201).json({
       success: true,
-      token: generateToken(school._id),
+      token,
+      role: 'school-admin',
+      user: {
+        id: school._id,
+        name: school.name,
+        email: school.email,
+        role: 'school-admin',
+      },
       school: {
         id: school._id,
         name: school.name,
@@ -63,7 +73,7 @@ const signup = async (req, res) => {
   }
 };
 
-// @desc    Auth school admin & get token
+// @desc    Unified Login for Super Admin & School Admin
 // @route   POST /api/v1/auth/login
 // @access  Public
 const login = async (req, res) => {
@@ -75,13 +85,50 @@ const login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
 
-    // Find school admin by email
-    const school = await School.findOne({ email });
+    // 1. First check if SuperAdmin exists with this email
+    const superAdmin = await SuperAdmin.findOne({ email }).select('+password');
+    if (superAdmin) {
+      if (!superAdmin.isActive) {
+        return res.status(401).json({ success: false, message: 'Account is deactivated' });
+      }
 
+      const isPasswordMatch = await superAdmin.comparePassword(password);
+      if (isPasswordMatch) {
+        superAdmin.lastLogin = Date.now();
+        await superAdmin.save();
+
+        const token = generateToken(superAdmin._id, 'super-admin');
+        return res.json({
+          success: true,
+          token,
+          role: 'super-admin',
+          user: {
+            id: superAdmin._id,
+            name: superAdmin.name,
+            email: superAdmin.email,
+            role: 'super-admin',
+          },
+          school: null,
+        });
+      } else {
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
+    }
+
+    // 2. If not SuperAdmin, check School collection
+    const school = await School.findOne({ email });
     if (school && (await school.comparePassword(password))) {
+      const token = generateToken(school._id, 'school-admin');
       return res.json({
         success: true,
-        token: generateToken(school._id),
+        token,
+        role: school.role || 'school-admin',
+        user: {
+          id: school._id,
+          name: school.name,
+          email: school.email,
+          role: school.role || 'school-admin',
+        },
         school: {
           id: school._id,
           name: school.name,
@@ -98,9 +145,9 @@ const login = async (req, res) => {
           communicationTemplates: school.communicationTemplates,
         },
       });
-    } else {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
+
+    return res.status(401).json({ success: false, message: 'Invalid email or password' });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ success: false, message: 'Server error during login' });

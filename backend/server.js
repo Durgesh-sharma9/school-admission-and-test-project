@@ -25,6 +25,7 @@ const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const localityRoutes = require('./routes/localityRoutes');
+const superAdminRoutes = require('./routes/superAdminRoutes');
 
 // Connect to Database
 connectDB();
@@ -55,6 +56,7 @@ app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/localities', localityRoutes);
+app.use('/api/v1/super-admin', superAdminRoutes);
 
 // Root Check
 app.get('/api/v1/health', (req, res) => {

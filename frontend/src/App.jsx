@@ -1,72 +1,105 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './shared/contexts/AuthContext';
+import { SuperAdminAuthProvider } from './shared/contexts/SuperAdminAuthContext';
 import { Toaster } from 'react-hot-toast';
-import Loader from './components/Loader';
-import ErrorBoundary from './components/ErrorBoundary';
+import Loader from './shared/components/Loader';
+import ErrorBoundary from './shared/components/ErrorBoundary';
 
-// Layouts
-import DashboardLayout from './layouts/DashboardLayout';
+// Landing Page (Lazy Loaded)
+const LandingPage = lazy(() => import('./app/landing/pages/LandingPage'));
 
-// Admin Pages (Lazy Loaded)
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Enquiries = lazy(() => import('./pages/Enquiries'));
-const AdmissionFormPage = lazy(() => import('./pages/AdmissionFormPage'));
-const QrLinksPage = lazy(() => import('./pages/QrLinksPage'));
-const ThankYouCmsPage = lazy(() => import('./pages/ThankYouCmsPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const AssessmentList = lazy(() => import('./pages/AssessmentList'));
-const AssessmentBuilder = lazy(() => import('./pages/AssessmentBuilder'));
+// School Admin Pages (Lazy Loaded)
+const SchoolLogin = lazy(() => import('./app/school/pages/Login'));
+const SchoolSignup = lazy(() => import('./app/school/pages/Signup'));
+const SchoolDashboard = lazy(() => import('./app/school/pages/Dashboard'));
+const SchoolEnquiries = lazy(() => import('./app/school/pages/Enquiries'));
+const SchoolAdmissionFormPage = lazy(() => import('./app/school/pages/AdmissionFormPage'));
+const SchoolQrLinksPage = lazy(() => import('./app/school/pages/QrLinksPage'));
+const SchoolThankYouCmsPage = lazy(() => import('./app/school/pages/ThankYouCmsPage'));
+const SchoolSettingsPage = lazy(() => import('./app/school/pages/SettingsPage'));
+const SchoolAssessmentList = lazy(() => import('./app/school/pages/AssessmentList'));
+const SchoolAssessmentBuilder = lazy(() => import('./app/school/pages/AssessmentBuilder'));
+const SchoolPublicAdmissionPage = lazy(() => import('./app/school/pages/PublicAdmissionPage'));
+const SchoolPublicThankYouPage = lazy(() => import('./app/school/pages/PublicThankYouPage'));
+const SchoolStudentTest = lazy(() => import('./app/school/pages/StudentTest'));
+const SchoolNotFound = lazy(() => import('./app/school/pages/NotFound'));
 
-// Public Pages (Lazy Loaded)
-const PublicAdmissionPage = lazy(() => import('./pages/PublicAdmissionPage'));
-const PublicThankYouPage = lazy(() => import('./pages/PublicThankYouPage'));
-const StudentTest = lazy(() => import('./pages/StudentTest'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+// School Admin Layout
+const SchoolLayout = lazy(() => import('./app/school/layouts/DashboardLayout'));
+
+// Super Admin Pages (Lazy Loaded)
+const SuperAdminLogin = lazy(() => import('./app/super-admin/pages/Login'));
+const SuperAdminDashboard = lazy(() => import('./app/super-admin/pages/Dashboard'));
+const SuperAdminSchools = lazy(() => import('./app/super-admin/pages/Schools'));
+const SuperAdminPlans = lazy(() => import('./app/super-admin/pages/Plans'));
+const SuperAdminPayments = lazy(() => import('./app/super-admin/pages/Payments'));
+const SuperAdminLandingCMS = lazy(() => import('./app/super-admin/pages/LandingCMS'));
+const SuperAdminNotifications = lazy(() => import('./app/super-admin/pages/Notifications'));
+const SuperAdminSettings = lazy(() => import('./app/super-admin/pages/Settings'));
+const SuperAdminProfile = lazy(() => import('./app/super-admin/pages/Profile'));
+
+// Super Admin Layout
+const SuperAdminLayout = lazy(() => import('./app/super-admin/layouts/SuperAdminLayout'));
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <BrowserRouter>
-          <Suspense fallback={<Loader fullPage message="Loading workspace components..." />}>
-            <Routes>
-              {/* Public Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+        <SuperAdminAuthProvider>
+          <BrowserRouter>
+            <Suspense fallback={<Loader fullPage message="Loading workspace components..." />}>
+              <Routes>
+                {/* Landing Page */}
+                <Route path="/" element={<LandingPage />} />
 
-              {/* Public Form Submission Routes (Parent Flow) */}
-              <Route path="/public/admission/:schoolId" element={<PublicAdmissionPage />} />
-              <Route path="/public/thankyou/:schoolId" element={<PublicThankYouPage />} />
-              <Route path="/public/test/:assignmentId" element={<StudentTest />} />
+                {/* School Admin Auth Routes */}
+                <Route path="/login" element={<SchoolLogin />} />
+                <Route path="/signup" element={<SchoolSignup />} />
 
-              {/* Protected Dashboard Admin Routes */}
-              <Route element={<DashboardLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/enquiries" element={<Enquiries />} />
-                <Route path="/admission-form" element={<AdmissionFormPage />} />
-                <Route path="/qr-code" element={<QrLinksPage />} />
-                <Route path="/thankyou-cms" element={<ThankYouCmsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/assessments" element={<AssessmentList />} />
-                <Route path="/assessments/new" element={<AssessmentBuilder />} />
-                <Route path="/assessments/:id/edit" element={<AssessmentBuilder />} />
-                
-                {/* Fallback inside dashboard */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              </Route>
+                {/* School Admin Public Form Routes */}
+                <Route path="/public/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                <Route path="/public/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
+                <Route path="/public/test/:assignmentId" element={<SchoolStudentTest />} />
 
-              {/* 404 Route */}
-              <Route path="/404" element={<NotFound />} />
+                {/* School Admin Protected Routes */}
+                <Route element={<SchoolLayout />}>
+                  <Route path="/dashboard" element={<SchoolDashboard />} />
+                  <Route path="/enquiries" element={<SchoolEnquiries />} />
+                  <Route path="/admission-form" element={<SchoolAdmissionFormPage />} />
+                  <Route path="/qr-code" element={<SchoolQrLinksPage />} />
+                  <Route path="/thankyou-cms" element={<SchoolThankYouCmsPage />} />
+                  <Route path="/settings" element={<SchoolSettingsPage />} />
+                  <Route path="/assessments" element={<SchoolAssessmentList />} />
+                  <Route path="/assessments/new" element={<SchoolAssessmentBuilder />} />
+                  <Route path="/assessments/:id/edit" element={<SchoolAssessmentBuilder />} />
+                </Route>
 
-              {/* Global Fallback Route */}
-              <Route path="*" element={<Navigate to="/404" replace />} />
-            </Routes>
-          </Suspense>
-          <Toaster position="top-right" />
-        </BrowserRouter>
+                {/* Super Admin Auth Routes */}
+                <Route path="/super-admin/login" element={<Navigate to="/login" replace />} />
+
+                {/* Super Admin Protected Routes */}
+                <Route element={<SuperAdminLayout />}>
+                  <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+                  <Route path="/super-admin/schools" element={<SuperAdminSchools />} />
+                  <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
+                  <Route path="/super-admin/payments" element={<SuperAdminPayments />} />
+                  <Route path="/super-admin/cms" element={<SuperAdminLandingCMS />} />
+                  <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
+                  <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
+                  <Route path="/super-admin/profile" element={<SuperAdminProfile />} />
+                </Route>
+
+                {/* 404 Route */}
+                <Route path="/404" element={<SchoolNotFound />} />
+
+                {/* Global Fallback Route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+            <Toaster position="top-right" />
+          </BrowserRouter>
+        </SuperAdminAuthProvider>
       </AuthProvider>
     </ErrorBoundary>
   );
