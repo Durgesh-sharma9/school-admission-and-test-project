@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../shared/contexts/AuthContext';
-import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../services/schoolApi';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import toast from 'react-hot-toast';

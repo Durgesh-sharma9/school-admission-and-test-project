@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Default API client configuration
-const api = axios.create({
+// Default School API client configuration
+const schoolApi = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1',
   headers: {
     'Content-Type': 'application/json',
@@ -9,7 +9,7 @@ const api = axios.create({
 });
 
 // Auto-inject JWT token from localStorage
-api.interceptors.request.use(
+schoolApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -23,7 +23,7 @@ api.interceptors.request.use(
 );
 
 // Global response interceptor to format errors
-api.interceptors.response.use(
+schoolApi.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const message =
@@ -40,5 +40,5 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default schoolApi;
 export { axios };

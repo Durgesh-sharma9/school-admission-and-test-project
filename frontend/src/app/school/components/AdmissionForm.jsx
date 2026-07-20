@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus } from 'lucide-react';
-import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router-dom';
 
 const INDIAN_STATES = [

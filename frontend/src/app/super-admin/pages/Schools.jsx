@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Search, Eye, CheckCircle, XCircle, Trash2, ExternalLink, Filter, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import superAdminApi from '../../../shared/services/superAdminApi';
-import { useAuth } from '../../../shared/contexts/AuthContext';
+import superAdminApi from '../services/superAdminApi';
+import { useAuth } from '../../school/contexts/AuthContext';
 import Button from '../../../shared/components/Button';
 import Modal from '../../../shared/components/Modal';
 import toast from 'react-hot-toast';

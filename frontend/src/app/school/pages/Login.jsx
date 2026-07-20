@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../shared/contexts/AuthContext';
-import { useSuperAdminAuth } from '../../../shared/contexts/SuperAdminAuthContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useSuperAdminAuth } from '../../super-admin/contexts/SuperAdminAuthContext';
 import toast from 'react-hot-toast';
 import { GraduationCap } from 'lucide-react';
 import Input from '../../../shared/components/Input';

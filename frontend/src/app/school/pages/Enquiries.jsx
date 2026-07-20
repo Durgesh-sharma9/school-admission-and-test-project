@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import toast from 'react-hot-toast';
-import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import AdmissionForm from '../components/AdmissionForm';
 import {
   Search,

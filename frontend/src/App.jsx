@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './shared/contexts/AuthContext';
-import { SuperAdminAuthProvider } from './shared/contexts/SuperAdminAuthContext';
+import { AuthProvider } from './app/school/contexts/AuthContext';
+import { SuperAdminAuthProvider } from './app/super-admin/contexts/SuperAdminAuthContext';
 import { Toaster } from 'react-hot-toast';
 import Loader from './shared/components/Loader';
 import ErrorBoundary from './shared/components/ErrorBoundary';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api from '../services/schoolApi';
 import toast from 'react-hot-toast';
 import AdmissionForm from '../components/AdmissionForm';
 import { ArrowLeft } from 'lucide-react';

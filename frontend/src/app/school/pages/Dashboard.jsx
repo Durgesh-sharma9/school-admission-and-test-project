@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
-import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import {
   Users,

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../../../shared/contexts/AuthContext';
-import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../services/schoolApi';
 import {
   Menu,
   User,

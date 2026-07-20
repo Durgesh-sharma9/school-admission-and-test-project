@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, LogOut, Camera, Save } from 'lucide-react';
-import { useSuperAdminAuth } from '../../../shared/contexts/SuperAdminAuthContext';
+import { useSuperAdminAuth } from '../contexts/SuperAdminAuthContext';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import toast from 'react-hot-toast';

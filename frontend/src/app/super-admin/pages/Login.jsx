@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useSuperAdminAuth } from '../../../shared/contexts/SuperAdminAuthContext';
+import { useSuperAdminAuth } from '../contexts/SuperAdminAuthContext';
 import toast from 'react-hot-toast';
 import { Shield } from 'lucide-react';
 import Input from '../../../shared/components/Input';

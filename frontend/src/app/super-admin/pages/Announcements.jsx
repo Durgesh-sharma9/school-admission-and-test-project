@@ -20,7 +20,7 @@ import {
   Send,
   AlertCircle
 } from 'lucide-react';
-import superAdminApi from '../../../shared/services/superAdminApi';
+import superAdminApi from '../services/superAdminApi';
 import Button from '../../../shared/components/Button';
 import Modal from '../../../shared/components/Modal';
 import toast from 'react-hot-toast';

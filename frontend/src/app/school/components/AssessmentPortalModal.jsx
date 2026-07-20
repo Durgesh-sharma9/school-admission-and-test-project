@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, CreditCard, IndianRupee, TrendingUp, Users, Calendar, ArrowUpRight, ArrowDownRight, ClipboardList } from 'lucide-react';
-import superAdminApi from '../../../shared/services/superAdminApi';
+import superAdminApi from '../services/superAdminApi';
 
 const formatINR = (val) => {
   return new Intl.NumberFormat('en-IN', {

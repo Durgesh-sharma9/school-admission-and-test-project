@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../shared/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import Button from '../../../shared/components/Button';
 import BrandedQrPoster from '../components/BrandedQrPoster';
 import toast from 'react-hot-toast';

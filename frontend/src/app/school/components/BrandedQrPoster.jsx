@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import api from '../services/api';
+import api from '../services/schoolApi';
 import Button from '../../../shared/components/Button';
 import toast from 'react-hot-toast';
 import {

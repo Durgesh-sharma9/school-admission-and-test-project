@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
-import { useSuperAdminAuth } from '../../../shared/contexts/SuperAdminAuthContext';
+import { useSuperAdminAuth } from '../contexts/SuperAdminAuthContext';
 import { Shield, Menu, X, LogOut, Settings, Building2, CreditCard, DollarSign, FileText, MessageSquare, LayoutDashboard, BarChart3, Bell, ChevronDown } from 'lucide-react';
 import Button from '../../../shared/components/Button';
 import Loader from '../../../shared/components/Loader';

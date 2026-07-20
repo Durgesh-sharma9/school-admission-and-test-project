@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import api from '../services/api';
+import api from '../services/schoolApi';
 
 const AuthContext = createContext(null);
 
@@ -111,3 +111,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthContext;
