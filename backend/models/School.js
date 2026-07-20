@@ -30,9 +30,50 @@ const schoolSchema = new mongoose.Schema({
     required: [true, 'School address is required'],
     trim: true,
   },
+  tagline: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  academicSession: {
+    type: String,
+    default: '2026-2027',
+    trim: true,
+  },
+  website: {
+    type: String,
+    default: '',
+    trim: true,
+  },
   logo: {
     type: String,
     default: '',
+  },
+  qrBranding: {
+    showLogo: { type: Boolean, default: true },
+    showName: { type: Boolean, default: true },
+    showTagline: { type: Boolean, default: true },
+    showContact: { type: Boolean, default: true },
+    showEmail: { type: Boolean, default: true },
+    showWebsite: { type: Boolean, default: true },
+    showAddress: { type: Boolean, default: true },
+    showAcademicSession: { type: Boolean, default: true },
+    footerMessage: { 
+      type: String, 
+      default: 'Thank You For Visiting Our School. We Look Forward To Welcoming Your Child.' 
+    },
+    primaryColor: { type: String, default: '#4f46e5' },
+    secondaryColor: { type: String, default: '#f59e0b' },
+    showHighlights: { type: Boolean, default: true },
+    highlights: {
+      type: [String],
+      default: [
+        'Experienced & Caring Faculty',
+        'Smart Classrooms & Modern Labs',
+        'Holistic Sports & Activity Program',
+        'Safe Campus & GPS Transport'
+      ]
+    },
   },
   role: {
     type: String,

@@ -16,10 +16,12 @@ import {
   Check
 } from 'lucide-react';
 
+import LocalityManagement from '../components/LocalityManagement';
+
 const SettingsPage = () => {
   const { school, updateSchoolState } = useAuth();
   
-  // Tab control: 'school', 'password', 'templates'
+  // Tab control: 'school', 'locality', 'password', 'templates'
   const [activeTab, setActiveTab] = useState('school');
 
   // School Form states
@@ -27,6 +29,32 @@ const SettingsPage = () => {
   const [phone, setPhone] = useState(school?.phone || '');
   const [address, setAddress] = useState(school?.address || '');
   const [logo, setLogo] = useState(school?.logo || '');
+  const [tagline, setTagline] = useState(school?.tagline || '');
+  const [academicSession, setAcademicSession] = useState(school?.academicSession || '2026-2027');
+  const [website, setWebsite] = useState(school?.website || '');
+  const DEFAULT_HIGHLIGHTS = [
+    'Experienced & Caring Faculty',
+    'Smart Classrooms & Modern Labs',
+    'Holistic Sports & Activity Program',
+    'Safe Campus & GPS Transport'
+  ];
+
+  const [qrBranding, setQrBranding] = useState({
+    showLogo: school?.qrBranding?.showLogo ?? true,
+    showName: school?.qrBranding?.showName ?? true,
+    showTagline: school?.qrBranding?.showTagline ?? true,
+    showContact: school?.qrBranding?.showContact ?? true,
+    showEmail: school?.qrBranding?.showEmail ?? true,
+    showWebsite: school?.qrBranding?.showWebsite ?? true,
+    showAddress: school?.qrBranding?.showAddress ?? true,
+    showAcademicSession: school?.qrBranding?.showAcademicSession ?? true,
+    showHighlights: school?.qrBranding?.showHighlights ?? true,
+    highlights: school?.qrBranding?.highlights?.length > 0 ? school.qrBranding.highlights : DEFAULT_HIGHLIGHTS,
+    footerMessage: school?.qrBranding?.footerMessage || 'Thank You For Visiting Our School. We Look Forward To Welcoming Your Child.',
+    primaryColor: school?.qrBranding?.primaryColor || '#4f46e5',
+    secondaryColor: school?.qrBranding?.secondaryColor || '#f59e0b',
+  });
+  
   const [minorTypingValidation, setMinorTypingValidation] = useState(
     school?.settings?.minorTypingValidation || false
   );
@@ -103,27 +131,20 @@ const SettingsPage = () => {
 
     setSavingSchool(true);
     try {
-      // 1. Save general profile
       const response = await api.put('/settings', {
         name,
         phone,
         address,
         logo,
+        tagline,
+        academicSession,
+        website,
+        qrBranding,
       });
 
-      // 2. Save spelling setting
-      await api.put('/settings/spelling', { minorTypingValidation });
-
       if (response.success) {
-        toast.success('School settings saved successfully!');
-        
-        // Sync React Auth Context state
-        const syncedSchool = {
-          ...response.school,
-          settings: { minorTypingValidation },
-          communicationTemplates: school.communicationTemplates // preserve templates
-        };
-        updateSchoolState(syncedSchool);
+        toast.success('School profile and branding updated successfully!');
+        updateSchoolState(response.school);
       }
     } catch (err) {
       toast.error(err.message || 'Failed to save settings');
@@ -234,32 +255,42 @@ const SettingsPage = () => {
       </div>
 
       {/* Tabs list */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab('school')}
           className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
             activeTab === 'school'
-              ? 'border-indigo-600 text-indigo-600'
+              ? 'border-indigo-600 text-indigo-600 font-bold'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
-          School Identity & Preferences
+          School Profile
+        </button>
+        <button
+          onClick={() => setActiveTab('locality')}
+          className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
+            activeTab === 'locality'
+              ? 'border-indigo-600 text-indigo-600 font-bold'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Locality Management
         </button>
         <button
           onClick={() => setActiveTab('templates')}
           className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
             activeTab === 'templates'
-              ? 'border-indigo-600 text-indigo-600'
+              ? 'border-indigo-600 text-indigo-600 font-bold'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
-          Communication Templates
+          Notifications & Templates
         </button>
         <button
           onClick={() => setActiveTab('password')}
           className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
             activeTab === 'password'
-              ? 'border-indigo-600 text-indigo-600'
+              ? 'border-indigo-600 text-indigo-600 font-bold'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -268,6 +299,8 @@ const SettingsPage = () => {
       </div>
 
       {/* Tab Panels */}
+      {activeTab === 'locality' && <LocalityManagement />}
+
       {activeTab === 'school' && (
         <form onSubmit={handleSaveSchool} className="space-y-6">
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
@@ -339,22 +372,114 @@ const SettingsPage = () => {
                     required
                   />
                 </div>
+                <Input
+                  label="School Tagline (Optional)"
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder="e.g. Nurturing Leaders of Tomorrow"
+                />
+                <Input
+                  label="Academic Session"
+                  value={academicSession}
+                  onChange={(e) => setAcademicSession(e.target.value)}
+                  placeholder="e.g. 2026-2027"
+                />
+                <div className="sm:col-span-2">
+                  <Input
+                    label="Official Website (Optional)"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    placeholder="e.g. https://www.myschool.edu.in"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Spelling Preferences Panel */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">
+          {/* QR Branding Customization Panel */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-5 text-left">
+            <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
+              <span className="text-base">🎨</span>
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                QR Branding & Poster Customization
+              </h3>
+            </div>
+
+            <p className="text-xs text-slate-500 font-medium">
+              Control which contact details and branding elements display on your generated Admission QR Poster.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 text-xs">
+              {[
+                { key: 'showLogo', label: 'School Logo' },
+                { key: 'showName', label: 'School Name' },
+                { key: 'showTagline', label: 'Tagline' },
+                { key: 'showContact', label: 'Phone Number' },
+                { key: 'showEmail', label: 'Email Address' },
+                { key: 'showWebsite', label: 'Website' },
+                { key: 'showAddress', label: 'Address' },
+                { key: 'showAcademicSession', label: 'Academic Session' },
+                { key: 'showHighlights', label: 'Why Choose Us Highlights' },
+              ].map((item) => (
+                <label key={item.key} className="flex items-center space-x-2 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors select-none">
+                  <input
+                    type="checkbox"
+                    checked={qrBranding[item.key]}
+                    onChange={(e) => setQrBranding({ ...qrBranding, [item.key]: e.target.checked })}
+                    className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                  />
+                  <span className="font-semibold text-slate-700 text-[11px]">{item.label}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Primary Brand Color"
+                type="color"
+                value={qrBranding.primaryColor || '#4f46e5'}
+                onChange={(e) => setQrBranding({ ...qrBranding, primaryColor: e.target.value })}
+              />
+              <Input
+                label="Secondary Accent Color"
+                type="color"
+                value={qrBranding.secondaryColor || '#f59e0b'}
+                onChange={(e) => setQrBranding({ ...qrBranding, secondaryColor: e.target.value })}
+              />
+            </div>
+
+            <Input
+              label="Why Choose Us Highlights (One per line)"
+              type="textarea"
+              value={(qrBranding.highlights || []).join('\n')}
+              onChange={(e) => {
+                const list = e.target.value.split('\n');
+                setQrBranding({ ...qrBranding, highlights: list });
+              }}
+              placeholder="e.g. Experienced & Caring Faculty&#10;Smart Classrooms & Modern Labs"
+            />
+
+            <Input
+              label="Poster Footer Message"
+              type="textarea"
+              value={qrBranding.footerMessage || ''}
+              onChange={(e) => setQrBranding({ ...qrBranding, footerMessage: e.target.value })}
+              placeholder="e.g. Thank You For Visiting Our School. We Look Forward To Welcoming Your Child."
+            />
+          </div>
+
+          {/* Evaluation Settings Panel */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Assessment Evaluation Settings
             </h3>
             
-            <label className="flex items-start p-4 rounded-xl border border-slate-150 cursor-pointer hover:bg-slate-50 transition-colors select-none">
+            <label className="flex items-start p-4 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors select-none">
               <input
                 type="checkbox"
                 checked={minorTypingValidation}
                 onChange={(e) => setMinorTypingValidation(e.target.checked)}
-                className="mt-0.5 h-4.5 w-4.5 text-indigo-650 focus:ring-indigo-500/20"
+                className="mt-0.5 h-4.5 w-4.5 text-indigo-600 focus:ring-indigo-500/20"
               />
               <div className="ml-3 space-y-0.5">
                 <span className="text-xs font-bold text-slate-800">
@@ -369,7 +494,7 @@ const SettingsPage = () => {
 
           <div className="flex justify-end">
             <Button type="submit" isLoading={savingSchool}>
-              Save System Preferences
+              Save School Profile & Branding
             </Button>
           </div>
         </form>

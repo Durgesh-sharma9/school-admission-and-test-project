@@ -18,6 +18,27 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const formatExternalUrl = (url) => {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
+const formatFileUrl = (url) => {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  const backendBase = import.meta.env.VITE_API_URL 
+    ? import.meta.env.VITE_API_URL.replace('/api/v1', '')
+    : 'http://localhost:5001';
+  return `${backendBase}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+};
+
 const PublicThankYouPage = () => {
   const { schoolId } = useParams();
   const location = useLocation();
@@ -181,7 +202,7 @@ const PublicThankYouPage = () => {
           {/* 3. Download Admission Brochure (only if uploaded) */}
           {((cms.admissionBrochure && cms.admissionBrochure.url) || cms.pdfUrl) && (
             <a
-              href={(cms.admissionBrochure && cms.admissionBrochure.url) || cms.pdfUrl}
+              href={formatFileUrl((cms.admissionBrochure && cms.admissionBrochure.url) || cms.pdfUrl)}
               download={(cms.admissionBrochure && cms.admissionBrochure.filename) || 'Admission_Brochure'}
               target="_blank"
               rel="noreferrer"
@@ -195,7 +216,7 @@ const PublicThankYouPage = () => {
           {/* 4. Download Fee Structure (only if uploaded) */}
           {(cms.feeStructure && cms.feeStructure.url) && (
             <a
-              href={cms.feeStructure.url}
+              href={formatFileUrl(cms.feeStructure.url)}
               download={cms.feeStructure.filename || 'Fee_Structure'}
               target="_blank"
               rel="noreferrer"
@@ -217,7 +238,7 @@ const PublicThankYouPage = () => {
                   cms.socialLinks.map((link, lIdx) => (
                     <a
                       key={lIdx}
-                      href={link.url}
+                      href={formatExternalUrl(link.url)}
                       target="_blank"
                       rel="noreferrer"
                       className="p-2.5 bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 rounded-full text-slate-650 hover:text-indigo-600 transition-all shadow-xs"
@@ -230,7 +251,7 @@ const PublicThankYouPage = () => {
                   <>
                     {cms.socialLink1 && (
                       <a
-                        href={cms.socialLink1}
+                        href={formatExternalUrl(cms.socialLink1)}
                         target="_blank"
                         rel="noreferrer"
                         className="p-2.5 bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 rounded-full text-slate-600 hover:text-indigo-600 transition-all shadow-xs"
@@ -241,7 +262,7 @@ const PublicThankYouPage = () => {
                     )}
                     {cms.socialLink2 && (
                       <a
-                        href={cms.socialLink2}
+                        href={formatExternalUrl(cms.socialLink2)}
                         target="_blank"
                         rel="noreferrer"
                         className="p-2.5 bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 rounded-full text-slate-600 hover:text-indigo-600 transition-all shadow-xs"

@@ -8,7 +8,16 @@ const path = require('path');
 // @access  Private (School Admin)
 const updateSettings = async (req, res) => {
   try {
-    const { name, phone, address, logo } = req.body;
+    const { 
+      name, 
+      phone, 
+      address, 
+      logo, 
+      tagline, 
+      academicSession, 
+      website, 
+      qrBranding 
+    } = req.body;
 
     const school = await School.findById(req.school.id);
     if (!school) {
@@ -24,6 +33,10 @@ const updateSettings = async (req, res) => {
     if (phone) school.phone = phone;
     if (address) school.address = address;
     if (logo !== undefined) school.logo = logo;
+    if (tagline !== undefined) school.tagline = tagline;
+    if (academicSession !== undefined) school.academicSession = academicSession;
+    if (website !== undefined) school.website = website;
+    if (qrBranding !== undefined) school.qrBranding = { ...school.qrBranding, ...qrBranding };
 
     await school.save();
 
@@ -37,6 +50,10 @@ const updateSettings = async (req, res) => {
         phone: school.phone,
         address: school.address,
         logo: school.logo,
+        tagline: school.tagline,
+        academicSession: school.academicSession,
+        website: school.website,
+        qrBranding: school.qrBranding,
         qrCodeUrl: school.qrCodeUrl,
         admissionFormLink: school.admissionFormLink,
         subscription: school.subscription,

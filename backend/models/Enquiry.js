@@ -91,6 +91,11 @@ const enquirySchema = new mongoose.Schema({
     required: [true, 'Area / Locality is required'],
     trim: true,
   },
+  localityId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Locality',
+    default: null,
+  },
   society: {
     type: String,
     trim: true,

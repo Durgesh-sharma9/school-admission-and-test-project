@@ -24,6 +24,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const localityRoutes = require('./routes/localityRoutes');
 
 // Connect to Database
 connectDB();
@@ -43,8 +44,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+// Serve static uploaded files with CORS enabled for canvas capture
+app.use('/uploads', cors(), express.static(path.join(__dirname, 'public/uploads')));
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -53,6 +54,7 @@ app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/localities', localityRoutes);
 
 // Root Check
 app.get('/api/v1/health', (req, res) => {

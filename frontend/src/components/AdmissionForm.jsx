@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import Input from './Input';
 import Button from './Button';
-import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye } from 'lucide-react';
+import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router-dom';
 
@@ -193,6 +193,8 @@ const AdmissionForm = ({
     toast.success('Parent details auto-filled! Please enter student information.');
   };
 
+  const watchArea = watch('area');
+
   const [stateSearch, setStateSearch] = React.useState('');
   const [showStateDropdown, setShowStateDropdown] = React.useState(false);
   const dropdownRef = React.useRef(null);
@@ -200,6 +202,29 @@ const AdmissionForm = ({
   const [sourceSearch, setSourceSearch] = React.useState('');
   const [showSourceDropdown, setShowSourceDropdown] = React.useState(false);
   const sourceDropdownRef = React.useRef(null);
+
+  const [activeLocalities, setActiveLocalities] = React.useState([]);
+  const [areaSearch, setAreaSearch] = React.useState('');
+  const [showLocalityDropdown, setShowLocalityDropdown] = React.useState(false);
+  const localityDropdownRef = React.useRef(null);
+
+  // Fetch active localities for dropdown suggestions
+  React.useEffect(() => {
+    const fetchActiveLocalities = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const targetSchoolId = schoolId || '';
+        const res = await fetch(`${apiBaseUrl}/localities/active?schoolId=${targetSchoolId}`);
+        const data = await res.json();
+        if (data.success) {
+          setActiveLocalities(data.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load active localities:', err);
+      }
+    };
+    fetchActiveLocalities();
+  }, [schoolId]);
 
   // Sync state search input on load/change
   React.useEffect(() => {
@@ -211,6 +236,11 @@ const AdmissionForm = ({
     setSourceSearch(watchSource || '');
   }, [watchSource]);
 
+  // Sync area search input on load/change
+  React.useEffect(() => {
+    setAreaSearch(watchArea || '');
+  }, [watchArea]);
+
   // Click outside listener for dropdowns
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -219,6 +249,9 @@ const AdmissionForm = ({
       }
       if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(event.target)) {
         setShowSourceDropdown(false);
+      }
+      if (localityDropdownRef.current && !localityDropdownRef.current.contains(event.target)) {
+        setShowLocalityDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -581,14 +614,73 @@ const AdmissionForm = ({
               )}
             </div>
 
-            <Input
-              label="Locality / Area"
-              name="area"
-              placeholder="e.g. Andheri West"
-              required
-              error={errors.area}
-              {...register('area', { required: 'Locality/Area is required' })}
-            />
+            {/* Searchable Creatable Locality Input */}
+            <div className="relative flex flex-col gap-1.5 text-left" ref={localityDropdownRef}>
+              <label className="block text-xs font-semibold text-slate-700 tracking-wide uppercase">
+                Locality / Area <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Type or select locality... e.g. Mahapura"
+                value={areaSearch}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setAreaSearch(val);
+                  setValue('area', val, { shouldValidate: true });
+                  setShowLocalityDropdown(true);
+                }}
+                onFocus={() => setShowLocalityDropdown(true)}
+                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${
+                  errors.area ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+                }`}
+              />
+              <input
+                type="hidden"
+                {...register('area', { required: 'Locality/Area is required' })}
+              />
+              {showLocalityDropdown && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 divide-y divide-slate-100">
+                  {/* Matching localities */}
+                  {activeLocalities
+                    .filter(loc => loc.name.toLowerCase().includes((areaSearch || '').toLowerCase()))
+                    .map((loc) => (
+                      <button
+                        key={loc._id}
+                        type="button"
+                        onClick={() => {
+                          setValue('area', loc.name, { shouldValidate: true });
+                          setAreaSearch(loc.name);
+                          setShowLocalityDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors font-semibold flex items-center gap-2"
+                      >
+                        <MapPin className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                        {loc.name}
+                      </button>
+                    ))}
+
+                  {/* Creatable option if typed locality is not an exact match */}
+                  {areaSearch.trim() && !activeLocalities.some(loc => loc.name.toLowerCase() === areaSearch.trim().toLowerCase()) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue('area', areaSearch.trim(), { shouldValidate: true });
+                        setShowLocalityDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-amber-700 bg-amber-50/60 hover:bg-amber-100/60 transition-colors font-extrabold flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4 text-amber-600 shrink-0" />
+                      Add "{areaSearch.trim()}"
+                    </button>
+                  )}
+                </div>
+              )}
+              {errors.area && (
+                <span className="text-xs text-red-500 font-medium mt-0.5">
+                  {errors.area.message}
+                </span>
+              )}
+            </div>
 
             <Input
               label="City"

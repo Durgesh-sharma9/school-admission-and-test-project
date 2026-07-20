@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Enquiry = require('../models/Enquiry');
 const School = require('../models/School');
 const ParentProfile = require('../models/ParentProfile');
+const { processLocalityOnEnquirySave } = require('./localityController');
 const generateEnquiryId = require('../utils/enquiryIdGenerator');
 const createNotification = require('../utils/createNotification');
 
@@ -183,9 +184,15 @@ const createEnquiryManual = async (req, res) => {
     const uniqueId = await generateEnquiryId();
     const { saveDate, saveTime } = getFormattedDateTime();
 
+    let localityInfo = null;
+    if (enquiryData.area) {
+      localityInfo = await processLocalityOnEnquirySave(schoolId, enquiryData.area, false);
+    }
+
     const enquiry = new Enquiry({
       ...enquiryData,
       schoolId,
+      localityId: localityInfo ? localityInfo.localityId : null,
       enquiryId: uniqueId,
       saveDate,
       saveTime,
@@ -237,9 +244,15 @@ const createEnquiryPublic = async (req, res) => {
     const uniqueId = await generateEnquiryId();
     const { saveDate, saveTime } = getFormattedDateTime();
 
+    let localityInfo = null;
+    if (enquiryData.area) {
+      localityInfo = await processLocalityOnEnquirySave(schoolId, enquiryData.area, true);
+    }
+
     const enquiry = new Enquiry({
       ...enquiryData,
       schoolId,
+      localityId: localityInfo ? localityInfo.localityId : null,
       enquiryId: uniqueId,
       saveDate,
       saveTime,
