@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { GraduationCap } from 'lucide-react';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const Login = () => {
   const { login, school } = useAuth();
@@ -14,6 +15,11 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [showResendOTP, setShowResendOTP] = useState(false);
+  const [resendEmail, setResendEmail] = useState('');
+  
+  // Check for auto-login state from OTP verification
+  const { email: autoEmail, autoLogin } = location.state || {};
 
   const {
     register,
@@ -21,7 +27,7 @@ const Login = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email: '',
+      email: autoEmail || '',
       password: '',
     }
   });
@@ -39,10 +45,11 @@ const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await login(data.email, data.password);
-      if (response.success) {
+      const result = await login(data.email, data.password);
+
+      if (result.success) {
         toast.success('Logged in successfully!');
-        if (response.role === 'super-admin') {
+        if (result.role === 'super-admin') {
           if (checkSuperAdminAuth) await checkSuperAdminAuth();
           navigate('/super-admin/dashboard', { replace: true });
         } else {
@@ -51,11 +58,39 @@ const Login = () => {
         }
       }
     } catch (error) {
-      toast.error(error.message || 'Invalid email or password');
+      if (error.data?.requiresVerification) {
+        toast.error(error.message || 'Please verify your email to login.');
+        navigate('/verify-otp', { state: { email: data.email } });
+      } else {
+        toast.error(error.message || 'Invalid email or password');
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const handleResendOTP = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/v1/otp/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resendEmail, purpose: 'EMAIL_VERIFICATION' })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('OTP sent successfully');
+        navigate('/verify-otp', { state: { email: resendEmail } });
+      } else {
+        toast.error(result.message || 'Failed to send OTP');
+      }
+    } catch (error) {
+      toast.error('Failed to send OTP');
+    }
+  };
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 bg-gradient-to-tr from-indigo-50/50 via-slate-50 to-indigo-50/30">
@@ -103,6 +138,15 @@ const Login = () => {
             />
           </div>
 
+          <div className="text-right">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-indigo-600 hover:text-indigo-500 font-semibold"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
           <div className="pt-2">
             <Button
               type="submit"
@@ -112,6 +156,9 @@ const Login = () => {
               Sign In
             </Button>
           </div>
+
+          {/* Google OAuth Login */}
+          <GoogleLoginButton />
         </form>
 
         {/* Footer */}

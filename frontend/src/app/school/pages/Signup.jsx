@@ -1,30 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import schoolApi from '../services/schoolApi';
 import toast from 'react-hot-toast';
 import { GraduationCap, Mail, Lock, Phone, MapPin, School as SchoolIcon } from 'lucide-react';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const Signup = () => {
-  const { signup, school } = useAuth();
+  const { school, updateSchoolState } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
+
+  const googleData = location.state?.googleData;
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
       name: '',
-      email: '',
+      email: googleData?.email || '',
       phone: '',
       address: '',
       password: '',
     }
   });
+
+  useEffect(() => {
+    if (googleData?.email) {
+      setValue('email', googleData.email);
+    }
+  }, [googleData, setValue]);
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -36,10 +48,36 @@ const Signup = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await signup(data);
-      if (response.success) {
-        toast.success('Account created successfully! Welcome to your Free Trial.');
-        navigate('/dashboard');
+      const isGoogle = Boolean(googleData?.googleVerified);
+      const payload = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        googleVerified: isGoogle,
+        authProvider: isGoogle ? 'google' : 'email',
+      };
+
+      if (!isGoogle) {
+        payload.password = data.password;
+      }
+
+      const result = await schoolApi.post('/auth/signup', payload);
+
+      if (result.success) {
+        if (result.token && result.school) {
+          localStorage.setItem('token', result.token);
+          if (updateSchoolState) {
+            updateSchoolState(result.school);
+          }
+          toast.success('School account created successfully!');
+          navigate('/dashboard', { replace: true });
+        } else {
+          toast.success('Account created! Please enter OTP sent to your email.');
+          navigate('/verify-otp', { state: { email: data.email } });
+        }
+      } else {
+        toast.error(result.message || 'Registration failed');
       }
     } catch (error) {
       toast.error(error.message || 'Registration failed');
@@ -103,21 +141,30 @@ const Signup = () => {
               })}
             />
 
-            <Input
-              label="Admin Password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              error={errors.password}
-              {...register('password', {
-                required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
-                },
-              })}
-            />
+            {!googleData?.googleVerified ? (
+              <Input
+                label="Admin Password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                error={errors.password}
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 6,
+                    message: 'Password must be at least 6 characters',
+                  },
+                })}
+              />
+            ) : (
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Admin Password</label>
+                <div className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 font-medium">
+                  Managed by Google
+                </div>
+              </div>
+            )}
           </div>
 
           <Input
@@ -138,6 +185,9 @@ const Signup = () => {
               Sign Up & Get Started
             </Button>
           </div>
+
+          {/* Google OAuth Login / Signup */}
+          <GoogleLoginButton />
         </form>
 
         {/* Footer */}

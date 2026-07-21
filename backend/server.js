@@ -27,6 +27,8 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const localityRoutes = require('./routes/localityRoutes');
 const superAdminRoutes = require('./routes/superAdminRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
+const otpRoutes = require('./routes/otpRoutes');
+const googleAuthRoutes = require('./routes/googleAuthRoutes');
 
 // Connect to Database
 connectDB();
@@ -51,6 +53,8 @@ app.use('/uploads', cors(), express.static(path.join(__dirname, 'public/uploads'
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', googleAuthRoutes);
+app.use('/api/v1/otp', otpRoutes);
 app.use('/api/v1/enquiries', enquiryRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);

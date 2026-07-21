@@ -15,10 +15,19 @@ const schoolSchema = new mongoose.Schema({
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
   },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    required: false,
+    default: null,
+  },
+  authProvider: {
+    type: String,
+    enum: ['email', 'google'],
+    default: 'email',
   },
   phone: {
     type: String,
@@ -156,7 +165,7 @@ const schoolSchema = new mongoose.Schema({
 
 // Hash password before saving
 schoolSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  if (!this.password || !this.isModified('password')) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -166,6 +175,7 @@ schoolSchema.pre('save', async function (next) {
 
 // Compare password method
 schoolSchema.methods.comparePassword = async function (enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
