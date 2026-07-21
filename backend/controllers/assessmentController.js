@@ -486,6 +486,8 @@ const submitAssessment = async (req, res) => {
     const { id } = req.params;
     const { answers, timeTaken } = req.body;
 
+    console.log(`[Submit Assessment Request] Assignment ID/Token: ${id}`);
+
     const assignment = await findAssignmentByIdOrToken(id, true);
     if (!assignment) {
       return res.status(404).json({ success: false, message: 'Test session not found' });
@@ -496,7 +498,22 @@ const submitAssessment = async (req, res) => {
     }
 
     const assessment = assignment.assessmentId;
+    if (!assessment) {
+      return res.status(404).json({ success: false, message: 'Associated assessment template not found' });
+    }
+
     const finalAnswers = answers || [];
+
+    // Safely compute total max marks for percentage calculation
+    let maxMarks = assessment.totalMarks || 0;
+    if (!maxMarks && assessment.sections) {
+      assessment.sections.forEach(sec => {
+        (sec.questions || []).forEach(q => {
+          maxMarks += (q.marks || 0);
+        });
+      });
+    }
+    if (!maxMarks) maxMarks = 1;
 
     // Auto-Grading Objective Questions
     let earnedObjectiveScore = 0;
@@ -506,14 +523,18 @@ const submitAssessment = async (req, res) => {
 
     // Build lookup table of template questions
     const questionLookup = {};
-    assessment.sections.forEach((sec, sIdx) => {
-      sec.questions.forEach((q, qIdx) => {
-        questionLookup[`${sIdx}-${qIdx}`] = q;
-        if (q.type === 'Descriptive') {
-          containsDescriptive = true;
+    if (assessment.sections) {
+      assessment.sections.forEach((sec, sIdx) => {
+        if (sec.questions) {
+          sec.questions.forEach((q, qIdx) => {
+            questionLookup[`${sIdx}-${qIdx}`] = q;
+            if (q.type === 'Descriptive') {
+              containsDescriptive = true;
+            }
+          });
         }
       });
-    });
+    }
 
     // Evaluate answers
     const evaluatedAnswers = finalAnswers.map(ans => {
@@ -539,7 +560,6 @@ const submitAssessment = async (req, res) => {
         }
         marksAwarded = isCorrect ? q.marks : 0;
       } else if (q.type === 'Descriptive') {
-        // Descriptive questions are left for manual evaluation (0 marks default initially)
         isCorrect = false;
         marksAwarded = 0;
       }
@@ -556,6 +576,8 @@ const submitAssessment = async (req, res) => {
       earnedObjectiveScore += ans.marksAwarded || 0;
     });
 
+    const percentage = parseFloat(((earnedObjectiveScore / maxMarks) * 100).toFixed(2));
+
     // Save final exam results details atomically to prevent Mongoose VersionError
     const updatedAssignment = await AssessmentAssignment.findByIdAndUpdate(
       assignment._id,
@@ -566,20 +588,36 @@ const submitAssessment = async (req, res) => {
           submittedAt: new Date(),
           timeTaken: timeTaken || 0,
           totalScore: earnedObjectiveScore,
-          percentage: parseFloat(((earnedObjectiveScore / maxMarks) * 100).toFixed(2)),
+          percentage: percentage,
           isEvaluated: !containsDescriptive,
         }
       },
       { new: true }
     );
 
+    // Also update Enquiry candidate status
+    if (assignment.enquiryId) {
+      const enquiryId = assignment.enquiryId._id || assignment.enquiryId;
+      await Enquiry.findByIdAndUpdate(enquiryId, {
+        $set: {
+          hasAssessment: true,
+          assessmentStatus: !containsDescriptive ? 'Evaluated' : 'Submitted'
+        }
+      });
+    }
+
     // Trigger Notification Log
-    await createNotification(
-      assignment.schoolId?._id || assignment.schoolId,
-      'Assessment Completed',
-      `Candidate ${assignment.enquiryId?.studentName || 'Student'} completed test "${assessment.name}". ${!containsDescriptive ? 'Evaluation complete.' : 'Grading worksheet pending descriptive evaluation.'}`,
-      'assessment_completed'
-    );
+    const targetSchoolId = assignment.schoolId?._id || assignment.schoolId;
+    if (targetSchoolId) {
+      await createNotification(
+        targetSchoolId,
+        'Assessment Completed',
+        `Candidate ${assignment.enquiryId?.studentName || 'Student'} completed test "${assessment.name}". ${!containsDescriptive ? 'Evaluation complete.' : 'Grading worksheet pending descriptive evaluation.'}`,
+        'assessment_completed'
+      );
+    }
+
+    console.log(`[Submit Assessment Success] Score: ${earnedObjectiveScore}/${maxMarks} (${percentage}%)`);
 
     return res.json({
       success: true,
@@ -588,7 +626,7 @@ const submitAssessment = async (req, res) => {
     });
   } catch (error) {
     console.error('Submit test error:', error);
-    return res.status(500).json({ success: false, message: 'Server error processing test submission' });
+    return res.status(500).json({ success: false, message: `Server error processing test submission: ${error.message}` });
   }
 };
 

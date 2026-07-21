@@ -212,19 +212,23 @@ const StudentTest = () => {
 
     setSubmitting(true);
     try {
-      const elapsedSeconds = assessment.duration * 60 - timeLeft;
+      const elapsedSeconds = (assessment?.duration || 0) * 60 - timeLeft;
       const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
       const res = await axios.post(`${apiBaseUrl}/assessments/assignments/${assignmentId}/submit`, {
         answers: studentAnswers,
-        timeTaken: elapsedSeconds,
+        timeTaken: elapsedSeconds > 0 ? elapsedSeconds : 0,
       });
 
       if (res.data.success) {
         setTestCompleted(true);
-        toast.success('Assessment submitted successfully!');
+        toast.success(res.data.message || 'Assessment submitted successfully!');
+      } else {
+        toast.error(res.data.message || 'Failed to submit assessment');
       }
     } catch (err) {
-      toast.error('Failed to submit assessment');
+      const errMsg = err.response?.data?.message || err.message || 'Failed to submit assessment';
+      console.error('Submit test error:', err);
+      toast.error(errMsg);
     } finally {
       setSubmitting(false);
     }
@@ -242,10 +246,14 @@ const StudentTest = () => {
 
       if (res.data.success) {
         setTestCompleted(true);
-        toast.success('Time expired! Your progress was saved and submitted.');
+        toast.success(res.data.message || 'Time expired! Your progress was saved and submitted.');
+      } else {
+        toast.error(res.data.message || 'Failed to auto-submit assessment');
       }
     } catch (err) {
-      console.error(err);
+      const errMsg = err.response?.data?.message || err.message || 'Failed to submit assessment';
+      console.error('Auto submit error:', err);
+      toast.error(errMsg);
     } finally {
       setSubmitting(false);
     }

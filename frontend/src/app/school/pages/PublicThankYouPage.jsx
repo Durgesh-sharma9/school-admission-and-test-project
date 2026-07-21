@@ -40,7 +40,8 @@ const formatFileUrl = (url) => {
 };
 
 const PublicThankYouPage = () => {
-  const { schoolId } = useParams();
+  const params = useParams();
+  const schoolId = params.schoolId || params.token || params.id;
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

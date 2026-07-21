@@ -7,7 +7,8 @@ import { School, HelpCircle, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PublicAdmissionPage = () => {
-  const { schoolId } = useParams();
+  const params = useParams();
+  const schoolId = params.schoolId || params.token || params.id;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [schoolInfo, setSchoolInfo] = useState(null);

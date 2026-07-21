@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const School = require('../models/School');
 const SuperAdmin = require('../models/SuperAdmin');
 const OTP = require('../models/OTP');
@@ -289,10 +290,26 @@ const getMe = async (req, res) => {
 // @access  Public
 const getPublicSchoolInfo = async (req, res) => {
   try {
-    const school = await School.findById(req.params.schoolId).select('name logo thankYouCms');
+    const { schoolId } = req.params;
+    let school = null;
+
+    if (mongoose.Types.ObjectId.isValid(schoolId)) {
+      school = await School.findById(schoolId).select('name logo thankYouCms');
+    }
+
+    if (!school) {
+      school = await School.findOne({
+        $or: [
+          { code: schoolId },
+          { slug: schoolId }
+        ]
+      }).select('name logo thankYouCms');
+    }
+
     if (!school) {
       return res.status(404).json({ success: false, message: 'School not found' });
     }
+
     return res.json({
       success: true,
       school,

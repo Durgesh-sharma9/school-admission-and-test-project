@@ -69,20 +69,40 @@ function App() {
                   <Route path="/forgot-password" element={<SchoolForgotPassword />} />
                   <Route path="/reset-password" element={<SchoolResetPassword />} />
 
-                  {/* Public Admission Form & Thank You Routes */}
+                  {/* Public Admission Form & QR Code Public Link Routes */}
                   <Route path="/public/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/admission/:token" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/qr/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/qr/:token" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/form/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/form/:token" element={<SchoolPublicAdmissionPage />} />
+
                   <Route path="/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/admission/:token" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/qr/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/qr/:token" element={<SchoolPublicAdmissionPage />} />
 
+                  {/* Public Thank You Routes */}
                   <Route path="/public/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/public/thankyou/:token" element={<SchoolPublicThankYouPage />} />
                   <Route path="/public/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
-                  <Route path="/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
-                  <Route path="/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/public/thank-you/:token" element={<SchoolPublicThankYouPage />} />
 
-                  {/* Student Assessment Test Portal */}
+                  <Route path="/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/thankyou/:token" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/thank-you/:token" element={<SchoolPublicThankYouPage />} />
+
+                  {/* Student Assessment Test Portal Routes */}
                   <Route path="/public/test/:assignmentId" element={<SchoolStudentTest />} />
                   <Route path="/public/test/:token" element={<SchoolStudentTest />} />
+                  <Route path="/public/assessment/:assignmentId" element={<SchoolStudentTest />} />
+                  <Route path="/public/assessment/:token" element={<SchoolStudentTest />} />
+
                   <Route path="/test/:assignmentId" element={<SchoolStudentTest />} />
                   <Route path="/test/:token" element={<SchoolStudentTest />} />
+                  <Route path="/assessment/:assignmentId" element={<SchoolStudentTest />} />
+                  <Route path="/assessment/:token" element={<SchoolStudentTest />} />
 
                   {/* Protected School Admin Routes */}
                   <Route element={<SchoolLayout />}>
@@ -94,6 +114,9 @@ function App() {
                     <Route path="/dashboard/settings" element={<SchoolSettingsPage />} />
                     <Route path="/dashboard/subscription" element={<SchoolSubscription />} />
                     <Route path="/dashboard/assessments" element={<SchoolAssessmentList />} />
+                    <Route path="/dashboard/assessments/create" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/dashboard/assessments/new" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/dashboard/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
 
                     <Route path="/enquiries" element={<SchoolEnquiries />} />
                     <Route path="/admission-form" element={<SchoolAdmissionFormPage />} />
@@ -106,6 +129,8 @@ function App() {
                     <Route path="/subscription" element={<SchoolSubscription />} />
                     <Route path="/assessments" element={<SchoolAssessmentList />} />
                     <Route path="/assessments/create" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/assessments/new" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/assessments/builder" element={<SchoolAssessmentBuilder />} />
                     <Route path="/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
                   </Route>
 
