@@ -12,7 +12,8 @@ import {
   LogOut,
   X,
   GraduationCap,
-  FileQuestion
+  FileQuestion,
+  CreditCard
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -25,6 +26,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Admission Form', path: '/admission-form', icon: FileText },
     { name: 'QR Code / Links', path: '/qr-code', icon: QrCode },
     { name: 'Thank You CMS', path: '/thankyou-cms', icon: Sparkles },
+    { name: 'Subscription', path: '/subscription', icon: CreditCard },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 

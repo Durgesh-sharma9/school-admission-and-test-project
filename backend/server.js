@@ -29,6 +29,9 @@ const superAdminRoutes = require('./routes/superAdminRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const otpRoutes = require('./routes/otpRoutes');
 const googleAuthRoutes = require('./routes/googleAuthRoutes');
+const planRoutes = require('./routes/planRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Connect to Database
 connectDB();
@@ -63,6 +66,9 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/localities', localityRoutes);
 app.use('/api/v1/super-admin', superAdminRoutes);
 app.use('/api/v1', announcementRoutes);
+app.use('/api/v1/plans', planRoutes);
+app.use('/api/v1/subscription', subscriptionRoutes);
+app.use('/api/v1/payment', paymentRoutes);
 
 // Root Check
 app.get('/api/v1/health', (req, res) => {

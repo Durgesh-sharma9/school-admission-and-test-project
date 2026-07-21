@@ -50,6 +50,7 @@ const DashboardLayout = () => {
     if (path.startsWith('/admission-form')) return 'Manual Admission Entry';
     if (path.startsWith('/qr-code')) return 'Admission QR & Public Links';
     if (path.startsWith('/thankyou-cms')) return 'Thank You CMS Configuration';
+    if (path.startsWith('/subscription')) return 'Subscription & Billing';
     if (path.startsWith('/settings')) return 'School Settings';
     return 'CRM Admin';
   };

@@ -26,6 +26,7 @@ const SchoolThankYouCmsPage = lazy(() => import('./app/school/pages/ThankYouCmsP
 const SchoolSettingsPage = lazy(() => import('./app/school/pages/SettingsPage'));
 const SchoolAssessmentList = lazy(() => import('./app/school/pages/AssessmentList'));
 const SchoolAssessmentBuilder = lazy(() => import('./app/school/pages/AssessmentBuilder'));
+const SchoolSubscription = lazy(() => import('./app/school/pages/Subscription'));
 const SchoolPublicAdmissionPage = lazy(() => import('./app/school/pages/PublicAdmissionPage'));
 const SchoolPublicThankYouPage = lazy(() => import('./app/school/pages/PublicThankYouPage'));
 const SchoolStudentTest = lazy(() => import('./app/school/pages/StudentTest'));
@@ -83,6 +84,7 @@ function App() {
                     <Route path="/dashboard/thank-you-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/dashboard/enquiries" element={<SchoolEnquiries />} />
                     <Route path="/dashboard/settings" element={<SchoolSettingsPage />} />
+                    <Route path="/dashboard/subscription" element={<SchoolSubscription />} />
                     <Route path="/dashboard/assessments" element={<SchoolAssessmentList />} />
 
                     <Route path="/enquiries" element={<SchoolEnquiries />} />
@@ -93,6 +95,7 @@ function App() {
                     <Route path="/thankyou-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/thank-you-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/settings" element={<SchoolSettingsPage />} />
+                    <Route path="/subscription" element={<SchoolSubscription />} />
                     <Route path="/assessments" element={<SchoolAssessmentList />} />
                     <Route path="/assessments/create" element={<SchoolAssessmentBuilder />} />
                     <Route path="/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
