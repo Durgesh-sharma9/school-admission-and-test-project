@@ -77,12 +77,14 @@ const SuperAdminAnnouncements = () => {
       if (searchQuery) params.search = searchQuery;
 
       const res = await superAdminApi.get('/announcements', { params });
-      if (res.data.success) {
+      if (res.data && res.data.success) {
         setAnnouncements(res.data.data || []);
+      } else {
+        setAnnouncements([]);
       }
     } catch (err) {
-      console.error('Failed to load announcements:', err);
-      toast.error('Failed to load announcements');
+      console.warn('Announcements empty state or load error:', err.message);
+      setAnnouncements([]);
     } finally {
       setLoading(false);
     }

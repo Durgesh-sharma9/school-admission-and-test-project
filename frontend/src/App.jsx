@@ -78,9 +78,19 @@ function App() {
                   {/* Protected School Admin Routes */}
                   <Route element={<SchoolLayout />}>
                     <Route path="/dashboard" element={<SchoolDashboard />} />
+                    <Route path="/dashboard/admission-form" element={<SchoolAdmissionFormPage />} />
+                    <Route path="/dashboard/qr-links" element={<SchoolQrLinksPage />} />
+                    <Route path="/dashboard/thank-you-cms" element={<SchoolThankYouCmsPage />} />
+                    <Route path="/dashboard/enquiries" element={<SchoolEnquiries />} />
+                    <Route path="/dashboard/settings" element={<SchoolSettingsPage />} />
+                    <Route path="/dashboard/assessments" element={<SchoolAssessmentList />} />
+
                     <Route path="/enquiries" element={<SchoolEnquiries />} />
+                    <Route path="/admission-form" element={<SchoolAdmissionFormPage />} />
                     <Route path="/admission-form-builder" element={<SchoolAdmissionFormPage />} />
+                    <Route path="/qr-code" element={<SchoolQrLinksPage />} />
                     <Route path="/qr-links" element={<SchoolQrLinksPage />} />
+                    <Route path="/thankyou-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/thank-you-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/settings" element={<SchoolSettingsPage />} />
                     <Route path="/assessments" element={<SchoolAssessmentList />} />
@@ -97,6 +107,7 @@ function App() {
                     <Route path="/super-admin/payments" element={<SuperAdminPayments />} />
                     <Route path="/super-admin/announcements" element={<SuperAdminAnnouncements />} />
                     <Route path="/super-admin/landing-cms" element={<SuperAdminLandingCMS />} />
+                    <Route path="/super-admin/cms" element={<SuperAdminLandingCMS />} />
                     <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
                     <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
                     <Route path="/super-admin/profile" element={<SuperAdminProfile />} />
