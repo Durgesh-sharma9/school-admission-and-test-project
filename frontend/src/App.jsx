@@ -18,7 +18,7 @@ const SchoolSignup = lazy(() => import('./app/school/pages/Signup'));
 const SchoolVerifyOTP = lazy(() => import('./app/school/pages/VerifyOTP'));
 const SchoolForgotPassword = lazy(() => import('./app/school/pages/ForgotPassword'));
 const SchoolResetPassword = lazy(() => import('./app/school/pages/ResetPassword'));
-const SchoolDashboard = lazy(() => import('./app/school/pages/Dashboard'));
+import SchoolDashboard from './app/school/pages/Dashboard';
 const SchoolEnquiries = lazy(() => import('./app/school/pages/Enquiries'));
 const SchoolAdmissionFormPage = lazy(() => import('./app/school/pages/AdmissionFormPage'));
 const SchoolQrLinksPage = lazy(() => import('./app/school/pages/QrLinksPage'));
@@ -70,11 +70,19 @@ function App() {
                   <Route path="/reset-password" element={<SchoolResetPassword />} />
 
                   {/* Public Admission Form & Thank You Routes */}
+                  <Route path="/public/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
                   <Route path="/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
+
+                  <Route path="/public/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/public/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
+                  <Route path="/thankyou/:schoolId" element={<SchoolPublicThankYouPage />} />
                   <Route path="/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
 
                   {/* Student Assessment Test Portal */}
-                  <Route path="/test/:assessmentId" element={<SchoolStudentTest />} />
+                  <Route path="/public/test/:assignmentId" element={<SchoolStudentTest />} />
+                  <Route path="/public/test/:token" element={<SchoolStudentTest />} />
+                  <Route path="/test/:assignmentId" element={<SchoolStudentTest />} />
+                  <Route path="/test/:token" element={<SchoolStudentTest />} />
 
                   {/* Protected School Admin Routes */}
                   <Route element={<SchoolLayout />}>

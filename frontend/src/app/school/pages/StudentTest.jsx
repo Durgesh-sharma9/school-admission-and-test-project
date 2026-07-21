@@ -18,7 +18,8 @@ import {
 import { motion } from 'framer-motion';
 
 const StudentTest = () => {
-  const { assignmentId } = useParams();
+  const params = useParams();
+  const assignmentId = params.assignmentId || params.token || params.assessmentId || params.id;
   const navigate = useNavigate();
 
   // Test states

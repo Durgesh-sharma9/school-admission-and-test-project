@@ -350,26 +350,65 @@ const getAssignmentsByEnquiry = async (req, res) => {
   }
 };
 
+// Helper function to resolve assignment document by ObjectId or publicToken
+const findAssignmentByIdOrToken = async (id, populateFields = true) => {
+  if (!id) return null;
+  const decodedId = decodeURIComponent(id).trim();
+  const mongoose = require('mongoose');
+
+  let assignment = null;
+  if (mongoose.Types.ObjectId.isValid(decodedId)) {
+    let query = AssessmentAssignment.findById(decodedId);
+    if (populateFields) {
+      query = query
+        .populate('assessmentId')
+        .populate('enquiryId', 'studentName parentName email mobile classSeeking')
+        .populate('schoolId', 'name logo settings');
+    }
+    assignment = await query;
+  }
+
+  if (!assignment) {
+    let query = AssessmentAssignment.findOne({
+      $or: [
+        { publicToken: decodedId },
+        { token: decodedId },
+        { accessCode: decodedId },
+      ]
+    });
+    if (populateFields) {
+      query = query
+        .populate('assessmentId')
+        .populate('enquiryId', 'studentName parentName email mobile classSeeking')
+        .populate('schoolId', 'name logo settings');
+    }
+    assignment = await query;
+  }
+
+  return assignment;
+};
+
 // @desc    Load assignment data (Public - for student exam lounge)
 // @route   GET /api/v1/assessments/assignments/:id
 // @access  Public
 const getAssignmentById = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const assignment = await AssessmentAssignment.findById(id)
-      .populate('assessmentId')
-      .populate('enquiryId', 'studentName parentName email mobile classSeeking')
-      .populate('schoolId', 'name logo');
+    const assignment = await findAssignmentByIdOrToken(id, true);
 
     if (!assignment) {
-      return res.status(404).json({ success: false, message: 'Test invitation not found' });
+      console.warn('Public assessment lookup failed for token/ID:', id);
+      return res.status(404).json({ success: false, message: 'This test assignment link is invalid, expired, or has been revoked.' });
     }
 
     // Security check: If student test is still active/pending, STRIP correct answers
     const school = assignment.schoolId;
     const enquiry = assignment.enquiryId;
-    const rawAssessment = assignment.assessmentId.toObject();
+    const rawAssessment = assignment.assessmentId ? assignment.assessmentId.toObject() : null;
+
+    if (!rawAssessment) {
+      return res.status(404).json({ success: false, message: 'Associated assessment template is no longer available.' });
+    }
 
     if (assignment.status === 'Pending') {
       rawAssessment.sections.forEach(sec => {
@@ -413,7 +452,7 @@ const saveProgress = async (req, res) => {
     const { id } = req.params;
     const { answers } = req.body; // Array of student answers
 
-    const assignment = await AssessmentAssignment.findById(id);
+    const assignment = await findAssignmentByIdOrToken(id, false);
     if (!assignment) {
       return res.status(404).json({ success: false, message: 'Active test session not found' });
     }
@@ -422,14 +461,12 @@ const saveProgress = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Test already submitted. Action locked.' });
     }
 
-    // If test has not started yet, record the start timestamp
+    const updateDoc = { answers };
     if (!assignment.startTime) {
-      assignment.startTime = new Date();
+      updateDoc.startTime = new Date();
     }
 
-    // Save temporary answers
-    assignment.answers = answers;
-    await assignment.save();
+    await AssessmentAssignment.findByIdAndUpdate(assignment._id, { $set: updateDoc });
 
     return res.json({
       success: true,
@@ -449,10 +486,7 @@ const submitAssessment = async (req, res) => {
     const { id } = req.params;
     const { answers, timeTaken } = req.body;
 
-    const assignment = await AssessmentAssignment.findById(id)
-      .populate('assessmentId')
-      .populate('enquiryId')
-      .populate('schoolId');
+    const assignment = await findAssignmentByIdOrToken(id, true);
     if (!assignment) {
       return res.status(404).json({ success: false, message: 'Test session not found' });
     }
@@ -522,34 +556,35 @@ const submitAssessment = async (req, res) => {
       earnedObjectiveScore += ans.marksAwarded || 0;
     });
 
-    // Save final exam results details
-    assignment.answers = evaluatedAnswers;
-    assignment.status = 'Completed';
-    assignment.submittedAt = new Date();
-    assignment.timeTaken = timeTaken || 0;
-    assignment.totalScore = earnedObjectiveScore;
-
-    // Calculate percentage
-    const maxMarks = assessment.totalMarks || 1;
-    assignment.percentage = parseFloat(((earnedObjectiveScore / maxMarks) * 100).toFixed(2));
-
-    // If there are no descriptive questions, the test is immediately fully evaluated
-    assignment.isEvaluated = !containsDescriptive;
-
-    await assignment.save();
+    // Save final exam results details atomically to prevent Mongoose VersionError
+    const updatedAssignment = await AssessmentAssignment.findByIdAndUpdate(
+      assignment._id,
+      {
+        $set: {
+          answers: evaluatedAnswers,
+          status: 'Completed',
+          submittedAt: new Date(),
+          timeTaken: timeTaken || 0,
+          totalScore: earnedObjectiveScore,
+          percentage: parseFloat(((earnedObjectiveScore / maxMarks) * 100).toFixed(2)),
+          isEvaluated: !containsDescriptive,
+        }
+      },
+      { new: true }
+    );
 
     // Trigger Notification Log
     await createNotification(
-      assignment.schoolId,
+      assignment.schoolId?._id || assignment.schoolId,
       'Assessment Completed',
-      `Candidate ${assignment.enquiryId?.studentName || 'Student'} completed test "${assessment.name}". ${assignment.isEvaluated ? 'Evaluation complete.' : 'Grading worksheet pending descriptive evaluation.'}`,
+      `Candidate ${assignment.enquiryId?.studentName || 'Student'} completed test "${assessment.name}". ${!containsDescriptive ? 'Evaluation complete.' : 'Grading worksheet pending descriptive evaluation.'}`,
       'assessment_completed'
     );
 
     return res.json({
       success: true,
       message: 'Test submitted and auto-evaluated successfully!',
-      data: assignment,
+      data: updatedAssignment,
     });
   } catch (error) {
     console.error('Submit test error:', error);
