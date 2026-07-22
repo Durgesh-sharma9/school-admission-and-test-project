@@ -32,6 +32,7 @@ const googleAuthRoutes = require('./routes/googleAuthRoutes');
 const planRoutes = require('./routes/planRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const collegeRoutes = require('./routes/collegeRoutes');
 
 // Connect to Database
 connectDB();
@@ -69,6 +70,7 @@ app.use('/api/v1', announcementRoutes);
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/payment', paymentRoutes);
+app.use('/api/v1/college', collegeRoutes);
 
 // Root Check
 app.get('/api/v1/health', (req, res) => {

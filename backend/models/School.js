@@ -89,6 +89,11 @@ const schoolSchema = new mongoose.Schema({
     enum: ['super-admin', 'school-admin'],
     default: 'school-admin',
   },
+  institutionType: {
+    type: String,
+    enum: ['school', 'college'],
+    default: 'school',
+  },
   
   // Trial/Subscription state (ready for future modules)
   subscription: {

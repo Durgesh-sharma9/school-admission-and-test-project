@@ -13,16 +13,16 @@ const axios = require('axios');
 // @access  Public
 const signup = async (req, res) => {
   try {
-    const { name, email, password, phone, address } = req.body;
+    const { name, email, password, phone, address, institutionType } = req.body;
     const isGoogleVerified = Boolean(req.body.googleVerified || req.body.authProvider === 'google');
 
-    console.log('Signup request received:', { name, email, phone, address, isGoogleVerified });
+    console.log('Signup request received:', { name, email, phone, address, isGoogleVerified, institutionType });
 
     // Validate request based on authentication provider
     if (isGoogleVerified) {
       if (!name || !email || !phone || !address) {
         console.log('Missing Google signup fields:', { name: !!name, email: !!email, phone: !!phone, address: !!address });
-        return res.status(400).json({ success: false, message: 'School name, admin email, contact number, and school address are required' });
+        return res.status(400).json({ success: false, message: 'Institution name, admin email, contact number, and address are required' });
       }
     } else {
       if (!name || !email || !password || !phone || !address) {
@@ -47,6 +47,7 @@ const signup = async (req, res) => {
       phone,
       address,
       emailVerified: isGoogleVerified, // Verified if completed via Google identity check
+      institutionType: institutionType || 'school',
     });
 
     console.log('School object created, attempting to save...');
@@ -57,7 +58,21 @@ const signup = async (req, res) => {
     console.log('School saved successfully, ID:', school._id);
 
     // Now generate permanent QR Code and form link
-    const { qrCodeUrl, admissionFormLink } = await generateSchoolQrCode(school._id);
+    let { qrCodeUrl, admissionFormLink } = await generateSchoolQrCode(school._id);
+    if (school.institutionType === 'college') {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      admissionFormLink = `${frontendUrl}/public/college/admission/${school._id}`;
+      const QRCode = require('qrcode');
+      qrCodeUrl = await QRCode.toDataURL(admissionFormLink, {
+        errorCorrectionLevel: 'H',
+        margin: 2,
+        width: 400,
+        color: {
+          dark: '#4f46e5',
+          light: '#ffffff'
+        }
+      });
+    }
 
     // Save QR details
     school.qrCodeUrl = qrCodeUrl;
@@ -240,6 +255,7 @@ const login = async (req, res) => {
           name: school.name,
           email: school.email,
           role: school.role || 'school-admin',
+          institutionType: school.institutionType || 'school',
         },
         school: {
           id: school._id,
@@ -255,6 +271,7 @@ const login = async (req, res) => {
           thankYouCms: school.thankYouCms,
           settings: school.settings,
           communicationTemplates: school.communicationTemplates,
+          institutionType: school.institutionType || 'school',
         },
       });
     }
@@ -294,7 +311,7 @@ const getPublicSchoolInfo = async (req, res) => {
     let school = null;
 
     if (mongoose.Types.ObjectId.isValid(schoolId)) {
-      school = await School.findById(schoolId).select('name logo thankYouCms');
+      school = await School.findById(schoolId).select('name logo thankYouCms institutionType');
     }
 
     if (!school) {
@@ -303,7 +320,7 @@ const getPublicSchoolInfo = async (req, res) => {
           { code: schoolId },
           { slug: schoolId }
         ]
-      }).select('name logo thankYouCms');
+      }).select('name logo thankYouCms institutionType');
     }
 
     if (!school) {
@@ -469,6 +486,7 @@ const googleLogin = async (req, res) => {
         name: school.name,
         email: school.email,
         role: school.role || 'school-admin',
+        institutionType: school.institutionType || 'school',
       },
       school: {
         id: school._id,
@@ -484,6 +502,7 @@ const googleLogin = async (req, res) => {
         thankYouCms: school.thankYouCms,
         settings: school.settings,
         communicationTemplates: school.communicationTemplates,
+        institutionType: school.institutionType || 'school',
       },
     });
   } catch (error) {

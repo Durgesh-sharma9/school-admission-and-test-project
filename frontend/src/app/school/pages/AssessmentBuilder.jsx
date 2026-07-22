@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../services/schoolApi';
+import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import toast from 'react-hot-toast';

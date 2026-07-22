@@ -32,8 +32,29 @@ const SchoolPublicThankYouPage = lazy(() => import('./app/school/pages/PublicTha
 const SchoolStudentTest = lazy(() => import('./app/school/pages/StudentTest'));
 const SchoolNotFound = lazy(() => import('./app/school/pages/NotFound'));
 
-// School Admin Layout
 const SchoolLayout = lazy(() => import('./app/school/layouts/DashboardLayout'));
+
+// College Admin Layout
+const CollegeLayout = lazy(() => import('./app/college/layouts/CollegeDashboardLayout'));
+
+// College Admin Pages
+const CollegeDashboard = lazy(() => import('./app/college/pages/Dashboard'));
+const CollegeApplications = lazy(() => import('./app/college/pages/Applications'));
+const CollegeAdmissionForm = lazy(() => import('./app/college/pages/AdmissionForm'));
+const CollegeDepartments = lazy(() => import('./app/college/pages/Departments'));
+const CollegeCourses = lazy(() => import('./app/college/pages/Courses'));
+const CollegeFaculty = lazy(() => import('./app/college/pages/Faculty'));
+const CollegeCounselling = lazy(() => import('./app/college/pages/Counselling'));
+const CollegeDocuments = lazy(() => import('./app/college/pages/Documents'));
+const CollegeFeeVerification = lazy(() => import('./app/college/pages/FeeVerification'));
+const CollegeQrLinks = lazy(() => import('./app/college/pages/QrLinksPage'));
+const CollegeThankYouCms = lazy(() => import('./app/college/pages/ThankYouCmsPage'));
+const CollegeSubscription = lazy(() => import('./app/college/pages/Subscription'));
+const CollegeSettings = lazy(() => import('./app/college/pages/SettingsPage'));
+
+// College Public Pages
+const CollegePublicAdmission = lazy(() => import('./app/college/pages/PublicAdmissionPage'));
+const CollegePublicThankYou = lazy(() => import('./app/college/pages/PublicThankYouPage'));
 
 // Super Admin Pages (Lazy Loaded)
 const SuperAdminLogin = lazy(() => import('./app/super-admin/pages/Login'));
@@ -132,6 +153,27 @@ function App() {
                     <Route path="/assessments/new" element={<SchoolAssessmentBuilder />} />
                     <Route path="/assessments/builder" element={<SchoolAssessmentBuilder />} />
                     <Route path="/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
+                  </Route>
+
+                  {/* College Public Routes */}
+                  <Route path="/public/college/admission/:schoolId" element={<CollegePublicAdmission />} />
+                  <Route path="/public/college/thank-you/:schoolId" element={<CollegePublicThankYou />} />
+
+                  {/* Protected College Admin Routes */}
+                  <Route element={<CollegeLayout />}>
+                    <Route path="/college/dashboard" element={<CollegeDashboard />} />
+                    <Route path="/college/applications" element={<CollegeApplications />} />
+                    <Route path="/college/admission-form" element={<CollegeAdmissionForm />} />
+                    <Route path="/college/departments" element={<CollegeDepartments />} />
+                    <Route path="/college/courses" element={<CollegeCourses />} />
+                    <Route path="/college/faculty" element={<CollegeFaculty />} />
+                    <Route path="/college/counselling" element={<CollegeCounselling />} />
+                    <Route path="/college/documents" element={<CollegeDocuments />} />
+                    <Route path="/college/fee-verification" element={<CollegeFeeVerification />} />
+                    <Route path="/college/qr-links" element={<CollegeQrLinks />} />
+                    <Route path="/college/thank-you-cms" element={<CollegeThankYouCms />} />
+                    <Route path="/college/subscription" element={<CollegeSubscription />} />
+                    <Route path="/college/settings" element={<CollegeSettings />} />
                   </Route>
 
                   {/* Super Admin Authentication & Protected Routes */}

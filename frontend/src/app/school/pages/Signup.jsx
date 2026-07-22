@@ -14,6 +14,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [institutionType, setInstitutionType] = useState('school');
 
   const googleData = location.state?.googleData;
 
@@ -41,7 +42,7 @@ const Signup = () => {
   // Redirect if already logged in
   React.useEffect(() => {
     if (school) {
-      navigate('/dashboard');
+      navigate(school.institutionType === 'college' ? '/college/dashboard' : '/dashboard');
     }
   }, [school, navigate]);
 
@@ -56,6 +57,7 @@ const Signup = () => {
         address: data.address,
         googleVerified: isGoogle,
         authProvider: isGoogle ? 'google' : 'email',
+        institutionType,
       };
 
       if (!isGoogle) {
@@ -70,8 +72,8 @@ const Signup = () => {
           if (updateSchoolState) {
             updateSchoolState(result.school);
           }
-          toast.success('School account created successfully!');
-          navigate('/dashboard', { replace: true });
+          toast.success(`${institutionType === 'school' ? 'School' : 'College'} account created successfully!`);
+          navigate(result.school.institutionType === 'college' ? '/college/dashboard' : '/dashboard', { replace: true });
         } else {
           toast.success('Account created! Please enter OTP sent to your email.');
           navigate('/verify-otp', { state: { email: data.email } });
@@ -90,30 +92,56 @@ const Signup = () => {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 bg-gradient-to-tr from-indigo-50/50 via-slate-50 to-indigo-50/30">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
         {/* Header */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-6">
           <div className="flex items-center justify-center h-12 w-12 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-600/20 mb-3">
             <GraduationCap className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Create School Account</h2>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Create {institutionType === 'school' ? 'School' : 'College'} Account</h2>
           <p className="text-slate-400 text-sm mt-1">Start your 30-day CRM free trial</p>
+        </div>
+
+        {/* Institution Type Selector */}
+        <div className="flex border border-slate-200 rounded-xl p-1 bg-slate-50 mb-6">
+          <button
+            type="button"
+            onClick={() => setInstitutionType('school')}
+            className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+              institutionType === 'school'
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Signup as School
+          </button>
+          <button
+            type="button"
+            onClick={() => setInstitutionType('college')}
+            className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+              institutionType === 'college'
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Signup as College
+          </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
-            label="School Name"
+            label={institutionType === 'school' ? 'School Name' : 'College Name'}
             name="name"
-            placeholder="e.g. Oakridge Public School"
+            placeholder={institutionType === 'school' ? 'e.g. Oakridge Public School' : 'e.g. Oakridge University College'}
             required
             error={errors.name}
-            {...register('name', { required: 'School name is required' })}
+            {...register('name', { required: `${institutionType === 'school' ? 'School' : 'College'} name is required` })}
           />
 
           <Input
             label="Admin Email Address"
             name="email"
             type="email"
-            placeholder="e.g. admin@school.com"
+            placeholder="e.g. admin@institution.com"
             required
             error={errors.email}
             {...register('email', {
@@ -168,12 +196,12 @@ const Signup = () => {
           </div>
 
           <Input
-            label="School Address"
+            label={institutionType === 'school' ? 'School Address' : 'College Address'}
             name="address"
-            placeholder="e.g. 123 Education Lane, Sector 4"
+            placeholder={institutionType === 'school' ? 'e.g. 123 Education Lane, Sector 4' : 'e.g. 456 University Boulevard'}
             required
             error={errors.address}
-            {...register('address', { required: 'School address is required' })}
+            {...register('address', { required: `${institutionType === 'school' ? 'School' : 'College'} address is required` })}
           />
 
           <div className="pt-2">
@@ -192,7 +220,7 @@ const Signup = () => {
 
         {/* Footer */}
         <div className="mt-6 text-center text-sm text-slate-500">
-          Already have a school account?{' '}
+          Already have an account?{' '}
           <Link to="/login" className="text-indigo-600 font-semibold hover:text-indigo-500">
             Log In
           </Link>

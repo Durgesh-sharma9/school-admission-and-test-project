@@ -37,7 +37,8 @@ const Login = () => {
     if (superAdmin) {
       navigate('/super-admin/dashboard', { replace: true });
     } else if (school) {
-      const origin = location.state?.from?.pathname || '/dashboard';
+      const defaultOrigin = school.institutionType === 'college' ? '/college/dashboard' : '/dashboard';
+      const origin = location.state?.from?.pathname || defaultOrigin;
       navigate(origin, { replace: true });
     }
   }, [school, superAdmin, navigate, location]);
@@ -53,7 +54,8 @@ const Login = () => {
           if (checkSuperAdminAuth) await checkSuperAdminAuth();
           navigate('/super-admin/dashboard', { replace: true });
         } else {
-          const origin = location.state?.from?.pathname || '/dashboard';
+          const defaultOrigin = result.school?.institutionType === 'college' ? '/college/dashboard' : '/dashboard';
+          const origin = location.state?.from?.pathname || defaultOrigin;
           navigate(origin, { replace: true });
         }
       }
