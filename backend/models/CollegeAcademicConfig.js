@@ -18,10 +18,6 @@ const collegeAcademicConfigSchema = new mongoose.Schema({
   selectedSpecializations: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'MasterSpecialization'
-  }],
-  selectedSessions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'MasterAdmissionSession'
   }]
 }, {
   timestamps: true

@@ -17,21 +17,23 @@ const {
   addApplicationNote,
   getPublicDepartments,
   getPublicCourses,
-  getPublicSpecializations,
-  getPublicSessions
+  getPublicSpecializations
 } = require('../controllers/collegeApplicationController');
 const {
   getCollegeAcademicConfig,
   saveCollegeAcademicConfig,
   getAcademicMastersForCollege
 } = require('../controllers/academicMasterController');
+const {
+  submitRequest,
+  getCollegeRequests
+} = require('../controllers/academicRequestController');
 
 // Public routes for public form and metadata
 router.post('/applications/submit', submitApplication);
 router.get('/public/departments/:collegeId', getPublicDepartments);
 router.get('/public/courses/:collegeId', getPublicCourses);
 router.get('/public/specializations/:collegeId', getPublicSpecializations);
-router.get('/public/sessions/:collegeId', getPublicSessions);
 
 // Protected routes (require valid JWT token from college admin)
 router.use(protect);
@@ -40,6 +42,8 @@ router.use(protect);
 router.get('/academic/config', getCollegeAcademicConfig);
 router.post('/academic/config', saveCollegeAcademicConfig);
 router.get('/academic/all-masters', getAcademicMastersForCollege);
+router.post('/academic/requests', submitRequest);
+router.get('/academic/requests', getCollegeRequests);
 
 // Dashboard
 router.get('/dashboard/analytics', getDashboardAnalytics);

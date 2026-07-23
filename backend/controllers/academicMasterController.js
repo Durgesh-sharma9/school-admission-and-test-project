@@ -1,7 +1,6 @@
 const MasterDepartment = require('../models/MasterDepartment');
 const MasterCourse = require('../models/MasterCourse');
 const MasterSpecialization = require('../models/MasterSpecialization');
-const MasterAdmissionSession = require('../models/MasterAdmissionSession');
 const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 
 // ==========================================
@@ -250,79 +249,6 @@ const deleteMasterSpecialization = async (req, res) => {
 
 
 // ==========================================
-// Admission Session Master CRUD
-// ==========================================
-
-const getMasterSessions = async (req, res) => {
-  try {
-    const { activeOnly } = req.query;
-    const filter = {};
-    if (activeOnly === 'true') filter.isActive = true;
-
-    const sessions = await MasterAdmissionSession.find(filter).sort({ name: -1 });
-    return res.json({ success: true, data: sessions });
-  } catch (error) {
-    console.error('Get master sessions error:', error);
-    return res.status(500).json({ success: false, message: 'Server error fetching sessions' });
-  }
-};
-
-const createMasterSession = async (req, res) => {
-  try {
-    const { name } = req.body;
-    if (!name) {
-      return res.status(400).json({ success: false, message: 'Name is required' });
-    }
-
-    const session = new MasterAdmissionSession({ name });
-    await session.save();
-
-    return res.status(201).json({ success: true, message: 'Session created successfully', data: session });
-  } catch (error) {
-    console.error('Create master session error:', error);
-    return res.status(550).json({ success: false, message: error.code === 11000 ? 'Session with this name already exists' : 'Server error creating session' });
-  }
-};
-
-const updateMasterSession = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, isActive } = req.body;
-
-    const session = await MasterAdmissionSession.findById(id);
-    if (!session) {
-      return res.status(404).json({ success: false, message: 'Session not found' });
-    }
-
-    if (name !== undefined) session.name = name;
-    if (isActive !== undefined) session.isActive = isActive;
-
-    await session.save();
-    return res.json({ success: true, message: 'Session updated successfully', data: session });
-  } catch (error) {
-    console.error('Update master session error:', error);
-    return res.status(550).json({ success: false, message: error.code === 11000 ? 'Session already exists' : 'Server error updating session' });
-  }
-};
-
-const deleteMasterSession = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const session = await MasterAdmissionSession.findByIdAndDelete(id);
-    if (!session) {
-      return res.status(404).json({ success: false, message: 'Session not found' });
-    }
-
-    return res.json({ success: true, message: 'Session deleted successfully' });
-  } catch (error) {
-    console.error('Delete master session error:', error);
-    return res.status(500).json({ success: false, message: 'Server error deleting session' });
-  }
-};
-
-
-// ==========================================
 // College Tenant Configurations
 // ==========================================
 
@@ -337,16 +263,14 @@ const getCollegeAcademicConfig = async (req, res) => {
     let config = await CollegeAcademicConfig.findOne({ schoolId })
       .populate('selectedDepartments')
       .populate('selectedCourses')
-      .populate('selectedSpecializations')
-      .populate('selectedSessions');
+      .populate('selectedSpecializations');
 
     if (!config) {
       config = new CollegeAcademicConfig({
         schoolId,
         selectedDepartments: [],
         selectedCourses: [],
-        selectedSpecializations: [],
-        selectedSessions: []
+        selectedSpecializations: []
       });
       await config.save();
     }
@@ -364,8 +288,7 @@ const saveCollegeAcademicConfig = async (req, res) => {
     const {
       selectedDepartments,
       selectedCourses,
-      selectedSpecializations,
-      selectedSessions
+      selectedSpecializations
     } = req.body;
 
     let config = await CollegeAcademicConfig.findOne({ schoolId });
@@ -376,7 +299,6 @@ const saveCollegeAcademicConfig = async (req, res) => {
     config.selectedDepartments = selectedDepartments || [];
     config.selectedCourses = selectedCourses || [];
     config.selectedSpecializations = selectedSpecializations || [];
-    config.selectedSessions = selectedSessions || [];
 
     await config.save();
     return res.json({ success: true, message: 'Academic configurations saved successfully', data: config });
@@ -391,15 +313,13 @@ const getAcademicMastersForCollege = async (req, res) => {
     const departments = await MasterDepartment.find({ isActive: true }).sort({ name: 1 });
     const courses = await MasterCourse.find({ isActive: true }).sort({ name: 1 });
     const specializations = await MasterSpecialization.find({ isActive: true }).sort({ name: 1 });
-    const sessions = await MasterAdmissionSession.find({ isActive: true }).sort({ name: -1 });
 
     return res.json({
       success: true,
       data: {
         departments,
         courses,
-        specializations,
-        sessions
+        specializations
       }
     });
   } catch (error) {
@@ -423,11 +343,6 @@ module.exports = {
   createMasterSpecialization,
   updateMasterSpecialization,
   deleteMasterSpecialization,
-  
-  getMasterSessions,
-  createMasterSession,
-  updateMasterSession,
-  deleteMasterSession,
 
   getCollegeAcademicConfig,
   saveCollegeAcademicConfig,

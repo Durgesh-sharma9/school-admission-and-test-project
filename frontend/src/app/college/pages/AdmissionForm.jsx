@@ -10,7 +10,6 @@ const AdmissionForm = () => {
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [specializations, setSpecializations] = useState([]);
-  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,7 +38,6 @@ const AdmissionForm = () => {
     departmentId: '',
     courseId: '',
     specialization: '',
-    session: '',
     modeOfStudy: 'Regular',
     hostelRequired: false,
     transportRequired: false,
@@ -76,12 +74,6 @@ const AdmissionForm = () => {
           setDepartments(config.selectedDepartments || []);
           setCourses(config.selectedCourses || []);
           setSpecializations(config.selectedSpecializations || []);
-          setSessions(config.selectedSessions || []);
-          
-          // Set default session if active ones exist
-          if (config.selectedSessions?.length > 0) {
-            setFormData(prev => ({ ...prev, session: config.selectedSessions[0].name }));
-          }
         }
       } catch (error) {
         toast.error('Failed to load academic configuration');
@@ -161,7 +153,6 @@ const AdmissionForm = () => {
           departmentId: '',
           courseId: '',
           specialization: '',
-          session: sessions[0]?.name || '',
           modeOfStudy: 'Regular',
           hostelRequired: false,
           transportRequired: false,
@@ -428,21 +419,6 @@ const AdmissionForm = () => {
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">Session</label>
-              <select
-                name="session"
-                value={formData.session}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
-                required
-              >
-                <option value="">-- Select Session --</option>
-                {sessions.map(s => (
-                  <option key={s._id} value={s.name}>{s.name}</option>
-                ))}
-              </select>
-            </div>
 
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-slate-700">Regular / Distance</label>

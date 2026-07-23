@@ -28,13 +28,13 @@ const {
   getMasterSpecializations,
   createMasterSpecialization,
   updateMasterSpecialization,
-  deleteMasterSpecialization,
-  
-  getMasterSessions,
-  createMasterSession,
-  updateMasterSession,
-  deleteMasterSession
+  deleteMasterSpecialization
 } = require('../controllers/academicMasterController');
+const {
+  getSuperAdminRequests,
+  approveRequest,
+  rejectRequest
+} = require('../controllers/academicRequestController');
 const { protect } = require('../middleware/superAdminAuth');
 
 // Auth routes
@@ -69,9 +69,9 @@ router.post('/academic/specializations', protect, createMasterSpecialization);
 router.put('/academic/specializations/:id', protect, updateMasterSpecialization);
 router.delete('/academic/specializations/:id', protect, deleteMasterSpecialization);
 
-router.get('/academic/sessions', protect, getMasterSessions);
-router.post('/academic/sessions', protect, createMasterSession);
-router.put('/academic/sessions/:id', protect, updateMasterSession);
-router.delete('/academic/sessions/:id', protect, deleteMasterSession);
+// Academic requests workflow
+router.get('/academic/requests', protect, getSuperAdminRequests);
+router.post('/academic/requests/:id/approve', protect, approveRequest);
+router.post('/academic/requests/:id/reject', protect, rejectRequest);
 
 module.exports = router;

@@ -3,7 +3,6 @@ const dotenv = require('dotenv');
 const MasterDepartment = require('../models/MasterDepartment');
 const MasterCourse = require('../models/MasterCourse');
 const MasterSpecialization = require('../models/MasterSpecialization');
-const MasterAdmissionSession = require('../models/MasterAdmissionSession');
 
 const path = require('path');
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -22,7 +21,6 @@ const seedData = async () => {
     await MasterDepartment.deleteMany({});
     await MasterCourse.deleteMany({});
     await MasterSpecialization.deleteMany({});
-    await MasterAdmissionSession.deleteMany({});
     console.log('Cleared existing academic masters.');
 
     // 1. Seed Departments
@@ -106,19 +104,6 @@ const seedData = async () => {
       const spec = new MasterSpecialization(s);
       await spec.save();
       console.log(`Seeded Specialization: ${spec.name}`);
-    }
-
-    // 4. Seed Admission Sessions
-    const sessions = [
-      { name: '2026-27' },
-      { name: '2027-28' },
-      { name: '2028-29' }
-    ];
-
-    for (const s of sessions) {
-      const session = new MasterAdmissionSession(s);
-      await session.save();
-      console.log(`Seeded Admission Session: ${session.name}`);
     }
 
     console.log('Academic Master seed completed successfully!');

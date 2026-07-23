@@ -386,21 +386,6 @@ const getPublicSpecializations = async (req, res) => {
   }
 };
 
-// @desc    Get public sessions for college
-// @route   GET /api/v1/college/public/sessions/:collegeId
-// @access  Public
-const getPublicSessions = async (req, res) => {
-  try {
-    const { collegeId } = req.params;
-    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate('selectedSessions');
-    const sessions = config ? config.selectedSessions : [];
-    return res.json({ success: true, data: sessions });
-  } catch (error) {
-    console.error('Public sessions error:', error);
-    return res.status(500).json({ success: false, message: 'Server error fetching sessions' });
-  }
-};
-
 module.exports = {
   getApplications,
   getApplicationById,
@@ -411,6 +396,5 @@ module.exports = {
   addApplicationNote,
   getPublicDepartments,
   getPublicCourses,
-  getPublicSpecializations,
-  getPublicSessions
+  getPublicSpecializations
 };

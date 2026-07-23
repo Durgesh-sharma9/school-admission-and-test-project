@@ -17,7 +17,6 @@ const PublicAdmissionPage = () => {
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [specializations, setSpecializations] = useState([]);
-  const [sessions, setSessions] = useState([]);
   
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -50,7 +49,6 @@ const PublicAdmissionPage = () => {
     departmentId: '',
     courseId: '',
     specialization: '',
-    session: '',
     modeOfStudy: 'Regular',
     hostelRequired: false,
     transportRequired: false,
@@ -96,24 +94,17 @@ const PublicAdmissionPage = () => {
         setLoading(true);
         const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
         
-        const [infoRes, deptsRes, coursesRes, specsRes, sessionsRes] = await Promise.all([
+        const [infoRes, deptsRes, coursesRes, specsRes] = await Promise.all([
           axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`),
           axios.get(`${apiBaseUrl}/college/public/departments/${schoolId}`),
           axios.get(`${apiBaseUrl}/college/public/courses/${schoolId}`),
-          axios.get(`${apiBaseUrl}/college/public/specializations/${schoolId}`),
-          axios.get(`${apiBaseUrl}/college/public/sessions/${schoolId}`)
+          axios.get(`${apiBaseUrl}/college/public/specializations/${schoolId}`)
         ]);
 
         if (infoRes.data.success) setCollegeInfo(infoRes.data.school);
         if (deptsRes.data.success) setDepartments(deptsRes.data.data);
         if (coursesRes.data.success) setCourses(coursesRes.data.data);
         if (specsRes.data.success) setSpecializations(specsRes.data.data);
-        if (sessionsRes.data.success) {
-          setSessions(sessionsRes.data.data);
-          if (sessionsRes.data.data?.length > 0) {
-            setFormData(prev => ({ ...prev, session: sessionsRes.data.data[0].name }));
-          }
-        }
       } catch (error) {
         console.error('Failed to fetch college details:', error);
         toast.error('Unable to verify college code');
@@ -446,21 +437,6 @@ const PublicAdmissionPage = () => {
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Session</label>
-                <select
-                  name="session"
-                  value={formData.session}
-                  onChange={handleChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
-                  required
-                >
-                  <option value="">-- Select Session --</option>
-                  {sessions.map(s => (
-                    <option key={s._id} value={s.name}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
 
               <div className="space-y-1">
                 <label className="block text-xs font-semibold text-slate-700">Regular / Distance</label>

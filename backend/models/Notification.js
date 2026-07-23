@@ -18,7 +18,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['new_enquiry', 'assessment_assigned', 'assessment_completed', 'status_changed', 'admission_confirmed'],
+    enum: ['new_enquiry', 'assessment_assigned', 'assessment_completed', 'status_changed', 'admission_confirmed', 'academic_request'],
     required: true,
   },
   isRead: {
