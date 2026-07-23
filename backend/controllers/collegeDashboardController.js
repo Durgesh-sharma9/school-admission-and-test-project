@@ -20,19 +20,44 @@ const getDashboardAnalytics = async (req, res) => {
       createdAt: { $gte: todayStart }
     });
 
+    const counsellingAssigned = await CollegeApplication.countDocuments({
+      schoolId: collegeId,
+      stage: 'Counselling Assigned'
+    });
+
+    const callScheduled = await CollegeApplication.countDocuments({
+      schoolId: collegeId,
+      stage: 'Call Scheduled'
+    });
+
+    const callCompleted = await CollegeApplication.countDocuments({
+      schoolId: collegeId,
+      stage: 'Call Completed'
+    });
+
+    const campusVisit = await CollegeApplication.countDocuments({
+      schoolId: collegeId,
+      stage: 'Campus Visit'
+    });
+
     const pendingVerification = await CollegeApplication.countDocuments({
       schoolId: collegeId,
       stage: 'Documents Pending'
     });
 
-    const counsellingScheduled = await CollegeApplication.countDocuments({
+    const verifiedVerification = await CollegeApplication.countDocuments({
       schoolId: collegeId,
-      stage: 'Counselling Scheduled'
+      stage: 'Documents Verified'
     });
 
-    const counsellingCompleted = await CollegeApplication.countDocuments({
+    const selected = await CollegeApplication.countDocuments({
       schoolId: collegeId,
-      stage: 'Counselling Completed'
+      stage: 'Selected'
+    });
+
+    const rejected = await CollegeApplication.countDocuments({
+      schoolId: collegeId,
+      stage: 'Rejected'
     });
 
     const confirmedAdmissions = await CollegeApplication.countDocuments({
@@ -116,9 +141,14 @@ const getDashboardAnalytics = async (req, res) => {
         stats: {
           totalApplications,
           todayApplications,
+          counsellingAssigned,
+          callScheduled,
+          callCompleted,
+          campusVisit,
           pendingVerification,
-          counsellingScheduled,
-          counsellingCompleted,
+          verifiedVerification,
+          selected,
+          rejected,
           confirmedAdmissions,
           scholarshipRequests,
           hostelRequests

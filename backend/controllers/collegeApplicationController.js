@@ -188,7 +188,7 @@ const submitApplication = async (req, res) => {
       receiptUrl: receiptUrl || '',
       paymentStatus: transactionId ? 'Pending' : 'Pending',
       paymentDate: transactionId ? new Date() : null,
-      stage: 'Application Received',
+      stage: 'Counselling Assigned',
       notes: [{ note: 'Application submitted successfully via Admission Desk Portal.' }]
     });
 

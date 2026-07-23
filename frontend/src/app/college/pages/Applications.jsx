@@ -23,13 +23,15 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STAGES = [
-  'Application Received',
+  'Counselling Assigned',
+  'Call Scheduled',
+  'Call Completed',
+  'Campus Visit',
   'Documents Pending',
   'Documents Verified',
-  'Counselling Scheduled',
-  'Counselling Completed',
-  'Admission Confirmed',
-  'Rejected'
+  'Selected',
+  'Rejected',
+  'Admission Confirmed'
 ];
 
 const Applications = () => {

@@ -29,7 +29,6 @@ const CollegeSidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Admission Form', path: '/college/admission-form', icon: FileText },
     { name: 'Departments', path: '/college/departments', icon: Layers },
     { name: 'Courses', path: '/college/courses', icon: BookOpen },
-    { name: 'Faculty', path: '/college/faculty', icon: Users },
     { name: 'Counselling', path: '/college/counselling', icon: Compass },
     { name: 'Documents', path: '/college/documents', icon: FileCheck },
     { name: 'QR Code / Links', path: '/college/qr-links', icon: QrCode },

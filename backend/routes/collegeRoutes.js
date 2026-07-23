@@ -6,7 +6,6 @@ const { protect } = require('../middleware/auth');
 const { getDashboardAnalytics } = require('../controllers/collegeDashboardController');
 const { getDepartments, createDepartment, updateDepartment, deleteDepartment } = require('../controllers/collegeDepartmentController');
 const { getCourses, createCourse, updateCourse, deleteCourse } = require('../controllers/collegeCourseController');
-const { getFaculty, createFaculty, updateFaculty, deleteFaculty } = require('../controllers/collegeFacultyController');
 const {
   getApplications,
   getApplicationById,
@@ -58,12 +57,6 @@ router.get('/courses', getCourses);
 router.post('/courses', createCourse);
 router.put('/courses/:id', updateCourse);
 router.delete('/courses/:id', deleteCourse);
-
-// Faculty CRUD
-router.get('/faculty', getFaculty);
-router.post('/faculty', createFaculty);
-router.put('/faculty/:id', updateFaculty);
-router.delete('/faculty/:id', deleteFaculty);
 
 // Applications desk & Counselling operations
 router.get('/applications', getApplications);

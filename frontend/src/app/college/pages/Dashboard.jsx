@@ -61,9 +61,14 @@ const Dashboard = () => {
   const stats = data?.stats || {
     totalApplications: 0,
     todayApplications: 0,
+    counsellingAssigned: 0,
+    callScheduled: 0,
+    callCompleted: 0,
+    campusVisit: 0,
     pendingVerification: 0,
-    counsellingScheduled: 0,
-    counsellingCompleted: 0,
+    verifiedVerification: 0,
+    selected: 0,
+    rejected: 0,
     confirmedAdmissions: 0,
     scholarshipRequests: 0,
     hostelRequests: 0
@@ -86,16 +91,19 @@ const Dashboard = () => {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
         {[
           { title: 'Total Applications', val: stats.totalApplications, icon: ClipboardList, color: 'indigo' },
           { title: 'Today\'s Applications', val: stats.todayApplications, icon: Clock, color: 'cyan' },
+          { title: 'Counselling Assigned', val: stats.counsellingAssigned, icon: Compass, color: 'fuchsia' },
+          { title: 'Call Scheduled', val: stats.callScheduled, icon: Clock, color: 'violet' },
+          { title: 'Call Completed', val: stats.callCompleted, icon: UserCheck, color: 'indigo' },
+          { title: 'Campus Visit', val: stats.campusVisit, icon: Home, color: 'emerald' },
           { title: 'Docs Pending', val: stats.pendingVerification, icon: FileText, color: 'amber' },
-          { title: 'Counselling Scheduled', val: stats.counsellingScheduled, icon: Compass, color: 'fuchsia' },
-          { title: 'Counselling Completed', val: stats.counsellingCompleted, icon: UserCheck, color: 'violet' },
-          { title: 'Admissions Confirmed', val: stats.confirmedAdmissions, icon: CheckCircle, color: 'emerald' },
-          { title: 'Scholarship Requests', val: stats.scholarshipRequests, icon: Award, color: 'amber' },
-          { title: 'Hostel Requests', val: stats.hostelRequests, icon: Home, color: 'indigo' }
+          { title: 'Docs Verified', val: stats.verifiedVerification, icon: CheckCircle, color: 'indigo' },
+          { title: 'Selected Applicants', val: stats.selected, icon: Award, color: 'emerald' },
+          { title: 'Rejected Applicants', val: stats.rejected, icon: Clock, color: 'rose' },
+          { title: 'Confirmed Admissions', val: stats.confirmedAdmissions, icon: CheckCircle, color: 'emerald' }
         ].map((item, idx) => {
           const Icon = item.icon;
           return (

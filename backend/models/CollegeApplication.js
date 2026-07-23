@@ -238,16 +238,17 @@ const collegeApplicationSchema = new mongoose.Schema({
   stage: {
     type: String,
     enum: [
-      'Application Received',
+      'Counselling Assigned',
+      'Call Scheduled',
+      'Call Completed',
+      'Campus Visit',
       'Documents Pending',
       'Documents Verified',
-      'Counselling Scheduled',
-      'Counselling Completed',
-      'Fee Pending',
-      'Admission Confirmed',
-      'Rejected'
+      'Selected',
+      'Rejected',
+      'Admission Confirmed'
     ],
-    default: 'Application Received',
+    default: 'Counselling Assigned',
   },
   notes: [{
     note: { type: String, required: true },

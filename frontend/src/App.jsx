@@ -43,7 +43,6 @@ const CollegeApplications = lazy(() => import('./app/college/pages/Applications'
 const CollegeAdmissionForm = lazy(() => import('./app/college/pages/AdmissionForm'));
 const CollegeDepartments = lazy(() => import('./app/college/pages/Departments'));
 const CollegeCourses = lazy(() => import('./app/college/pages/Courses'));
-const CollegeFaculty = lazy(() => import('./app/college/pages/Faculty'));
 const CollegeCounselling = lazy(() => import('./app/college/pages/Counselling'));
 const CollegeDocuments = lazy(() => import('./app/college/pages/Documents'));
 const CollegeQrLinks = lazy(() => import('./app/college/pages/QrLinksPage'));
@@ -168,7 +167,6 @@ function App() {
                     <Route path="/college/admission-form" element={<CollegeAdmissionForm />} />
                     <Route path="/college/departments" element={<CollegeDepartments />} />
                     <Route path="/college/courses" element={<CollegeCourses />} />
-                    <Route path="/college/faculty" element={<CollegeFaculty />} />
                     <Route path="/college/counselling" element={<CollegeCounselling />} />
                     <Route path="/college/documents" element={<CollegeDocuments />} />
                     <Route path="/college/qr-links" element={<CollegeQrLinks />} />
