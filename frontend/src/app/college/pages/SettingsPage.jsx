@@ -29,7 +29,10 @@ import {
 
 const SettingsPage = () => {
   const { school, updateSchoolState } = useAuth();
+  
+  // Tabs: 'profile', 'branding', 'templates', 'security'
   const [activeTab, setActiveTab] = useState('profile');
+  
   const [loading, setLoading] = useState(false);
   const [fetchingMasters, setFetchingMasters] = useState(false);
 
@@ -46,8 +49,6 @@ const SettingsPage = () => {
   const [pincode, setPincode] = useState(school?.pincode || '');
   const [universityAffiliation, setUniversityAffiliation] = useState(school?.universityAffiliation || '');
   const [collegeType, setCollegeType] = useState(school?.collegeType || '');
-
-  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Academic Configuration States
   const [allDepts, setAllDepts] = useState([]);
@@ -108,7 +109,7 @@ const SettingsPage = () => {
   const [bannerUrl, setBannerUrl] = useState(school?.documents?.collegeBannerUrl || '');
   const [galleryImages, setGalleryImages] = useState(school?.documents?.galleryImages || []);
   
-  const [uploadingDoc, setUploadingDoc] = useState({ brochure: false, prospectus: false, banner: false, gallery: false });
+  const [uploadingDoc, setUploadingDoc] = useState({ logo: false, brochure: false, prospectus: false, banner: false, gallery: false });
 
   // Security password states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -117,9 +118,9 @@ const SettingsPage = () => {
   const [savingPassword, setSavingPassword] = useState(false);
 
   useEffect(() => {
-    if (activeTab === 'academic-config') {
+    // Automatically load academic configurations when Profile is active
+    if (activeTab === 'profile') {
       fetchAcademicConfig();
-    } else if (activeTab === 'requests') {
       fetchRequests();
     }
   }, [activeTab]);
@@ -195,7 +196,7 @@ const SettingsPage = () => {
       if (response.success) {
         if (type === 'logo') {
           setLogo(response.fileUrl);
-          toast.success('Logo uploaded successfully! Save changes to apply.');
+          toast.success('College Logo uploaded! Save profile changes to apply.');
         } else if (type === 'brochure') {
           setBrochureUrl(response.fileUrl);
           toast.success('Brochure uploaded successfully!');
@@ -219,6 +220,7 @@ const SettingsPage = () => {
     }
   };
 
+  // Save College details settings
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -235,14 +237,20 @@ const SettingsPage = () => {
         pincode,
         universityAffiliation,
         collegeType,
-        logo
+        logo,
+        documents: {
+          admissionBrochureUrl: brochureUrl,
+          prospectusUrl: prospectusUrl,
+          collegeBannerUrl: bannerUrl,
+          galleryImages: galleryImages
+        }
       });
       if (res.success) {
-        toast.success('College profile settings saved!');
+        toast.success('College Profile details and documents saved!');
         if (updateSchoolState) updateSchoolState(res.school);
       }
     } catch (error) {
-      toast.error('Failed to save profile details');
+      toast.error('Failed to save College Profile details');
     } finally {
       setLoading(false);
     }
@@ -256,34 +264,11 @@ const SettingsPage = () => {
         qrBranding: branding
       });
       if (res.success) {
-        toast.success('College branding configuration updated!');
+        toast.success('College Branding configuration updated!');
         if (updateSchoolState) updateSchoolState(res.school);
       }
     } catch (error) {
-      toast.error('Failed to save branding configurations');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDocumentsSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await api.put('/settings', {
-        documents: {
-          admissionBrochureUrl: brochureUrl,
-          prospectusUrl: prospectusUrl,
-          collegeBannerUrl: bannerUrl,
-          galleryImages: galleryImages
-        }
-      });
-      if (res.success) {
-        toast.success('College documents saved successfully!');
-        if (updateSchoolState) updateSchoolState(res.school);
-      }
-    } catch (error) {
-      toast.error('Failed to save uploaded documents');
+      toast.error('Failed to save College Branding configurations');
     } finally {
       setLoading(false);
     }
@@ -301,10 +286,10 @@ const SettingsPage = () => {
 
       const res = await api.post('/college/academic/config', payload);
       if (res.success) {
-        toast.success('Academic configuration saved successfully!');
+        toast.success('Academic course configuration saved!');
       }
     } catch (error) {
-      toast.error('Failed to save academic config');
+      toast.error('Failed to save course configuration');
     } finally {
       setLoading(false);
     }
@@ -336,11 +321,7 @@ const SettingsPage = () => {
         toast.success('Academic request submitted to Super Admin!');
         setIsRequestModalOpen(false);
         resetRequestForm();
-        if (activeTab === 'requests') {
-          fetchRequests();
-        } else {
-          setActiveTab('requests');
-        }
+        fetchRequests();
       }
     } catch (error) {
       toast.error(error.message || 'Failed to submit request');
@@ -506,24 +487,21 @@ const SettingsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-4 gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-800">College Settings</h2>
-          <p className="text-slate-500 text-xs mt-0.5 font-semibold">Configure details, branding palettes, messaging templates, document catalogs, and academic masters.</p>
+          <p className="text-slate-500 text-xs mt-0.5 font-semibold">Configure details, branding templates, documents repository, and administrator credentials.</p>
         </div>
 
         {/* Tab switcher */}
         <div className="flex bg-slate-100 p-1 rounded-xl gap-1 overflow-x-auto shrink-0 max-w-full">
           {[
-            { key: 'profile', label: 'Profile' },
+            { key: 'profile', label: 'College Profile' },
             { key: 'branding', label: 'Branding' },
-            { key: 'documents', label: 'Documents' },
-            { key: 'templates', label: 'Templates' },
-            { key: 'academic-config', label: 'Academic Config' },
-            { key: 'requests', label: 'My Requests' },
+            { key: 'templates', label: 'Notifications & Templates' },
             { key: 'security', label: 'Security' }
           ].map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'bg-white text-indigo-650 shadow-xs font-extrabold'
                   : 'text-slate-500 hover:text-slate-850'
@@ -535,11 +513,12 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Tab 1: Profile */}
+      {/* Tab 1: College Profile */}
       {activeTab === 'profile' && (
         <form onSubmit={handleProfileSubmit} className="space-y-6">
+          {/* Card 1: Identity & Affiliation */}
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">University Profile Details</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">College Profile Details</h3>
             
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               {/* Logo Upload Box */}
@@ -587,7 +566,7 @@ const SettingsPage = () => {
               {/* Form Grid */}
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                 <Input
-                  label="College/University Name *"
+                  label="College Name *"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   required
@@ -599,20 +578,21 @@ const SettingsPage = () => {
                   placeholder="e.g. Center of Excellence"
                 />
                 <Input
-                  label="Official Website"
+                  label="College Website"
                   value={website}
                   onChange={e => setWebsite(e.target.value)}
                   placeholder="e.g. https://college.edu"
                 />
                 <Input
-                  label="Admission Email Address"
-                  value={admissionEmail}
+                  label="Admission Email *"
                   type="email"
+                  value={admissionEmail}
                   onChange={e => setAdmissionEmail(e.target.value)}
                   placeholder="e.g. admissions@college.edu"
+                  required
                 />
                 <Input
-                  label="Contact Helpline Number *"
+                  label="College Contact Number *"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   required
@@ -648,7 +628,7 @@ const SettingsPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-2">
                   <Input
-                    label="Official Campus Address *"
+                    label="College Address *"
                     value={address}
                     onChange={e => setAddress(e.target.value)}
                     required
@@ -675,9 +655,357 @@ const SettingsPage = () => {
             </div>
           </div>
 
+          {/* Card 2: Documents Upload */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Admission Documents Repository</h3>
+              <p className="text-slate-450 text-[10px] mt-0.5 font-semibold">Upload college catalogs, brochures, and media highlights.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Brochure PDF */}
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-indigo-500" /> Admission Brochure PDF
+                  </h4>
+                  <p className="text-[10px] text-slate-400 mt-1">Upload the latest course descriptions and intake details in PDF format.</p>
+                </div>
+                
+                <div className="flex items-center justify-between gap-4 mt-3">
+                  <div className="truncate flex-1">
+                    {brochureUrl ? (
+                      <a href={brochureUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-650 hover:underline truncate block">
+                        {brochureUrl.substring(brochureUrl.lastIndexOf('/') + 1) || 'View Brochure PDF'}
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">No Brochure Uploaded</span>
+                    )}
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    <div className="relative">
+                      <button type="button" className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1">
+                        <Upload className="h-3.5 w-3.5" /> Upload
+                      </button>
+                      <input type="file" accept="application/pdf" onChange={e => handleUploadFile(e, 'brochure')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                    </div>
+                    {brochureUrl && (
+                      <button type="button" onClick={() => setBrochureUrl('')} className="p-1.5 bg-white border border-red-100 rounded-lg text-red-650 hover:bg-red-50">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Prospectus PDF */}
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-indigo-500" /> Prospectus PDF
+                  </h4>
+                  <p className="text-[10px] text-slate-400 mt-1">Upload the university curriculum, admissions prospectus booklet.</p>
+                </div>
+
+                <div className="flex items-center justify-between gap-4 mt-3">
+                  <div className="truncate flex-1">
+                    {prospectusUrl ? (
+                      <a href={prospectusUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-650 hover:underline truncate block">
+                        {prospectusUrl.substring(prospectusUrl.lastIndexOf('/') + 1) || 'View Prospectus PDF'}
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">No Prospectus Uploaded</span>
+                    )}
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    <div className="relative">
+                      <button type="button" className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1">
+                        <Upload className="h-3.5 w-3.5" /> Upload
+                      </button>
+                      <input type="file" accept="application/pdf" onChange={e => handleUploadFile(e, 'prospectus')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                    </div>
+                    {prospectusUrl && (
+                      <button type="button" onClick={() => setProspectusUrl('')} className="p-1.5 bg-white border border-red-100 rounded-lg text-red-650 hover:bg-red-50">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* College Banner Image */}
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Image className="h-4 w-4 text-indigo-500" /> College Banner
+                </h4>
+                <p className="text-[10px] text-slate-400">Branded header banner used in public registration flows.</p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-center mt-3 pt-2">
+                  <div className="h-28 w-56 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                    {bannerUrl ? (
+                      <img src={bannerUrl} alt="College Banner" className="h-full w-full object-cover" />
+                    ) : (
+                      <Image className="h-8 w-8 text-slate-350" />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="relative w-fit">
+                      <button type="button" className="px-4 py-2 border border-slate-200 bg-white rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+                        <Upload className="h-4 w-4" /> Upload Banner
+                      </button>
+                      <input type="file" accept="image/*" onChange={e => handleUploadFile(e, 'banner')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                    </div>
+                    {bannerUrl && (
+                      <button type="button" onClick={() => setBannerUrl('')} className="px-4 py-2 border border-red-200 bg-white rounded-xl text-xs font-bold text-red-650 hover:bg-red-50 flex items-center gap-1.5 w-fit">
+                        <Trash2 className="h-4 w-4" /> Delete Banner
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* College Gallery Images */}
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Image className="h-4 w-4 text-indigo-500" /> College Gallery Images
+                    </h4>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Upload college campus view and facilities pictures.</p>
+                  </div>
+                  <div className="relative">
+                    <button type="button" className="px-3 py-1.5 bg-indigo-650 text-white hover:bg-indigo-750 rounded-xl text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1">
+                      <Plus className="h-3.5 w-3.5" /> Upload Image
+                    </button>
+                    <input type="file" accept="image/*" onChange={e => handleUploadFile(e, 'gallery')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                  </div>
+                </div>
+
+                {galleryImages.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic py-6 text-center">No images uploaded to college gallery yet.</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 pt-3">
+                    {galleryImages.map((img, idx) => (
+                      <div key={idx} className="relative h-24 w-full bg-slate-100 rounded-xl border overflow-hidden group shadow-2xs">
+                        <img src={img} alt={`Gallery ${idx}`} className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setGalleryImages(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-1.5 right-1.5 p-1 bg-red-650 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                          title="Delete Image"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Academic Course Catalog (Configured inside profile for simplified tabs) */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+            <div className="flex justify-between items-center border-b pb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-800">Academic Configurations</h3>
+                <p className="text-slate-450 text-[10px] mt-0.5">Offered Departments, Courses and Specializations selection checklist.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  resetRequestForm();
+                  setIsRequestModalOpen(true);
+                }}
+                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+              >
+                Request New Course
+              </button>
+            </div>
+
+            {fetchingMasters ? (
+              <Loader message="Loading Global Master catalogs..." />
+            ) : (
+              <div className="space-y-6">
+                {/* Step 1: Departments */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Layers className="h-4 w-4 text-slate-500" /> Step 1: Enable Departments
+                  </h4>
+                  {allDepts.length === 0 ? (
+                    <p className="text-slate-400 text-xs italic">No global departments configured.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {allDepts.map(dept => {
+                        const isChecked = selectedDepts.includes(dept._id);
+                        return (
+                          <label
+                            key={dept._id}
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                              isChecked
+                                ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
+                                : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => toggleDept(dept._id)}
+                              className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
+                            />
+                            <span className="text-xs truncate">{dept.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Step 2: Courses */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <BookOpen className="h-4 w-4 text-slate-500" /> Step 2: Enable Courses
+                  </h4>
+                  {selectedDepts.length === 0 ? (
+                    <p className="text-slate-400 text-xs italic">Select at least one department above to view courses.</p>
+                  ) : visibleCourses.length === 0 ? (
+                    <p className="text-slate-400 text-xs italic">No courses available under selected departments.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {visibleCourses.map(course => {
+                        const isChecked = selectedCourses.includes(course._id);
+                        return (
+                          <label
+                            key={course._id}
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                              isChecked
+                                ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
+                                : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => toggleCourse(course._id)}
+                              className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
+                            />
+                            <span className="text-xs truncate">{course.name} ({course.code})</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Step 3: Specializations */}
+                <div className="space-y-3 pt-2">
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <GraduationCap className="h-4 w-4 text-slate-500" /> Step 3: Enable Specializations
+                  </h4>
+                  {selectedCourses.length === 0 ? (
+                    <p className="text-slate-400 text-xs italic">Select at least one course above to view specializations.</p>
+                  ) : visibleSpecs.length === 0 ? (
+                    <p className="text-slate-400 text-xs italic">No specializations available under selected courses.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {visibleSpecs.map(spec => {
+                        const isChecked = selectedSpecs.includes(spec._id);
+                        return (
+                          <label
+                            key={spec._id}
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                              isChecked
+                                ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
+                                : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => toggleSpec(spec._id)}
+                              className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
+                            />
+                            <span className="text-xs truncate">{spec.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2 justify-end pt-3">
+                  <button
+                    type="button"
+                    onClick={handleConfigSubmit}
+                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                  >
+                    <Check className="h-4 w-4" /> Save Course Configuration
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Card 4: Requested Course Submissions History */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">My Requests</h3>
+              <p className="text-slate-450 text-[10px] mt-0.5">Track approvals and comments for submitted course requests.</p>
+            </div>
+
+            {fetchingRequests ? (
+              <Loader message="Loading submissions..." />
+            ) : requestsList.length === 0 ? (
+              <p className="text-xs text-slate-400 italic py-4 text-center">No requested master entries submitted.</p>
+            ) : (
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold uppercase text-slate-400">
+                      <th className="py-3 px-4">Request Type</th>
+                      <th className="py-3 px-4">Requested Item</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Submitted Date</th>
+                      <th className="py-3 px-4">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 text-slate-650">
+                    {requestsList.map(req => {
+                      const itemDisplay = req.requestType === 'Department' ? req.departmentName :
+                                          req.requestType === 'Course' ? `${req.courseName} (${req.courseCode || 'No Code'})` :
+                                          `${req.specializationName} (${req.courseId?.name || 'N/A'})`;
+                      
+                      const statusColor = req.status === 'Pending' ? 'bg-amber-50 text-amber-600 border border-amber-200' :
+                                          req.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
+                                          'bg-rose-50 text-rose-600 border border-rose-200';
+
+                      return (
+                        <tr key={req._id} className="hover:bg-slate-50/40 transition-colors">
+                          <td className="py-4 px-4 font-bold text-slate-850">{req.requestType}</td>
+                          <td className="py-4 px-4 font-semibold text-slate-700">{itemDisplay}</td>
+                          <td className="py-4 px-4">
+                            <span className={`px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wide ${statusColor}`}>
+                              {req.status}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4 text-slate-500">
+                            {new Date(req.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+                          <td className="py-4 px-4 text-slate-555 max-w-xs truncate" title={req.adminRemarks || 'N/A'}>
+                            {req.adminRemarks || <span className="text-slate-400 italic">No remarks</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end pt-2">
             <Button type="submit" isLoading={loading} className="py-3 px-6 text-xs font-semibold inline-flex items-center">
-              <Check className="h-4.5 w-4.5 mr-1.5" /> Save Profile Details
+              <Check className="h-4.5 w-4.5 mr-1.5" /> Save Profile & Documents
             </Button>
           </div>
         </form>
@@ -688,23 +1016,23 @@ const SettingsPage = () => {
         <form onSubmit={handleBrandingSubmit} className="space-y-6">
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
             <div>
-              <h3 className="text-sm font-bold text-slate-800">QR Poster & Admission Page Branding</h3>
+              <h3 className="text-sm font-bold text-slate-800">QR Poster & Public Page Branding</h3>
               <p className="text-slate-450 text-[10px] mt-0.5">Toggle checkboxes to control branding details rendering on QR codes, admissions posters, and public forms.</p>
             </div>
 
             {/* Checkboxes grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
               {[
-                { key: 'showLogo', label: 'Show College Logo' },
-                { key: 'showName', label: 'Show College Name' },
-                { key: 'showTagline', label: 'Show Tagline' },
-                { key: 'showContact', label: 'Show Contact Number' },
-                { key: 'showEmail', label: 'Show Email' },
-                { key: 'showWebsite', label: 'Show Website' },
-                { key: 'showAddress', label: 'Show Address' },
-                { key: 'showUniversityName', label: 'Show University Name' },
-                { key: 'showAccreditation', label: 'Show Accreditation' },
-                { key: 'showFacilities', label: 'Show Facilities' }
+                { key: 'showLogo', label: 'College Logo' },
+                { key: 'showName', label: 'College Name' },
+                { key: 'showTagline', label: 'College Tagline' },
+                { key: 'showContact', label: 'Contact Number' },
+                { key: 'showEmail', label: 'Admission Email' },
+                { key: 'showWebsite', label: 'Website' },
+                { key: 'showAddress', label: 'Address' },
+                { key: 'showUniversityName', label: 'University Name' },
+                { key: 'showAccreditation', label: 'Accreditation' },
+                { key: 'showFacilities', label: 'Facilities' }
               ].map(item => (
                 <label 
                   key={item.key}
@@ -714,7 +1042,7 @@ const SettingsPage = () => {
                     type="checkbox"
                     checked={branding[item.key]}
                     onChange={e => setBranding({ ...branding, [item.key]: e.target.checked })}
-                    className="mt-0.5 h-4 w-4 text-indigo-650 border-slate-300 focus:ring-indigo-500 rounded"
+                    className="mt-0.5 h-4 w-4 text-indigo-650 border-slate-350 focus:ring-indigo-500 rounded"
                   />
                   <span className="ml-2.5">{item.label}</span>
                 </label>
@@ -724,9 +1052,9 @@ const SettingsPage = () => {
             {/* Color pickers */}
             <div className="border-t border-slate-100 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { key: 'primaryColor', label: 'Primary Brand Color' },
-                { key: 'secondaryColor', label: 'Secondary Accent Color' },
-                { key: 'accentColor', label: 'Visual Highlight Color' }
+                { key: 'primaryColor', label: 'Primary Color' },
+                { key: 'secondaryColor', label: 'Secondary Color' },
+                { key: 'accentColor', label: 'Accent Color' }
               ].map(color => (
                 <div key={color.key} className="space-y-1.5">
                   <label className="block text-xs font-semibold text-slate-700 uppercase">{color.label}</label>
@@ -781,166 +1109,7 @@ const SettingsPage = () => {
         </form>
       )}
 
-      {/* Tab 3: Documents */}
-      {activeTab === 'documents' && (
-        <form onSubmit={handleDocumentsSubmit} className="space-y-6">
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
-            <div>
-              <h3 className="text-sm font-bold text-slate-800">College Documents & Media Catalog</h3>
-              <p className="text-slate-450 text-[10px] mt-0.5">Upload official PDF brochures, university prospectus, banners, and gallery photographs for admission desks.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Admission Brochure PDF */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText className="h-4 w-4 text-indigo-500" /> Admission Brochure PDF
-                  </h4>
-                  <p className="text-[10px] text-slate-400 mt-1">Upload the latest course descriptions and intake details in PDF format.</p>
-                </div>
-                
-                <div className="flex items-center justify-between gap-4 mt-3">
-                  <div className="truncate flex-1">
-                    {brochureUrl ? (
-                      <a href={brochureUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-650 hover:underline truncate block">
-                        {brochureUrl.substring(brochureUrl.lastIndexOf('/') + 1) || 'View Brochure PDF'}
-                      </a>
-                    ) : (
-                      <span className="text-xs text-slate-400 italic">No Brochure Uploaded</span>
-                    )}
-                  </div>
-                  <div className="flex gap-1.5 shrink-0">
-                    <div className="relative">
-                      <button type="button" className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1">
-                        <Upload className="h-3.5 w-3.5" /> Upload
-                      </button>
-                      <input type="file" accept="application/pdf" onChange={e => handleUploadFile(e, 'brochure')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
-                    </div>
-                    {brochureUrl && (
-                      <button type="button" onClick={() => setBrochureUrl('')} className="p-1.5 bg-white border border-red-100 rounded-lg text-red-650 hover:bg-red-50">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Prospectus PDF */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText className="h-4 w-4 text-indigo-500" /> Prospectus PDF
-                  </h4>
-                  <p className="text-[10px] text-slate-400 mt-1">Upload the university curriculum, fee schedules, rules and guidelines booklet.</p>
-                </div>
-
-                <div className="flex items-center justify-between gap-4 mt-3">
-                  <div className="truncate flex-1">
-                    {prospectusUrl ? (
-                      <a href={prospectusUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-650 hover:underline truncate block">
-                        {prospectusUrl.substring(prospectusUrl.lastIndexOf('/') + 1) || 'View Prospectus PDF'}
-                      </a>
-                    ) : (
-                      <span className="text-xs text-slate-400 italic">No Prospectus Uploaded</span>
-                    )}
-                  </div>
-                  <div className="flex gap-1.5 shrink-0">
-                    <div className="relative">
-                      <button type="button" className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1">
-                        <Upload className="h-3.5 w-3.5" /> Upload
-                      </button>
-                      <input type="file" accept="application/pdf" onChange={e => handleUploadFile(e, 'prospectus')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
-                    </div>
-                    {prospectusUrl && (
-                      <button type="button" onClick={() => setProspectusUrl('')} className="p-1.5 bg-white border border-red-100 rounded-lg text-red-650 hover:bg-red-50">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* College Banner Image */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
-                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Image className="h-4 w-4 text-indigo-500" /> College Hero Banner
-                </h4>
-                <p className="text-[10px] text-slate-400">Hero background banner displayable on the dynamic Public Registration form headers.</p>
-                
-                <div className="flex flex-col sm:flex-row gap-4 items-center mt-3 pt-2">
-                  <div className="h-28 w-56 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                    {bannerUrl ? (
-                      <img src={bannerUrl} alt="College Hero Banner" className="h-full w-full object-cover" />
-                    ) : (
-                      <Image className="h-8 w-8 text-slate-350" />
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-2 w-full">
-                    <div className="relative w-fit">
-                      <button type="button" className="px-4 py-2 border border-slate-200 bg-white rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
-                        <Upload className="h-4 w-4" /> Upload Banner Image
-                      </button>
-                      <input type="file" accept="image/*" onChange={e => handleUploadFile(e, 'banner')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
-                    </div>
-                    {bannerUrl && (
-                      <button type="button" onClick={() => setBannerUrl('')} className="px-4 py-2 border border-red-200 bg-white rounded-xl text-xs font-bold text-red-650 hover:bg-red-50 flex items-center gap-1.5 w-fit">
-                        <Trash2 className="h-4 w-4" /> Delete Banner
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* College Gallery Images */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <Image className="h-4 w-4 text-indigo-500" /> College Gallery Images
-                    </h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Upload infrastructure or campus environment pictures.</p>
-                  </div>
-                  <div className="relative">
-                    <button type="button" className="px-3 py-1.5 bg-indigo-650 text-white hover:bg-indigo-750 rounded-xl text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1">
-                      <Plus className="h-3.5 w-3.5" /> Upload Image
-                    </button>
-                    <input type="file" accept="image/*" onChange={e => handleUploadFile(e, 'gallery')} className="absolute inset-0 opacity-0 w-full cursor-pointer" />
-                  </div>
-                </div>
-
-                {galleryImages.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-6 text-center">No images uploaded to campus gallery yet.</p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 pt-3">
-                    {galleryImages.map((img, idx) => (
-                      <div key={idx} className="relative h-24 w-full bg-slate-100 rounded-xl border overflow-hidden group shadow-2xs">
-                        <img src={img} alt={`Gallery ${idx}`} className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => setGalleryImages(prev => prev.filter((_, i) => i !== idx))}
-                          className="absolute top-1.5 right-1.5 p-1 bg-red-650 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                          title="Delete Image"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-2">
-            <Button type="submit" isLoading={loading} className="py-3 px-6 text-xs font-semibold inline-flex items-center">
-              <Check className="h-4.5 w-4.5 mr-1.5" /> Save Uploaded Documents
-            </Button>
-          </div>
-        </form>
-      )}
-
-      {/* Tab 4: Templates */}
+      {/* Tab 3: Templates */}
       {activeTab === 'templates' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Template Creator */}
@@ -1060,239 +1229,7 @@ const SettingsPage = () => {
         </div>
       )}
 
-      {/* Tab 5: Academic Config */}
-      {activeTab === 'academic-config' && (
-        <form onSubmit={handleConfigSubmit} className="space-y-6">
-          {fetchingMasters ? (
-            <Loader message="Loading Super Admin Master catalogs..." />
-          ) : (
-            <>
-              <div className="flex justify-between items-center bg-indigo-50/40 border border-indigo-100/70 p-4 rounded-2xl">
-                <div className="space-y-0.5">
-                  <h4 className="text-xs font-bold text-indigo-950">Missing a course or specialization?</h4>
-                  <p className="text-[10px] text-indigo-600">Submit a master request to the Super Admin for approvals.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetRequestForm();
-                    setIsRequestModalOpen(true);
-                  }}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
-                >
-                  Request New Course
-                </button>
-              </div>
-
-              {/* Step 1: Select Departments */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <Layers className="h-4 w-4 text-slate-500" /> Step 1: Enable Departments
-                  </h3>
-                  <p className="text-slate-400 text-[11px] mt-0.5">Toggle checkboxes to make departments available for admissions configuration.</p>
-                </div>
-                
-                {allDepts.length === 0 ? (
-                  <p className="text-slate-400 text-xs italic">No global departments configured by Super Admin yet.</p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 py-2">
-                    {allDepts.map(dept => {
-                      const isChecked = selectedDepts.includes(dept._id);
-                      return (
-                        <label
-                          key={dept._id}
-                          className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                            isChecked
-                              ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
-                              : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => toggleDept(dept._id)}
-                            className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
-                          />
-                          <span className="text-xs truncate">{dept.name}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Step 2: Select Courses */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <BookOpen className="h-4 w-4 text-slate-500" /> Step 2: Enable Courses
-                  </h3>
-                  <p className="text-slate-400 text-[11px] mt-0.5">Only courses belonging to selected departments are visible.</p>
-                </div>
-
-                {selectedDepts.length === 0 ? (
-                  <p className="text-slate-400 text-xs italic">Please select at least one department above to load courses.</p>
-                ) : visibleCourses.length === 0 ? (
-                  <p className="text-slate-400 text-xs italic">No courses exist under selected departments.</p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 py-2">
-                    {visibleCourses.map(course => {
-                      const isChecked = selectedCourses.includes(course._id);
-                      return (
-                        <label
-                          key={course._id}
-                          className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                            isChecked
-                              ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
-                              : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => toggleCourse(course._id)}
-                            className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
-                          />
-                          <span className="text-xs truncate">{course.name} ({course.code})</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Step 3: Select Specializations */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <GraduationCap className="h-4 w-4 text-slate-500" /> Step 3: Enable Specializations
-                  </h3>
-                  <p className="text-slate-400 text-[11px] mt-0.5">Only specializations belonging to selected courses are visible.</p>
-                </div>
-
-                {selectedCourses.length === 0 ? (
-                  <p className="text-slate-400 text-xs italic">Please select at least one course above to load specializations.</p>
-                ) : visibleSpecs.length === 0 ? (
-                  <p className="text-slate-400 text-xs italic">No specializations exist under selected courses.</p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 py-2">
-                    {visibleSpecs.map(spec => {
-                      const isChecked = selectedSpecs.includes(spec._id);
-                      return (
-                        <label
-                          key={spec._id}
-                          className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                            isChecked
-                              ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
-                              : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => toggleSpec(spec._id)}
-                            className="h-4 w-4 text-indigo-600 border-slate-350 focus:ring-indigo-500 rounded"
-                          />
-                          <span className="text-xs truncate">{spec.name}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <Button type="submit" isLoading={loading} className="py-3 px-6 text-xs font-semibold inline-flex items-center">
-                  <Sparkles className="h-4.5 w-4.5 mr-1.5" /> Save Academic Configuration
-                </Button>
-              </div>
-            </>
-          )}
-        </form>
-      )}
-
-      {/* Tab 6: Requests */}
-      {activeTab === 'requests' && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-sm font-bold text-slate-800">My Requests History</h3>
-              <p className="text-slate-400 text-[10px]">Track approvals and remarks for master record submissions.</p>
-            </div>
-            <button
-              onClick={() => {
-                resetRequestForm();
-                setIsRequestModalOpen(true);
-              }}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
-            >
-              Request New Course
-            </button>
-          </div>
-
-          {fetchingRequests ? (
-            <Loader message="Loading academic request submissions..." />
-          ) : requestsList.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
-                <Send className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-800">No Requests Submitted</h3>
-                <p className="text-slate-550 text-xs">When you request new departments or courses, they will list here.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold uppercase text-slate-400">
-                      <th className="py-3 px-4">Request Type</th>
-                      <th className="py-3 px-4">Requested Item</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Submitted Date</th>
-                      <th className="py-3 px-4">Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 text-slate-650">
-                    {requestsList.map(req => {
-                      const itemDisplay = req.requestType === 'Department' ? req.departmentName :
-                                          req.requestType === 'Course' ? `${req.courseName} (${req.courseCode || 'No Code'})` :
-                                          `${req.specializationName} (${req.courseId?.name || 'N/A'})`;
-                      
-                      const statusColor = req.status === 'Pending' ? 'bg-amber-50 text-amber-600 border border-amber-200' :
-                                          req.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
-                                          'bg-rose-50 text-rose-600 border border-rose-200';
-
-                      return (
-                        <tr key={req._id} className="hover:bg-slate-50/40 transition-colors">
-                          <td className="py-4 px-4 font-bold text-slate-850">{req.requestType}</td>
-                          <td className="py-4 px-4 font-semibold text-slate-700">{itemDisplay}</td>
-                          <td className="py-4 px-4">
-                            <span className={`px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wide ${statusColor}`}>
-                              {req.status}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-slate-500">
-                            {new Date(req.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </td>
-                          <td className="py-4 px-4 text-slate-555 max-w-xs truncate" title={req.adminRemarks || 'N/A'}>
-                            {req.adminRemarks || <span className="text-slate-400 italic">No remarks</span>}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab 7: Security */}
+      {/* Tab 4: Security */}
       {activeTab === 'security' && (
         <form onSubmit={handleSavePassword} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6 max-w-xl">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block border-b pb-1">Change Password</span>
