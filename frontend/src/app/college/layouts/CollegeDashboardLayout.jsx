@@ -31,8 +31,7 @@ const CollegeDashboardLayout = () => {
     if (path.startsWith('/college/dashboard')) return 'College Dashboard';
     if (path.startsWith('/college/applications')) return 'Applications CRM Desk';
     if (path.startsWith('/college/admission-form')) return 'Manual Admission entry';
-    if (path.startsWith('/college/departments')) return 'Departments Management';
-    if (path.startsWith('/college/courses')) return 'Courses Configuration';
+    if (path.startsWith('/college/academic-config')) return 'Academic Configuration';
     if (path.startsWith('/college/counselling')) return 'Counselling Pipeline';
     if (path.startsWith('/college/documents')) return 'Document Verification Desk';
     if (path.startsWith('/college/qr-links')) return 'QR & Admission Desk Links';
