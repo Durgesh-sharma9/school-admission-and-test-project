@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const CollegeApplication = require('../models/CollegeApplication');
 const CollegeCourse = require('../models/CollegeCourse');
 const CollegeDepartment = require('../models/CollegeDepartment');
@@ -8,161 +9,292 @@ const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 // @access  Private (College Admin)
 const getDashboardAnalytics = async (req, res) => {
   try {
+    // Validate authentication context
+    if (!req.school || !req.school.id) {
+      console.error('Dashboard Auth Error: req.school or req.school.id is missing');
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Not authorized, invalid school/college administrator context' 
+      });
+    }
+
     const collegeId = req.school.id;
+    let collegeObjectId;
+    try {
+      collegeObjectId = new mongoose.Types.ObjectId(collegeId);
+    } catch (err) {
+      console.error(`Dashboard ObjectId conversion error for ID ${collegeId}:`, err);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid college identifier format' 
+      });
+    }
 
-    // Basic Metrics
-    const totalApplications = await CollegeApplication.countDocuments({ schoolId: collegeId });
-    
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayApplications = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      createdAt: { $gte: todayStart }
-    });
+    // Basic Metrics (always default to 0 on failure or empty)
+    let totalApplications = 0;
+    let todayApplications = 0;
+    let counsellingAssigned = 0;
+    let callScheduled = 0;
+    let callCompleted = 0;
+    let campusVisit = 0;
+    let pendingVerification = 0;
+    let verifiedVerification = 0;
+    let selected = 0;
+    let rejected = 0;
+    let confirmedAdmissions = 0;
+    let scholarshipRequests = 0;
+    let hostelRequests = 0;
 
-    const counsellingAssigned = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Counselling Assigned'
-    });
+    try {
+      totalApplications = await CollegeApplication.countDocuments({ schoolId: collegeObjectId }) || 0;
+    } catch (e) {
+      console.error('Error counting totalApplications:', e);
+    }
 
-    const callScheduled = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Call Scheduled'
-    });
+    try {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      todayApplications = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        createdAt: { $gte: todayStart }
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting todayApplications:', e);
+    }
 
-    const callCompleted = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Call Completed'
-    });
+    try {
+      counsellingAssigned = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Counselling Assigned'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting counsellingAssigned:', e);
+    }
 
-    const campusVisit = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Campus Visit'
-    });
+    try {
+      callScheduled = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Call Scheduled'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting callScheduled:', e);
+    }
 
-    const pendingVerification = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Documents Pending'
-    });
+    try {
+      callCompleted = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Call Completed'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting callCompleted:', e);
+    }
 
-    const verifiedVerification = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Documents Verified'
-    });
+    try {
+      campusVisit = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Campus Visit'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting campusVisit:', e);
+    }
 
-    const selected = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Selected'
-    });
+    try {
+      pendingVerification = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Documents Pending'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting pendingVerification:', e);
+    }
 
-    const rejected = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Rejected'
-    });
+    try {
+      verifiedVerification = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Documents Verified'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting verifiedVerification:', e);
+    }
 
-    const confirmedAdmissions = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      stage: 'Admission Confirmed'
-    });
+    try {
+      selected = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Selected'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting selected:', e);
+    }
 
-    const scholarshipRequests = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      $or: [
-        { scholarshipApplied: true },
-        { scholarshipAmount: { $gt: 0 } }
-      ]
-    });
+    try {
+      rejected = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Rejected'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting rejected:', e);
+    }
 
-    const hostelRequests = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      hostelRequired: true
-    });
+    try {
+      confirmedAdmissions = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        stage: 'Admission Confirmed'
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting confirmedAdmissions:', e);
+    }
+
+    try {
+      scholarshipRequests = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        $or: [
+          { scholarshipApplied: true },
+          { scholarshipAmount: { $gt: 0 } }
+        ]
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting scholarshipRequests:', e);
+    }
+
+    try {
+      hostelRequests = await CollegeApplication.countDocuments({
+        schoolId: collegeObjectId,
+        hostelRequired: true
+      }) || 0;
+    } catch (e) {
+      console.error('Error counting hostelRequests:', e);
+    }
 
     // Course distribution
-    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId })
-      .populate('selectedDepartments')
-      .populate('selectedCourses');
+    let courseDistribution = [];
+    try {
+      const config = await CollegeAcademicConfig.findOne({ schoolId: collegeObjectId })
+        .populate('selectedDepartments')
+        .populate('selectedCourses');
 
-    const courses = config ? config.selectedCourses : [];
-    const courseDistribution = [];
-    for (const course of courses) {
-      const count = await CollegeApplication.countDocuments({ schoolId: collegeId, courseId: course._id });
-      courseDistribution.push({
-        name: course.name,
-        code: course.code,
-        count
-      });
+      const courses = config ? config.selectedCourses : [];
+      for (const course of courses) {
+        if (course && course._id) {
+          const count = await CollegeApplication.countDocuments({ schoolId: collegeObjectId, courseId: course._id }) || 0;
+          courseDistribution.push({
+            name: course.name || 'Unknown Course',
+            code: course.code || 'N/A',
+            count
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Error generating courseDistribution:', e);
     }
 
     // Department distribution
-    const departments = config ? config.selectedDepartments : [];
-    const departmentDistribution = [];
-    for (const dept of departments) {
-      const count = await CollegeApplication.countDocuments({ schoolId: collegeId, departmentId: dept._id });
-      departmentDistribution.push({
-        name: dept.name,
-        code: dept.code,
-        count
-      });
+    let departmentDistribution = [];
+    try {
+      const config = await CollegeAcademicConfig.findOne({ schoolId: collegeObjectId })
+        .populate('selectedDepartments');
+
+      const departments = config ? config.selectedDepartments : [];
+      for (const dept of departments) {
+        if (dept && dept._id) {
+          const count = await CollegeApplication.countDocuments({ schoolId: collegeObjectId, departmentId: dept._id }) || 0;
+          departmentDistribution.push({
+            name: dept.name || 'Unknown Department',
+            code: dept.code || 'N/A',
+            count
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Error generating departmentDistribution:', e);
     }
 
     // City-wise applications
-    const cityAggregate = await CollegeApplication.aggregate([
-      { $match: { schoolId: new require('mongoose').Types.ObjectId(collegeId) } },
-      { $group: { _id: '$city', count: { $sum: 1 } } },
-      { $sort: { count: -1 } }
-    ]);
-    const cityDistribution = cityAggregate.map(item => ({
-      city: item._id || 'Unknown',
-      count: item.count
-    }));
+    let cityDistribution = [];
+    try {
+      const cityAggregate = await CollegeApplication.aggregate([
+        { $match: { schoolId: collegeObjectId } },
+        { $group: { _id: '$city', count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+      ]);
+      cityDistribution = (cityAggregate || []).map(item => ({
+        city: item?._id || 'Unknown',
+        count: item?.count || 0
+      }));
+    } catch (e) {
+      console.error('Error generating cityDistribution aggregate:', e);
+    }
 
     // Lead source analytics
-    const sourceAggregate = await CollegeApplication.aggregate([
-      { $match: { schoolId: new require('mongoose').Types.ObjectId(collegeId) } },
-      { $group: { _id: '$referralSource', count: { $sum: 1 } } },
-      { $sort: { count: -1 } }
-    ]);
-    const leadSourceDistribution = sourceAggregate.map(item => ({
-      source: item._id || 'Organic',
-      count: item.count
-    }));
+    let leadSourceDistribution = [];
+    try {
+      const sourceAggregate = await CollegeApplication.aggregate([
+        { $match: { schoolId: collegeObjectId } },
+        { $group: { _id: '$referralSource', count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+      ]);
+      leadSourceDistribution = (sourceAggregate || []).map(item => ({
+        source: item?._id || 'Organic',
+        count: item?.count || 0
+      }));
+    } catch (e) {
+      console.error('Error generating leadSourceDistribution aggregate:', e);
+    }
 
     // Recent applications
-    const recentApplications = await CollegeApplication.find({ schoolId: collegeId })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .populate('courseId', 'name')
-      .populate('departmentId', 'name');
+    let recentApplications = [];
+    try {
+      recentApplications = await CollegeApplication.find({ schoolId: collegeObjectId })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('courseId', 'name')
+        .populate('departmentId', 'name') || [];
+    } catch (e) {
+      console.error('Error fetching recentApplications:', e);
+    }
+
+    // Build stats mapping (with aliases to support both frontend & any external spec checklist)
+    const stats = {
+      totalApplications,
+      todayApplications,
+      counsellingAssigned,
+      callScheduled,
+      callCompleted,
+      campusVisit,
+      pendingVerification,
+      docsPending: pendingVerification,
+      verifiedVerification,
+      docsVerified: verifiedVerification,
+      selected,
+      selectedApplicants: selected,
+      rejected,
+      rejectedApplicants: rejected,
+      confirmedAdmissions,
+      scholarshipRequests,
+      hostelRequests,
+      applicationsByDepartment: departmentDistribution || [],
+      applicationsByCourse: courseDistribution || []
+    };
 
     return res.json({
       success: true,
       data: {
-        stats: {
-          totalApplications,
-          todayApplications,
-          counsellingAssigned,
-          callScheduled,
-          callCompleted,
-          campusVisit,
-          pendingVerification,
-          verifiedVerification,
-          selected,
-          rejected,
-          confirmedAdmissions,
-          scholarshipRequests,
-          hostelRequests
-        },
-        courseDistribution,
-        departmentDistribution,
-        cityDistribution,
-        leadSourceDistribution,
-        recentApplications
+        stats,
+        courseDistribution: courseDistribution || [],
+        departmentDistribution: departmentDistribution || [],
+        cityDistribution: cityDistribution || [],
+        leadSourceDistribution: leadSourceDistribution || [],
+        recentApplications: recentApplications || []
       }
     });
   } catch (error) {
-    console.error('College dashboard analytics error:', error);
-    return res.status(500).json({ success: false, message: 'Server error loading dashboard analytics' });
+    console.error('CRITICAL: College dashboard analytics exception caught:');
+    console.error(error);
+    if (error && error.stack) {
+      console.error(error.stack);
+    }
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Server error loading dashboard analytics' 
+    });
   }
 };
 
