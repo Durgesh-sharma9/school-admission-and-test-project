@@ -67,6 +67,7 @@ const SuperAdminAnnouncements = lazy(() => import('./app/super-admin/pages/Annou
 const SuperAdminNotifications = lazy(() => import('./app/super-admin/pages/Notifications'));
 const SuperAdminSettings = lazy(() => import('./app/super-admin/pages/Settings'));
 const SuperAdminProfile = lazy(() => import('./app/super-admin/pages/Profile'));
+const SuperAdminAcademicMasters = lazy(() => import('./app/super-admin/pages/AcademicMasters'));
 
 // Super Admin Layout
 const SuperAdminLayout = lazy(() => import('./app/super-admin/layouts/SuperAdminLayout'));
@@ -191,6 +192,7 @@ function App() {
                     <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
                     <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
                     <Route path="/super-admin/profile" element={<SuperAdminProfile />} />
+                    <Route path="/super-admin/academic-masters" element={<SuperAdminAcademicMasters />} />
                   </Route>
 
                   {/* 404 Route */}

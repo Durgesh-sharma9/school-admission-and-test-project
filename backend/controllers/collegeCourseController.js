@@ -1,4 +1,4 @@
-const CollegeCourse = require('../models/CollegeCourse');
+const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 
 // @desc    Get all courses for a college
 // @route   GET /api/v1/college/courses
@@ -6,13 +6,15 @@ const CollegeCourse = require('../models/CollegeCourse');
 const getCourses = async (req, res) => {
   try {
     const collegeId = req.school.id;
-    const courses = await CollegeCourse.find({ schoolId: collegeId })
-      .populate('departmentId', 'name')
-      .sort({ name: 1 });
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate({
+      path: 'selectedCourses',
+      populate: { path: 'departmentId', select: 'name code' }
+    });
+    const courses = config ? config.selectedCourses : [];
     return res.json({ success: true, data: courses });
   } catch (error) {
     console.error('Get courses error:', error);
-    return res.status(500).json({ success: false, message: 'Server error fetching courses' });
+    return res.status(550).json({ success: false, message: 'Server error fetching courses' });
   }
 };
 

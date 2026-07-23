@@ -148,12 +148,12 @@ const collegeApplicationSchema = new mongoose.Schema({
   // Admission details
   departmentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CollegeDepartment',
+    ref: 'MasterDepartment',
     required: [true, 'Department selection is required'],
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CollegeCourse',
+    ref: 'MasterCourse',
     required: [true, 'Course selection is required'],
   },
   specialization: {

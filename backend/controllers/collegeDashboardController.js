@@ -1,6 +1,7 @@
 const CollegeApplication = require('../models/CollegeApplication');
 const CollegeCourse = require('../models/CollegeCourse');
 const CollegeDepartment = require('../models/CollegeDepartment');
+const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 
 // @desc    Get College CRM Dashboard analytics
 // @route   GET /api/v1/college/dashboard/analytics
@@ -61,7 +62,11 @@ const getDashboardAnalytics = async (req, res) => {
     });
 
     // Course distribution
-    const courses = await CollegeCourse.find({ schoolId: collegeId });
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId })
+      .populate('selectedDepartments')
+      .populate('selectedCourses');
+
+    const courses = config ? config.selectedCourses : [];
     const courseDistribution = [];
     for (const course of courses) {
       const count = await CollegeApplication.countDocuments({ schoolId: collegeId, courseId: course._id });
@@ -73,7 +78,7 @@ const getDashboardAnalytics = async (req, res) => {
     }
 
     // Department distribution
-    const departments = await CollegeDepartment.find({ schoolId: collegeId });
+    const departments = config ? config.selectedDepartments : [];
     const departmentDistribution = [];
     for (const dept of departments) {
       const count = await CollegeApplication.countDocuments({ schoolId: collegeId, departmentId: dept._id });

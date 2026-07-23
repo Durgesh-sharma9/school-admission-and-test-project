@@ -1,4 +1,4 @@
-const CollegeDepartment = require('../models/CollegeDepartment');
+const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 
 // @desc    Get all departments for a college
 // @route   GET /api/v1/college/departments
@@ -6,11 +6,12 @@ const CollegeDepartment = require('../models/CollegeDepartment');
 const getDepartments = async (req, res) => {
   try {
     const collegeId = req.school.id;
-    const departments = await CollegeDepartment.find({ schoolId: collegeId }).sort({ name: 1 });
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate('selectedDepartments');
+    const departments = config ? config.selectedDepartments : [];
     return res.json({ success: true, data: departments });
   } catch (error) {
     console.error('Get departments error:', error);
-    return res.status(500).json({ success: false, message: 'Server error fetching departments' });
+    return res.status(550).json({ success: false, message: 'Server error fetching departments' });
   }
 };
 

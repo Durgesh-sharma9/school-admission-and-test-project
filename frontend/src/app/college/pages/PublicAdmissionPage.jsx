@@ -16,6 +16,8 @@ const PublicAdmissionPage = () => {
   const [collegeInfo, setCollegeInfo] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
+  const [sessions, setSessions] = useState([]);
   
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -48,7 +50,7 @@ const PublicAdmissionPage = () => {
     departmentId: '',
     courseId: '',
     specialization: '',
-    session: '2026-2027',
+    session: '',
     modeOfStudy: 'Regular',
     hostelRequired: false,
     transportRequired: false,
@@ -94,15 +96,24 @@ const PublicAdmissionPage = () => {
         setLoading(true);
         const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
         
-        const [infoRes, deptsRes, coursesRes] = await Promise.all([
+        const [infoRes, deptsRes, coursesRes, specsRes, sessionsRes] = await Promise.all([
           axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`),
           axios.get(`${apiBaseUrl}/college/public/departments/${schoolId}`),
-          axios.get(`${apiBaseUrl}/college/public/courses/${schoolId}`)
+          axios.get(`${apiBaseUrl}/college/public/courses/${schoolId}`),
+          axios.get(`${apiBaseUrl}/college/public/specializations/${schoolId}`),
+          axios.get(`${apiBaseUrl}/college/public/sessions/${schoolId}`)
         ]);
 
         if (infoRes.data.success) setCollegeInfo(infoRes.data.school);
         if (deptsRes.data.success) setDepartments(deptsRes.data.data);
         if (coursesRes.data.success) setCourses(coursesRes.data.data);
+        if (specsRes.data.success) setSpecializations(specsRes.data.data);
+        if (sessionsRes.data.success) {
+          setSessions(sessionsRes.data.data);
+          if (sessionsRes.data.data?.length > 0) {
+            setFormData(prev => ({ ...prev, session: sessionsRes.data.data[0].name }));
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch college details:', error);
         toast.error('Unable to verify college code');
@@ -201,6 +212,7 @@ const PublicAdmissionPage = () => {
   }
 
   const filteredCourses = courses.filter(c => c.departmentId?._id === formData.departmentId || c.departmentId === formData.departmentId);
+  const filteredSpecs = specializations.filter(s => s.courseId?._id === formData.courseId || s.courseId === formData.courseId);
 
   return (
     <div className="min-h-screen bg-slate-50 bg-gradient-to-tr from-indigo-50/20 via-slate-50 to-indigo-50/10 py-10 px-4">
@@ -414,26 +426,41 @@ const PublicAdmissionPage = () => {
                 >
                   <option value="">-- Select Course --</option>
                   {filteredCourses.map(c => (
-                    <option key={c._id} value={c._id}>{c.name}</option>
+                    <option key={c._id} value={c._id}>{c.name} ({c.code})</option>
                   ))}
                 </select>
               </div>
 
-              <Input
-                label="Specialization"
-                name="specialization"
-                value={formData.specialization}
-                onChange={handleChange}
-                placeholder="e.g. Data Science"
-              />
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Specialization</label>
+                <select
+                  name="specialization"
+                  value={formData.specialization}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                >
+                  <option value="">-- Select Specialization --</option>
+                  {filteredSpecs.map(s => (
+                    <option key={s._id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
 
-              <Input
-                label="Session"
-                name="session"
-                value={formData.session}
-                onChange={handleChange}
-                placeholder="e.g. 2026-2027"
-              />
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Session</label>
+                <select
+                  name="session"
+                  value={formData.session}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                  required
+                >
+                  <option value="">-- Select Session --</option>
+                  {sessions.map(s => (
+                    <option key={s._id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
 
               <div className="space-y-1">
                 <label className="block text-xs font-semibold text-slate-700">Regular / Distance</label>

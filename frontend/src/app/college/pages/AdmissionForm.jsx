@@ -9,6 +9,8 @@ import { FilePlus } from 'lucide-react';
 const AdmissionForm = () => {
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,25 +39,12 @@ const AdmissionForm = () => {
     departmentId: '',
     courseId: '',
     specialization: '',
-    session: '2026-2027',
+    session: '',
     modeOfStudy: 'Regular',
     hostelRequired: false,
     transportRequired: false,
     scholarshipApplied: false,
     referralSource: 'Direct',
-
-    fatherName: '',
-    motherName: '',
-    parentName: '',
-    parentMobile: '',
-    parentEmail: '',
-    parentOccupation: '',
-
-    state: '',
-    city: '',
-    pinCode: '',
-    address: '',
-    area: '',
 
     docPhoto: '',
     docSign: '',
@@ -81,14 +70,21 @@ const AdmissionForm = () => {
     const fetchMetadata = async () => {
       try {
         setLoading(true);
-        const [deptsRes, coursesRes] = await Promise.all([
-          api.get('/college/departments'),
-          api.get('/college/courses')
-        ]);
-        if (deptsRes.success) setDepartments(deptsRes.data);
-        if (coursesRes.success) setCourses(coursesRes.data);
+        const configRes = await api.get('/college/academic/config');
+        if (configRes.success && configRes.data) {
+          const config = configRes.data;
+          setDepartments(config.selectedDepartments || []);
+          setCourses(config.selectedCourses || []);
+          setSpecializations(config.selectedSpecializations || []);
+          setSessions(config.selectedSessions || []);
+          
+          // Set default session if active ones exist
+          if (config.selectedSessions?.length > 0) {
+            setFormData(prev => ({ ...prev, session: config.selectedSessions[0].name }));
+          }
+        }
       } catch (error) {
-        toast.error('Failed to load departments or courses configuration');
+        toast.error('Failed to load academic configuration');
       } finally {
         setLoading(false);
       }
@@ -165,7 +161,7 @@ const AdmissionForm = () => {
           departmentId: '',
           courseId: '',
           specialization: '',
-          session: '2026-2027',
+          session: sessions[0]?.name || '',
           modeOfStudy: 'Regular',
           hostelRequired: false,
           transportRequired: false,
@@ -213,6 +209,7 @@ const AdmissionForm = () => {
   }
 
   const filteredCourses = courses.filter(c => c.departmentId?._id === formData.departmentId || c.departmentId === formData.departmentId);
+  const filteredSpecs = specializations.filter(s => s.courseId?._id === formData.courseId || s.courseId === formData.courseId);
 
   return (
     <div className="space-y-6 text-left max-w-4xl mx-auto">
@@ -411,26 +408,41 @@ const AdmissionForm = () => {
               >
                 <option value="">-- Select Course --</option>
                 {filteredCourses.map(c => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
+                  <option key={c._id} value={c._id}>{c.name} ({c.code})</option>
                 ))}
               </select>
             </div>
 
-            <Input
-              label="Specialization"
-              name="specialization"
-              value={formData.specialization}
-              onChange={handleChange}
-              placeholder="e.g. Data Science"
-            />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-slate-700">Specialization</label>
+              <select
+                name="specialization"
+                value={formData.specialization}
+                onChange={handleChange}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+              >
+                <option value="">-- Select Specialization --</option>
+                {filteredSpecs.map(s => (
+                  <option key={s._id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
 
-            <Input
-              label="Session"
-              name="session"
-              value={formData.session}
-              onChange={handleChange}
-              placeholder="e.g. 2026-2027"
-            />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-slate-700">Session</label>
+              <select
+                name="session"
+                value={formData.session}
+                onChange={handleChange}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                required
+              >
+                <option value="">-- Select Session --</option>
+                {sessions.map(s => (
+                  <option key={s._id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
 
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-slate-700">Regular / Distance</label>

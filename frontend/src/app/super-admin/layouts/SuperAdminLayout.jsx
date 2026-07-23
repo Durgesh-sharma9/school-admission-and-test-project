@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { useSuperAdminAuth } from '../contexts/SuperAdminAuthContext';
-import { Shield, Menu, X, LogOut, Settings, Building2, CreditCard, DollarSign, FileText, MessageSquare, LayoutDashboard, BarChart3, Bell, ChevronDown } from 'lucide-react';
+import { Shield, Menu, X, LogOut, Settings, Building2, CreditCard, DollarSign, FileText, MessageSquare, LayoutDashboard, BarChart3, Bell, ChevronDown, GraduationCap } from 'lucide-react';
 import Button from '../../../shared/components/Button';
 import Loader from '../../../shared/components/Loader';
 
@@ -26,6 +26,7 @@ const SuperAdminLayout = () => {
     { name: 'Payments', href: '/super-admin/payments', icon: DollarSign },
     { name: 'Announcements', href: '/super-admin/announcements', icon: MessageSquare },
     { name: 'Landing CMS', href: '/super-admin/landing-cms', icon: FileText },
+    { name: 'Academic Masters', href: '/super-admin/academic-masters', icon: GraduationCap },
     { name: 'Settings', href: '/super-admin/settings', icon: Settings },
     { name: 'Profile', href: '/super-admin/profile', icon: BarChart3 },
   ];

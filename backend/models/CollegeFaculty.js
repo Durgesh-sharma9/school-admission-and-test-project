@@ -24,7 +24,7 @@ const collegeFacultySchema = new mongoose.Schema({
   },
   departmentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CollegeDepartment',
+    ref: 'MasterDepartment',
     required: [true, 'Department is required'],
   },
   status: {

@@ -1,6 +1,7 @@
 const CollegeApplication = require('../models/CollegeApplication');
 const CollegeCourse = require('../models/CollegeCourse');
 const CollegeDepartment = require('../models/CollegeDepartment');
+const CollegeAcademicConfig = require('../models/CollegeAcademicConfig');
 
 // Helper to generate custom application ID
 const generateApplicationId = () => {
@@ -131,9 +132,9 @@ const submitApplication = async (req, res) => {
     }
 
     // Verify course belongs to this college
-    const course = await CollegeCourse.findOne({ _id: courseId, schoolId });
-    if (!course) {
-      return res.status(400).json({ success: false, message: 'Selected course is invalid for this college' });
+    const config = await CollegeAcademicConfig.findOne({ schoolId });
+    if (!config || !config.selectedCourses.includes(courseId)) {
+      return res.status(400).json({ success: false, message: 'Selected course is not active for this college' });
     }
 
     const app = new CollegeApplication({
@@ -343,7 +344,8 @@ const addApplicationNote = async (req, res) => {
 const getPublicDepartments = async (req, res) => {
   try {
     const { collegeId } = req.params;
-    const departments = await CollegeDepartment.find({ schoolId: collegeId }).sort({ name: 1 });
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate('selectedDepartments');
+    const departments = config ? config.selectedDepartments : [];
     return res.json({ success: true, data: departments });
   } catch (error) {
     console.error('Public departments error:', error);
@@ -357,13 +359,45 @@ const getPublicDepartments = async (req, res) => {
 const getPublicCourses = async (req, res) => {
   try {
     const { collegeId } = req.params;
-    const courses = await CollegeCourse.find({ schoolId: collegeId })
-      .populate('departmentId', 'name')
-      .sort({ name: 1 });
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate({
+      path: 'selectedCourses',
+      populate: { path: 'departmentId', select: 'name code' }
+    });
+    const courses = config ? config.selectedCourses : [];
     return res.json({ success: true, data: courses });
   } catch (error) {
     console.error('Public courses error:', error);
     return res.status(500).json({ success: false, message: 'Server error fetching courses' });
+  }
+};
+
+// @desc    Get public specializations for college
+// @route   GET /api/v1/college/public/specializations/:collegeId
+// @access  Public
+const getPublicSpecializations = async (req, res) => {
+  try {
+    const { collegeId } = req.params;
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate('selectedSpecializations');
+    const specializations = config ? config.selectedSpecializations : [];
+    return res.json({ success: true, data: specializations });
+  } catch (error) {
+    console.error('Public specializations error:', error);
+    return res.status(500).json({ success: false, message: 'Server error fetching specializations' });
+  }
+};
+
+// @desc    Get public sessions for college
+// @route   GET /api/v1/college/public/sessions/:collegeId
+// @access  Public
+const getPublicSessions = async (req, res) => {
+  try {
+    const { collegeId } = req.params;
+    const config = await CollegeAcademicConfig.findOne({ schoolId: collegeId }).populate('selectedSessions');
+    const sessions = config ? config.selectedSessions : [];
+    return res.json({ success: true, data: sessions });
+  } catch (error) {
+    console.error('Public sessions error:', error);
+    return res.status(500).json({ success: false, message: 'Server error fetching sessions' });
   }
 };
 
@@ -376,5 +410,7 @@ module.exports = {
   verifyFee,
   addApplicationNote,
   getPublicDepartments,
-  getPublicCourses
+  getPublicCourses,
+  getPublicSpecializations,
+  getPublicSessions
 };
