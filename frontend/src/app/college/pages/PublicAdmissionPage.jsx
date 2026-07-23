@@ -4,7 +4,7 @@ import axios from 'axios';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
-import { GraduationCap, HelpCircle, Sparkles } from 'lucide-react';
+import { GraduationCap, ShieldCheck, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PublicAdmissionPage = () => {
@@ -30,7 +30,6 @@ const PublicAdmissionPage = () => {
     gender: 'Male',
     mobile: '',
     email: '',
-    aadhaar: '',
     category: 'General',
     nationality: 'Indian',
 
@@ -41,7 +40,6 @@ const PublicAdmissionPage = () => {
     twelfthPercentage: '',
     twelfthYear: '',
     graduationPercentage: '',
-    graduationDegree: '',
     graduationYear: '',
     entranceExam: '',
     entranceScore: '',
@@ -49,43 +47,25 @@ const PublicAdmissionPage = () => {
     departmentId: '',
     courseId: '',
     specialization: '',
-    modeOfStudy: 'Regular',
-    hostelRequired: false,
-    transportRequired: false,
-    scholarshipApplied: false,
-    referralSource: 'Direct',
+    referralSource: 'Google Search',
 
     fatherName: '',
+    fatherMobile: '',
     motherName: '',
-    parentName: '',
-    parentMobile: '',
+    motherMobile: '',
     parentEmail: '',
-    parentOccupation: '',
 
     state: '',
     city: '',
     pinCode: '',
     address: '',
-    area: '',
 
     docPhoto: '',
-    docSign: '',
-    docAadhaar: '',
     doc10th: '',
     doc12th: '',
-    docMigration: '',
-    docTransfer: '',
-    docCharacter: '',
-    docIncome: '',
-    docCaste: '',
     docGrad: '',
-
-    feeAmountPaid: '',
-    discountApplied: '',
-    scholarshipAmount: '',
-    paymentMode: 'Online',
-    transactionId: '',
-    receiptUrl: ''
+    docTransfer: '',
+    docCaste: ''
   });
 
   useEffect(() => {
@@ -126,42 +106,108 @@ const PublicAdmissionPage = () => {
     }));
   };
 
+  const validateForm = () => {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.mobile)) {
+      toast.error('Student mobile number must be exactly 10 digits');
+      return false;
+    }
+    if (formData.fatherMobile && !phoneRegex.test(formData.fatherMobile)) {
+      toast.error('Father mobile number must be exactly 10 digits');
+      return false;
+    }
+    if (formData.motherMobile && !phoneRegex.test(formData.motherMobile)) {
+      toast.error('Mother mobile number must be exactly 10 digits');
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid student email address');
+      return false;
+    }
+    if (formData.parentEmail && !emailRegex.test(formData.parentEmail)) {
+      toast.error('Please enter a valid parent email address');
+      return false;
+    }
+
+    const p10 = parseFloat(formData.tenthPercentage);
+    if (isNaN(p10) || p10 < 0 || p10 > 100) {
+      toast.error('10th percentage must be between 0 and 100');
+      return false;
+    }
+    const p12 = parseFloat(formData.twelfthPercentage);
+    if (isNaN(p12) || p12 < 0 || p12 > 100) {
+      toast.error('12th percentage must be between 0 and 100');
+      return false;
+    }
+    if (formData.graduationPercentage) {
+      const pGrad = parseFloat(formData.graduationPercentage);
+      if (isNaN(pGrad) || pGrad < 0 || pGrad > 100) {
+        toast.error('Graduation percentage must be between 0 and 100');
+        return false;
+      }
+    }
+
+    const yearRegex = /^[0-9]{4}$/;
+    if (!yearRegex.test(formData.tenthYear)) {
+      toast.error('10th passing year must be a 4-digit number');
+      return false;
+    }
+    if (!yearRegex.test(formData.twelfthYear)) {
+      toast.error('12th passing year must be a 4-digit number');
+      return false;
+    }
+    if (formData.graduationYear && !yearRegex.test(formData.graduationYear)) {
+      toast.error('Graduation passing year must be a 4-digit number');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.departmentId || !formData.courseId) {
-      toast.error('Please select a Department and Course');
+      toast.error('Please select Department and Course');
       return;
     }
+
+    if (!validateForm()) return;
 
     setSubmitting(true);
     try {
       const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
-      
+
+      // Map to backward-compatible structure matching Mongoose requirements
       const payload = {
         ...formData,
         schoolId,
+        parentName: formData.fatherName || formData.motherName || 'Parent',
+        parentMobile: formData.fatherMobile || formData.motherMobile || formData.mobile || '9999999999',
+        parentOccupation: 'N/A',
+        modeOfStudy: 'Regular',
+        hostelRequired: false,
+        transportRequired: false,
+        scholarshipApplied: false,
+        feeAmountPaid: 0,
+        discountApplied: 0,
+        scholarshipAmount: 0,
+        paymentMode: 'Online',
+        transactionId: '',
+        receiptUrl: '',
         documents: []
       };
 
-      const docFields = [
-        { key: 'docPhoto', label: 'Photo' },
-        { key: 'docSign', label: 'Signature' },
-        { key: 'docAadhaar', label: 'Aadhaar' },
-        { key: 'doc10th', label: '10th Marksheet' },
-        { key: 'doc12th', label: '12th Marksheet' },
-        { key: 'docMigration', label: 'Migration' },
-        { key: 'docTransfer', label: 'Transfer Certificate' },
-        { key: 'docCharacter', label: 'Character Certificate' },
-        { key: 'docIncome', label: 'Income Certificate' },
-        { key: 'docCaste', label: 'Caste Certificate' },
-        { key: 'docGrad', label: 'Graduation Marksheet' }
-      ];
-
-      docFields.forEach(doc => {
-        if (formData[doc.key]) {
-          payload.documents.push({ name: doc.label, url: formData[doc.key] });
-        }
-      });
+      // Push document files catalog urls
+      if (formData.docPhoto) payload.documents.push({ name: 'Photo', url: formData.docPhoto });
+      if (formData.doc10th) payload.documents.push({ name: '10th Marksheet', url: formData.doc10th });
+      if (formData.doc12th) payload.documents.push({ name: '12th Marksheet', url: formData.doc12th });
+      if (formData.docGrad) payload.documents.push({ name: 'Graduation Marksheet', url: formData.docGrad });
+      if (formData.docTransfer) payload.documents.push({ name: 'Transfer Certificate', url: formData.docTransfer });
+      if (formData.category !== 'General' && formData.docCaste) {
+        payload.documents.push({ name: 'Caste Certificate', url: formData.docCaste });
+      }
 
       const res = await axios.post(`${apiBaseUrl}/college/applications/submit`, payload);
       if (res.data.success) {
@@ -175,7 +221,7 @@ const PublicAdmissionPage = () => {
         });
       }
     } catch (error) {
-      const msg = error.response?.data?.message || 'Failed to submit college application';
+      const msg = error.response?.data?.message || 'Failed to submit registration application';
       toast.error(msg);
     } finally {
       setSubmitting(false);
@@ -183,7 +229,7 @@ const PublicAdmissionPage = () => {
   };
 
   if (loading) {
-    return <Loader fullPage message="Loading admission registration form..." />;
+    return <Loader fullPage message="Loading registration form..." />;
   }
 
   if (!collegeInfo) {
@@ -207,7 +253,7 @@ const PublicAdmissionPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 bg-gradient-to-tr from-indigo-50/20 via-slate-50 to-indigo-50/10 py-10 px-4">
-      <div className="max-w-4xl mx-auto space-y-8 text-left">
+      <div className="max-w-4xl mx-auto space-y-6 text-left">
         {/* Header */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           {collegeInfo?.logo ? (
@@ -222,18 +268,20 @@ const PublicAdmissionPage = () => {
             </div>
           )}
           <div>
-            <h1 className="text-xl font-bold text-slate-850">{collegeInfo.name}</h1>
-            <p className="text-slate-400 text-xs mt-0.5">Public Admission Desk Portal</p>
+            <h1 className="text-xl font-extrabold text-slate-850">{collegeInfo.name}</h1>
+            <p className="text-slate-400 text-xs mt-0.5">{collegeInfo.tagline || 'Public Admission Registration Portal'}</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
-          {/* Section 1: Student Information */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">1. Student Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* SECTION 1: Student Information */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              1. Student Information
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Input
-                label="Student Name"
+                label="Student Name *"
                 name="studentName"
                 value={formData.studentName}
                 onChange={handleChange}
@@ -241,7 +289,7 @@ const PublicAdmissionPage = () => {
                 required
               />
               <Input
-                label="DOB"
+                label="Date of Birth *"
                 name="dob"
                 type="date"
                 value={formData.dob}
@@ -249,7 +297,7 @@ const PublicAdmissionPage = () => {
                 required
               />
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Gender</label>
+                <label className="block text-xs font-semibold text-slate-700">Gender *</label>
                 <select
                   name="gender"
                   value={formData.gender}
@@ -262,15 +310,15 @@ const PublicAdmissionPage = () => {
                 </select>
               </div>
               <Input
-                label="Mobile"
+                label="Mobile Number *"
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleChange}
-                placeholder="e.g. 9876543210"
+                placeholder="10-digit number"
                 required
               />
               <Input
-                label="Email"
+                label="Email Address *"
                 name="email"
                 type="email"
                 value={formData.email}
@@ -278,53 +326,68 @@ const PublicAdmissionPage = () => {
                 placeholder="e.g. amit@gmail.com"
                 required
               />
-              <Input
-                label="Aadhaar"
-                name="aadhaar"
-                value={formData.aadhaar}
-                onChange={handleChange}
-                placeholder="e.g. 1234-5678-9012"
-              />
-              <Input
-                label="Category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                placeholder="e.g. General, OBC, SC, ST"
-              />
-              <Input
-                label="Nationality"
-                name="nationality"
-                value={formData.nationality}
-                onChange={handleChange}
-                placeholder="e.g. Indian"
-              />
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Category *</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                >
+                  <option value="General">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="OBC-NCL">OBC-NCL</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="EWS">EWS</option>
+                  <option value="Minority">Minority</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Nationality *</label>
+                <select
+                  name="nationality"
+                  value={formData.nationality}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                >
+                  <option value="Indian">Indian</option>
+                  <option value="Nepalese">Nepalese</option>
+                  <option value="Bhutanese">Bhutanese</option>
+                  <option value="Bangladeshi">Bangladeshi</option>
+                  <option value="Sri Lankan">Sri Lankan</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Section 2: Academic Details */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">2. Academic Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* SECTION 2: Academic Details */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              2. Academic Details
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Input
-                label="10th Board"
+                label="10th Board *"
                 name="tenthBoard"
                 value={formData.tenthBoard}
                 onChange={handleChange}
-                placeholder="e.g. CBSE"
+                placeholder="e.g. CBSE / State Board"
                 required
               />
               <Input
-                label="10th %"
+                label="10th Percentage *"
                 name="tenthPercentage"
                 type="number"
                 value={formData.tenthPercentage}
                 onChange={handleChange}
-                placeholder="e.g. 85.5"
+                placeholder="e.g. 84.5"
                 required
               />
               <Input
-                label="10th Year"
+                label="10th Passing Year *"
                 name="tenthYear"
                 type="number"
                 value={formData.tenthYear}
@@ -332,26 +395,25 @@ const PublicAdmissionPage = () => {
                 placeholder="e.g. 2022"
                 required
               />
-              
               <Input
-                label="12th Board"
+                label="12th Board *"
                 name="twelfthBoard"
                 value={formData.twelfthBoard}
                 onChange={handleChange}
-                placeholder="e.g. CBSE"
+                placeholder="e.g. CBSE / State Board"
                 required
               />
               <Input
-                label="12th %"
+                label="12th Percentage *"
                 name="twelfthPercentage"
                 type="number"
                 value={formData.twelfthPercentage}
                 onChange={handleChange}
-                placeholder="e.g. 88.2"
+                placeholder="e.g. 87.2"
                 required
               />
               <Input
-                label="12th Year"
+                label="12th Passing Year *"
                 name="twelfthYear"
                 type="number"
                 value={formData.twelfthYear}
@@ -359,39 +421,51 @@ const PublicAdmissionPage = () => {
                 placeholder="e.g. 2024"
                 required
               />
-
               <Input
-                label="Graduation Degree / Percentage (Optional)"
+                label="Graduation Percentage (Optional)"
                 name="graduationPercentage"
                 type="number"
                 value={formData.graduationPercentage}
                 onChange={handleChange}
-                placeholder="e.g. 78.4"
+                placeholder="e.g. 75.6"
               />
               <Input
-                label="Entrance Exam"
+                label="Graduation Passing Year (Optional)"
+                name="graduationYear"
+                type="number"
+                value={formData.graduationYear}
+                onChange={handleChange}
+                placeholder="e.g. 2027"
+              />
+              <Input
+                label="Entrance Exam Name (Optional)"
                 name="entranceExam"
                 value={formData.entranceExam}
                 onChange={handleChange}
-                placeholder="e.g. JEE Main, CAT"
+                placeholder="e.g. JEE, CAT, MAT"
               />
-              <Input
-                label="Entrance Score"
-                name="entranceScore"
-                type="number"
-                value={formData.entranceScore}
-                onChange={handleChange}
-                placeholder="e.g. 98.4"
-              />
+              {formData.entranceExam && (
+                <Input
+                  label="Entrance Score *"
+                  name="entranceScore"
+                  type="number"
+                  value={formData.entranceScore}
+                  onChange={handleChange}
+                  placeholder="Percentile / Rank"
+                  required
+                />
+              )}
             </div>
           </div>
 
-          {/* Section 3: Course Selection */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">3. Course Selection</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* SECTION 3: Course Selection */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              3. Course Selection
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Department</label>
+                <label className="block text-xs font-semibold text-slate-700">Department *</label>
                 <select
                   name="departmentId"
                   value={formData.departmentId}
@@ -407,13 +481,14 @@ const PublicAdmissionPage = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Course</label>
+                <label className="block text-xs font-semibold text-slate-700">Course *</label>
                 <select
                   name="courseId"
                   value={formData.courseId}
                   onChange={handleChange}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
                   required
+                  disabled={!formData.departmentId}
                 >
                   <option value="">-- Select Course --</option>
                   {filteredCourses.map(c => (
@@ -429,6 +504,7 @@ const PublicAdmissionPage = () => {
                   value={formData.specialization}
                   onChange={handleChange}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
+                  disabled={!formData.courseId}
                 >
                   <option value="">-- Select Specialization --</option>
                   {filteredSpecs.map(s => (
@@ -437,75 +513,50 @@ const PublicAdmissionPage = () => {
                 </select>
               </div>
 
-
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Regular / Distance</label>
+                <label className="block text-xs font-semibold text-slate-700">Reference Source</label>
                 <select
-                  name="modeOfStudy"
-                  value={formData.modeOfStudy}
+                  name="referralSource"
+                  value={formData.referralSource}
                   onChange={handleChange}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
                 >
-                  <option value="Regular">Regular</option>
-                  <option value="Distance">Distance</option>
+                  <option value="Google Search">Google Search</option>
+                  <option value="College Website">College Website</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="Walk-in">Walk-in</option>
+                  <option value="Friend / Relative">Friend / Relative</option>
+                  <option value="School">School</option>
+                  <option value="Education Fair">Education Fair</option>
+                  <option value="Newspaper">Newspaper</option>
+                  <option value="Counsellor">Counsellor</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
-
-              <Input
-                label="Referral Source"
-                name="referralSource"
-                value={formData.referralSource}
-                onChange={handleChange}
-                placeholder="e.g. Google Search, News, Referral"
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-6 py-2">
-              <label className="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="hostelRequired"
-                  checked={formData.hostelRequired}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-indigo-650 focus:ring-indigo-500 rounded border-slate-300"
-                />
-                <span>Hostel Facility Request</span>
-              </label>
-
-              <label className="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="transportRequired"
-                  checked={formData.transportRequired}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-indigo-650 focus:ring-indigo-500 rounded border-slate-300"
-                />
-                <span>Transport Facility Request</span>
-              </label>
-
-              <label className="flex items-center space-x-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="scholarshipApplied"
-                  checked={formData.scholarshipApplied}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-indigo-650 focus:ring-indigo-500 rounded border-slate-300"
-                />
-                <span>Scholarship Request</span>
-              </label>
             </div>
           </div>
 
-          {/* Section 4: Parent Details */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">4. Parent Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* SECTION 4: Parent Details */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              4. Parent Details
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Input
                 label="Father's Name"
                 name="fatherName"
                 value={formData.fatherName}
                 onChange={handleChange}
                 placeholder="e.g. Ramesh Sen"
+              />
+              <Input
+                label="Father's Mobile"
+                name="fatherMobile"
+                value={formData.fatherMobile}
+                onChange={handleChange}
+                placeholder="10-digit number"
               />
               <Input
                 label="Mother's Name"
@@ -515,52 +566,39 @@ const PublicAdmissionPage = () => {
                 placeholder="e.g. Sunita Sen"
               />
               <Input
-                label="Guardian Name"
-                name="parentName"
-                value={formData.parentName}
+                label="Mother's Mobile"
+                name="motherMobile"
+                value={formData.motherMobile}
                 onChange={handleChange}
-                placeholder="e.g. Sunil Sen"
-                required
+                placeholder="10-digit number"
               />
               <Input
-                label="Parent Mobile"
-                name="parentMobile"
-                value={formData.parentMobile}
-                onChange={handleChange}
-                placeholder="e.g. 9876543211"
-                required
-              />
-              <Input
-                label="Parent Email"
+                label="Parent Email (Optional)"
                 name="parentEmail"
                 type="email"
                 value={formData.parentEmail}
                 onChange={handleChange}
-                placeholder="e.g. sunil@gmail.com"
-              />
-              <Input
-                label="Occupation"
-                name="parentOccupation"
-                value={formData.parentOccupation}
-                onChange={handleChange}
-                placeholder="e.g. Government Service"
+                placeholder="e.g. parent@gmail.com"
               />
             </div>
           </div>
 
-          {/* Section 5: Address */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">5. Address</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* SECTION 5: Address */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              5. Address Details
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Input
-                label="State"
+                label="State *"
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
                 placeholder="e.g. Delhi"
+                required
               />
               <Input
-                label="City"
+                label="City *"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
@@ -568,111 +606,93 @@ const PublicAdmissionPage = () => {
                 required
               />
               <Input
-                label="PIN"
+                label="PIN Code *"
                 name="pinCode"
                 value={formData.pinCode}
                 onChange={handleChange}
                 placeholder="e.g. 110001"
+                required
               />
-              <div className="md:col-span-3">
+              <div className="sm:col-span-2 md:col-span-3">
                 <Input
-                  label="Address"
+                  label="Full Address *"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="e.g. 123 University Marg, Sector 5"
+                  placeholder="House No, Building, Street, Area details..."
                   required
                 />
               </div>
             </div>
           </div>
 
-          {/* Section 6: Documents */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">6. Documents (Provide file URLs)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Photo Link" name="docPhoto" value={formData.docPhoto} onChange={handleChange} placeholder="e.g. https://cloud.com/photo.jpg" />
-              <Input label="Signature Link" name="docSign" value={formData.docSign} onChange={handleChange} placeholder="e.g. https://cloud.com/sign.jpg" />
-              <Input label="Aadhaar Card Link" name="docAadhaar" value={formData.docAadhaar} onChange={handleChange} placeholder="e.g. https://cloud.com/aadhaar.pdf" />
-              <Input label="10th Marksheet Link" name="doc10th" value={formData.doc10th} onChange={handleChange} placeholder="e.g. https://cloud.com/10th.pdf" />
-              <Input label="12th Marksheet Link" name="doc12th" value={formData.doc12th} onChange={handleChange} placeholder="e.g. https://cloud.com/12th.pdf" />
-              <Input label="Migration Certificate Link" name="docMigration" value={formData.docMigration} onChange={handleChange} placeholder="e.g. https://cloud.com/migration.pdf" />
-              <Input label="Transfer Certificate Link" name="docTransfer" value={formData.docTransfer} onChange={handleChange} placeholder="e.g. https://cloud.com/transfer.pdf" />
-              <Input label="Character Certificate Link" name="docCharacter" value={formData.docCharacter} onChange={handleChange} placeholder="e.g. https://cloud.com/character.pdf" />
-              <Input label="Income Certificate Link" name="docIncome" value={formData.docIncome} onChange={handleChange} placeholder="e.g. https://cloud.com/income.pdf" />
-              <Input label="Caste Certificate Link" name="docCaste" value={formData.docCaste} onChange={handleChange} placeholder="e.g. https://cloud.com/caste.pdf" />
-              <Input label="Graduation Marksheet Link (Optional)" name="docGrad" value={formData.docGrad} onChange={handleChange} placeholder="e.g. https://cloud.com/grad.pdf" />
-            </div>
-          </div>
-
-          {/* Section 7: Fee Information */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">7. Fee Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* SECTION 6: Documents */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+            <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
+              6. Documents (File URL links)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
-                label="Registration Fee Amount"
-                name="feeAmountPaid"
-                type="number"
-                value={formData.feeAmountPaid}
+                label="Student Photo (Required) *"
+                name="docPhoto"
+                value={formData.docPhoto}
                 onChange={handleChange}
-                placeholder="e.g. 1000"
+                placeholder="URL link to student photo"
+                required
               />
               <Input
-                label="Discount"
-                name="discountApplied"
-                type="number"
-                value={formData.discountApplied}
+                label="10th Marksheet (Optional)"
+                name="doc10th"
+                value={formData.doc10th}
                 onChange={handleChange}
-                placeholder="e.g. 100"
+                placeholder="URL link to 10th marksheet"
               />
               <Input
-                label="Scholarship Amount"
-                name="scholarshipAmount"
-                type="number"
-                value={formData.scholarshipAmount}
+                label="12th Marksheet (Optional)"
+                name="doc12th"
+                value={formData.doc12th}
                 onChange={handleChange}
-                placeholder="e.g. 500"
+                placeholder="URL link to 12th marksheet"
               />
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Payment Mode</label>
-                <select
-                  name="paymentMode"
-                  value={formData.paymentMode}
+              <Input
+                label="Graduation Marksheet (Optional)"
+                name="docGrad"
+                value={formData.docGrad}
+                onChange={handleChange}
+                placeholder="URL link to graduation certificate"
+              />
+              <Input
+                label="Transfer Certificate (Optional)"
+                name="docTransfer"
+                value={formData.docTransfer}
+                onChange={handleChange}
+                placeholder="URL link to TC"
+              />
+              {formData.category !== 'General' && (
+                <Input
+                  label="Category Certificate (Required) *"
+                  name="docCaste"
+                  value={formData.docCaste}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none"
-                >
-                  <option value="Online">Online</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Demand Draft">Demand Draft</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                </select>
-              </div>
-              <Input
-                label="Transaction ID"
-                name="transactionId"
-                value={formData.transactionId}
-                onChange={handleChange}
-                placeholder="e.g. TXN12345"
-              />
-              <Input
-                label="Receipt Link"
-                name="receiptUrl"
-                value={formData.receiptUrl}
-                onChange={handleChange}
-                placeholder="e.g. https://cloud.com/receipt.pdf"
-              />
+                  placeholder="URL link to Caste Certificate"
+                  required
+                />
+              )}
             </div>
           </div>
 
-          {/* Submit */}
-          <div className="pt-4 flex justify-end">
+          {/* Section 7: Submit Button */}
+          <div className="flex items-center justify-between bg-indigo-50/50 rounded-2xl border border-indigo-100 p-5">
+            <div className="hidden sm:flex items-center text-xs text-indigo-850 gap-2 font-semibold">
+              <ShieldCheck className="h-5 w-5 text-indigo-600 shrink-0" />
+              <span>Encrypted transmission. Secure Portal Submission.</span>
+            </div>
             <Button
               type="submit"
-              className="py-3 px-6 text-sm font-semibold inline-flex items-center"
+              className="py-3 px-6 text-xs font-bold inline-flex items-center"
               isLoading={submitting}
             >
-              <Sparkles className="h-4.5 w-4.5 mr-2" />
-              Submit Admission Application
+              Submit Application Registration
             </Button>
           </div>
         </form>
