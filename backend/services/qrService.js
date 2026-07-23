@@ -1,4 +1,5 @@
 const QRCode = require('qrcode');
+const School = require('../models/School');
 
 /**
  * Generates a permanent QR code data URL pointing to the school's public admission form.
@@ -7,16 +8,19 @@ const QRCode = require('qrcode');
  */
 const generateSchoolQrCode = async (schoolId) => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-  const admissionFormLink = `${frontendUrl}/public/admission/${schoolId}`;
-
+  
   try {
+    const institution = await School.findById(schoolId);
+    const type = institution?.institutionType === 'college' ? 'college' : 'school';
+    const admissionFormLink = `${frontendUrl}/public/${type}/admission/${schoolId}`;
+
     // Generate base64 data URI of the QR Code
     const qrCodeUrl = await QRCode.toDataURL(admissionFormLink, {
       errorCorrectionLevel: 'H',
       margin: 2,
       width: 400,
       color: {
-        dark: '#4f46e5', // indigo-600 color theme
+        dark: type === 'college' ? '#4f46e5' : '#4f46e5', // indigo-600 color theme
         light: '#ffffff'
       }
     });

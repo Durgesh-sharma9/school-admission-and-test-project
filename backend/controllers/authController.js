@@ -59,20 +59,6 @@ const signup = async (req, res) => {
 
     // Now generate permanent QR Code and form link
     let { qrCodeUrl, admissionFormLink } = await generateSchoolQrCode(school._id);
-    if (school.institutionType === 'college') {
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      admissionFormLink = `${frontendUrl}/public/college/admission/${school._id}`;
-      const QRCode = require('qrcode');
-      qrCodeUrl = await QRCode.toDataURL(admissionFormLink, {
-        errorCorrectionLevel: 'H',
-        margin: 2,
-        width: 400,
-        color: {
-          dark: '#4f46e5',
-          light: '#ffffff'
-        }
-      });
-    }
 
     // Save QR details
     school.qrCodeUrl = qrCodeUrl;

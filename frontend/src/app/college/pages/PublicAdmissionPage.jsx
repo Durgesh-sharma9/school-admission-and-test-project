@@ -32,19 +32,6 @@ const PublicAdmissionPage = () => {
     aadhaar: '',
     category: 'General',
     nationality: 'Indian',
-    
-    fatherName: '',
-    motherName: '',
-    parentName: '',
-    parentMobile: '',
-    parentEmail: '',
-    parentOccupation: '',
-
-    state: '',
-    city: '',
-    pinCode: '',
-    address: '',
-    area: '',
 
     tenthBoard: '',
     tenthPercentage: '',
@@ -67,6 +54,19 @@ const PublicAdmissionPage = () => {
     transportRequired: false,
     scholarshipApplied: false,
     referralSource: 'Direct',
+
+    fatherName: '',
+    motherName: '',
+    parentName: '',
+    parentMobile: '',
+    parentEmail: '',
+    parentOccupation: '',
+
+    state: '',
+    city: '',
+    pinCode: '',
+    address: '',
+    area: '',
 
     docPhoto: '',
     docSign: '',
@@ -141,7 +141,6 @@ const PublicAdmissionPage = () => {
         documents: []
       };
 
-      // Map document urls
       const docFields = [
         { key: 'docPhoto', label: 'Photo' },
         { key: 'docSign', label: 'Signature' },
@@ -300,100 +299,9 @@ const PublicAdmissionPage = () => {
             </div>
           </div>
 
-          {/* Section 2: Parent Information */}
+          {/* Section 2: Academic Details */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">2. Parent Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="Father's Name"
-                name="fatherName"
-                value={formData.fatherName}
-                onChange={handleChange}
-                placeholder="e.g. Ramesh Sen"
-              />
-              <Input
-                label="Mother's Name"
-                name="motherName"
-                value={formData.motherName}
-                onChange={handleChange}
-                placeholder="e.g. Sunita Sen"
-              />
-              <Input
-                label="Guardian Name"
-                name="parentName"
-                value={formData.parentName}
-                onChange={handleChange}
-                placeholder="e.g. Sunil Sen"
-                required
-              />
-              <Input
-                label="Parent Mobile"
-                name="parentMobile"
-                value={formData.parentMobile}
-                onChange={handleChange}
-                placeholder="e.g. 9876543211"
-                required
-              />
-              <Input
-                label="Parent Email"
-                name="parentEmail"
-                type="email"
-                value={formData.parentEmail}
-                onChange={handleChange}
-                placeholder="e.g. sunil@gmail.com"
-              />
-              <Input
-                label="Occupation"
-                name="parentOccupation"
-                value={formData.parentOccupation}
-                onChange={handleChange}
-                placeholder="e.g. Government Service"
-              />
-            </div>
-          </div>
-
-          {/* Section 3: Address */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">3. Address</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="State"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                placeholder="e.g. Delhi"
-              />
-              <Input
-                label="City"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="e.g. New Delhi"
-                required
-              />
-              <Input
-                label="PIN"
-                name="pinCode"
-                value={formData.pinCode}
-                onChange={handleChange}
-                placeholder="e.g. 110001"
-              />
-              <div className="md:col-span-3">
-                <Input
-                  label="Address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="e.g. 123 University Marg, Sector 5"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section 4: Academic History */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">4. Academic History</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">2. Academic Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 label="10th Board"
@@ -450,7 +358,7 @@ const PublicAdmissionPage = () => {
               />
 
               <Input
-                label="Graduation (Optional)"
+                label="Graduation Degree / Percentage (Optional)"
                 name="graduationPercentage"
                 type="number"
                 value={formData.graduationPercentage}
@@ -475,9 +383,9 @@ const PublicAdmissionPage = () => {
             </div>
           </div>
 
-          {/* Section 5: Admission */}
+          {/* Section 3: Course Selection */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">5. Admission</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">3. Course Selection</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="block text-xs font-semibold text-slate-700">Department</label>
@@ -585,9 +493,100 @@ const PublicAdmissionPage = () => {
             </div>
           </div>
 
-          {/* Section 6: Document Upload */}
+          {/* Section 4: Parent Details */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">6. Document Upload (Provide file URLs)</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">4. Parent Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input
+                label="Father's Name"
+                name="fatherName"
+                value={formData.fatherName}
+                onChange={handleChange}
+                placeholder="e.g. Ramesh Sen"
+              />
+              <Input
+                label="Mother's Name"
+                name="motherName"
+                value={formData.motherName}
+                onChange={handleChange}
+                placeholder="e.g. Sunita Sen"
+              />
+              <Input
+                label="Guardian Name"
+                name="parentName"
+                value={formData.parentName}
+                onChange={handleChange}
+                placeholder="e.g. Sunil Sen"
+                required
+              />
+              <Input
+                label="Parent Mobile"
+                name="parentMobile"
+                value={formData.parentMobile}
+                onChange={handleChange}
+                placeholder="e.g. 9876543211"
+                required
+              />
+              <Input
+                label="Parent Email"
+                name="parentEmail"
+                type="email"
+                value={formData.parentEmail}
+                onChange={handleChange}
+                placeholder="e.g. sunil@gmail.com"
+              />
+              <Input
+                label="Occupation"
+                name="parentOccupation"
+                value={formData.parentOccupation}
+                onChange={handleChange}
+                placeholder="e.g. Government Service"
+              />
+            </div>
+          </div>
+
+          {/* Section 5: Address */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">5. Address</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input
+                label="State"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                placeholder="e.g. Delhi"
+              />
+              <Input
+                label="City"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="e.g. New Delhi"
+                required
+              />
+              <Input
+                label="PIN"
+                name="pinCode"
+                value={formData.pinCode}
+                onChange={handleChange}
+                placeholder="e.g. 110001"
+              />
+              <div className="md:col-span-3">
+                <Input
+                  label="Address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="e.g. 123 University Marg, Sector 5"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 6: Documents */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">6. Documents (Provide file URLs)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input label="Photo Link" name="docPhoto" value={formData.docPhoto} onChange={handleChange} placeholder="e.g. https://cloud.com/photo.jpg" />
               <Input label="Signature Link" name="docSign" value={formData.docSign} onChange={handleChange} placeholder="e.g. https://cloud.com/sign.jpg" />
@@ -603,9 +602,9 @@ const PublicAdmissionPage = () => {
             </div>
           </div>
 
-          {/* Section 7: Fee Details */}
+          {/* Section 7: Fee Information */}
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">7. Fee details</h3>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">7. Fee Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 label="Registration Fee Amount"

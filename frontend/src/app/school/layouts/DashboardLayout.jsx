@@ -42,6 +42,11 @@ const DashboardLayout = () => {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
+  // Crossover protection: redirect college users to college dashboard
+  if (school && school.institutionType === 'college') {
+    return <Navigate to="/college/dashboard" replace />;
+  }
+
   // Determine current page title based on path
   const getPageTitle = () => {
     const path = location.pathname;

@@ -91,6 +91,8 @@ function App() {
                   <Route path="/reset-password" element={<SchoolResetPassword />} />
 
                   {/* Public Admission Form & QR Code Public Link Routes */}
+                  <Route path="/public/school/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
+                  <Route path="/public/school/thank-you/:schoolId" element={<SchoolPublicThankYouPage />} />
                   <Route path="/public/admission/:schoolId" element={<SchoolPublicAdmissionPage />} />
                   <Route path="/public/admission/:token" element={<SchoolPublicAdmissionPage />} />
                   <Route path="/public/qr/:schoolId" element={<SchoolPublicAdmissionPage />} />

@@ -54,7 +54,7 @@ const CollegeDashboardLayout = () => {
         <CollegeNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} title={getPageTitle()} />
 
         {/* Trial Expired Warning Banner */}
-        {!isTrialActive() && (
+        {!isTrialActive && (
           <div className="bg-red-50 border-y border-red-100 px-6 py-2.5 flex items-center justify-between text-left">
             <p className="text-xs text-red-800 font-semibold">
               ⚠️ Your free trial has expired. New public admissions are paused. Please update your subscription plan.
