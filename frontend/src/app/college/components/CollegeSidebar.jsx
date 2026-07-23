@@ -32,7 +32,6 @@ const CollegeSidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Faculty', path: '/college/faculty', icon: Users },
     { name: 'Counselling', path: '/college/counselling', icon: Compass },
     { name: 'Documents', path: '/college/documents', icon: FileCheck },
-    { name: 'Fee Verification', path: '/college/fee-verification', icon: DollarSign },
     { name: 'QR Code / Links', path: '/college/qr-links', icon: QrCode },
     { name: 'Thank You CMS', path: '/college/thank-you-cms', icon: Sparkles },
     { name: 'Subscription', path: '/college/subscription', icon: CreditCard },

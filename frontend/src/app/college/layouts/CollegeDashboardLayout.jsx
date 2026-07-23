@@ -36,7 +36,6 @@ const CollegeDashboardLayout = () => {
     if (path.startsWith('/college/faculty')) return 'Faculty Registry';
     if (path.startsWith('/college/counselling')) return 'Counselling Pipeline';
     if (path.startsWith('/college/documents')) return 'Document Verification Desk';
-    if (path.startsWith('/college/fee-verification')) return 'Fee Verification Desk';
     if (path.startsWith('/college/qr-links')) return 'QR & Admission Desk Links';
     if (path.startsWith('/college/thank-you-cms')) return 'Thank You Page Customizer';
     if (path.startsWith('/college/subscription')) return 'Subscription & Plans';

@@ -64,7 +64,6 @@ const Dashboard = () => {
     pendingVerification: 0,
     counsellingScheduled: 0,
     counsellingCompleted: 0,
-    feePending: 0,
     confirmedAdmissions: 0,
     scholarshipRequests: 0,
     hostelRequests: 0
@@ -87,14 +86,13 @@ const Dashboard = () => {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {[
           { title: 'Total Applications', val: stats.totalApplications, icon: ClipboardList, color: 'indigo' },
           { title: 'Today\'s Applications', val: stats.todayApplications, icon: Clock, color: 'cyan' },
           { title: 'Docs Pending', val: stats.pendingVerification, icon: FileText, color: 'amber' },
           { title: 'Counselling Scheduled', val: stats.counsellingScheduled, icon: Compass, color: 'fuchsia' },
           { title: 'Counselling Completed', val: stats.counsellingCompleted, icon: UserCheck, color: 'violet' },
-          { title: 'Fee Pending', val: stats.feePending, icon: DollarSign, color: 'rose' },
           { title: 'Admissions Confirmed', val: stats.confirmedAdmissions, icon: CheckCircle, color: 'emerald' },
           { title: 'Scholarship Requests', val: stats.scholarshipRequests, icon: Award, color: 'amber' },
           { title: 'Hostel Requests', val: stats.hostelRequests, icon: Home, color: 'indigo' }

@@ -13,7 +13,6 @@ const {
   submitApplication,
   updateApplicationStage,
   verifyDocument,
-  verifyFee,
   addApplicationNote,
   getPublicDepartments,
   getPublicCourses,
@@ -71,7 +70,6 @@ router.get('/applications', getApplications);
 router.get('/applications/:id', getApplicationById);
 router.put('/applications/:id/stage', updateApplicationStage);
 router.put('/applications/:id/document/:docId', verifyDocument);
-router.put('/applications/:id/fee', verifyFee);
 router.post('/applications/:id/note', addApplicationNote);
 
 module.exports = router;

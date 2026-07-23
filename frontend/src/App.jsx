@@ -46,7 +46,6 @@ const CollegeCourses = lazy(() => import('./app/college/pages/Courses'));
 const CollegeFaculty = lazy(() => import('./app/college/pages/Faculty'));
 const CollegeCounselling = lazy(() => import('./app/college/pages/Counselling'));
 const CollegeDocuments = lazy(() => import('./app/college/pages/Documents'));
-const CollegeFeeVerification = lazy(() => import('./app/college/pages/FeeVerification'));
 const CollegeQrLinks = lazy(() => import('./app/college/pages/QrLinksPage'));
 const CollegeThankYouCms = lazy(() => import('./app/college/pages/ThankYouCmsPage'));
 const CollegeSubscription = lazy(() => import('./app/college/pages/Subscription'));
@@ -172,7 +171,6 @@ function App() {
                     <Route path="/college/faculty" element={<CollegeFaculty />} />
                     <Route path="/college/counselling" element={<CollegeCounselling />} />
                     <Route path="/college/documents" element={<CollegeDocuments />} />
-                    <Route path="/college/fee-verification" element={<CollegeFeeVerification />} />
                     <Route path="/college/qr-links" element={<CollegeQrLinks />} />
                     <Route path="/college/thank-you-cms" element={<CollegeThankYouCms />} />
                     <Route path="/college/subscription" element={<CollegeSubscription />} />

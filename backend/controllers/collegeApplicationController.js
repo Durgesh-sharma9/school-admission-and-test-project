@@ -271,40 +271,7 @@ const verifyDocument = async (req, res) => {
   }
 };
 
-// @desc    Verify fee payment transaction
-// @route   PUT /api/v1/college/applications/:id/fee
-// @access  Private (College Admin)
-const verifyFee = async (req, res) => {
-  try {
-    const collegeId = req.school.id;
-    const { id } = req.params;
-    const { paymentStatus, amount } = req.body;
 
-    if (!paymentStatus) {
-      return res.status(400).json({ success: false, message: 'Payment status is required' });
-    }
-
-    const app = await CollegeApplication.findOne({ _id: id, schoolId: collegeId });
-    if (!app) {
-      return res.status(404).json({ success: false, message: 'Application not found' });
-    }
-
-    app.paymentStatus = paymentStatus;
-    if (amount !== undefined) app.feeAmountPaid = amount;
-
-    app.notes.push({
-      note: `Fee status marked as ${paymentStatus}. Amount: ${app.feeAmountPaid}`,
-      counselorName: req.school.name,
-      date: new Date()
-    });
-
-    await app.save();
-    return res.json({ success: true, message: 'Fee verification updated', data: app });
-  } catch (error) {
-    console.error('Verify fee error:', error);
-    return res.status(500).json({ success: false, message: 'Server error updating fee verification' });
-  }
-};
 
 // @desc    Add general counselling note
 // @route   POST /api/v1/college/applications/:id/note
@@ -392,7 +359,6 @@ module.exports = {
   submitApplication,
   updateApplicationStage,
   verifyDocument,
-  verifyFee,
   addApplicationNote,
   getPublicDepartments,
   getPublicCourses,

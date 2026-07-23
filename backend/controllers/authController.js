@@ -297,7 +297,7 @@ const getPublicSchoolInfo = async (req, res) => {
     let school = null;
 
     if (mongoose.Types.ObjectId.isValid(schoolId)) {
-      school = await School.findById(schoolId).select('name logo thankYouCms institutionType');
+      school = await School.findById(schoolId).select('name logo tagline website phone email admissionEmail address city state pincode universityAffiliation collegeType thankYouCms qrBranding institutionType');
     }
 
     if (!school) {
@@ -306,7 +306,7 @@ const getPublicSchoolInfo = async (req, res) => {
           { code: schoolId },
           { slug: schoolId }
         ]
-      }).select('name logo thankYouCms institutionType');
+      }).select('name logo tagline website phone email admissionEmail address city state pincode universityAffiliation collegeType thankYouCms qrBranding institutionType');
     }
 
     if (!school) {

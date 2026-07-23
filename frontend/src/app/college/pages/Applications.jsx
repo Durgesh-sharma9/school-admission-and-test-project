@@ -28,7 +28,6 @@ const STAGES = [
   'Documents Verified',
   'Counselling Scheduled',
   'Counselling Completed',
-  'Fee Pending',
   'Admission Confirmed',
   'Rejected'
 ];
@@ -108,18 +107,7 @@ const Applications = () => {
     }
   };
 
-  const handleFeeVerify = async (paymentStatus, amount) => {
-    try {
-      const res = await api.put(`/college/applications/${selectedApp._id}/fee`, { paymentStatus, amount });
-      if (res.success) {
-        toast.success(`Fee marked as ${paymentStatus}`);
-        setSelectedApp(res.data);
-        fetchApplications();
-      }
-    } catch (error) {
-      toast.error('Failed to verify fee payment');
-    }
-  };
+
 
   const handleAddNote = async (e) => {
     e.preventDefault();
@@ -143,7 +131,7 @@ const Applications = () => {
       toast.error('No applications found to export');
       return;
     }
-    const headers = ['Application ID', 'Student Name', 'Email', 'Mobile', 'Course', 'Tenth %', 'Twelfth %', 'Admission Stage', 'Payment Status'];
+    const headers = ['Application ID', 'Student Name', 'Email', 'Mobile', 'Course', 'Tenth %', 'Twelfth %', 'Admission Stage'];
     const rows = [headers.join(',')];
     applications.forEach(app => {
       rows.push([
@@ -154,8 +142,7 @@ const Applications = () => {
         `"${app.courseId?.name || 'N/A'}"`,
         app.tenthPercentage,
         app.twelfthPercentage,
-        app.stage,
-        app.paymentStatus
+        app.stage
       ].join(','));
     });
     const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -242,7 +229,6 @@ const Applications = () => {
                   <th className="py-3 px-4">Selected Course</th>
                   <th className="py-3 px-4">10% / 12% / Grad</th>
                   <th className="py-3 px-4">Stage</th>
-                  <th className="py-3 px-4">Fees Status</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -268,13 +254,6 @@ const Applications = () => {
                     <td className="py-3.5 px-4">
                       <span className="px-2 py-0.5 rounded-full font-bold text-[9px] bg-indigo-50 text-indigo-600 uppercase tracking-wide">
                         {app.stage}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wide ${
-                        app.paymentStatus === 'Verified' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                      }`}>
-                        {app.paymentStatus}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
@@ -465,31 +444,7 @@ const Applications = () => {
                   )}
                 </div>
 
-                {/* Fee verification section */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">Registration fee status</h4>
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold">Transaction Reference</p>
-                      <p className="text-xs font-semibold text-slate-700 mt-0.5">{selectedApp.transactionId || 'No reference id'}</p>
-                      <p className="text-xs font-bold text-slate-800 mt-1">Paid Amount: ${selectedApp.feeAmountPaid}</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleFeeVerify('Verified', selectedApp.feeAmountPaid)}
-                        className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-                      >
-                        Verify Payment
-                      </button>
-                      <button
-                        onClick={() => handleFeeVerify('Failed', selectedApp.feeAmountPaid)}
-                        className="py-1.5 px-3 bg-rose-650 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-                      >
-                        Flag Failed
-                      </button>
-                    </div>
-                  </div>
-                </div>
+
 
                 {/* Log history list & counselling notes */}
                 <div className="space-y-3">

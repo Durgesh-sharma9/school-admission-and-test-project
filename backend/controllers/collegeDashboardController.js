@@ -35,14 +35,6 @@ const getDashboardAnalytics = async (req, res) => {
       stage: 'Counselling Completed'
     });
 
-    const feePending = await CollegeApplication.countDocuments({
-      schoolId: collegeId,
-      $or: [
-        { stage: 'Fee Pending' },
-        { paymentStatus: 'Pending' }
-      ]
-    });
-
     const confirmedAdmissions = await CollegeApplication.countDocuments({
       schoolId: collegeId,
       stage: 'Admission Confirmed'
@@ -127,7 +119,6 @@ const getDashboardAnalytics = async (req, res) => {
           pendingVerification,
           counsellingScheduled,
           counsellingCompleted,
-          feePending,
           confirmedAdmissions,
           scholarshipRequests,
           hostelRequests
