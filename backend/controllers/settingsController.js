@@ -16,7 +16,14 @@ const updateSettings = async (req, res) => {
       tagline, 
       academicSession, 
       website, 
-      qrBranding 
+      qrBranding,
+      admissionEmail,
+      city,
+      state,
+      pincode,
+      universityAffiliation,
+      collegeType,
+      documents
     } = req.body;
 
     const school = await School.findById(req.school.id);
@@ -36,13 +43,24 @@ const updateSettings = async (req, res) => {
     if (tagline !== undefined) school.tagline = tagline;
     if (academicSession !== undefined) school.academicSession = academicSession;
     if (website !== undefined) school.website = website;
-    if (qrBranding !== undefined) school.qrBranding = { ...school.qrBranding, ...qrBranding };
+    if (qrBranding !== undefined) {
+      school.qrBranding = { ...school.qrBranding.toObject(), ...qrBranding };
+    }
+    if (admissionEmail !== undefined) school.admissionEmail = admissionEmail;
+    if (city !== undefined) school.city = city;
+    if (state !== undefined) school.state = state;
+    if (pincode !== undefined) school.pincode = pincode;
+    if (universityAffiliation !== undefined) school.universityAffiliation = universityAffiliation;
+    if (collegeType !== undefined) school.collegeType = collegeType;
+    if (documents !== undefined) {
+      school.documents = { ...school.documents?.toObject(), ...documents };
+    }
 
     await school.save();
 
     return res.json({
       success: true,
-      message: 'School settings updated successfully',
+      message: 'Settings updated successfully',
       school: {
         id: school._id,
         name: school.name,
@@ -60,6 +78,13 @@ const updateSettings = async (req, res) => {
         thankYouCms: school.thankYouCms,
         settings: school.settings,
         communicationTemplates: school.communicationTemplates,
+        admissionEmail: school.admissionEmail,
+        city: school.city,
+        state: school.state,
+        pincode: school.pincode,
+        universityAffiliation: school.universityAffiliation,
+        collegeType: school.collegeType,
+        documents: school.documents
       },
     });
   } catch (error) {

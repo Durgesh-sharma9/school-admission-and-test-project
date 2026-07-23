@@ -54,6 +54,42 @@ const schoolSchema = new mongoose.Schema({
     default: '',
     trim: true,
   },
+  admissionEmail: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  city: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  state: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  pincode: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  universityAffiliation: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  collegeType: {
+    type: String,
+    enum: ['Government', 'Private', 'Autonomous', 'Deemed', ''],
+    default: '',
+  },
+  documents: {
+    admissionBrochureUrl: { type: String, default: '' },
+    prospectusUrl: { type: String, default: '' },
+    collegeBannerUrl: { type: String, default: '' },
+    galleryImages: { type: [String], default: [] }
+  },
   logo: {
     type: String,
     default: '',
@@ -67,12 +103,16 @@ const schoolSchema = new mongoose.Schema({
     showWebsite: { type: Boolean, default: true },
     showAddress: { type: Boolean, default: true },
     showAcademicSession: { type: Boolean, default: true },
+    showUniversityName: { type: Boolean, default: true },
+    showAccreditation: { type: Boolean, default: true },
+    showFacilities: { type: Boolean, default: true },
     footerMessage: { 
       type: String, 
       default: 'Thank You For Visiting Our School. We Look Forward To Welcoming Your Child.' 
     },
     primaryColor: { type: String, default: '#4f46e5' },
     secondaryColor: { type: String, default: '#f59e0b' },
+    accentColor: { type: String, default: '#6366f1' },
     showHighlights: { type: Boolean, default: true },
     highlights: {
       type: [String],
@@ -160,7 +200,7 @@ const schoolSchema = new mongoose.Schema({
   },
   communicationTemplates: [{
     name: { type: String, required: true },
-    type: { type: String, enum: ['whatsapp', 'email'], required: true },
+    type: { type: String, enum: ['whatsapp', 'email', 'sms'], required: true },
     subject: { type: String, default: '' },
     body: { type: String, required: true }
   }],
