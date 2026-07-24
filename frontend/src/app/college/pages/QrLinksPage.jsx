@@ -438,98 +438,81 @@ const QrLinksPage = () => {
     }, 1000);
   };
 
-  // Download flyer handler
+  // Download flyer handler — renders poster at full native size off-screen for pixel-perfect export
   const handleDownload = async (format) => {
-    const posterEl = document.getElementById('admission-poster-canvas');
-    if (!posterEl) return;
-
     if (format === 'png') setDownloadingPng(true);
     else if (format === 'pdf') setDownloadingPdf(true);
 
-    const prevTransform = posterEl.style.transform;
-    const prevTransformOrigin = posterEl.style.transformOrigin;
-
-    posterEl.style.transform = 'none';
-    posterEl.style.transformOrigin = 'initial';
-
     try {
+      // Wait for web fonts to be fully loaded
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
+      await new Promise(resolve => setTimeout(resolve, 80));
 
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // 1. Create an off-screen container at the poster's full native pixel dimensions
+      const container = document.createElement('div');
+      container.style.cssText = [
+        `position:fixed`,
+        `top:-${posterDims.height + 200}px`,
+        `left:-${posterDims.width + 200}px`,
+        `width:${posterDims.width}px`,
+        `height:${posterDims.height}px`,
+        `overflow:hidden`,
+        `z-index:-9999`,
+        `pointer-events:none`,
+        `visibility:hidden`,
+      ].join(';');
+      document.body.appendChild(container);
 
-      const canvas = await html2canvas(posterEl, {
-        scale: 2.0, // High-quality 2x capture
+      // 2. Render the React poster tree into the off-screen node at scale=1 (no transform)
+      const { createRoot } = await import('react-dom/client');
+      const offscreenRoot = createRoot(container);
+      offscreenRoot.render(renderPosterCanvas(1, 'pdf-export-canvas'));
+
+      // 3. Allow React to flush the render and all images to settle
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // 4. Capture at 4× density for print-quality resolution
+      const canvas = await html2canvas(container, {
+        scale: 4,
         useCORS: true,
-        allowTaint: false, // Prevent tainted canvas SecurityErrors
+        allowTaint: false,
         backgroundColor: effectiveBg,
+        width: posterDims.width,
+        height: posterDims.height,
         logging: false,
         onclone: (clonedDoc) => {
-          // 1. Clean oklch and oklab from style tags
+          // Remove oklch/oklab color values not supported by html2canvas
           const styleTags = clonedDoc.querySelectorAll('style');
           styleTags.forEach(tag => {
             let cssText = tag.textContent;
             if (cssText && (cssText.includes('oklch') || cssText.includes('oklab'))) {
-              const colorRegex = /(oklch|oklab)\([^)]+\)/g;
-              cssText = cssText.replace(colorRegex, (match) => {
-                try {
-                  return oklchToRgb(match);
-                } catch (e) {
-                  return 'rgb(0,0,0)';
-                }
+              cssText = cssText.replace(/(oklch|oklab)\([^)]+\)/g, match => {
+                try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
               });
               tag.textContent = cssText;
             }
           });
-
-          // 2. Clean oklch and oklab from inline styles
           const allElements = clonedDoc.getElementsByTagName('*');
           for (const el of allElements) {
             const styleAttr = el.getAttribute('style');
             if (styleAttr && (styleAttr.includes('oklch') || styleAttr.includes('oklab'))) {
-              const colorRegex = /(oklch|oklab)\([^)]+\)/g;
-              el.setAttribute('style', styleAttr.replace(colorRegex, (match) => {
-                try {
-                  return oklchToRgb(match);
-                } catch (e) {
-                  return 'rgb(0,0,0)';
-                }
+              el.setAttribute('style', styleAttr.replace(/(oklch|oklab)\([^)]+\)/g, match => {
+                try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
               }));
             }
           }
         }
       });
 
+      // 5. Export to the requested format
       const imgData = canvas.toDataURL('image/png');
 
       if (format === 'pdf') {
-        const pdfPageWidth = 210; // A4 standard width in mm
-        const pdfPageHeight = 297; // A4 standard height in mm
-        const margin = 10; // 10mm print-safe margin
-
-        const printableWidth = pdfPageWidth - (margin * 2);
-        const printableHeight = pdfPageHeight - (margin * 2);
-
-        const posterRatio = posterDims.height / posterDims.width;
-
-        let w = printableWidth;
-        let h = w * posterRatio;
-
-        if (h > printableHeight) {
-          h = printableHeight;
-          w = h / posterRatio;
-        }
-
-        const x = margin + (printableWidth - w) / 2;
-        const y = margin + (printableHeight - h) / 2;
-
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4'
-        });
-        pdf.addImage(imgData, 'PNG', x, y, w, h);
+        // Full-bleed A4 — the poster's own internal p-16 padding serves as the print margin
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
         pdf.save(`${name.replace(/\s+/g, '_')}_admission_poster.pdf`);
         toast.success('PDF document exported successfully!');
       } else {
@@ -539,12 +522,15 @@ const QrLinksPage = () => {
         link.click();
         toast.success('PNG image exported successfully!');
       }
+
+      // 6. Clean up the off-screen container
+      offscreenRoot.unmount();
+      document.body.removeChild(container);
+
     } catch (err) {
       console.error('Export error details:', err);
-      toast.error(`Failed to export flyer file: ${err.message || err}`);
+      toast.error(`Failed to export flyer: ${err.message || err}`);
     } finally {
-      posterEl.style.transform = prevTransform;
-      posterEl.style.transformOrigin = prevTransformOrigin;
       setDownloadingPng(false);
       setDownloadingPdf(false);
     }
@@ -817,9 +803,9 @@ const QrLinksPage = () => {
                   className="p-5 bg-white border-2 rounded-3xl flex items-center justify-center shadow-md"
                 >
                   {displayQr ? (
-                    <img src={displayQr} crossOrigin="anonymous" className="h-48 w-48 object-contain" alt="QR" />
+                    <img src={displayQr} crossOrigin="anonymous" className="h-56 w-56 object-contain" alt="QR" />
                   ) : (
-                    <div className="h-48 w-48 bg-slate-55 flex items-center justify-center text-slate-355 text-base rounded-2xl">Scan QR</div>
+                    <div className="h-56 w-56 bg-slate-55 flex items-center justify-center text-slate-355 text-base rounded-2xl">Scan QR</div>
                   )}
                 </div>
                 <span className="text-[10px] font-black tracking-wider uppercase text-center opacity-75">Scan to Apply Online</span>
