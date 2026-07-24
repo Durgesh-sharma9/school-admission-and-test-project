@@ -34,10 +34,10 @@ import {
 const urlToBase64 = async (url) => {
   if (!url) return null;
   if (url.startsWith('data:image')) return url;
-  
+
   let targetUrl = url;
   if (targetUrl.startsWith('/')) {
-    const backendBase = import.meta.env.VITE_API_URL 
+    const backendBase = import.meta.env.VITE_API_URL
       ? import.meta.env.VITE_API_URL.replace('/api/v1', '')
       : 'http://localhost:5001';
     targetUrl = `${backendBase}${targetUrl}`;
@@ -176,7 +176,7 @@ const SIZE_REGISTRY = [
 
 const QrLinksPage = () => {
   const { school, updateSchoolState } = useAuth();
-  
+
   // Link States
   const [copyingLink, setCopyingLink] = useState(false);
   const [copyingReception, setCopyingReception] = useState(false);
@@ -229,8 +229,8 @@ const QrLinksPage = () => {
   // Template/Size selectors
   const [selectedTemplate, setSelectedTemplate] = useState('modern-premium');
   const [posterTheme, setPosterTheme] = useState('bw'); // 'bw' (default) or 'brand'
-  const [selectedSize, setSelectedSize] = useState('A4 Portrait'); 
-  const [zoomSetting, setZoomSetting] = useState('Fit Screen'); 
+  const [selectedSize, setSelectedSize] = useState('A4 Portrait');
+  const [zoomSetting, setZoomSetting] = useState('Fit Screen');
   const [activeTab, setActiveTab] = useState('links'); // 'links', 'branding', 'preview' 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [modalZoom, setModalZoom] = useState(0.45);
@@ -283,7 +283,7 @@ const QrLinksPage = () => {
     if (zoomSetting === '50%') return 0.5;
     if (zoomSetting === '75%') return 0.75;
     if (zoomSetting === '100%') return 1.0;
-    
+
     // Fit Screen mode - dynamic scaling based on design height and width
     const { width, height } = getPosterDims();
     const scaleHeight = 450 / height;
@@ -310,12 +310,12 @@ const QrLinksPage = () => {
   const effectiveBg = selectedTemplate === 'luxury-black'
     ? (themeMode === 'bw' ? '#000000' : '#0b1329')
     : (selectedTemplate === 'color-burst'
-        ? (themeMode === 'bw' ? '#18181b' : '#8b5cf6')
-        : '#ffffff');
+      ? (themeMode === 'bw' ? '#18181b' : '#8b5cf6')
+      : '#ffffff');
 
-  const isDarkBg = selectedTemplate === 'luxury-black' || 
-                   selectedTemplate === 'color-burst' || 
-                   (selectedTemplate === 'creative-gradient' && themeMode === 'brand');
+  const isDarkBg = selectedTemplate === 'luxury-black' ||
+    selectedTemplate === 'color-burst' ||
+    (selectedTemplate === 'creative-gradient' && themeMode === 'brand');
 
   const effectiveTextColor = isDarkBg
     ? '#ffffff'
@@ -423,7 +423,7 @@ const QrLinksPage = () => {
           title: name || 'College Admission Portal',
           url: publicLink
         });
-      } catch {}
+      } catch { }
     } else {
       await navigator.clipboard.writeText(publicLink);
       toast.success('Public Portal URL copied for sharing!');
@@ -507,23 +507,23 @@ const QrLinksPage = () => {
         const pdfPageWidth = 210; // A4 standard width in mm
         const pdfPageHeight = 297; // A4 standard height in mm
         const margin = 10; // 10mm print-safe margin
-        
+
         const printableWidth = pdfPageWidth - (margin * 2);
         const printableHeight = pdfPageHeight - (margin * 2);
-        
+
         const posterRatio = posterDims.height / posterDims.width;
-        
+
         let w = printableWidth;
         let h = w * posterRatio;
-        
+
         if (h > printableHeight) {
           h = printableHeight;
           w = h / posterRatio;
         }
-        
+
         const x = margin + (printableWidth - w) / 2;
         const y = margin + (printableHeight - h) / 2;
-        
+
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
@@ -611,7 +611,7 @@ const QrLinksPage = () => {
       });
 
       const imgData = canvas.toDataURL('image/png');
-      
+
       // Open print window
       const printWindow = window.open('', '_blank');
       if (printWindow) {
@@ -681,11 +681,11 @@ const QrLinksPage = () => {
         {/* 1. CLASSIC TEMPLATE (formerly modern-premium) */}
         {selectedTemplate === 'modern-premium' && (
           <>
-            <div 
-              style={{ background: themeMode === 'bw' ? '#000000' : `linear-gradient(to right, ${effectivePrimary}, ${effectiveSecondary})` }} 
-              className="absolute top-0 inset-x-0 h-4" 
+            <div
+              style={{ background: themeMode === 'bw' ? '#000000' : `linear-gradient(to right, ${effectivePrimary}, ${effectiveSecondary})` }}
+              className="absolute top-0 inset-x-0 h-4"
             />
-            
+
             {/* Header */}
             <div className="w-full flex flex-col items-center space-y-4 pt-4">
               {qrBranding.showLogo && displayLogo ? (
@@ -699,12 +699,12 @@ const QrLinksPage = () => {
                     {name}
                   </h2>
                   {qrBranding.showTagline && tagline && (
-                    <span 
-                      style={{ 
-                        backgroundColor: themeMode === 'bw' ? '#f3f4f6' : `${effectivePrimary}10`, 
-                        borderColor: themeMode === 'bw' ? '#d1d5db' : `${effectivePrimary}30`, 
-                        color: effectiveTextColor 
-                      }} 
+                    <span
+                      style={{
+                        backgroundColor: themeMode === 'bw' ? '#f3f4f6' : `${effectivePrimary}10`,
+                        borderColor: themeMode === 'bw' ? '#d1d5db' : `${effectivePrimary}30`,
+                        color: effectiveTextColor
+                      }}
                       className="py-1.5 px-4 border rounded-xl font-black text-xs uppercase tracking-widest block w-fit mx-auto"
                     >
                       {tagline}
@@ -722,7 +722,7 @@ const QrLinksPage = () => {
                     Admissions Open {academicSession}
                   </span>
                 )}
-                <h1 
+                <h1
                   style={themeMode === 'bw' ? { color: effectiveTextColor } : {
                     background: `linear-gradient(to right, ${effectivePrimary}, ${effectiveSecondary})`,
                     WebkitBackgroundClip: 'text',
@@ -812,8 +812,8 @@ const QrLinksPage = () => {
             <div className="grid grid-cols-12 gap-8 my-auto items-center py-6">
               {/* Left: QR Frame */}
               <div className="col-span-5 flex flex-col items-center space-y-4">
-                <div 
-                  style={{ borderColor: effectivePrimary }} 
+                <div
+                  style={{ borderColor: effectivePrimary }}
                   className="p-5 bg-white border-2 rounded-3xl flex items-center justify-center shadow-md"
                 >
                   {displayQr ? (
@@ -829,11 +829,11 @@ const QrLinksPage = () => {
               <div className="col-span-7 space-y-5">
                 <div className="space-y-2">
                   {qrBranding.showAcademicSession && (
-                    <span 
-                      style={{ 
-                        backgroundColor: themeMode === 'bw' ? '#f3f4f6' : `${effectiveSecondary}20`, 
-                        color: effectiveTextColor 
-                      }} 
+                    <span
+                      style={{
+                        backgroundColor: themeMode === 'bw' ? '#f3f4f6' : `${effectiveSecondary}20`,
+                        color: effectiveTextColor
+                      }}
                       className="inline-block py-1.5 px-4 font-black text-xs uppercase tracking-widest rounded-lg"
                     >
                       Admissions Open {academicSession}
@@ -882,7 +882,7 @@ const QrLinksPage = () => {
         {selectedTemplate === 'luxury-black' && (
           <>
             <div className="absolute inset-0 border border-amber-500/20 m-4 pointer-events-none rounded-2xl" />
-            
+
             {/* Header */}
             <div className="w-full flex flex-col items-center space-y-4 pt-4">
               {qrBranding.showLogo && (
@@ -973,7 +973,7 @@ const QrLinksPage = () => {
                 <div className="absolute bottom-[-20px] right-[-20px] w-64 h-64 bg-pink-550/30 rounded-full blur-3xl pointer-events-none" />
               </>
             )}
-            
+
             {/* Glass header card */}
             <div className="w-full p-6 bg-white/10 backdrop-blur-md border border-white/25 rounded-3xl flex items-center justify-between gap-4">
               {qrBranding.showName && (
@@ -982,8 +982,8 @@ const QrLinksPage = () => {
                     {name}
                   </h2>
                   {qrBranding.showTagline && tagline && (
-                    <span 
-                      style={{ color: themeMode === 'bw' ? '#ffffff' : '#f59e0b' }} 
+                    <span
+                      style={{ color: themeMode === 'bw' ? '#ffffff' : '#f59e0b' }}
                       className="text-xs font-bold uppercase tracking-widest block"
                     >
                       {tagline}
@@ -1004,10 +1004,10 @@ const QrLinksPage = () => {
             <div className="flex flex-col items-center space-y-5 my-auto">
               <div className="space-y-2">
                 {qrBranding.showAcademicSession && (
-                  <div 
-                    style={{ 
-                      backgroundColor: themeMode === 'bw' ? '#ffffff' : '#f59e0b', 
-                      color: themeMode === 'bw' ? '#000000' : '#1e1b4b' 
+                  <div
+                    style={{
+                      backgroundColor: themeMode === 'bw' ? '#ffffff' : '#f59e0b',
+                      color: themeMode === 'bw' ? '#000000' : '#1e1b4b'
                     }}
                     className="py-1.5 px-4 rounded-full font-black text-xs uppercase tracking-widest inline-block shadow-sm"
                   >
@@ -1040,8 +1040,8 @@ const QrLinksPage = () => {
               <div className="grid grid-cols-2 gap-4 text-left w-full my-auto">
                 {qrBranding.highlights.filter(h => h.trim()).slice(0, 4).map((highlight, idx) => (
                   <div key={idx} className="p-4 bg-white/10 border border-white/15 rounded-2xl backdrop-blur-md">
-                    <span 
-                      style={{ color: themeMode === 'bw' ? '#ffffff' : '#f59e0b' }} 
+                    <span
+                      style={{ color: themeMode === 'bw' ? '#ffffff' : '#f59e0b' }}
                       className="text-[10px] font-bold uppercase tracking-widest block mb-1"
                     >
                       Feature
@@ -1068,19 +1068,18 @@ const QrLinksPage = () => {
 
         {/* 5. MINIMAL ELEGANT (formerly creative-gradient) */}
         {selectedTemplate === 'creative-gradient' && (
-          <div 
+          <div
             style={{ color: effectiveTextColor }}
-            className={`w-full h-full flex flex-col justify-between py-2 relative z-10 p-12 rounded-3xl ${
-              themeMode === 'bw'
+            className={`w-full h-full flex flex-col justify-between py-2 relative z-10 p-12 rounded-3xl ${themeMode === 'bw'
                 ? 'bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200 border border-slate-200'
                 : 'bg-gradient-to-br from-indigo-700 via-indigo-900 to-cyan-755'
-            }`}
+              }`}
           >
             {/* Floating bubble shapes (hidden in B&W) */}
             {themeMode !== 'bw' && (
               <div className="absolute top-4 right-4 w-32 h-32 bg-cyan-400/10 rounded-full blur-xl pointer-events-none" />
             )}
-            
+
             {/* Header */}
             <div className="w-full flex items-center justify-between border-b border-white/10 pb-5">
               {qrBranding.showName && (
@@ -1108,10 +1107,10 @@ const QrLinksPage = () => {
             <div className="flex flex-col items-center space-y-5 my-auto">
               <div className="space-y-2 text-center">
                 {qrBranding.showAcademicSession && (
-                  <span 
-                    style={{ 
-                      backgroundColor: themeMode === 'bw' ? '#1f2937' : '#22d3ee', 
-                      color: '#ffffff' 
+                  <span
+                    style={{
+                      backgroundColor: themeMode === 'bw' ? '#1f2937' : '#22d3ee',
+                      color: '#ffffff'
                     }}
                     className="py-1.5 px-4 rounded-full font-black text-xs uppercase tracking-widest inline-block shadow-sm"
                   >
@@ -1169,7 +1168,7 @@ const QrLinksPage = () => {
 
   return (
     <div className="space-y-6 text-left pb-16 no-print bg-[#F8FAFC]">
-      
+
       {/* Title Header with Template Selector */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-205 pb-5">
         <div>
@@ -1213,33 +1212,30 @@ const QrLinksPage = () => {
         <button
           type="button"
           onClick={() => setActiveTab('links')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
-            activeTab === 'links'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'links'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-600 hover:bg-white/50'
-          }`}
+            }`}
         >
           Links
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('branding')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
-            activeTab === 'branding'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'branding'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-600 hover:bg-white/50'
-          }`}
+            }`}
         >
           Branding
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('preview')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
-            activeTab === 'preview'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'preview'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-600 hover:bg-white/50'
-          }`}
+            }`}
         >
           Preview
         </button>
@@ -1248,10 +1244,10 @@ const QrLinksPage = () => {
       {/* Wrapping form across all columns so Submit save button in column 2 can submit input values from all sections */}
       <form onSubmit={handleSaveBranding}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* COLUMN 1: LINKS & DOWNLOADS & SAVE ACTION (25% / 3 columns) */}
           <div className={`col-span-12 md:col-span-4 lg:col-span-3 space-y-6 order-3 lg:order-1 ${activeTab === 'links' ? 'block' : 'hidden md:block lg:block'}`}>
-            
+
             {/* Card 1: Links */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
@@ -1366,27 +1362,29 @@ const QrLinksPage = () => {
           {/* COLUMN 2: POSTER BRANDING SETTINGS EDITOR (35% / 4 columns) */}
           <div className={`col-span-12 md:col-span-8 lg:col-span-4 space-y-6 order-2 lg:order-2 ${activeTab === 'branding' ? 'block' : 'hidden md:block lg:block'}`}>
             <div className="space-y-6 pb-20 relative">
-              
+
               {/* Group 1: Branding Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#7C3AED] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'branding' ? '' : 'branding')}
-                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-55 transition-all duration-200"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <Sparkles className="h-4.5 w-4.5 text-indigo-650" />
+                    <div className="icon-circle bg-[#EDE9FE]">
+                      <Sparkles className="h-4 w-4 text-[#7C3AED]" />
+                    </div>
                     <div className="text-left flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-none">Branding Identity</span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Manage college logo and visual branding</span>
+                      <span className="text-[17px] font-bold text-slate-900 leading-none">Branding Identity</span>
+                      <span className="text-[12px] text-slate-500 font-normal mt-1">Manage college logo and visual branding</span>
                     </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'branding' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'branding' ? 'rotate-90 text-[#7C3AED]' : ''}`} />
                 </button>
 
                 {expandedSection === 'branding' && (
-                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
-                    
+                  <div className="p-5 border-t border-slate-100 space-y-4 bg-white animate-fadeIn">
+
                     {/* Identity & Logo */}
                     <div className="flex gap-4 items-center">
                       <div className="relative h-16 w-16 rounded-xl bg-slate-55 border flex items-center justify-center overflow-hidden shrink-0">
@@ -1529,24 +1527,26 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 2: Poster Content Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#EA580C] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'content' ? '' : 'content')}
                   className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="icon-circle bg-[#FED7AA]">
+                      <FileText className="h-4 w-4 text-[#EA580C]" />
+                    </div>
                     <div className="text-left flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-none">Poster Text Content</span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Customize title, subtitle, and session</span>
+                      <span className="text-[17px] font-bold text-slate-900 leading-none">Poster Text Content</span>
+                      <span className="text-[12px] text-slate-500 font-normal mt-1">Customize title, subtitle, and session</span>
                     </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'content' ? 'rotate-90 text-indigo-600' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'content' ? 'rotate-90 text-[#EA580C]' : ''}`} />
                 </button>
 
                 {expandedSection === 'content' && (
-                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 bg-white animate-fadeIn">
                     <Input
                       label="Poster Main Title *"
                       value={qrBranding.posterTitle}
@@ -1571,24 +1571,26 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 3: Contact Details Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#16A34A] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'contact' ? '' : 'contact')}
                   className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <Phone className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="icon-circle bg-[#DCFCE7]">
+                      <Phone className="h-4 w-4 text-[#16A34A]" />
+                    </div>
                     <div className="text-left flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-none">Contact Details</span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5 font-medium mt-0.5">Configure phone, website, and address</span>
+                      <span className="text-[17px] font-bold text-slate-900 leading-none">Contact Details</span>
+                      <span className="text-[12px] text-slate-500 font-normal mt-1">Configure phone, website, and address</span>
                     </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'contact' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'contact' ? 'rotate-90 text-[#16A34A]' : ''}`} />
                 </button>
 
                 {expandedSection === 'contact' && (
-                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 bg-white animate-fadeIn">
                     <Input
                       label="Official Website"
                       value={website}
@@ -1612,24 +1614,26 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 4: Footer & Highlights Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#CA8A04] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'footer' ? '' : 'footer')}
-                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-55 transition-all duration-200"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <Layout className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="icon-circle bg-[#FEF08A]">
+                      <Layout className="h-4 w-4 text-[#CA8A04]" />
+                    </div>
                     <div className="text-left flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-none">Footer & Highlights</span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Add bullet highlights and footer messages</span>
+                      <span className="text-[17px] font-bold text-slate-900 leading-none">Footer & Highlights</span>
+                      <span className="text-[12px] text-slate-500 font-normal mt-1">Add bullet highlights and footer messages</span>
                     </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'footer' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'footer' ? 'rotate-90 text-[#CA8A04]' : ''}`} />
                 </button>
 
                 {expandedSection === 'footer' && (
-                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 bg-white animate-fadeIn">
                     <Input
                       label="Why Choose Us Highlights (One per line)"
                       type="textarea"
@@ -1652,24 +1656,26 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 5: Visibility Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#DB2777] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'visibility' ? '' : 'visibility')}
-                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-55 transition-all duration-200"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <Eye className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="icon-circle bg-[#FCE7F3]">
+                      <Eye className="h-4 w-4 text-[#DB2777]" />
+                    </div>
                     <div className="text-left flex flex-col">
-                      <span className="text-sm font-bold text-slate-900 leading-none">Visibility Toggles</span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Choose which components to display</span>
+                      <span className="text-[17px] font-bold text-slate-900 leading-none">Visibility Toggles</span>
+                      <span className="text-[12px] text-slate-500 font-normal mt-1">Choose which components to display</span>
                     </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'visibility' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'visibility' ? 'rotate-90 text-[#DB2777]' : ''}`} />
                 </button>
 
                 {expandedSection === 'visibility' && (
-                  <div className="p-5 border-t border-slate-100 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 bg-white animate-fadeIn">
                     <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-700">
                       {[
                         { key: 'showLogo', label: 'College Logo' },
@@ -1698,14 +1704,16 @@ const QrLinksPage = () => {
               </div>
 
               {/* Sticky bottom Save bar docked inside the scrollable column */}
-              <div className="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-xl shadow-lg flex items-center justify-between mt-6">
-                <div className="text-xs font-semibold text-slate-500">
-                  Unsaved branding alterations
+              <div className="sticky bottom-4 z-20 bg-white/80 backdrop-blur-xl border border-white/70 p-4 rounded-xl shadow-xl shadow-indigo-100/40 flex items-center justify-between mt-6 ring-1 ring-slate-200/50">
+                <div className="flex flex-col">
+                  <span className="text-[13px] font-semibold text-slate-800">Studio Settings</span>
+                  <span className="text-[11px] text-slate-500 font-normal">Unsaved changes pending</span>
                 </div>
                 <Button
                   type="submit"
                   isLoading={savingBranding}
-                  className="h-[46px] px-6 bg-indigo-650 hover:bg-indigo-750 text-sm font-semibold text-white rounded-xl shadow-sm transition-colors shrink-0"
+                  variant="primary"
+                  className="px-6 shrink-0"
                 >
                   Save Studio Settings
                 </Button>
@@ -1716,10 +1724,10 @@ const QrLinksPage = () => {
 
           {/* COLUMN 3: STICKY LIVE PREVIEW WORKSPACE (40% / 5 columns) */}
           <div className={`col-span-12 lg:col-span-5 lg:sticky lg:top-[20px] self-start order-1 lg:order-3 ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
-            
-            {/* Canva Workspace backdrop: Light background, rounded, shadow, vertically and horizontally centered */}
-            <div className="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-sm relative mt-3">
-              
+
+            {/* Canva Workspace backdrop: Clean white canvas */}
+            <div className="bg-white rounded-xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-sm relative mt-3 border border-slate-200">
+
               {/* Clutter-free scaling node boundary wrapper */}
               <div
                 style={{
@@ -1739,19 +1747,19 @@ const QrLinksPage = () => {
 
       {/* Fullscreen Preview Modal Presentation View */}
       {isFullScreen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex flex-col justify-between p-6 select-none animate-fadeIn"
           onClick={() => setIsFullScreen(false)}
         >
           {/* Modal Header Controls */}
-          <div 
+          <div
             className="w-full flex flex-col sm:flex-row items-center justify-between bg-white border border-slate-200 p-4 rounded-xl shadow-md max-w-4xl mx-auto z-10 gap-3"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-2">⛶ PRESENTATION VIEW</span>
             </div>
-            
+
             <div className="flex items-center gap-2 flex-wrap justify-center">
               <button
                 type="button"
@@ -1802,7 +1810,7 @@ const QrLinksPage = () => {
 
           {/* Modal Body Container */}
           <div className="flex-1 w-full flex items-center justify-center overflow-auto p-4" onClick={() => setIsFullScreen(false)}>
-            <div 
+            <div
               className="bg-slate-55 border border-slate-200 p-6 rounded-xl flex items-center justify-center overflow-auto shadow-md relative shrink-0 transition-all duration-200"
               style={{
                 width: modalFit === 'width' ? '90vw' : 'auto',
