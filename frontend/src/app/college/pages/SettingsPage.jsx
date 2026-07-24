@@ -247,7 +247,7 @@ const SettingsPage = () => {
       });
       if (res.success) {
         toast.success('College Profile details and documents saved!');
-        if (updateSchoolState) updateSchoolState(res.school);
+        if (updateSchoolState) updateSchoolState({ ...school, ...res.school, institutionType: 'college' });
       }
     } catch (error) {
       toast.error('Failed to save College Profile details');
@@ -265,7 +265,7 @@ const SettingsPage = () => {
       });
       if (res.success) {
         toast.success('College Branding configuration updated!');
-        if (updateSchoolState) updateSchoolState(res.school);
+        if (updateSchoolState) updateSchoolState({ ...school, ...res.school, institutionType: 'college' });
       }
     } catch (error) {
       toast.error('Failed to save College Branding configurations');

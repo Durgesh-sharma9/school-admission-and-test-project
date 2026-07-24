@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import superAdminApi from '../services/superAdminApi';
 import Button from '../../../shared/components/Button';
 import Loader from '../../../shared/components/Loader';
-import Modal from '../../../shared/components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, Check, X, Layers, BookOpen, GraduationCap, Inbox, Send, MessageSquare } from 'lucide-react';
 
@@ -203,8 +202,7 @@ const AcademicMasters = () => {
     }
   };
 
-  const handleRejectRequest = async (e) => {
-    e.preventDefault();
+  const handleRejectRequest = async () => {
     if (!rejectReason.trim()) {
       toast.error('Please specify rejection remarks');
       return;
@@ -647,140 +645,233 @@ const AcademicMasters = () => {
         </div>
       )}
 
-      {/* View Academic Request Details Modal */}
+      {/* ── Academic Master Request Details Modal (Redesigned) ── */}
       {selectedReq && (
-        <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)}>
-          <div className="space-y-4 text-left p-2 text-slate-800">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Request Master Details</h3>
-              <p className="text-slate-500 text-[10px] mt-0.5">Submitted by {selectedReq.collegeId?.name || 'Unknown'}</p>
-            </div>
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all ${isViewModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsViewModalOpen(false)}
+          />
 
-            <div className="space-y-3 pt-2 text-xs divide-y divide-slate-100">
-              <div className="grid grid-cols-3 py-2">
-                <span className="font-bold text-slate-450">Request Type:</span>
-                <span className="col-span-2 font-semibold text-slate-800">{selectedReq.requestType}</span>
-              </div>
-              <div className="grid grid-cols-3 py-2">
-                <span className="font-bold text-slate-450">Requested Item:</span>
-                <span className="col-span-2 font-bold text-indigo-650">
-                  {selectedReq.requestType === 'Department' ? selectedReq.departmentName :
-                   selectedReq.requestType === 'Course' ? `${selectedReq.courseName} (${selectedReq.courseCode || 'No Code'})` :
-                   selectedReq.specializationName}
-                </span>
-              </div>
-              {selectedReq.requestType === 'Course' && selectedReq.duration && (
-                <div className="grid grid-cols-3 py-2">
-                  <span className="font-bold text-slate-450">Duration:</span>
-                  <span className="col-span-2">{selectedReq.duration}</span>
-                </div>
-              )}
-              {selectedReq.requestType !== 'Department' && (
-                <div className="grid grid-cols-3 py-2">
-                  <span className="font-bold text-slate-450">Parent Department:</span>
-                  <span className="col-span-2">{selectedReq.departmentId?.name || selectedReq.departmentName || 'N/A'}</span>
-                </div>
-              )}
-              {selectedReq.requestType === 'Specialization' && (
-                <div className="grid grid-cols-3 py-2">
-                  <span className="font-bold text-slate-450">Parent Course:</span>
-                  <span className="col-span-2">{selectedReq.courseId?.name || selectedReq.courseName || 'N/A'}</span>
-                </div>
-              )}
-              <div className="grid grid-cols-3 py-2">
-                <span className="font-bold text-slate-450">College Reason:</span>
-                <span className="col-span-2 italic text-slate-600 bg-slate-50 p-2 rounded-lg">{selectedReq.reason}</span>
-              </div>
-              <div className="grid grid-cols-3 py-2">
-                <span className="font-bold text-slate-450">Current Status:</span>
-                <span className="col-span-2">
-                  <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] uppercase ${
-                    selectedReq.status === 'Pending' ? 'bg-amber-50 text-amber-600' :
-                    selectedReq.status === 'Approved' ? 'bg-emerald-50 text-emerald-600' :
-                    'bg-rose-50 text-rose-600'
-                  }`}>
-                    {selectedReq.status}
-                  </span>
-                </span>
-              </div>
-              {selectedReq.status === 'Rejected' && selectedReq.adminRemarks && (
-                <div className="grid grid-cols-3 py-2">
-                  <span className="font-bold text-slate-450">Rejection Remarks:</span>
-                  <span className="col-span-2 text-rose-600 font-semibold">{selectedReq.adminRemarks}</span>
-                </div>
-              )}
-            </div>
+          {/* Modal Panel */}
+          <div className="relative bg-slate-900 border border-slate-700 rounded-[20px] shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto flex flex-col">
 
-            <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+            {/* ── Header ── */}
+            <div className="flex items-start justify-between px-8 py-6 border-b border-slate-800 shrink-0">
+              <div className="flex items-start gap-4">
+                {/* Icon */}
+                <div className="h-11 w-11 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                  <GraduationCap className="h-5 w-5 text-indigo-400" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white tracking-tight">Academic Master Request</h2>
+                  <div className="flex flex-wrap items-center gap-3 mt-1.5">
+                    <span className="text-xs text-slate-400">
+                      Submitted by{' '}
+                      <span className="text-slate-200 font-semibold">{selectedReq.collegeId?.name || 'Unknown College'}</span>
+                    </span>
+                    {selectedReq.createdAt && (
+                      <>
+                        <span className="h-1 w-1 rounded-full bg-slate-600 inline-block" />
+                        <span className="text-xs text-slate-400">
+                          {new Date(selectedReq.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </>
+                    )}
+                    <span className="h-1 w-1 rounded-full bg-slate-600 inline-block" />
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                      selectedReq.status === 'Pending'  ? 'bg-amber-500/15  text-amber-400  border border-amber-500/30' :
+                      selectedReq.status === 'Approved' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
+                      'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                    }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${
+                        selectedReq.status === 'Pending'  ? 'bg-amber-400' :
+                        selectedReq.status === 'Approved' ? 'bg-emerald-400' : 'bg-rose-400'
+                      }`} />
+                      {selectedReq.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Close button */}
               <button
                 onClick={() => setIsViewModalOpen(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-all"
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0"
               >
-                Close Details
+                <X className="h-4.5 w-4.5" />
               </button>
+            </div>
+
+            {/* ── Body ── */}
+            <div className="px-8 py-6 space-y-5 flex-1">
+
+              {/* Section 1: Request Type */}
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Request Classification</p>
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-indigo-600/20 border border-indigo-500/25 flex items-center justify-center">
+                    {selectedReq.requestType === 'Department' ? <Layers className="h-4 w-4 text-indigo-400" /> :
+                     selectedReq.requestType === 'Course'     ? <BookOpen className="h-4 w-4 text-indigo-400" /> :
+                                                                <GraduationCap className="h-4 w-4 text-indigo-400" />}
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400">Requested Type</p>
+                    <p className="text-sm font-bold text-white mt-0.5">{selectedReq.requestType}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Academic Hierarchy */}
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Academic Details</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                  {/* Department */}
+                  <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40">
+                    <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Department</p>
+                    <p className="text-xs font-semibold text-slate-200">
+                      {selectedReq.requestType === 'Department'
+                        ? selectedReq.departmentName
+                        : selectedReq.departmentId?.name || selectedReq.departmentName || '—'}
+                    </p>
+                  </div>
+
+                  {/* Course */}
+                  {(selectedReq.requestType === 'Course' || selectedReq.requestType === 'Specialization') && (
+                    <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40">
+                      <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Course</p>
+                      <p className="text-xs font-semibold text-slate-200">
+                        {selectedReq.requestType === 'Course'
+                          ? `${selectedReq.courseName || '—'} ${selectedReq.courseCode ? `(${selectedReq.courseCode})` : ''}`
+                          : selectedReq.courseId?.name || selectedReq.courseName || '—'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Specialization */}
+                  {selectedReq.requestType === 'Specialization' && (
+                    <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40">
+                      <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Specialization</p>
+                      <p className="text-xs font-semibold text-slate-200">{selectedReq.specializationName || '—'}</p>
+                    </div>
+                  )}
+
+                  {/* Duration (Course) */}
+                  {selectedReq.requestType === 'Course' && selectedReq.duration && (
+                    <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40">
+                      <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Duration</p>
+                      <p className="text-xs font-semibold text-slate-200">{selectedReq.duration}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Section 3: Reason */}
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Reason for Request</p>
+                <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40">
+                  <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedReq.reason || '—'}</p>
+                </div>
+              </div>
+
+              {/* Section 4: Rejection remarks (only visible if rejected) */}
+              {selectedReq.status === 'Rejected' && selectedReq.adminRemarks && (
+                <div className="bg-rose-950/40 border border-rose-800/40 rounded-2xl p-5">
+                  <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-3">Admin Rejection Remarks</p>
+                  <p className="text-xs text-rose-300 leading-relaxed">{selectedReq.adminRemarks}</p>
+                </div>
+              )}
+
+              {/* Section 5: Admin Remarks (inline Reject flow) */}
+              {selectedReq.status === 'Pending' && isRejectModalOpen && (
+                <div className="bg-rose-950/30 border border-rose-700/40 rounded-2xl p-5 space-y-3">
+                  <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Admin Rejection Remarks</p>
+                  <textarea
+                    value={rejectReason}
+                    onChange={e => setRejectReason(e.target.value)}
+                    rows={4}
+                    placeholder="Provide the reason for rejecting this request…"
+                    className="w-full bg-slate-900/80 border border-rose-700/40 text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/40 resize-none"
+                  />
+                </div>
+              )}
+
+              {/* Section 5 alt: Admin Remarks textarea for Pending (non-reject mode) */}
+              {selectedReq.status === 'Pending' && !isRejectModalOpen && (
+                <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5 space-y-3">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Admin Remarks</p>
+                  <textarea
+                    value={rejectReason}
+                    onChange={e => setRejectReason(e.target.value)}
+                    rows={3}
+                    placeholder="Optional remarks for approval / reason for rejection…"
+                    className="w-full bg-slate-900/80 border border-slate-700/50 text-slate-200 placeholder-slate-500 rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* ── Footer ── */}
+            <div className="px-8 py-5 border-t border-slate-800 flex items-center justify-end gap-3 shrink-0">
+              {/* Close */}
+              <button
+                onClick={() => {
+                  setIsViewModalOpen(false);
+                  setIsRejectModalOpen(false);
+                  setRejectReason('');
+                }}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-all min-w-[100px] text-center"
+              >
+                Close
+              </button>
+
               {selectedReq.status === 'Pending' && (
                 <>
-                  <button
-                    onClick={() => {
-                      setRejectReason('');
-                      setIsRejectModalOpen(true);
-                    }}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all"
-                  >
-                    Reject Request
-                  </button>
-                  <Button
-                    onClick={() => handleApproveRequest(selectedReq._id)}
-                    isLoading={actionLoading}
-                    className="px-4 py-2 text-xs font-bold"
-                  >
-                    Approve Request
-                  </Button>
+                  {/* Reject button — if not yet in reject mode, enter it; otherwise confirm */}
+                  {isRejectModalOpen ? (
+                    <>
+                      <button
+                        onClick={() => { setIsRejectModalOpen(false); setRejectReason(''); }}
+                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all min-w-[120px]"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        disabled={actionLoading}
+                        onClick={handleRejectRequest}
+                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 border border-rose-500 transition-all min-w-[140px] disabled:opacity-50"
+                      >
+                        {actionLoading ? 'Rejecting…' : 'Confirm Reject'}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setIsRejectModalOpen(true)}
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600/80 hover:bg-rose-600 border border-rose-600/50 transition-all min-w-[140px]"
+                    >
+                      Reject Request
+                    </button>
+                  )}
+
+                  {/* Approve */}
+                  {!isRejectModalOpen && (
+                    <button
+                      disabled={actionLoading}
+                      onClick={() => handleApproveRequest(selectedReq._id)}
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/50 transition-all min-w-[140px] disabled:opacity-50 shadow-lg shadow-indigo-900/30"
+                    >
+                      {actionLoading ? 'Approving…' : 'Approve Request'}
+                    </button>
+                  )}
                 </>
               )}
             </div>
           </div>
-        </Modal>
-      )}
-
-      {/* Reject Request remarks modal */}
-      {selectedReq && (
-        <Modal isOpen={isRejectModalOpen} onClose={() => setIsRejectModalOpen(false)}>
-          <form onSubmit={handleRejectRequest} className="space-y-4 text-left p-2 text-slate-800">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Specify Rejection Reason</h3>
-              <p className="text-slate-500 text-[10px] mt-0.5">Please provide remarks explaining the reject decision.</p>
-            </div>
-
-            <div className="space-y-1.5 pt-2">
-              <label className="block text-xs font-bold text-slate-700">Rejection Reason *</label>
-              <textarea
-                value={rejectReason}
-                onChange={e => setRejectReason(e.target.value)}
-                placeholder="Remarks details..."
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none h-24"
-                required
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4 border-t mt-4">
-              <button
-                type="button"
-                onClick={() => setIsRejectModalOpen(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-all"
-              >
-                Cancel
-              </button>
-              <Button
-                type="submit"
-                isLoading={actionLoading}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white"
-              >
-                Confirm Reject
-              </Button>
-            </div>
-          </form>
-        </Modal>
+        </div>
       )}
     </div>
   );

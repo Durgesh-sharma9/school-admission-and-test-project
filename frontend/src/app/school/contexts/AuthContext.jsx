@@ -73,7 +73,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateSchoolState = (updatedSchool) => {
-    setSchool(updatedSchool);
+    setSchool(prev => {
+      if (!prev) return updatedSchool;
+      // Merge: preserve critical identity fields from previous state
+      return {
+        ...prev,
+        ...updatedSchool,
+        // Never allow these to be accidentally wiped
+        institutionType: updatedSchool.institutionType || prev.institutionType,
+        role: updatedSchool.role || prev.role,
+      };
+    });
   };
 
   // Subscription/Trial check

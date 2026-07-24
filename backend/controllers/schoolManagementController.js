@@ -219,6 +219,7 @@ const impersonateSchool = async (req, res) => {
         thankYouCms: school.thankYouCms,
         settings: school.settings,
         communicationTemplates: school.communicationTemplates,
+        institutionType: school.institutionType || 'school',
       },
     });
   } catch (error) {

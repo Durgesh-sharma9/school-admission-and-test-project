@@ -47,6 +47,7 @@ const googleAuth = async (req, res) => {
           email: school.email,
           role: 'school-admin',
           picture: picture || null,
+          institutionType: school.institutionType || 'school',
         },
         school: {
           id: school._id,
@@ -62,6 +63,7 @@ const googleAuth = async (req, res) => {
           thankYouCms: school.thankYouCms,
           settings: school.settings,
           communicationTemplates: school.communicationTemplates,
+          institutionType: school.institutionType || 'school',
         },
         isNewUser: false,
       });
@@ -78,6 +80,7 @@ const googleAuth = async (req, res) => {
         address: 'Not provided', // Placeholder - user will update
         emailVerified: true, // Google email is verified
         logo: picture || '',
+        institutionType: req.body.institutionType || 'school',
       });
 
       await newSchool.save();
@@ -99,6 +102,7 @@ const googleAuth = async (req, res) => {
           email: newSchool.email,
           role: 'school-admin',
           picture: picture || null,
+          institutionType: newSchool.institutionType || 'school',
         },
         school: {
           id: newSchool._id,
@@ -114,6 +118,7 @@ const googleAuth = async (req, res) => {
           thankYouCms: newSchool.thankYouCms,
           settings: newSchool.settings,
           communicationTemplates: newSchool.communicationTemplates,
+          institutionType: newSchool.institutionType || 'school',
         },
         isNewUser: true,
         message: 'Account created successfully. Please complete your profile.',

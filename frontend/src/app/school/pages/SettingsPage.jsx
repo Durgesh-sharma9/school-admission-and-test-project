@@ -144,7 +144,7 @@ const SettingsPage = () => {
 
       if (response.success) {
         toast.success('School profile and branding updated successfully!');
-        updateSchoolState(response.school);
+        updateSchoolState({ ...school, ...response.school, institutionType: school.institutionType || 'school' });
       }
     } catch (err) {
       toast.error(err.message || 'Failed to save settings');

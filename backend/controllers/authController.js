@@ -50,6 +50,58 @@ const signup = async (req, res) => {
       institutionType: institutionType || 'school',
     });
 
+    if (school.institutionType === 'college') {
+      school.qrBranding = {
+        showLogo: true,
+        showName: true,
+        showTagline: true,
+        showContact: true,
+        showEmail: true,
+        showWebsite: true,
+        showAddress: true,
+        showAcademicSession: false,
+        showUniversityName: true,
+        showAccreditation: true,
+        showFacilities: true,
+        footerMessage: 'Thank You For Visiting Our College. We Look Forward To Welcoming You.',
+        primaryColor: '#4f46e5',
+        secondaryColor: '#f59e0b',
+        accentColor: '#6366f1',
+        showHighlights: true,
+        highlights: [
+          'Academic & Research Excellence',
+          'Industry Collaborations & Placements',
+          'State-of-the-Art Labs & Infrastructure',
+          'Holistic Student Development & Clubs'
+        ]
+      };
+    } else {
+      school.qrBranding = {
+        showLogo: true,
+        showName: true,
+        showTagline: true,
+        showContact: true,
+        showEmail: true,
+        showWebsite: true,
+        showAddress: true,
+        showAcademicSession: true,
+        showUniversityName: false,
+        showAccreditation: false,
+        showFacilities: false,
+        footerMessage: 'Thank You For Visiting Our School. We Look Forward To Welcoming Your Child.',
+        primaryColor: '#4f46e5',
+        secondaryColor: '#f59e0b',
+        accentColor: '#6366f1',
+        showHighlights: true,
+        highlights: [
+          'Experienced & Caring Faculty',
+          'Smart Classrooms & Modern Labs',
+          'Holistic Sports & Activity Program',
+          'Safe Campus & GPS Transport'
+        ]
+      };
+    }
+
     console.log('School object created, attempting to save...');
 
     // Save initially to generate the _id
@@ -78,6 +130,7 @@ const signup = async (req, res) => {
           name: school.name,
           email: school.email,
           role: school.role || 'school-admin',
+          institutionType: school.institutionType || 'school',
         },
         school: {
           id: school._id,
@@ -93,6 +146,7 @@ const signup = async (req, res) => {
           thankYouCms: school.thankYouCms,
           settings: school.settings,
           communicationTemplates: school.communicationTemplates,
+          institutionType: school.institutionType || 'school',
         },
       });
     }

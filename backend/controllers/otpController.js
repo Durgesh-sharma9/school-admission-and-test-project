@@ -249,6 +249,7 @@ exports.verifyOTP = async (req, res) => {
           thankYouCms: school.thankYouCms,
           settings: school.settings,
           communicationTemplates: school.communicationTemplates,
+          institutionType: school.institutionType || 'school',
         };
       }
     }
@@ -258,7 +259,13 @@ exports.verifyOTP = async (req, res) => {
       message: 'OTP verified successfully',
       token,
       role: schoolData?.role || 'school-admin',
-      user: schoolData ? { id: schoolData.id, name: schoolData.name, email: schoolData.email, role: schoolData.role } : null,
+      user: schoolData ? { 
+        id: schoolData.id, 
+        name: schoolData.name, 
+        email: schoolData.email, 
+        role: schoolData.role,
+        institutionType: schoolData.institutionType 
+      } : null,
       school: schoolData
     });
 

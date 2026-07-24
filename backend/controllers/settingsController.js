@@ -84,7 +84,8 @@ const updateSettings = async (req, res) => {
         pincode: school.pincode,
         universityAffiliation: school.universityAffiliation,
         collegeType: school.collegeType,
-        documents: school.documents
+        documents: school.documents,
+        institutionType: school.institutionType
       },
     });
   } catch (error) {

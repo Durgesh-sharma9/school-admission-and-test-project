@@ -122,7 +122,8 @@ const VerifyOTP = () => {
           if (updateSchoolState) {
             updateSchoolState(data.school);
           }
-          navigate('/dashboard', { replace: true });
+          const target = data.school.institutionType === 'college' ? '/college/dashboard' : '/dashboard';
+          navigate(target, { replace: true });
         } else {
           toast.success('Email verified successfully. Please login.');
           navigate('/login', { state: { email } });
