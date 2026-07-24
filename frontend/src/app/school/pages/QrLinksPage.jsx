@@ -17,6 +17,7 @@ import {
   Share2,
   Check,
   Layout,
+  Link,
   Smartphone,
   Monitor,
   FileText,
@@ -1167,15 +1168,20 @@ const QrLinksPage = () => {
   };
 
   return (
-    <div className="space-y-6 text-left pb-16 no-print">
+    <div className="space-y-6 text-left pb-16 no-print bg-[#F8FAFC]">
       
       {/* Title Header with Template Selector */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-205 pb-5">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            Admission QR & Public Links
-          </h1>
-          <p className="text-sm font-semibold text-slate-500 mt-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              Admission QR & Public Links
+            </h1>
+            <span className="py-1 px-2.5 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg shadow-2xs">
+              Studio
+            </span>
+          </div>
+          <p className="text-sm font-semibold text-slate-505 mt-1">
             Professional Admission Poster Studio
           </p>
         </div>
@@ -1183,7 +1189,7 @@ const QrLinksPage = () => {
           <select
             value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="rounded-xl border border-slate-200 py-2.5 px-4 text-xs font-bold bg-white text-slate-800 focus:outline-none cursor-pointer hover:border-slate-350 transition-colors shadow-3xs"
+            className="rounded-lg border border-slate-200 py-2 px-3 text-sm font-semibold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 cursor-pointer hover:border-slate-350 transition-all duration-200 shadow-2xs"
           >
             <option value="modern-premium">Classic</option>
             <option value="corporate-split">Modern Premium</option>
@@ -1194,22 +1200,23 @@ const QrLinksPage = () => {
           <button
             type="button"
             onClick={() => setIsFullScreen(true)}
-            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white border border-slate-700 text-xs font-black rounded-xl transition-all shadow-sm flex items-center gap-2"
+            className="h-[46px] px-5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm flex items-center gap-2"
           >
-            <span>⛶ Full Screen Preview</span>
+            <Maximize2 className="h-4 w-4 text-slate-500" />
+            <span>Full Screen Preview</span>
           </button>
         </div>
       </div>
 
       {/* Mobile/Tablet Tab Switcher */}
-      <div className="lg:hidden flex border border-slate-200 bg-slate-50 p-1 rounded-xl shadow-3xs gap-1">
+      <div className="lg:hidden flex border border-slate-200 bg-slate-50 p-1 rounded-lg gap-1">
         <button
           type="button"
           onClick={() => setActiveTab('links')}
-          className={`flex-1 py-2 px-3 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
             activeTab === 'links'
-              ? 'bg-indigo-650 text-white shadow-xs'
-              : 'text-slate-655 hover:bg-white/50'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-white/50'
           }`}
         >
           Links
@@ -1217,10 +1224,10 @@ const QrLinksPage = () => {
         <button
           type="button"
           onClick={() => setActiveTab('branding')}
-          className={`flex-1 py-2 px-3 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
             activeTab === 'branding'
-              ? 'bg-indigo-650 text-white shadow-xs'
-              : 'text-slate-655 hover:bg-white/50'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-white/50'
           }`}
         >
           Branding
@@ -1228,10 +1235,10 @@ const QrLinksPage = () => {
         <button
           type="button"
           onClick={() => setActiveTab('preview')}
-          className={`flex-1 py-2 px-3 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${
             activeTab === 'preview'
-              ? 'bg-indigo-650 text-white shadow-xs'
-              : 'text-slate-655 hover:bg-white/50'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-white/50'
           }`}
         >
           Preview
@@ -1246,88 +1253,94 @@ const QrLinksPage = () => {
           <div className={`col-span-12 md:col-span-4 lg:col-span-3 space-y-6 order-3 lg:order-1 ${activeTab === 'links' ? 'block' : 'hidden md:block lg:block'}`}>
             
             {/* Card 1: Links */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-3xs space-y-4 hover:shadow-2xs transition-shadow">
-              <span className="text-[10px] font-black text-slate-455 uppercase tracking-widest block border-b pb-2">
-                Admission CRM Links
-              </span>
+            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <Link className="h-4 w-4 text-indigo-600" />
+                <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Admission CRM Links
+                </span>
+              </div>
 
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-bold text-slate-500">Public Portal CRM Link</label>
-                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-xl p-1 pl-2">
-                    <span className="truncate flex-1 font-mono text-[9px] text-slate-500 pr-1">{publicLink}</span>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500">Public Portal CRM Link</label>
+                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-1 pl-2">
+                    <span className="truncate flex-1 font-mono text-xs text-slate-500 pr-1">{publicLink}</span>
                     <button
                       type="button"
                       onClick={() => handleCopyLink(publicLink, setCopyingLink)}
-                      className="p-1.5 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
                     >
-                      {copyingLink ? <Check className="h-3 w-3 text-indigo-600" /> : <Copy className="h-3 w-3" />}
+                      {copyingLink ? <Check className="h-4 w-4 text-indigo-600 animate-scale-in" /> : <Copy className="h-4 w-4" />}
                     </button>
                     <a
                       href={publicLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-4 w-4" />
                     </a>
                     <button
                       type="button"
                       onClick={handleShare}
-                      className="p-1.5 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
                     >
-                      <Share2 className="h-3 w-3" />
+                      <Share2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[9px] font-bold text-slate-500">Reception Entry Link</label>
-                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-xl p-1 pl-2">
-                    <span className="truncate flex-1 font-mono text-[9px] text-slate-500 pr-1">{receptionLink}</span>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500">Reception Entry Link</label>
+                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-1 pl-2">
+                    <span className="truncate flex-1 font-mono text-xs text-slate-500 pr-1">{receptionLink}</span>
                     <button
                       type="button"
                       onClick={() => handleCopyLink(receptionLink, setCopyingReception)}
-                      className="p-1.5 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
                     >
-                      {copyingReception ? <Check className="h-3 w-3 text-indigo-600" /> : <Copy className="h-3 w-3" />}
+                      {copyingReception ? <Check className="h-4 w-4 text-indigo-600 animate-scale-in" /> : <Copy className="h-4 w-4" />}
                     </button>
                     <a
                       href={receptionLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-1.5 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-4 w-4" />
                     </a>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-1 flex justify-end">
+              <div className="pt-2 flex justify-end border-t border-slate-100">
                 <button
                   type="button"
                   onClick={handleGenerateNew}
                   disabled={generatingLink}
-                  className="inline-flex items-center text-[9px] font-bold text-indigo-600 gap-1 hover:text-indigo-850"
+                  className="inline-flex items-center text-xs font-semibold text-indigo-600 gap-1.5 hover:text-indigo-800 transition-colors"
                 >
-                  <RefreshCw className={`h-2.5 w-2.5 ${generatingLink ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-3.5 w-3.5 ${generatingLink ? 'animate-spin' : ''}`} />
                   <span>Generate Links</span>
                 </button>
               </div>
             </div>
 
             {/* Card 2: Export Flyer Buttons */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-3xs space-y-3 hover:shadow-2xs transition-shadow">
-              <span className="text-[10px] font-black text-slate-455 uppercase tracking-widest block border-b pb-2">
-                Export Flyer Poster
-              </span>
-              <div className="grid grid-cols-1 gap-2.5">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <Download className="h-4 w-4 text-indigo-600" />
+                <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Export Flyer Poster
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
                 <Button
                   type="button"
                   onClick={() => handleDownload('png')}
                   isLoading={downloadingPng}
-                  className="w-full justify-center text-xs font-extrabold bg-indigo-600 hover:bg-indigo-750 text-white flex items-center gap-2 py-3.5 rounded-xl shadow-xs transition-colors"
+                  className="w-full h-[46px] justify-center text-sm font-semibold bg-indigo-600 hover:bg-indigo-770 text-white flex items-center gap-2 rounded-xl shadow-sm transition-colors"
                 >
                   <Download className="h-4 w-4" /> Download PNG Flyer
                 </Button>
@@ -1335,16 +1348,16 @@ const QrLinksPage = () => {
                   type="button"
                   onClick={() => handleDownload('pdf')}
                   isLoading={downloadingPdf}
-                  className="w-full justify-center text-xs font-extrabold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-2 py-3.5 rounded-xl shadow-xs transition-colors"
+                  className="w-full h-[46px] justify-center text-sm font-semibold bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-2 rounded-xl shadow-sm transition-colors"
                 >
-                  <FileText className="h-4 w-4" /> Download PDF Document
+                  <FileText className="h-4 w-4 text-slate-500" /> Download PDF Document
                 </Button>
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="w-full py-3.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-black rounded-xl flex items-center justify-center gap-2 transition-all shadow-3xs"
+                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
                 >
-                  <Printer className="h-4 w-4" /> Print High-Res Poster
+                  <Printer className="h-4 w-4 text-slate-500" /> Print High-Res Poster
                 </button>
               </div>
             </div>
@@ -1356,46 +1369,49 @@ const QrLinksPage = () => {
             <div className="space-y-6 pb-20 relative">
               
               {/* Group 1: Branding Accordion Card */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-3xs overflow-hidden transition-all duration-200 hover:shadow-2xs">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'branding' ? '' : 'branding')}
-                  className="w-full flex items-center justify-between py-4 px-5 text-slate-850 font-extrabold text-sm hover:bg-slate-50/50 transition-colors border-b border-slate-150/40"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <Sparkles className="h-4 w-4 text-indigo-650" />
-                    <span>Branding Identity</span>
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="text-left flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 leading-none">Branding Identity</span>
+                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Manage school logo and visual branding</span>
+                    </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'branding' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'branding' ? 'rotate-90 text-indigo-600' : ''}`} />
                 </button>
 
                 {expandedSection === 'branding' && (
-                  <div className="p-5 space-y-3.5 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
                     
                     {/* Identity & Logo */}
                     <div className="flex gap-4 items-center">
-                      <div className="relative h-16 w-16 rounded-xl bg-slate-50 border flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="relative h-16 w-16 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                         {logo ? (
                           <img src={logo} alt="Logo" className="h-full w-full object-contain" />
                         ) : (
-                          <span className="text-[10px] text-slate-400 font-bold">No Logo</span>
+                          <span className="text-[10px] text-slate-400 font-semibold">No Logo</span>
                         )}
                         {uploadingLogo && (
-                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center text-xs font-bold text-white">
+                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center text-xs font-semibold text-white">
                             ...
                           </div>
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">Logo Upload</span>
-                        <div className="flex items-center gap-1.5">
+                      <div className="flex flex-col gap-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Logo Upload</span>
+                        <div className="flex items-center gap-2">
                           <div className="relative">
                             <button
                               type="button"
-                              className="px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold text-slate-700 bg-white hover:bg-slate-50 flex items-center gap-1 shadow-3xs"
+                              className="h-[36px] px-3.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 flex items-center gap-1.5 transition-colors shadow-sm"
                             >
-                              <Upload className="h-3 w-3" />
+                              <Upload className="h-3.5 w-3.5 text-slate-500" />
                               Upload
                             </button>
                             <input
@@ -1409,9 +1425,9 @@ const QrLinksPage = () => {
                             <button
                               type="button"
                               onClick={handleDeleteLogo}
-                              className="px-2.5 py-1.5 rounded-lg border border-red-100 text-[10px] font-semibold text-red-650 bg-white hover:bg-red-550 flex items-center gap-1 hover:text-white transition-colors"
+                              className="h-[36px] px-3.5 rounded-lg border border-red-100 text-xs font-semibold text-red-600 bg-white hover:bg-red-50 flex items-center gap-1.5 transition-colors"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-3.5 w-3.5" />
                               Clear
                             </button>
                           )}
@@ -1433,30 +1449,30 @@ const QrLinksPage = () => {
                     />
 
                     {/* Poster Theme Selection */}
-                    <div className="border-t border-slate-100 pt-3.5 space-y-2 text-left">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">
+                    <div className="border-t border-slate-100 pt-4 space-y-2.5 text-left">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                         Poster Theme Selection
                       </span>
                       <div className="flex gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
                           <input
                             type="radio"
                             name="posterTheme"
                             value="bw"
                             checked={posterTheme === 'bw'}
                             onChange={() => setPosterTheme('bw')}
-                            className="text-indigo-650 focus:ring-indigo-500/20"
+                            className="text-indigo-600 focus:ring-indigo-500/20"
                           />
                           Black & White (default)
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
                           <input
                             type="radio"
                             name="posterTheme"
                             value="brand"
                             checked={posterTheme === 'brand'}
                             onChange={() => setPosterTheme('brand')}
-                            className="text-indigo-650 focus:ring-indigo-500/20"
+                            className="text-indigo-600 focus:ring-indigo-500/20"
                           />
                           Brand Colors
                         </label>
@@ -1465,43 +1481,43 @@ const QrLinksPage = () => {
 
                     {/* Brand Colors Palette */}
                     {posterTheme === 'brand' && (
-                      <div className="border-t border-slate-100 pt-3.5 space-y-2 text-left animate-fadeIn">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase">
+                      <div className="border-t border-slate-100 pt-4 space-y-2.5 text-left animate-fadeIn">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                           Brand Palette Colors
                         </span>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-extrabold text-slate-500 uppercase">Primary Color</label>
-                            <div className="flex gap-1">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wide">Primary Color</label>
+                            <div className="flex gap-2">
                               <input
                                 type="color"
                                 value={qrBranding.primaryColor}
                                 onChange={e => setQrBranding({ ...qrBranding, primaryColor: e.target.value })}
-                                className="h-8 w-10 border rounded-lg cursor-pointer"
+                                className="h-[46px] w-[50px] border border-slate-200 rounded-lg cursor-pointer p-1 bg-white"
                               />
                               <input
                                 type="text"
                                 value={qrBranding.primaryColor}
                                 onChange={e => setQrBranding({ ...qrBranding, primaryColor: e.target.value })}
-                                className="w-full border rounded-lg px-2 text-[10px] font-mono bg-slate-50"
+                                className="w-full h-[46px] border border-slate-200 rounded-lg px-3 text-sm font-mono bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
                               />
                             </div>
                           </div>
 
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-extrabold text-slate-500 uppercase">Secondary Color</label>
-                            <div className="flex gap-1">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wide">Secondary Color</label>
+                            <div className="flex gap-2">
                               <input
                                 type="color"
                                 value={qrBranding.secondaryColor}
                                 onChange={e => setQrBranding({ ...qrBranding, secondaryColor: e.target.value })}
-                                className="h-8 w-10 border rounded-lg cursor-pointer"
+                                className="h-[46px] w-[50px] border border-slate-200 rounded-lg cursor-pointer p-1 bg-white"
                               />
                               <input
                                 type="text"
                                 value={qrBranding.secondaryColor}
                                 onChange={e => setQrBranding({ ...qrBranding, secondaryColor: e.target.value })}
-                                className="w-full border rounded-lg px-2 text-[10px] font-mono bg-slate-50"
+                                className="w-full h-[46px] border border-slate-200 rounded-lg px-3 text-sm font-mono bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
                               />
                             </div>
                           </div>
@@ -1514,21 +1530,24 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 2: Poster Content Accordion Card */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-3xs overflow-hidden transition-all duration-200 hover:shadow-2xs">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'content' ? '' : 'content')}
-                  className="w-full flex items-center justify-between py-4 px-5 text-slate-850 font-extrabold text-sm hover:bg-slate-55/50 transition-colors border-b border-slate-150/40"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <FileText className="h-4 w-4 text-indigo-650" />
-                    <span>Poster Text Content</span>
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="text-left flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 leading-none">Poster Text Content</span>
+                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Customize title, subtitle, and session</span>
+                    </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'content' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'content' ? 'rotate-90 text-indigo-600' : ''}`} />
                 </button>
 
                 {expandedSection === 'content' && (
-                  <div className="p-5 space-y-3.5 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
                     <Input
                       label="Poster Main Title *"
                       value={qrBranding.posterTitle}
@@ -1553,21 +1572,24 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 3: Contact Details Accordion Card */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-3xs overflow-hidden transition-all duration-200 hover:shadow-2xs">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'contact' ? '' : 'contact')}
-                  className="w-full flex items-center justify-between py-4 px-5 text-slate-850 font-extrabold text-sm hover:bg-slate-55/50 transition-colors border-b border-slate-150/40"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <Phone className="h-4 w-4 text-indigo-650" />
-                    <span>Contact details</span>
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="text-left flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 leading-none">Contact Details</span>
+                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Configure phone, website, and address</span>
+                    </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'contact' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'contact' ? 'rotate-90 text-indigo-600' : ''}`} />
                 </button>
 
                 {expandedSection === 'contact' && (
-                  <div className="p-5 space-y-3.5 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
                     <Input
                       label="Official Website"
                       value={website}
@@ -1591,21 +1613,24 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 4: Footer & Highlights Accordion Card */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-3xs overflow-hidden transition-all duration-200 hover:shadow-2xs">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'footer' ? '' : 'footer')}
-                  className="w-full flex items-center justify-between py-4 px-5 text-slate-850 font-extrabold text-sm hover:bg-slate-55/50 transition-colors border-b border-slate-150/40"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-55 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <Layout className="h-4 w-4 text-indigo-650" />
-                    <span>Footer & Highlights</span>
+                  <div className="flex items-center gap-3">
+                    <Layout className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="text-left flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 leading-none">Footer & Highlights</span>
+                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Add bullet highlights and footer messages</span>
+                    </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'footer' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'footer' ? 'rotate-90 text-indigo-600' : ''}`} />
                 </button>
 
                 {expandedSection === 'footer' && (
-                  <div className="p-5 space-y-3.5 animate-fadeIn">
+                  <div className="p-5 border-t border-slate-100 space-y-4 animate-fadeIn">
                     <Input
                       label="Why Choose Us Highlights (One per line)"
                       type="textarea"
@@ -1628,22 +1653,25 @@ const QrLinksPage = () => {
               </div>
 
               {/* Group 5: Visibility Accordion Card */}
-              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-3xs overflow-hidden transition-all duration-200 hover:shadow-2xs">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'visibility' ? '' : 'visibility')}
-                  className="w-full flex items-center justify-between py-4 px-5 text-slate-850 font-extrabold text-sm hover:bg-slate-55/50 transition-colors border-b border-slate-150/40"
+                  className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-55 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-2 text-slate-700">
-                    <Eye className="h-4 w-4 text-indigo-650" />
-                    <span>Visibility Toggles</span>
+                  <div className="flex items-center gap-3">
+                    <Eye className="h-4.5 w-4.5 text-indigo-600" />
+                    <div className="text-left flex flex-col">
+                      <span className="text-sm font-bold text-slate-900 leading-none">Visibility Toggles</span>
+                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">Choose which components to display</span>
+                    </div>
                   </div>
-                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'visibility' ? 'rotate-90 text-indigo-650 font-black' : ''}`} />
+                  <ChevronRight className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${expandedSection === 'visibility' ? 'rotate-90 text-indigo-600' : ''}`} />
                 </button>
 
                 {expandedSection === 'visibility' && (
-                  <div className="p-5 animate-fadeIn">
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-slate-700">
+                  <div className="p-5 border-t border-slate-100 animate-fadeIn">
+                    <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-700">
                       {[
                         { key: 'showLogo', label: 'School Logo' },
                         { key: 'showName', label: 'School Name' },
@@ -1655,12 +1683,12 @@ const QrLinksPage = () => {
                         { key: 'showAcademicSession', label: 'Academic Session' },
                         { key: 'showHighlights', label: 'Highlights List' },
                       ].map(item => (
-                        <label key={item.key} className="flex items-center space-x-1.5 cursor-pointer bg-slate-50 hover:bg-slate-100 p-2 rounded-lg select-none border border-slate-150 transition-colors">
+                        <label key={item.key} className="flex items-center space-x-2.5 cursor-pointer bg-slate-50 hover:bg-slate-100/80 p-2.5 rounded-lg select-none border border-slate-150 transition-colors">
                           <input
                             type="checkbox"
                             checked={qrBranding[item.key]}
                             onChange={e => setQrBranding({ ...qrBranding, [item.key]: e.target.checked })}
-                            className="rounded text-indigo-650 focus:ring-indigo-500/20"
+                            className="rounded text-indigo-600 focus:ring-indigo-500/20"
                           />
                           <span className="truncate">{item.label}</span>
                         </label>
@@ -1671,14 +1699,14 @@ const QrLinksPage = () => {
               </div>
 
               {/* Sticky bottom Save bar docked inside the scrollable column */}
-              <div className="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md border border-slate-200/80 p-4 rounded-2xl shadow-lg flex items-center justify-between mt-6">
-                <div className="text-[10px] font-semibold text-slate-500">
+              <div className="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-xl shadow-lg flex items-center justify-between mt-6">
+                <div className="text-xs font-semibold text-slate-500">
                   Unsaved branding alterations
                 </div>
                 <Button
                   type="submit"
                   isLoading={savingBranding}
-                  className="py-2.5 px-6 bg-indigo-650 hover:bg-indigo-750 text-xs font-black text-white rounded-xl shadow-md tracking-wider uppercase transition-colors shrink-0"
+                  className="h-[46px] px-6 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm transition-all duration-200 shrink-0"
                 >
                   Save Studio Settings
                 </Button>
@@ -1691,7 +1719,7 @@ const QrLinksPage = () => {
           <div className={`col-span-12 lg:col-span-5 lg:sticky lg:top-[20px] self-start order-1 lg:order-3 ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
             
             {/* Canva Workspace backdrop: Light background, rounded, shadow, vertically and horizontally centered */}
-            <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-xs relative mt-3">
+            <div className="bg-[#F8FAFC] border border-slate-200 rounded-xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-sm relative mt-3">
               
               {/* Clutter-free scaling node boundary wrapper */}
               <div
@@ -1700,7 +1728,7 @@ const QrLinksPage = () => {
                   height: `${posterDims.height * scale}px`,
                   overflow: 'hidden'
                 }}
-                className="rounded-3xl shadow-xl relative border border-slate-200/85 bg-white shrink-0 transition-all duration-200"
+                className="rounded-xl shadow-sm relative border border-slate-200 bg-white shrink-0 transition-all duration-200"
               >
                 {renderPosterCanvas(scale, 'admission-poster-canvas')}
               </div>
@@ -1718,47 +1746,47 @@ const QrLinksPage = () => {
         >
           {/* Modal Header Controls */}
           <div 
-            className="w-full flex flex-col sm:flex-row items-center justify-between bg-slate-900/95 border border-slate-800 p-4 rounded-2xl shadow-2xl max-w-4xl mx-auto z-10 gap-3"
+            className="w-full flex flex-col sm:flex-row items-center justify-between bg-white border border-slate-200 p-4 rounded-xl shadow-md max-w-4xl mx-auto z-10 gap-3"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">⛶ PRESENTATION VIEW</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-2">⛶ PRESENTATION VIEW</span>
             </div>
             
             <div className="flex items-center gap-2 flex-wrap justify-center">
               <button
                 type="button"
                 onClick={() => setModalZoom(z => Math.max(0.2, z - 0.1))}
-                className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-black rounded-lg transition-colors"
+                className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
               >
                 Zoom -
               </button>
-              <span className="text-[10px] font-mono text-slate-300 font-bold px-2 w-12 text-center">{Math.round(modalZoom * 100)}%</span>
+              <span className="text-xs font-mono text-slate-600 font-bold px-2 w-12 text-center">{Math.round(modalZoom * 100)}%</span>
               <button
                 type="button"
                 onClick={() => setModalZoom(z => Math.min(3.0, z + 0.1))}
-                className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-black rounded-lg transition-colors"
+                className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
               >
                 Zoom +
               </button>
               <button
                 type="button"
                 onClick={() => { setModalZoom(0.5); setModalFit('width'); }}
-                className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-black rounded-lg transition-colors ml-2"
+                className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors ml-2"
               >
                 Fit Width
               </button>
               <button
                 type="button"
                 onClick={() => { setModalZoom(0.4); setModalFit('height'); }}
-                className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-black rounded-lg transition-colors"
+                className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
               >
                 Fit Height
               </button>
               <button
                 type="button"
                 onClick={() => { setModalZoom(0.65); setModalFit('none'); }}
-                className="px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-black rounded-lg transition-colors"
+                className="h-9 px-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors"
               >
                 Reset
               </button>
@@ -1767,7 +1795,7 @@ const QrLinksPage = () => {
             <button
               type="button"
               onClick={() => setIsFullScreen(false)}
-              className="p-1.5 hover:bg-slate-855 border border-slate-800 hover:border-slate-700 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
+              className="p-1.5 hover:bg-slate-50 border border-slate-250 hover:border-slate-300 rounded-lg text-slate-500 hover:text-slate-700 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -1776,7 +1804,7 @@ const QrLinksPage = () => {
           {/* Modal Body Container */}
           <div className="flex-1 w-full flex items-center justify-center overflow-auto p-4" onClick={() => setIsFullScreen(false)}>
             <div 
-              className="bg-slate-900 border border-slate-800 p-6 rounded-[2.5rem] flex items-center justify-center overflow-auto shadow-2xl relative shrink-0 transition-all duration-200"
+              className="bg-slate-50 border border-slate-200 p-6 rounded-xl flex items-center justify-center overflow-auto shadow-md relative shrink-0 transition-all duration-200"
               style={{
                 width: modalFit === 'width' ? '90vw' : 'auto',
                 height: modalFit === 'height' ? '80vh' : 'auto',
@@ -1791,7 +1819,7 @@ const QrLinksPage = () => {
                   height: `${posterDims.height * modalZoom}px`,
                   overflow: 'hidden'
                 }}
-                className="rounded-3xl shadow-2xl relative border border-slate-950 bg-slate-950 shrink-0 transition-all duration-200"
+                className="rounded-xl shadow-md relative border border-slate-200 bg-white shrink-0 transition-all duration-200"
               >
                 {renderPosterCanvas(modalZoom, 'admission-poster-canvas-modal')}
               </div>
