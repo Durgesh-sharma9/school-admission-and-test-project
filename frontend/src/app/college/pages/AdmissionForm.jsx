@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../school/services/schoolApi';
+import { useAuth } from '../../school/contexts/AuthContext';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
@@ -7,6 +8,7 @@ import toast from 'react-hot-toast';
 import { FilePlus, ShieldCheck } from 'lucide-react';
 
 const AdmissionForm = () => {
+  const { school } = useAuth();
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [specializations, setSpecializations] = useState([]);
@@ -159,7 +161,7 @@ const AdmissionForm = () => {
       // Map to backward-compatible structure matching Mongoose requirements
       const payload = {
         ...formData,
-        schoolId: api.getSchoolId(),
+        schoolId: school?._id || school?.id,
         parentName: formData.fatherName || formData.motherName || 'Parent',
         parentMobile: formData.fatherMobile || formData.motherMobile || formData.mobile || '9999999999',
         parentOccupation: 'N/A',

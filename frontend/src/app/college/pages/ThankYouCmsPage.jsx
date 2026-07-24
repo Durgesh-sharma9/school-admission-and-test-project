@@ -1,81 +1,531 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../school/contexts/AuthContext';
-import Button from '../../../shared/components/Button';
-import Input from '../../../shared/components/Input';
-import toast from 'react-hot-toast';
 import api from '../../school/services/schoolApi';
-import { Sparkles, FileText } from 'lucide-react';
+import Button from '../../../shared/components/Button';
+import toast from 'react-hot-toast';
+import {
+  Sparkles,
+  Link as LinkIcon,
+  FileText,
+  Image as ImageIcon,
+  Trash2,
+  Upload,
+  Eye,
+  Plus,
+  Instagram,
+  Facebook,
+  Youtube,
+  MessageCircle,
+  Linkedin,
+  Globe,
+  Send,
+  Twitter
+} from 'lucide-react';
 
 const ThankYouCmsPage = () => {
   const { school, updateSchoolState } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [bannerUrl, setBannerUrl] = useState('');
-  const [brochureUrl, setBrochureUrl] = useState('');
 
-  useEffect(() => {
-    if (school?.thankYouCms) {
-      setBannerUrl(school.thankYouCms.banner || '');
-      setBrochureUrl(school.thankYouCms.admissionBrochure?.url || '');
+  // Platform icon helper mapping
+  const getPlatformIcon = (platform, className = "h-4.5 w-4.5") => {
+    switch (platform) {
+      case 'Instagram':
+        return <Instagram className={className} />;
+      case 'Facebook':
+        return <Facebook className={className} />;
+      case 'YouTube':
+        return <Youtube className={className} />;
+      case 'WhatsApp':
+        return <MessageCircle className={className} />;
+      case 'LinkedIn':
+        return <Linkedin className={className} />;
+      case 'X (Twitter)':
+        return <Twitter className={className} />;
+      case 'Telegram':
+        return <Send className={className} />;
+      case 'College Website':
+      case 'School Website':
+        return <Globe className={className} />;
+      default:
+        return <LinkIcon className={className} />;
     }
-  }, [school]);
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const payload = {
-        thankYouCms: {
-          banner: bannerUrl,
-          admissionBrochure: {
-            url: brochureUrl,
-            type: brochureUrl.endsWith('.pdf') ? 'pdf' : 'image'
-          }
-        }
+  // 1. Initial State Sync supporting backward compatibility mapping & College terminology
+  const getInitialSocialLinks = () => {
+    if (school?.thankYouCms?.socialLinks && school.thankYouCms.socialLinks.length > 0) {
+      return school.thankYouCms.socialLinks.map(link => ({
+        ...link,
+        platform: link.platform === 'School Website' ? 'College Website' : link.platform
+      }));
+    }
+    const legacy = [];
+    if (school?.thankYouCms?.socialLink1) {
+      legacy.push({ platform: 'College Website', url: school.thankYouCms.socialLink1 });
+    }
+    if (school?.thankYouCms?.socialLink2) {
+      legacy.push({ platform: 'Facebook', url: school.thankYouCms.socialLink2 });
+    }
+    return legacy;
+  };
+
+  const getInitialBrochure = () => {
+    if (school?.thankYouCms?.admissionBrochure && school.thankYouCms.admissionBrochure.url) {
+      return school.thankYouCms.admissionBrochure;
+    }
+    if (school?.thankYouCms?.pdfUrl) {
+      return {
+        url: school.thankYouCms.pdfUrl,
+        type: 'pdf',
+        mimeType: 'application/pdf',
+        filename: school.thankYouCms.pdfUrl.split('/').pop() || 'Admission_Brochure.pdf'
       };
+    }
+    return { url: '', type: '', mimeType: '', filename: '' };
+  };
 
-      const res = await api.put('/settings/thankyou-cms', payload);
-      if (res.success) {
-        toast.success('Thank You CMS settings updated!');
-        if (updateSchoolState) updateSchoolState(res.data);
+  // Form State hooks
+  const [socialLinks, setSocialLinks] = useState(getInitialSocialLinks());
+  const [admissionBrochure, setAdmissionBrochure] = useState(getInitialBrochure());
+  const [banner, setBanner] = useState(school?.thankYouCms?.banner || school?.thankYouCms?.imageUrl || '');
+
+  const [saving, setSaving] = useState(false);
+  const [uploadingBrochure, setUploadingBrochure] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  // File Upload Handlers
+  const handleFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size exceeds the 5MB limit');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    if (type === 'brochure') setUploadingBrochure(true);
+    else if (type === 'banner') setUploadingBanner(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const res = await fetch(`${apiBaseUrl}/settings/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const response = await res.json();
+      
+      if (response.success) {
+        if (type === 'brochure') {
+          setAdmissionBrochure({
+            url: response.fileUrl,
+            type: response.type,
+            mimeType: response.mimeType,
+            filename: response.filename
+          });
+          toast.success('College brochure uploaded!');
+        } else if (type === 'banner') {
+          setBanner(response.fileUrl);
+          toast.success('Thank you banner uploaded!');
+        }
+      } else {
+        toast.error(response.message || 'File upload failed');
       }
     } catch (error) {
-      toast.error('Failed to update Thank You CMS settings');
+      toast.error('Upload connection error');
     } finally {
-      setLoading(false);
+      setUploadingBrochure(false);
+      setUploadingBanner(false);
+    }
+  };
+
+  // Delete uploaded items
+  const handleDeleteItem = (type) => {
+    if (type === 'brochure') {
+      setAdmissionBrochure({ url: '', type: '', mimeType: '', filename: '' });
+      toast.success('College brochure cleared. Save changes to confirm.');
+    } else if (type === 'banner') {
+      setBanner('');
+      toast.success('Banner cleared. Save changes to confirm.');
+    }
+  };
+
+  // Social Links mutations
+  const handleAddSocial = () => {
+    if (socialLinks.length >= 4) return;
+    setSocialLinks([...socialLinks, { platform: 'College Website', url: '' }]);
+  };
+
+  const handleUpdateSocial = (index, key, val) => {
+    const updated = [...socialLinks];
+    updated[index][key] = val;
+    setSocialLinks(updated);
+  };
+
+  const handleDeleteSocial = (index) => {
+    setSocialLinks(socialLinks.filter((_, i) => i !== index));
+  };
+
+  // Save Configs
+  const handleSaveCms = async () => {
+    // Validate each social link has url if configured
+    const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i;
+    for (const link of socialLinks) {
+      if (!link.url || !link.url.trim()) {
+        toast.error('Please enter a URL for all added social channels');
+        return;
+      }
+      if (!urlRegex.test(link.url)) {
+        toast.error(`Invalid URL format: ${link.url}`);
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      // Map College Website back to School Website for API validation compatibility
+      const socialLinksPayload = socialLinks.map(link => ({
+        ...link,
+        platform: link.platform === 'College Website' ? 'School Website' : link.platform
+      }));
+
+      // Reuse the existing thankyou-cms update API
+      const response = await api.put('/settings/thankyou-cms', {
+        socialLinks: socialLinksPayload,
+        admissionBrochure,
+        banner,
+        // Sync legacy parameters for backend backward compatibility
+        socialLink1: socialLinksPayload[0]?.url || '',
+        socialLink2: socialLinksPayload[1]?.url || '',
+        pdfUrl: admissionBrochure?.url || '',
+        imageUrl: banner || ''
+      });
+
+      if (response.success) {
+        toast.success('Thank You page CMS updated successfully!');
+        
+        // Sync context state
+        const updatedSchool = {
+          ...school,
+          thankYouCms: response.thankYouCms,
+        };
+        updateSchoolState(updatedSchool);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to save CMS settings');
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <div className="space-y-6 text-left max-w-4xl mx-auto">
+    <div className="space-y-6 text-left">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">Thank You Page Customizer</h2>
-        <p className="text-slate-500 text-xs mt-0.5">Customize the public screen layout applicants see after submitting their college form.</p>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Thank You Page CMS Settings</h2>
+        <p className="text-slate-500 text-sm mt-0.5">
+          Customize the files and updates applicants receive upon successfully submitting admission application forms.
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">CMS Configuration</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Post-Submission Welcome Banner Image URL"
-            value={bannerUrl}
-            onChange={e => setBannerUrl(e.target.value)}
-            placeholder="e.g. https://images.unsplash.com/photo-university-campus"
-          />
-          <Input
-            label="Prospectus / Brochure Download Link"
-            value={brochureUrl}
-            onChange={e => setBrochureUrl(e.target.value)}
-            placeholder="e.g. https://college.edu/prospectus.pdf"
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Left pane: Configurations Forms */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+          <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block">
+            CMS Layout Assets
+          </span>
+
+          {/* Social Links CRUD */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+                <LinkIcon className="h-4 w-4 text-indigo-500" />
+                Follow Us Links ({socialLinks.length}/4)
+              </h4>
+              <button
+                type="button"
+                onClick={handleAddSocial}
+                disabled={socialLinks.length >= 4}
+                className="inline-flex items-center px-2 py-1 text-[10px] font-bold bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add Link
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {socialLinks.map((link, idx) => (
+                <div key={idx} className="flex gap-2 items-center">
+                  <div className="flex items-center justify-center h-10 w-10 bg-slate-50 rounded-xl text-slate-500 border border-slate-100 flex-shrink-0">
+                    {getPlatformIcon(link.platform, "h-5 w-5")}
+                  </div>
+
+                  <select
+                    value={link.platform}
+                    onChange={(e) => handleUpdateSocial(idx, 'platform', e.target.value)}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {['Instagram', 'Facebook', 'YouTube', 'WhatsApp', 'LinkedIn', 'X (Twitter)', 'Telegram', 'College Website', 'Other'].map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+
+                  <input
+                    type="text"
+                    value={link.url}
+                    onChange={(e) => handleUpdateSocial(idx, 'url', e.target.value)}
+                    placeholder="https://yoursocial.com/url"
+                    className="flex-1 rounded-lg border border-slate-200 px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSocial(idx)}
+                    className="p-2 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 hover:bg-rose-100/50 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+
+              {socialLinks.length === 0 && (
+                <div className="py-4 text-center text-xs text-slate-400 border border-dashed border-slate-150 rounded-xl">
+                  No social follow channels configured. Use the button above to add up to 4 updates links.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Admission Brochure Upload */}
+          <div className="space-y-3 pt-2">
+            <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+              <FileText className="h-4 w-4 text-blue-500" />
+              College Brochure File (Max 1)
+            </h4>
+
+            {admissionBrochure?.url ? (
+              <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg">
+                <div className="flex items-center space-x-2 truncate pr-4">
+                  <FileText className="h-5 w-5 text-red-500 flex-shrink-0" />
+                  <span className="text-xs font-medium text-slate-600 truncate">
+                    {admissionBrochure.filename || 'College Brochure'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={admissionBrochure.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2 hover:bg-slate-200/50 rounded-md text-slate-500 hover:text-slate-800 transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteItem('brochure')}
+                    className="p-2 hover:bg-red-50 rounded-md text-red-500 hover:text-red-700 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all bg-slate-50/50">
+                <Upload className="h-6 w-6 text-slate-400 mb-1" />
+                <span className="text-xs font-bold text-slate-600 block">
+                  {uploadingBrochure ? 'Uploading...' : 'Upload College Brochure'}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">PDF or Image up to 5MB</span>
+                <input
+                  type="file"
+                  accept=".pdf,image/*"
+                  onChange={(e) => handleFileUpload(e, 'brochure')}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={uploadingBrochure}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Banner Upload */}
+          <div className="space-y-3 pt-2">
+            <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+              <ImageIcon className="h-4 w-4 text-emerald-500" />
+              Thank You Banner Image (Max 1)
+            </h4>
+
+            {banner ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg">
+                  <div className="flex items-center space-x-2 truncate pr-4">
+                    <ImageIcon className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                    <span className="text-xs font-medium text-slate-600 truncate">
+                      {banner.split('/').pop() || 'Thank_You_Banner.jpg'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteItem('banner')}
+                      className="p-2 hover:bg-red-50 rounded-md text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <img
+                  src={banner}
+                  alt="Banner preview"
+                  className="h-28 w-full object-cover rounded-lg border border-slate-100"
+                />
+              </div>
+            ) : (
+              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all bg-slate-50/50">
+                <Upload className="h-6 w-6 text-slate-400 mb-1" />
+                <span className="text-xs font-bold text-slate-600 block">
+                  {uploadingBanner ? 'Uploading...' : 'Upload Banner Image'}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">PNG, JPG, WEBP up to 5MB</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, 'banner')}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={uploadingBanner}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Welcome / Thank You Message Info Card */}
+          <div className="space-y-2 pt-2 text-xs">
+            <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              Welcome / Thank You Message
+            </h4>
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-3.5 text-slate-600 leading-normal">
+              <span className="font-semibold text-slate-700 block mb-0.5">Post-submission Welcome Text:</span>
+              Your admission application for <span className="font-bold">John Doe</span> has been registered successfully. Our counseling team will contact you shortly.
+            </div>
+          </div>
+
+          {/* Footer Message Info Card */}
+          <div className="space-y-2 pt-2 text-xs">
+            <h4 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+              <Globe className="h-4 w-4 text-blue-500" />
+              Footer Message
+            </h4>
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-3.5 text-slate-600 leading-normal">
+              <span className="font-semibold text-slate-700 block mb-0.5">Footer Signature:</span>
+              Powered by {school?.name || 'College Admin'}
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-50">
+            <Button
+              className="w-full py-3"
+              onClick={handleSaveCms}
+              isLoading={saving}
+            >
+              Save CMS Changes
+            </Button>
+          </div>
         </div>
 
-        <div className="pt-2 flex justify-end">
-          <Button type="submit" isLoading={loading} className="py-3 px-6 text-xs font-semibold inline-flex items-center">
-            <Sparkles className="h-4.5 w-4.5 mr-1.5" /> Save CMS Layout
-          </Button>
+        {/* Right pane: Phone Mockup Display */}
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+            Applicant View Live Mockup
+          </span>
+
+          <div className="w-full max-w-sm border-8 border-slate-800 rounded-[2.5rem] shadow-2xl h-[580px] bg-slate-50 overflow-hidden relative flex flex-col">
+            {/* Phone speaker notch */}
+            <div className="absolute top-0 inset-x-0 h-5 bg-slate-800 flex justify-center items-start z-20">
+              <div className="w-24 h-3.5 bg-black rounded-b-xl" />
+            </div>
+
+            {/* Browser layout content */}
+            <div className="flex-1 overflow-y-auto px-5 pt-8 pb-6 text-center space-y-4 bg-white">
+              <div className="flex flex-col items-center space-y-1 pt-4">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-650 text-xs">
+                  {school?.name?.charAt(0).toUpperCase() || 'C'}
+                </div>
+                <h4 className="text-xs font-extrabold text-slate-800">{school?.name}</h4>
+              </div>
+
+              {/* Thank You Box */}
+              <div className="bg-indigo-50/50 rounded-2xl p-4 border border-indigo-100/30 space-y-2.5">
+                <div className="h-9 w-9 rounded-full bg-indigo-600 text-white flex items-center justify-center mx-auto">
+                  <Sparkles className="h-4.5 w-4.5" />
+                </div>
+                <h3 className="text-sm font-bold text-indigo-950">Thank You!</h3>
+                <p className="text-[10px] text-slate-500 leading-normal">
+                  Your admission application for <span className="font-semibold text-slate-700">John Doe</span> has been registered successfully. Our team will contact you shortly.
+                </p>
+              </div>
+
+              {/* Banner image */}
+              {banner && (
+                <div className="rounded-xl overflow-hidden border border-slate-100">
+                  <img
+                    src={banner}
+                    alt="Mockup Banner"
+                    className="w-full h-24 object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Brochure Downloader (with PDF/Image extension detection) */}
+              {admissionBrochure?.url && (
+                <a
+                  href={admissionBrochure.url}
+                  download={admissionBrochure.filename || 'Brochure'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-indigo-750 transition-colors"
+                >
+                  <FileText className="h-3.5 w-3.5 mr-2" />
+                  Download College Brochure ({admissionBrochure.type === 'pdf' ? 'PDF' : 'Image'})
+                </a>
+              )}
+
+              {/* Social Channels follow section */}
+              {socialLinks.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Follow Our Updates
+                  </span>
+                  <div className="flex justify-center gap-3">
+                    {socialLinks.map((link, lIdx) => (
+                      <a
+                        key={lIdx}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 bg-slate-50 border border-slate-100 hover:bg-indigo-50 rounded-full text-slate-650 hover:text-indigo-600 transition-all"
+                        title={link.platform}
+                      >
+                        {getPlatformIcon(link.platform, "h-4 w-4")}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom handle bar */}
+            <div className="h-4 bg-slate-800 flex justify-center items-center">
+              <div className="w-28 h-1 bg-slate-600 rounded-full" />
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

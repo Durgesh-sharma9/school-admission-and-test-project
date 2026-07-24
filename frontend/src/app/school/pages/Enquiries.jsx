@@ -27,7 +27,8 @@ import {
   User,
   Users,
   MapPin,
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';

@@ -163,7 +163,7 @@ const Counselling = () => {
                       type="text"
                       value={noteText}
                       onChange={e => setNoteText(e.target.value)}
-                      placeholder="Add assessment results or student preferences remarks..."
+                      placeholder="Add counseling follow-up note or student preferences..."
                       className="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none"
                     />
                     <Button type="submit" className="py-2 px-4 text-xs font-semibold">
