@@ -106,6 +106,8 @@ const schoolSchema = new mongoose.Schema({
     showUniversityName: { type: Boolean, default: true },
     showAccreditation: { type: Boolean, default: true },
     showFacilities: { type: Boolean, default: true },
+    posterTitle: { type: String, default: '' },
+    posterSubtitle: { type: String, default: '' },
     footerMessage: { 
       type: String, 
       default: 'Thank You For Visiting Our School. We Look Forward To Welcoming Your Child.' 

@@ -396,76 +396,28 @@ const SettingsPage = () => {
             </div>
           </div>
 
-          {/* QR Branding Customization Panel */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-5 text-left">
+          {/* QR Branding Redirect Card */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
               <span className="text-base">🎨</span>
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                QR Branding & Poster Customization
+                Admission Poster Branding
               </h3>
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
-              Control which contact details and branding elements display on your generated Admission QR Poster.
+              Manage admission poster branding, colors, highlights, QR templates, downloads and live preview from QR Builder.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 text-xs">
-              {[
-                { key: 'showLogo', label: 'School Logo' },
-                { key: 'showName', label: 'School Name' },
-                { key: 'showTagline', label: 'Tagline' },
-                { key: 'showContact', label: 'Phone Number' },
-                { key: 'showEmail', label: 'Email Address' },
-                { key: 'showWebsite', label: 'Website' },
-                { key: 'showAddress', label: 'Address' },
-                { key: 'showAcademicSession', label: 'Academic Session' },
-                { key: 'showHighlights', label: 'Why Choose Us Highlights' },
-              ].map((item) => (
-                <label key={item.key} className="flex items-center space-x-2 cursor-pointer p-2.5 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors select-none">
-                  <input
-                    type="checkbox"
-                    checked={qrBranding[item.key]}
-                    onChange={(e) => setQrBranding({ ...qrBranding, [item.key]: e.target.checked })}
-                    className="rounded text-indigo-600 focus:ring-indigo-500/20"
-                  />
-                  <span className="font-semibold text-slate-700 text-[11px]">{item.label}</span>
-                </label>
-              ))}
+            <div>
+              <button
+                type="button"
+                onClick={() => window.location.href = '/qr-code'}
+                className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+              >
+                Open QR Builder
+              </button>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Primary Brand Color"
-                type="color"
-                value={qrBranding.primaryColor || '#4f46e5'}
-                onChange={(e) => setQrBranding({ ...qrBranding, primaryColor: e.target.value })}
-              />
-              <Input
-                label="Secondary Accent Color"
-                type="color"
-                value={qrBranding.secondaryColor || '#f59e0b'}
-                onChange={(e) => setQrBranding({ ...qrBranding, secondaryColor: e.target.value })}
-              />
-            </div>
-
-            <Input
-              label="Why Choose Us Highlights (One per line)"
-              type="textarea"
-              value={(qrBranding.highlights || []).join('\n')}
-              onChange={(e) => {
-                const list = e.target.value.split('\n');
-                setQrBranding({ ...qrBranding, highlights: list });
-              }}
-              placeholder="e.g. Experienced & Caring Faculty&#10;Smart Classrooms & Modern Labs"
-            />
-
-            <Input
-              label="Poster Footer Message"
-              type="textarea"
-              value={qrBranding.footerMessage || ''}
-              onChange={(e) => setQrBranding({ ...qrBranding, footerMessage: e.target.value })}
-              placeholder="e.g. Thank You For Visiting Our School. We Look Forward To Welcoming Your Child."
-            />
           </div>
 
           {/* Evaluation Settings Panel */}
@@ -494,7 +446,7 @@ const SettingsPage = () => {
 
           <div className="flex justify-end">
             <Button type="submit" isLoading={savingSchool}>
-              Save School Profile & Branding
+              Save School Profile
             </Button>
           </div>
         </form>

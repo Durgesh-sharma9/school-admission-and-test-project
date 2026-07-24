@@ -1011,102 +1011,30 @@ const SettingsPage = () => {
         </form>
       )}
 
-      {/* Tab 2: Branding */}
+      {/* Tab 2: Branding Redirect Card */}
       {activeTab === 'branding' && (
-        <form onSubmit={handleBrandingSubmit} className="space-y-6">
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
-            <div>
-              <h3 className="text-sm font-bold text-slate-800">QR Poster & Public Page Branding</h3>
-              <p className="text-slate-450 text-[10px] mt-0.5">Toggle checkboxes to control branding details rendering on QR codes, admissions posters, and public forms.</p>
-            </div>
-
-            {/* Checkboxes grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
-              {[
-                { key: 'showLogo', label: 'College Logo' },
-                { key: 'showName', label: 'College Name' },
-                { key: 'showTagline', label: 'College Tagline' },
-                { key: 'showContact', label: 'Contact Number' },
-                { key: 'showEmail', label: 'Admission Email' },
-                { key: 'showWebsite', label: 'Website' },
-                { key: 'showAddress', label: 'Address' },
-                { key: 'showUniversityName', label: 'University Name' },
-                { key: 'showAccreditation', label: 'Accreditation' },
-                { key: 'showFacilities', label: 'Facilities' }
-              ].map(item => (
-                <label 
-                  key={item.key}
-                  className="flex items-start p-3 bg-slate-50/50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors select-none text-xs font-bold text-slate-700"
-                >
-                  <input
-                    type="checkbox"
-                    checked={branding[item.key]}
-                    onChange={e => setBranding({ ...branding, [item.key]: e.target.checked })}
-                    className="mt-0.5 h-4 w-4 text-indigo-650 border-slate-350 focus:ring-indigo-500 rounded"
-                  />
-                  <span className="ml-2.5">{item.label}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Color pickers */}
-            <div className="border-t border-slate-100 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { key: 'primaryColor', label: 'Primary Color' },
-                { key: 'secondaryColor', label: 'Secondary Color' },
-                { key: 'accentColor', label: 'Accent Color' }
-              ].map(color => (
-                <div key={color.key} className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">{color.label}</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="color"
-                      value={branding[color.key]}
-                      onChange={e => setBranding({ ...branding, [color.key]: e.target.value })}
-                      className="h-10 w-12 rounded-xl border border-slate-200 cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={branding[color.key]}
-                      onChange={e => setBranding({ ...branding, [color.key]: e.target.value })}
-                      placeholder="#ffffff"
-                      className="flex-1 rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:outline-none bg-slate-50 font-mono"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Highlight & Footer messages */}
-            <div className="border-t border-slate-100 pt-4 space-y-4">
-              <Input
-                label="Why Choose Our College Highlights (one feature per line)"
-                type="textarea"
-                value={(branding.highlights || []).join('\n')}
-                onChange={e => {
-                  const list = e.target.value.split('\n');
-                  setBranding({ ...branding, highlights: list });
-                }}
-                placeholder="e.g. NAAC A++ Accredited University Campus&#10;100% Placement Records&#10;State-of-the-Art Laboratory Facilities"
-                rows={4}
-              />
-              <Input
-                label="Poster Footer Message"
-                type="textarea"
-                value={branding.footerMessage}
-                onChange={e => setBranding({ ...branding, footerMessage: e.target.value })}
-                placeholder="e.g. Thank You For Visiting Our Campus. We Look Forward To Welcoming You."
-                rows={2}
-              />
-            </div>
+        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left max-w-lg">
+          <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
+            <span className="text-base">🎨</span>
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              Admission Poster Branding
+            </h3>
           </div>
 
-          <div className="flex justify-end pt-2">
-            <Button type="submit" isLoading={loading} className="py-3 px-6 text-xs font-semibold inline-flex items-center">
-              <Check className="h-4.5 w-4.5 mr-1.5" /> Save Branding Configuration
-            </Button>
+          <p className="text-xs text-slate-500 font-medium">
+            Manage admission poster branding, colors, highlights, QR templates, downloads and live preview from QR Builder.
+          </p>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => window.location.href = '/college/qr-links'}
+              className="px-4 py-2 bg-indigo-650 hover:bg-indigo-755 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+            >
+              Open QR Builder
+            </button>
           </div>
-        </form>
+        </div>
       )}
 
       {/* Tab 3: Templates */}
