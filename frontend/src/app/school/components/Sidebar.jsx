@@ -25,7 +25,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: 'Assessments', path: '/assessments', icon: FileQuestion },
     { name: 'Admission Form', path: '/admission-form', icon: FileText },
     { name: 'QR Code / Links', path: '/qr-code', icon: QrCode },
-    { name: 'Thank You CMS', path: '/thankyou-cms', icon: Sparkles },
+    { name: 'Enquiry Banner', path: '/thankyou-cms', icon: Sparkles },
     { name: 'Subscription', path: '/subscription', icon: CreditCard },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];

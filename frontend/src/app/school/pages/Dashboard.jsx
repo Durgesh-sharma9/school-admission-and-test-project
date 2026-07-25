@@ -770,7 +770,7 @@ const Dashboard = () => {
             { label: 'Public Form', icon: SchoolIcon, link: `/public/admission/${school?._id}`, color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100', external: true },
             { label: 'Assign Test', icon: BookOpen, link: '/assessments', color: 'text-purple-600 bg-purple-50 hover:bg-purple-100' },
             { label: 'New Test', icon: FileQuestion, link: '/assessments/create', color: 'text-amber-600 bg-amber-50 hover:bg-amber-100' },
-            { label: 'Thank You CMS', icon: Sparkles, link: '/thank-you-cms', color: 'text-rose-600 bg-rose-50 hover:bg-rose-100' },
+            { label: 'Enquiry Banner', icon: Sparkles, link: '/thank-you-cms', color: 'text-rose-600 bg-rose-50 hover:bg-rose-100' },
             { label: 'Settings', icon: Filter, link: '/settings', color: 'text-slate-600 bg-slate-100 hover:bg-slate-200' },
           ].map((action) => {
             const ActionIcon = action.icon;
