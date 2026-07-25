@@ -843,14 +843,107 @@ const Enquiries = () => {
                     {/* Expandable CRM Journey Timeline Row */}
                     <AnimatePresence>
                       {expandedEnquiryId === enq._id && (
-                        <tr className="bg-slate-50/30">
-                          <td colSpan={9} className="px-6 py-5 border-b border-slate-100/85">
-                            <AdmissionJourneyTimeline
-                              enquiry={enq}
-                              stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                              onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
-                              counselorName={school?.name || 'Admin'}
-                            />
+                        <tr className="bg-[#F8FAFC]">
+                          <td colSpan={9} className="px-6 py-6 border-b border-[#E5E7EB]">
+                            <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
+                              {/* Top Information Bar / Enquiry Header */}
+                              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
+                                <div className="space-y-1.5 text-left">
+                                  <div className="flex flex-wrap items-center gap-2.5">
+                                    <h3 className="text-[18px] font-semibold text-slate-800 leading-none">{enq.studentName}</h3>
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-[#6D5DF6] border border-indigo-100">
+                                      {enq.enquiryId}
+                                    </span>
+                                    {/* Status Badge */}
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-wider ${
+                                      enq.status === 'New Enquiry' || enq.status === 'New'
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                        : enq.status === 'Hold'
+                                        ? 'bg-amber-50 border-amber-250 text-amber-700'
+                                        : enq.status === 'Not Interested' || enq.status === 'Rejected'
+                                        ? 'bg-rose-50 border-rose-250 text-rose-750'
+                                        : enq.status === 'Admission Confirmed' || enq.status === 'Confirmed'
+                                        ? 'bg-emerald-50 border-emerald-250 text-emerald-700'
+                                        : 'bg-purple-50 border-purple-250 text-purple-750'
+                                    }`}>
+                                      {enq.status === 'New Enquiry' ? 'NEW' : enq.status === 'Not Interested' ? 'REJECTED' : enq.status === 'Admission Confirmed' ? 'CONFIRMED' : enq.status.toUpperCase()}
+                                    </span>
+                                  </div>
+
+                                  {/* Metadata Line */}
+                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-semibold">
+                                    <span>Class seeking: <strong>{enq.classSeeking}</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-350" />
+                                    <span>City: <strong>{enq.city}</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span>Parent: <strong>{enq.parentName} ({enq.mobile})</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span>Submitted: <strong>{enq.saveDate} {enq.saveTime}</strong></span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Header Right */}
+                                <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedEnquiryForView(enq);
+                                      setViewModalOpen(true);
+                                    }}
+                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                  >
+                                    View Profile
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedEnquiryForEdit(enq);
+                                      setEditStatus(enq.status);
+                                      setEditModalOpen(true);
+                                    }}
+                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                  >
+                                    Edit Status
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedEnquiryForAssessment(enq)}
+                                    className="border-indigo-100 hover:bg-indigo-50/50 text-[#6D5DF6] h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                  >
+                                    Assessments
+                                  </Button>
+                                  {!enq.isConvertedToAdmission ? (
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => handleConvertAdmission(enq._id)}
+                                      className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                    >
+                                      Convert to Registered
+                                    </Button>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-250">
+                                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                                      Registered
+                                    </span>
+                                  )}
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleDeleteEnquiry(enq._id)}
+                                    className="border-[#E5E7EB] text-[#EF4444] hover:bg-red-50/50 h-8 px-3 text-xs font-bold rounded-lg transition-all hover:border-red-200"
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* CRM Admissions Journey Timeline */}
+                              <AdmissionJourneyTimeline
+                                enquiry={enq}
+                                stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                                onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
+                                counselorName={school?.name || 'Admin'}
+                              />
+                            </div>
                           </td>
                         </tr>
                       )}

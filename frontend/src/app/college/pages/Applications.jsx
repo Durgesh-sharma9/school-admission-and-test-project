@@ -578,21 +578,79 @@ const Applications = () => {
                         </td>
                       </tr>
 
-                      {/* Expandable CRM Journey Timeline Row */}
-                      <AnimatePresence>
-                        {expandedAppId === app._id && (
-                          <tr className="bg-slate-50/30">
-                            <td colSpan={7} className="px-6 py-5 border-b border-slate-100/85">
+                    {/* Expandable CRM Journey Timeline Row */}
+                    <AnimatePresence>
+                      {expandedAppId === app._id && (
+                        <tr className="bg-[#F8FAFC]">
+                          <td colSpan={7} className="px-6 py-6 border-b border-[#E5E7EB]">
+                            <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
+                              {/* Top Information Bar / Application Header */}
+                              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
+                                <div className="space-y-1.5 text-left">
+                                  <div className="flex flex-wrap items-center gap-2.5">
+                                    <h3 className="text-[18px] font-semibold text-slate-800 leading-none">{app.studentName}</h3>
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-[#6D5DF6] border border-indigo-100">
+                                      {app.applicationId}
+                                    </span>
+                                    {/* Status Badge */}
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-wider ${
+                                      app.stage === 'Counselling Assigned' || app.stage === 'New'
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                        : app.stage === 'Call Scheduled' || app.stage === 'Hold'
+                                        ? 'bg-amber-50 border-amber-250 text-amber-700'
+                                        : app.stage === 'Rejected' || app.stage === 'Not Interested'
+                                        ? 'bg-rose-50 border-rose-250 text-rose-750'
+                                        : app.stage === 'Admission Confirmed' || app.stage === 'Confirmed'
+                                        ? 'bg-emerald-50 border-emerald-250 text-emerald-700'
+                                        : 'bg-purple-50 border-purple-250 text-purple-750'
+                                    }`}>
+                                      {STAGE_MAP_TO_STATUS[app.stage] ? STAGE_MAP_TO_STATUS[app.stage].toUpperCase() : 'NEW'}
+                                    </span>
+                                  </div>
+
+                                  {/* Metadata Line */}
+                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-semibold">
+                                    <span>Course Seeking: <strong>{app.courseId?.name || 'N/A'} ({app.departmentId?.name || 'N/A'})</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-350" />
+                                    <span>City: <strong>{app.city}</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span>Parent: <strong>{app.parentName} ({app.parentMobile})</strong></span>
+                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span>Submitted: <strong>{new Date(app.createdAt).toLocaleDateString()}</strong></span>
+                                  </div>
+                                </div>
+
+                                {/* Action Buttons Header Right */}
+                                <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleViewDetails(app._id)}
+                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                  >
+                                    View Profile
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleOpenContactModal(app)}
+                                    className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                  >
+                                    Quick Contact
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* CRM Admissions Journey Timeline */}
                               <AdmissionJourneyTimeline
                                 enquiry={app}
                                 stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
                                 onSaveJourney={(updatedJourney) => handleSaveJourney(app._id, updatedJourney)}
                                 counselorName="Admin"
                               />
-                            </td>
-                          </tr>
-                        )}
-                      </AnimatePresence>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </AnimatePresence>
                     </React.Fragment>
                   );
                 })}
