@@ -31,6 +31,7 @@ const SchoolPublicAdmissionPage = lazy(() => import('./app/school/pages/PublicAd
 const SchoolPublicThankYouPage = lazy(() => import('./app/school/pages/PublicThankYouPage'));
 const SchoolStudentTest = lazy(() => import('./app/school/pages/StudentTest'));
 const SchoolNotFound = lazy(() => import('./app/school/pages/NotFound'));
+const SchoolTasksPage = lazy(() => import('./app/school/pages/TasksPage'));
 
 const SchoolLayout = lazy(() => import('./app/school/layouts/DashboardLayout'));
 
@@ -40,6 +41,7 @@ const CollegeLayout = lazy(() => import('./app/college/layouts/CollegeDashboardL
 // College Admin Pages
 const CollegeDashboard = lazy(() => import('./app/college/pages/Dashboard'));
 const CollegeApplications = lazy(() => import('./app/college/pages/Applications'));
+const CollegeTasksPage = lazy(() => import('./app/college/pages/TasksPage'));
 const CollegeAdmissionForm = lazy(() => import('./app/college/pages/AdmissionForm'));
 const CollegeAcademicConfigPage = lazy(() => import('./app/college/pages/AcademicConfigPage'));
 const CollegeCounselling = lazy(() => import('./app/college/pages/Counselling'));
@@ -132,6 +134,7 @@ function App() {
                     <Route path="/dashboard/qr-links" element={<SchoolQrLinksPage />} />
                     <Route path="/dashboard/thank-you-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/dashboard/enquiries" element={<SchoolEnquiries />} />
+                    <Route path="/dashboard/tasks" element={<SchoolTasksPage />} />
                     <Route path="/dashboard/settings" element={<SchoolSettingsPage />} />
                     <Route path="/dashboard/subscription" element={<SchoolSubscription />} />
                     <Route path="/dashboard/assessments" element={<SchoolAssessmentList />} />
@@ -140,6 +143,7 @@ function App() {
                     <Route path="/dashboard/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
 
                     <Route path="/enquiries" element={<SchoolEnquiries />} />
+                    <Route path="/tasks" element={<SchoolTasksPage />} />
                     <Route path="/admission-form" element={<SchoolAdmissionFormPage />} />
                     <Route path="/admission-form-builder" element={<SchoolAdmissionFormPage />} />
                     <Route path="/qr-code" element={<SchoolQrLinksPage />} />
@@ -163,6 +167,7 @@ function App() {
                   <Route element={<CollegeLayout />}>
                     <Route path="/college/dashboard" element={<CollegeDashboard />} />
                     <Route path="/college/applications" element={<CollegeApplications />} />
+                    <Route path="/college/tasks" element={<CollegeTasksPage />} />
                     <Route path="/college/admission-form" element={<CollegeAdmissionForm />} />
                     <Route path="/college/academic-config" element={<CollegeAcademicConfigPage />} />
                     <Route path="/college/counselling" element={<CollegeCounselling />} />

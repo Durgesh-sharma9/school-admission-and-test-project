@@ -4,6 +4,7 @@ import { useAuth } from '../../school/contexts/AuthContext';
 import {
   LayoutDashboard,
   ClipboardList,
+  CheckSquare,
   FileText,
   QrCode,
   Sparkles,
@@ -26,6 +27,7 @@ const CollegeSidebar = ({ isOpen, toggleSidebar }) => {
   const menuItems = [
     { name: 'Dashboard', path: '/college/dashboard', icon: LayoutDashboard },
     { name: 'Applications', path: '/college/applications', icon: ClipboardList },
+    { name: "Today's Tasks", path: '/college/tasks', icon: CheckSquare },
     { name: 'Admission Form', path: '/college/admission-form', icon: FileText },
     { name: 'Academic Configuration', path: '/college/academic-config', icon: Layers },
     { name: 'Counselling', path: '/college/counselling', icon: Compass },

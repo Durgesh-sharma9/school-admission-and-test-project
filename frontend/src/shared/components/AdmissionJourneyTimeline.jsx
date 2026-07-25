@@ -191,10 +191,13 @@ const AdmissionJourneyTimeline = ({
   ];
 
   return (
-    <div className="space-y-3.5 text-left font-sans relative timeline-container-ref">
-      {/* Connected Horizontal Timeline Scroller */}
-      <div className="overflow-x-auto pb-2.5 scrollbar-thin bg-[#F8FAFC]/55 p-3 rounded-xl border border-[#E5E7EB]">
-        <div className="flex items-center w-max py-2 px-1">
+    <div className="space-y-4 text-left font-sans relative timeline-container-ref">
+      {/* Unified Timeline Card Container */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+        
+        {/* Connected Horizontal Timeline Scroller */}
+        <div className="overflow-x-auto pb-2 p-3 border-b border-slate-200">
+          <div className="flex items-center w-max py-1 px-1">
           {displayNodes.map((stage, idx) => {
             const isAddNode = stage.isAddNode;
 
@@ -205,8 +208,8 @@ const AdmissionJourneyTimeline = ({
                 <React.Fragment key="add-node">
                   {idx > 0 && (
                     <div 
-                      className={`h-1 w-14 mx-2 rounded transition-colors duration-305 ${
-                        previousCompleted ? 'bg-[#22C55E]' : 'bg-[#E5E7EB]'
+                      className={`h-1.5 w-16 mx-3 rounded-full transition-colors duration-300 ${
+                        previousCompleted ? 'bg-emerald-500' : 'bg-slate-200'
                       }`}
                     />
                   )}
@@ -223,25 +226,22 @@ const AdmissionJourneyTimeline = ({
                     }}
                     onMouseEnter={(e) => {
                       setHoveredStageIndex(idx);
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const parentEl = e.currentTarget.closest('.timeline-container-ref');
-                      if (parentEl) {
-                        const parentRect = parentEl.getBoundingClientRect();
-                        setHoveredStageRect({
-                          top: rect.top - parentRect.top,
-                          left: rect.left - parentRect.left + (rect.width / 2),
-                          idx
-                        });
-                      }
+                      const circleEl = e.currentTarget.querySelector('div');
+                      const rect = circleEl ? circleEl.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
+                      setHoveredStageRect({
+                        top: rect.top,
+                        left: rect.left + (rect.width / 2),
+                        idx
+                      });
                     }}
                     onMouseLeave={() => {
                       setHoveredStageIndex(null);
                       setHoveredStageRect(null);
                     }}
-                    className="flex flex-col items-center shrink-0 cursor-pointer relative transition-transform duration-200 hover:scale-105"
+                    className="flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-300 hover:scale-105"
                   >
-                    <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#6D5DF6] bg-indigo-50/20 text-[#6D5DF6] flex items-center justify-center font-bold relative hover:bg-indigo-50">
-                      <Plus className="h-4.5 w-4.5" />
+                    <div className="w-8 h-8 rounded-full border-2 border-dashed border-indigo-500 bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold relative hover:bg-indigo-100 transition-all">
+                      <Plus className="h-4 w-4" />
                     </div>
 
                     {/* Label below circle */}
@@ -260,8 +260,8 @@ const AdmissionJourneyTimeline = ({
               <React.Fragment key={idx}>
                 {idx > 0 && (
                   <div 
-                    className={`h-1 w-14 mx-2 rounded transition-colors duration-305 ${
-                      normalizedJourney[idx - 1].completedAt ? 'bg-[#22C55E]' : 'bg-[#E5E7EB]'
+                    className={`h-1.5 w-16 mx-3 rounded-full transition-colors duration-300 ${
+                      normalizedJourney[idx - 1].completedAt ? 'bg-emerald-500' : 'bg-slate-200'
                     }`}
                   />
                 )}
@@ -271,33 +271,30 @@ const AdmissionJourneyTimeline = ({
                   onClick={() => setSelectedStageIndex(idx)}
                   onMouseEnter={(e) => {
                     setHoveredStageIndex(idx);
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const parentEl = e.currentTarget.closest('.timeline-container-ref');
-                    if (parentEl) {
-                      const parentRect = parentEl.getBoundingClientRect();
-                      setHoveredStageRect({
-                        top: rect.top - parentRect.top,
-                        left: rect.left - parentRect.left + (rect.width / 2),
-                        idx
-                      });
-                    }
+                    const circleEl = e.currentTarget.querySelector('div');
+                    const rect = circleEl ? circleEl.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
+                    setHoveredStageRect({
+                      top: rect.top,
+                      left: rect.left + (rect.width / 2),
+                      idx
+                    });
                   }}
                   onMouseLeave={() => {
                     setHoveredStageIndex(null);
                     setHoveredStageRect(null);
                   }}
-                  className="flex flex-col items-center shrink-0 cursor-pointer relative transition-transform duration-200"
+                  className="flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-300 hover:scale-105"
                 >
                   {/* Circle Node */}
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 font-bold relative ${
                     status === 'Completed'
-                      ? 'bg-[#22C55E] border-[#22C55E] text-white shadow-xs'
+                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-md'
                       : status === 'Current' || status === 'Overdue'
-                      ? 'bg-[#6D5DF6] border-[#6D5DF6] text-white shadow-lg shadow-[#6D5DF6]/20 scale-105'
-                      : 'bg-white border-[#E5E7EB] text-slate-400'
+                      ? 'bg-indigo-500 border-indigo-500 text-white shadow-lg shadow-indigo-500/20 scale-105'
+                      : 'bg-white border-slate-300 text-slate-400 hover:border-slate-400'
                   }`}>
                     {status === 'Completed' ? (
-                      <Check className="h-4.5 w-4.5 text-white" />
+                      <Check className="h-4 w-4 text-white" />
                     ) : (
                       <span className="text-[10px] font-black">{idx + 1}</span>
                     )}
@@ -310,7 +307,7 @@ const AdmissionJourneyTimeline = ({
 
                   {/* Label below circle */}
                   <span className={`text-[11px] font-semibold mt-2 block whitespace-nowrap transition-colors duration-200 ${
-                    isSelected ? 'text-[#6D5DF6] font-bold' : 'text-slate-700'
+                    isSelected ? 'text-indigo-600 font-bold' : 'text-slate-700'
                   }`}>
                     {stage.stage}
                   </span>
@@ -336,11 +333,11 @@ const AdmissionJourneyTimeline = ({
       {hoveredStageRect && (
         <div 
           style={{
-            position: 'absolute',
-            top: '0px', 
+            position: 'fixed',
+            top: `${hoveredStageRect.top + 40}px`,
             left: `${hoveredStageRect.left}px`,
-            transform: 'translate(-50%, -105%)',
-            zIndex: 60
+            transform: 'translateX(-50%)',
+            zIndex: 9999
           }}
           className="bg-slate-900 text-white text-[10.5px] p-3 rounded-xl shadow-xl w-52 pointer-events-none transition-all duration-150 text-left border border-slate-700/60 leading-normal"
         >
@@ -374,7 +371,7 @@ const AdmissionJourneyTimeline = ({
         </div>
       )}
 
-      {/* Selected Stage Detail Panel */}
+      {/* Selected Stage Detail Panel - Inside Unified Container */}
       {(() => {
         const stage = normalizedJourney[selectedStageIndex];
         if (!stage) return null;
@@ -387,13 +384,13 @@ const AdmissionJourneyTimeline = ({
 
         if (isOnlyFormSubmitted) {
           return (
-            <div className="py-5 text-center bg-slate-50 border-2 border-dashed border-[#E5E7EB] rounded-xl p-4 flex flex-col items-center justify-center space-y-2 shadow-xs">
-              <div className="h-8 w-8 bg-indigo-50 border border-indigo-100 rounded-lg flex items-center justify-center">
-                <Sparkles className="h-4.5 w-4.5 text-[#6D5DF6]" />
+            <div className="py-5 text-center bg-gradient-to-br from-slate-50 to-white border-t border-slate-100 p-4 flex flex-col items-center justify-center space-y-2">
+              <div className="h-10 w-10 bg-indigo-100 border border-indigo-200 rounded-lg flex items-center justify-center shadow-sm">
+                <Sparkles className="h-5 w-5 text-indigo-600" />
               </div>
               <div className="space-y-0.5">
                 <h5 className="text-xs font-extrabold text-slate-800">Continue Admission Journey</h5>
-                <p className="text-[10.5px] text-slate-400 max-w-sm leading-normal">Start candidate logging by clicking the "+" timeline node above to record the first contact.</p>
+                <p className="text-[10px] text-slate-500 max-w-sm leading-relaxed">Start candidate logging by clicking the "+" timeline node above to record the first contact.</p>
               </div>
               <Button
                 variant="primary"
@@ -405,7 +402,7 @@ const AdmissionJourneyTimeline = ({
                   setModalNotes('');
                   setTimelineModalOpen(true);
                 }}
-                className="bg-[#6D5DF6] hover:bg-[#5b4ee3] text-white text-[11px] font-bold px-3.5 py-1.5 rounded-lg shadow-xs transition-all border-transparent h-8"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-4 py-2 rounded-lg shadow-sm transition-all border-transparent h-8"
               >
                 + Add First Interaction
               </Button>
@@ -414,64 +411,65 @@ const AdmissionJourneyTimeline = ({
         }
 
         return (
-          <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-start justify-between gap-4 transition-all text-left relative overflow-hidden">
-            {/* Left accent strip for current */}
-            {(status === 'Current' || status === 'Overdue') && (
-              <div className="absolute top-0 bottom-0 left-0 w-1 bg-[#6D5DF6]" />
-            )}
-
-            <div className="space-y-2.5 flex-1 min-w-0">
+          <div className="border-t border-slate-100">
+            {/* Header with accent */}
+            <div className={`px-4 py-2.5 border-b border-slate-100 flex items-center justify-between ${
+              (status === 'Current' || status === 'Overdue') ? 'bg-gradient-to-r from-indigo-50 to-white' : 'bg-slate-50'
+            }`}>
               <div className="flex items-center gap-2">
-                <h5 className="text-xs font-black text-slate-800 leading-tight">
+                <h5 className="text-xs font-black text-slate-900 leading-tight">
                   {stage.stage}
                 </h5>
-                <span className={`px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wide border ${
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide border ${
                   status === 'Completed'
-                    ? 'bg-emerald-50 border-emerald-250 text-emerald-700'
+                    ? 'bg-emerald-100 border-emerald-200 text-emerald-700'
                     : status === 'Current'
-                    ? 'bg-blue-50 border-blue-200 text-blue-700'
+                    ? 'bg-indigo-100 border-indigo-200 text-indigo-700'
                     : status === 'Overdue'
-                    ? 'bg-red-50 border-red-200 text-red-700 animate-pulse'
-                    : 'bg-slate-50 border-slate-200 text-slate-500'
+                    ? 'bg-red-100 border-red-200 text-red-700 animate-pulse'
+                    : 'bg-slate-100 border-slate-200 text-slate-500'
                 }`}>
                   {status === 'Current' ? 'ACTIVE' : status}
                 </span>
                 {getFollowUpStatusBadge(stage)}
               </div>
+            </div>
 
-              {/* Responsive Info Chips */}
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              {/* Premium Info Chips */}
               <div className="flex flex-wrap gap-1.5 text-[10px]">
-                <span className="flex items-center gap-1 bg-[#F8FAFC] border border-[#E5E7EB] px-2 py-0.5 rounded-lg text-slate-500 font-semibold">
+                <span className="flex items-center gap-1 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg text-slate-600 font-semibold shadow-sm">
                   <Info className="h-3 w-3 text-slate-400" />
-                  Created: <strong>{new Date(stage.createdAt || stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</strong>
+                  Created: <strong>{new Date(stage.createdAt || stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
                 </span>
                 {stage.completedAt && (
-                  <span className="flex items-center gap-1 bg-emerald-50/50 border border-emerald-150 px-2 py-0.5 rounded-lg text-emerald-700 font-semibold">
+                  <span className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg text-emerald-700 font-semibold shadow-sm">
                     <Check className="h-3 w-3 text-emerald-500" />
-                    Completed: <strong>{new Date(stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</strong>
+                    Completed: <strong>{new Date(stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
                   </span>
                 )}
                 {stage.followUpDate && !stage.completedAt && (
-                  <span className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-semibold border ${
+                  <span className={`flex items-center gap-1 px-2 py-1 rounded-lg font-semibold border shadow-sm ${
                     status === 'Overdue' 
                       ? 'bg-red-50 border-red-200 text-red-700' 
-                      : 'bg-amber-50/50 border-amber-200 text-amber-700'
+                      : 'bg-amber-50 border-amber-200 text-amber-700'
                   }`}>
                     <Calendar className="h-3 w-3" />
-                    Follow-up: <strong>{new Date(stage.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</strong>
+                    Follow-up: <strong>{new Date(stage.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
                   </span>
                 )}
                 {stage.createdBy && (
-                  <span className="flex items-center gap-1 bg-[#F8FAFC] border border-[#E5E7EB] px-2 py-0.5 rounded-lg text-slate-500 font-semibold">
+                  <span className="flex items-center gap-1 bg-slate-50 border border-slate-200 px-2 py-1 rounded-lg text-slate-600 font-semibold shadow-sm">
                     <User className="h-3 w-3 text-slate-400" />
                     Assigned To: <strong>{stage.createdBy}</strong>
                   </span>
                 )}
               </div>
 
-              {/* Modern Notes Box */}
+              {/* Notes Box */}
               {stage.notes ? (
-                <div className="text-xs text-slate-650 bg-[#F8FAFC] p-3 rounded-lg border border-[#E5E7EB] font-medium leading-relaxed">
+                <div className="text-xs text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium leading-relaxed shadow-sm">
                   {stage.notes}
                 </div>
               ) : (
@@ -479,13 +477,13 @@ const AdmissionJourneyTimeline = ({
               )}
             </div>
 
-            {/* Actions for Selected Stage */}
-            <div className="flex flex-wrap items-center gap-1.5 font-bold shrink-0 self-end md:self-start pt-1 md:pt-0">
+            {/* Footer Actions */}
+            <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-1.5">
               {!stage.completedAt && (
                 <Button
                   variant="primary"
                   onClick={() => handleMarkComplete(selectedStageIndex)}
-                  className="bg-[#6D5DF6] hover:bg-[#5b4ee3] text-[10.5px] border-transparent h-8 px-3 rounded-lg shadow-xs transition-all font-extrabold"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-[10px] border-transparent h-8 px-3 rounded-lg shadow-sm transition-all font-bold"
                 >
                   Mark Complete
                 </Button>
@@ -508,7 +506,7 @@ const AdmissionJourneyTimeline = ({
                     setModalNotes(stage.notes || '');
                     setTimelineModalOpen(true);
                   }}
-                  className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-[10.5px] rounded-lg font-extrabold transition-all"
+                  className="border-slate-300 hover:bg-white text-slate-700 h-8 px-3 text-[10px] rounded-lg font-bold transition-all"
                 >
                   Edit
                 </Button>
@@ -516,9 +514,9 @@ const AdmissionJourneyTimeline = ({
 
               {isLatest && selectedStageIndex > 0 ? (
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => handleDeleteStage(selectedStageIndex)}
-                  className="border-[#E5E7EB] text-[#EF4444] hover:bg-red-50/50 h-8 px-3 text-[10.5px] rounded-lg font-extrabold transition-all hover:border-red-200"
+                  className="border-red-200 text-red-600 hover:bg-red-50 h-8 px-3 text-[10px] rounded-lg font-bold transition-all"
                 >
                   Delete
                 </Button>
@@ -527,6 +525,7 @@ const AdmissionJourneyTimeline = ({
           </div>
         );
       })()}
+      </div>
 
       {/* Add / Edit Timeline Stage Modal */}
       {timelineModalOpen && (

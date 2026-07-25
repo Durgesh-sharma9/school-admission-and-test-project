@@ -4,6 +4,7 @@ import api from '../../school/services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
+import DeleteConfirmationModal from '../../../shared/components/DeleteConfirmationModal';
 import toast from 'react-hot-toast';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import CRMProfileModal from '../../../shared/components/CRMProfileModal';
@@ -25,6 +26,7 @@ import {
   ArrowRight,
   ClipboardList,
   MessageCircle,
+  MessageSquare,
   PhoneCall,
   Users,
   X,
@@ -37,7 +39,8 @@ import {
   Info,
   Award,
   Briefcase,
-  GitCommit
+  GitCommit,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -97,6 +100,7 @@ const Applications = () => {
   const [sortBy, setSortBy] = useState('newest'); // newest, oldest
   const [timelineFilter, setTimelineFilter] = useState('');
   const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Details Modal state
   const [selectedApp, setSelectedApp] = useState(null);
@@ -106,6 +110,11 @@ const Applications = () => {
   // Contact Modal state
   const [contactApp, setContactApp] = useState(null);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+
+  // Delete Modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [appToDelete, setAppToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch applications
   const fetchApplications = async () => {
@@ -167,6 +176,101 @@ const Applications = () => {
       } catch (error) {
         toast.error('Failed to load contact details');
       }
+    }
+  };
+
+  // Handle select all rows
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds(filteredApplications.map((app) => app._id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  // Handle single row selection
+  const handleSelectRow = (id) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter((item) => item !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  // Get selected applications details
+  const getSelectedApplicationsDetails = () => {
+    return filteredApplications.filter((app) => selectedIds.includes(app._id));
+  };
+
+  const getPersonalizedMessage = (template, app) => {
+    return template
+      .replace(/\[Parent Name\]/g, app.parentName)
+      .replace(/\[Student Name\]/g, app.studentName)
+      .replace(/\[Application ID\]/g, app.applicationId);
+  };
+
+  const launchCommunication = (app) => {
+    const text = getPersonalizedMessage(messageBody, app);
+    const encodedText = encodeURIComponent(text);
+
+    if (messageType === 'whatsapp') {
+      const number = app.whatsapp || app.parentMobile || app.mobile;
+      const cleanNumber = number.replace(/[^0-9]/g, '');
+      window.open(`https://wa.me/${cleanNumber}?text=${encodedText}`, '_blank');
+    } else {
+      const subject = encodeURIComponent(messageSubject || 'College Admission Follow-up');
+      window.open(`mailto:${app.email}?subject=${subject}&body=${encodedText}`, '_blank');
+    }
+  };
+
+  const launchBulkEmail = () => {
+    const selectedList = getSelectedApplicationsDetails().filter((a) => a.email);
+    if (selectedList.length === 0) {
+      toast.error('None of the selected applications have valid email addresses.');
+      return;
+    }
+    
+    const bccList = selectedList.map((a) => a.email).join(',');
+    const subject = encodeURIComponent(messageSubject || 'Admission Follow-up');
+    const firstApp = selectedList[0];
+    const text = messageBody
+      .replace(/\[Parent Name\]/g, 'Parent')
+      .replace(/\[Student Name\]/g, 'your child')
+      .replace(/\[Application ID\]/g, 'Application ID');
+    const encodedText = encodeURIComponent(text);
+
+    window.open(`mailto:?bcc=${bccList}&subject=${subject}&body=${encodedText}`, '_blank');
+    toast.success('Mail client opened with BCC list!');
+    setMessageModalOpen(false);
+  };
+
+  // Communication Modal States
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [messageType, setMessageType] = useState('whatsapp');
+  const [messageSubject, setMessageSubject] = useState('');
+  const [messageBody, setMessageBody] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const handleDeleteClick = (app) => {
+    setAppToDelete(app);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!appToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await api.delete(`/college/applications/${appToDelete._id}`);
+      if (response.success) {
+        toast.success('Application deleted successfully');
+        setApplications(prev => prev.filter(app => app._id !== appToDelete._id));
+        setDeleteModalOpen(false);
+        setAppToDelete(null);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete application');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -373,7 +477,6 @@ const Applications = () => {
         isExpanded={filtersExpanded}
         onToggleExpand={() => setFiltersExpanded(!filtersExpanded)}
         searchPlaceholder="Search by ID, name, email, mobile..."
-        className="border-0 shadow-[0_2px_20px_rgb(0,0,0,0.03)]"
       >
         <FilterRow>
           {/* Status Filter */}
@@ -434,8 +537,8 @@ const Applications = () => {
             value={sortBy}
             onChange={setSortBy}
             options={[
-              { value: 'newest', label: 'Newest first' },
-              { value: 'oldest', label: 'Oldest first' },
+              { value: 'newest', label: 'Newest First' },
+              { value: 'oldest', label: 'Oldest First' },
             ]}
             placeholder="Sort By"
           />
@@ -449,6 +552,54 @@ const Applications = () => {
           />
         </FilterRow>
       </CollapsibleFilters>
+
+      {/* Selected Action floating bar */}
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 15 }}
+            className="bg-indigo-900 text-white rounded-xl px-5 py-3 shadow-md flex items-center justify-between flex-wrap gap-3"
+          >
+            <span className="text-xs font-semibold">
+              {selectedIds.length} applications selected
+            </span>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="primary"
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 border-none shadow-xs text-white"
+                onClick={() => {
+                  setMessageType('whatsapp');
+                  setMessageModalOpen(true);
+                }}
+              >
+                <MessageSquare size={16} className="mr-1.5" />
+                WhatsApp Selected
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 border-none shadow-xs text-white"
+                onClick={() => {
+                  setMessageType('email');
+                  setMessageModalOpen(true);
+                }}
+              >
+                <Mail size={16} className="mr-1.5" />
+                Email Selected
+              </Button>
+              <button
+                onClick={() => setSelectedIds([])}
+                className="text-xs font-bold text-slate-300 hover:text-white"
+              >
+                Clear Selection
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Table or Empty State */}
       <div className="bg-white border-0 rounded-3xl shadow-[0_2px_20px_rgb(0,0,0,0.03)] overflow-hidden">
@@ -473,13 +624,23 @@ const Applications = () => {
             <table className="w-full text-left text-sm text-gray-700">
               <thead className="text-[11px] text-gray-400 font-black uppercase tracking-wider bg-[#f8f9fe] border-b border-gray-100">
                 <tr>
-                  <th className="py-5 px-6">App ID</th>
-                  <th className="py-5 px-6">Student</th>
-                  <th className="py-5 px-6">Department</th>
-                  <th className="py-5 px-6">Course</th>
-                  <th className="py-5 px-6">Status</th>
-                  <th className="py-5 px-6">Created Date</th>
-                  <th className="py-5 px-6 text-center w-[180px]">Actions</th>
+                  <th className="py-2 px-6 w-12 text-center">
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={
+                        filteredApplications.length > 0 && selectedIds.length === filteredApplications.length
+                      }
+                      className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                    />
+                  </th>
+                  <th className="py-2 px-6">App ID</th>
+                  <th className="py-2 px-6">Student</th>
+                  <th className="py-2 px-6">Department</th>
+                  <th className="py-2 px-6">Course</th>
+                  <th className="py-2 px-6">Status</th>
+                  <th className="py-2 px-6">Created Date</th>
+                  <th className="py-2 px-6 text-center w-[180px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -488,31 +649,41 @@ const Applications = () => {
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        className={`hover:bg-purple-50/20 transition-colors ${
-                          expandedAppId === app._id ? 'bg-indigo-50/20' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
-                        }`}
+                        className={`transition-all duration-200 ${
+                          expandedAppId === app._id 
+                            ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm' 
+                            : 'hover:bg-slate-50 border-l-4 border-l-transparent'
+                        } ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
                       >
-                        <td className="py-3.5 px-6 font-black text-gray-900 whitespace-nowrap">{app.applicationId}</td>
-                        <td className="py-3.5 px-6 text-gray-800">
-                          <div className="font-bold text-gray-900 leading-tight">{app.studentName}</div>
-                          <span className="block text-[10px] text-gray-500 font-semibold mt-0.5">
+                        <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(app._id)}
+                            onChange={() => handleSelectRow(app._id)}
+                            className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                          />
+                        </td>
+                        <td className="px-6 py-2 font-black text-slate-900 whitespace-nowrap text-sm">{app.applicationId}</td>
+                        <td className="px-6 py-2 text-slate-800">
+                          <div className="font-semibold text-slate-900 text-[13px] leading-tight">{app.studentName}</div>
+                          <span className="block text-[10px] text-slate-400 font-semibold mt-0.5">
                             {app.email} | {app.parentMobile || app.mobile}
                           </span>
                         </td>
-                        <td className="py-3.5 px-6 font-bold text-gray-600">
+                        <td className="px-6 py-2 font-bold text-slate-600 text-xs">
                           {app.departmentId?.name || 'N/A'}
                         </td>
-                        <td className="py-3.5 px-6 font-bold text-gray-600">
+                        <td className="px-6 py-2 font-bold text-slate-600 text-xs">
                           {app.courseId?.name || 'N/A'}
                         </td>
-                        <td className="py-3.5 px-6 font-bold text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-6 py-2 font-bold text-center" onClick={(e) => e.stopPropagation()}>
                           
                           {/* Colorful Status Dropdown */}
                           <div className="relative inline-block w-[140px]">
                             <select
                               value={currentStatus}
                               onChange={(e) => handleStatusChangeDirectly(app._id, e.target.value)}
-                              className={`w-full text-[10px] font-black uppercase rounded-lg pl-3 pr-7 py-2 cursor-pointer appearance-none transition-all outline-none border shadow-sm focus:ring-2 focus:ring-offset-1 ${
+                              className={`w-full text-[10px] font-black uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border shadow-sm focus:ring-2 focus:ring-offset-1 ${
                                 currentStatus === 'New' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
                                 currentStatus === 'Hold' ? 'bg-orange-50 text-orange-700 border-orange-200 focus:ring-orange-500' :
                                 currentStatus === 'Not Interested' ? 'bg-red-50 text-red-700 border-red-200 focus:ring-red-500' :
@@ -532,17 +703,17 @@ const Applications = () => {
                           </div>
 
                         </td>
-                        <td className="py-3.5 px-6 text-xs text-gray-700 font-semibold whitespace-nowrap">
+                        <td className="px-6 py-2 text-xs text-slate-700 font-semibold whitespace-nowrap">
                           {new Date(app.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric'
                           })}
                         </td>
-                        <td className="py-3.5 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                           
                           {/* Correct Action Buttons using standard <button> tag */}
-                          <div className="flex items-center justify-center gap-2">
+                          <div className="flex items-center justify-center gap-1.5">
                             <button
                               className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${
                                 expandedAppId === app._id 
@@ -570,6 +741,14 @@ const Applications = () => {
                             >
                               <Phone size={18} strokeWidth={2} />
                             </button>
+
+                            <button
+                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 hover:shadow-xs transition-all shadow-sm"
+                              onClick={() => handleDeleteClick(app)}
+                              title="Delete"
+                            >
+                              <Trash2 size={18} strokeWidth={2} />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -583,32 +762,32 @@ const Applications = () => {
                                 initial={{ opacity: 0, height: 0 }} 
                                 animate={{ opacity: 1, height: 'auto' }} 
                                 exit={{ opacity: 0, height: 0 }}
-                                className="m-4 lg:m-6 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border-2 border-indigo-100 overflow-hidden"
+                                className="m-4 lg:m-6 bg-white border border-indigo-100 rounded-xl shadow-sm overflow-hidden"
                               >
                                 
                                 {/* Gradient Header */}
-                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 flex justify-between items-center text-white">
-                                  <h4 className="font-black flex items-center gap-2 tracking-wide uppercase text-sm">
-                                    <GitCommit size={20} /> CRM Application Journey
+                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 flex justify-between items-center text-white">
+                                  <h4 className="font-black flex items-center gap-2 tracking-wide uppercase text-xs">
+                                    <GitCommit size={18} /> CRM Application Journey
                                   </h4>
                                   <button onClick={() => setExpandedAppId(null)} className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition-all">
-                                    <X size={18} />
+                                    <X size={16} />
                                   </button>
                                 </div>
 
-                                <div className="p-6 space-y-6">
+                                <div className="p-4 space-y-4">
                                   
                                   {/* Student Info Top Bar */}
-                                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5">
-                                    <div className="space-y-2 text-left">
-                                      <div className="flex flex-wrap items-center gap-3">
-                                        <h3 className="text-xl font-black text-gray-900 leading-none">{app.studentName}</h3>
-                                        <span className="px-3 py-1 rounded-md text-[10px] font-black bg-purple-100 text-purple-700">
+                                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-3">
+                                    <div className="space-y-1 text-left">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <h3 className="text-sm font-black text-gray-900 leading-none">{app.studentName}</h3>
+                                        <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-purple-100 text-purple-700">
                                           {app.applicationId}
                                         </span>
                                       </div>
-                                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 font-bold">
-                                        <span>Course Seeking: <strong className="text-gray-700">{app.courseId?.name || 'N/A'} ({app.departmentId?.name || 'N/A'})</strong></span>
+                                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-500 font-bold">
+                                        <span>Course: <strong className="text-gray-700">{app.courseId?.name || 'N/A'} ({app.departmentId?.name || 'N/A'})</strong></span>
                                         <span className="h-1 w-1 rounded-full bg-gray-300" />
                                         <span>City: <strong className="text-gray-700">{app.city}</strong></span>
                                         <span className="h-1 w-1 rounded-full bg-gray-300" />
@@ -619,13 +798,13 @@ const Applications = () => {
                                     <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
                                       <button
                                         onClick={() => handleViewDetails(app._id)}
-                                        className="h-9 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all"
+                                        className="h-7 px-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-all text-[10px]"
                                       >
                                         View Profile
                                       </button>
                                       <button
                                         onClick={() => handleOpenContactModal(app)}
-                                        className="h-9 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl transition-all"
+                                        className="h-7 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg transition-all text-[10px]"
                                       >
                                         Quick Contact
                                       </button>
@@ -633,7 +812,7 @@ const Applications = () => {
                                   </div>
 
                                   {/* CRM Admissions Journey Timeline */}
-                                  <div className="bg-[#f8f9fe] rounded-2xl p-6 border border-gray-100">
+                                  <div className="bg-[#f8f9fe] rounded-xl p-4 border border-gray-100">
                                     <AdmissionJourneyTimeline
                                       enquiry={app}
                                       stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
@@ -692,6 +871,174 @@ const Applications = () => {
         data={contactApp}
         type="college"
       />
+
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setAppToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Application"
+        itemType="application"
+        itemInfo={appToDelete ? {
+          'Application ID': appToDelete.applicationId,
+          'Student Name': appToDelete.studentName,
+          'Department': appToDelete.departmentId?.name || 'N/A',
+          'Course': appToDelete.courseId?.name || 'N/A',
+        } : {}}
+        isDeleting={isDeleting}
+      />
+
+      {/* Bulk Communication Modal */}
+      <AnimatePresence>
+        {messageModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-8"
+            >
+              <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  {messageType === 'whatsapp' ? (
+                    <MessageSquare size={18} className="text-emerald-600" />
+                  ) : (
+                    <Mail size={18} className="text-blue-600" />
+                  )}
+                  Draft Personalized Message
+                </h3>
+                <button
+                  onClick={() => setMessageModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 font-bold"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Customize your template message below. Placeholders like{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Parent Name]
+                  </code>
+                  ,{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Student Name]
+                  </code>
+                  , and{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Application ID]
+                  </code>{' '}
+                  will automatically populate with each contact's custom details.
+                </p>
+
+                {messageType === 'email' && (
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <label className="block text-xs font-semibold text-slate-700 uppercase">
+                      Email Subject
+                    </label>
+                    <input
+                      type="text"
+                      value={messageSubject}
+                      onChange={(e) => setMessageSubject(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      placeholder="Enter email subject..."
+                    />
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Message Body
+                  </label>
+                  <textarea
+                    value={messageBody}
+                    onChange={(e) => setMessageBody(e.target.value)}
+                    rows={5}
+                    className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                    placeholder="Enter your message..."
+                  />
+                </div>
+
+                {/* Recipient list */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase text-left">
+                    Recipients ({selectedIds.length})
+                  </label>
+                  <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2 divide-y divide-slate-100 text-xs">
+                    {getSelectedApplicationsDetails().map((app) => (
+                      <div key={app._id} className="py-2 flex items-center justify-between">
+                        <div className="text-left">
+                          <span className="font-semibold text-slate-800 block">
+                            {app.parentName} ({app.studentName})
+                          </span>
+                          <span className="text-[10px] text-slate-500">
+                            {messageType === 'whatsapp' ? app.whatsapp || app.parentMobile || app.mobile : app.email || 'No email provided'}
+                          </span>
+                        </div>
+                        
+                        {messageType === 'whatsapp' ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => launchCommunication(app)}
+                            className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-none px-2.5 py-1 text-[10px]"
+                          >
+                            Send WhatsApp
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => launchCommunication(app)}
+                            className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none px-2.5 py-1 text-[10px]"
+                            isDisabled={!app.email}
+                          >
+                            Send Email
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                {messageType === 'email' ? (
+                  <Button
+                    variant="primary"
+                    onClick={launchBulkEmail}
+                    className="bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                  >
+                    <Mail size={16} className="mr-1.5" />
+                    Send Bulk Email (BCC)
+                  </Button>
+                ) : (
+                  <div className="text-xs text-slate-500">
+                    Click individual WhatsApp buttons above to send messages
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setMessageModalOpen(false)}
+                  className="border-slate-300 text-slate-700 hover:bg-slate-100"
+                >
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

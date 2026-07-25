@@ -6,6 +6,7 @@ import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
+import DeleteConfirmationModal from '../../../shared/components/DeleteConfirmationModal';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import AdmissionForm from '../components/AdmissionForm';
@@ -107,6 +108,11 @@ const Enquiries = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [selectedEnquiryForContact, setSelectedEnquiryForContact] = useState(null);
 
+  // Delete Modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [enquiryToDelete, setEnquiryToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Parent History States
   const [viewingParentMobile, setViewingParentMobile] = useState(null);
   const [parentHistoryData, setParentHistoryData] = useState(null);
@@ -196,16 +202,27 @@ const Enquiries = () => {
   };
 
   // Soft Delete Enquiry Handler
-  const handleDeleteEnquiry = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this enquiry? This action supports soft delete auditing.')) return;
+  const handleDeleteClick = (enq) => {
+    setEnquiryToDelete(enq);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!enquiryToDelete) return;
+    
+    setIsDeleting(true);
     try {
-      const response = await api.delete(`/enquiries/${id}`);
+      const response = await api.delete(`/enquiries/${enquiryToDelete._id}`);
       if (response.success) {
-        toast.success('Enquiry soft-deleted successfully');
-        fetchEnquiries();
+        toast.success('Enquiry deleted successfully');
+        setEnquiries(prev => prev.filter(enq => enq._id !== enquiryToDelete._id));
+        setDeleteModalOpen(false);
+        setEnquiryToDelete(null);
       }
     } catch (error) {
       toast.error(error.message || 'Delete failed');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -727,24 +744,26 @@ const Enquiries = () => {
                       className="rounded text-indigo-600 focus:ring-indigo-500/20"
                     />
                   </th>
-                  <th className="px-6 py-2.5">Enquiry ID</th>
-                  <th className="px-6 py-2.5">Student Name</th>
-                  <th className="px-6 py-2.5">Parent Details</th>
-                  <th className="px-6 py-2.5">Class</th>
-                  <th className="px-6 py-2.5">Status</th>
-                  <th className="px-6 py-2.5">Date Submited</th>
-                  <th className="px-6 py-2.5 text-center w-[300px]">Actions</th>
+                  <th className="px-6 py-2">Enquiry ID</th>
+                  <th className="px-6 py-2">Student Name</th>
+                  <th className="px-6 py-2">Parent Details</th>
+                  <th className="px-6 py-2">Class</th>
+                  <th className="px-6 py-2">Status</th>
+                  <th className="px-6 py-2">Date Submited</th>
+                  <th className="px-6 py-2 text-center w-[300px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {enquiries.map((enq, index) => (
                   <React.Fragment key={enq._id}>
                     <tr 
-                      className={`hover:bg-slate-50/75 transition-colors ${
-                        expandedEnquiryId === enq._id ? 'bg-indigo-50/30 font-semibold' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
-                      }`}
+                      className={`transition-all duration-200 ${
+                        expandedEnquiryId === enq._id 
+                          ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm' 
+                          : 'hover:bg-slate-50 border-l-4 border-l-transparent'
+                      } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}
                     >
-                      <td className="px-6 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(enq._id)}
@@ -752,36 +771,36 @@ const Enquiries = () => {
                           className="rounded text-indigo-600 focus:ring-indigo-500/20"
                         />
                       </td>
-                      <td className="px-6 py-2.5 font-bold text-slate-800 whitespace-nowrap">{enq.enquiryId}</td>
-                      <td className="px-6 py-2.5 text-slate-800">
-                        <div className="font-semibold text-slate-850 leading-normal">{enq.studentName}</div>
-                        <span className="block text-[10px] text-slate-450 font-medium">
+                      <td className="px-6 py-2 font-bold text-slate-900 whitespace-nowrap text-sm">{enq.enquiryId}</td>
+                      <td className="px-6 py-2 text-slate-800">
+                        <div className="font-semibold text-slate-900 text-[13px] leading-tight">{enq.studentName}</div>
+                        <span className="block text-[10px] text-slate-400 font-medium mt-0.5">
                           {enq.gender}
                         </span>
                       </td>
-                      <td className="px-6 py-2.5">
+                      <td className="px-6 py-2">
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
                             setViewingParentMobile(enq.mobile);
                           }}
-                          className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline leading-normal"
+                          className="font-semibold text-slate-700 block cursor-pointer hover:text-indigo-600 hover:underline leading-tight text-xs"
                           title="View Parent & Family History Profile"
                         >
                           {enq.parentName}
                         </span>
-                        <span className="text-[10px] text-slate-450 font-medium block">
+                        <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
                           📞 {enq.mobile}
                         </span>
                       </td>
-                      <td className="px-6 py-2.5 font-medium text-slate-700">{enq.classSeeking}</td>
-                      <td className="px-6 py-2.5 font-bold" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-6 py-2 font-medium text-slate-700 text-xs">{enq.classSeeking}</td>
+                      <td className="px-6 py-2 font-bold" onClick={(e) => e.stopPropagation()}>
                         
                         <div className="relative inline-block w-[120px]">
                           <select
                             value={enq.status}
                             onChange={(e) => handleStatusChange(enq._id, e.target.value)}
-                            className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-2 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
+                            className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
                               ${
                                 enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
                                 enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
@@ -802,11 +821,11 @@ const Enquiries = () => {
                         </div>
 
                       </td>
-                      <td className="px-6 py-2.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                      <td className="px-6 py-2 text-xs font-semibold text-slate-700 whitespace-nowrap">
                         {formatSubmissionDate(enq.saveDate, enq.saveTime)}
                       </td>
-                      <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-2">
+                      <td className="px-6 py-2" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-1.5">
                           
                           {/* USING STANDARD HTML BUTTONS FOR ICONS */}
                           <button
@@ -853,7 +872,7 @@ const Enquiries = () => {
 
                           <button
                             className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 hover:shadow-xs transition-all shadow-sm"
-                            onClick={() => handleDeleteEnquiry(enq._id)}
+                            onClick={() => handleDeleteClick(enq)}
                             title="Delete"
                           >
                             <Trash2 size={18} strokeWidth={2} />
@@ -865,19 +884,19 @@ const Enquiries = () => {
 
                     <AnimatePresence>
                       {expandedEnquiryId === enq._id && (
-                        <tr className="bg-slate-50">
-                          <td colSpan={8} className="px-6 py-6 border-b border-slate-200">
+                        <tr className="bg-indigo-50/40">
+                          <td colSpan={8} className="px-4 py-4 border-b border-indigo-100">
                             
-                            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                            <div className="bg-white border border-indigo-100 rounded-xl shadow-sm overflow-hidden">
                               
-                              <div className="bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200">
-                                <div className="space-y-1.5 text-left">
-                                  <div className="flex flex-wrap items-center gap-2.5">
-                                    <h3 className="text-lg font-bold text-slate-800 leading-none">{enq.studentName}</h3>
-                                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                              <div className="bg-gradient-to-r from-indigo-50 to-slate-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100">
+                                <div className="space-y-1 text-left">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h3 className="text-sm font-bold text-slate-800 leading-none">{enq.studentName}</h3>
+                                    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
                                       {enq.enquiryId}
                                     </span>
-                                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border tracking-wider ${
+                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border tracking-wider ${
                                       enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
                                       enq.status === 'Hold' ? 'bg-amber-50 border-amber-200 text-amber-700' :
                                       enq.status === 'Not Interested' ? 'bg-rose-50 border-rose-200 text-rose-700' :
@@ -888,8 +907,8 @@ const Enquiries = () => {
                                     </span>
                                   </div>
 
-                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-500 font-semibold">
-                                    <span>Class seeking: <strong>{enq.classSeeking}</strong></span>
+                                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-semibold">
+                                    <span>Class: <strong>{enq.classSeeking}</strong></span>
                                     <span className="h-1 w-1 rounded-full bg-slate-300" />
                                     <span>City: <strong>{enq.city}</strong></span>
                                     <span className="h-1 w-1 rounded-full bg-slate-300" />
@@ -906,21 +925,21 @@ const Enquiries = () => {
                                       setSelectedEnquiryForView(enq);
                                       setViewModalOpen(true);
                                     }}
-                                    className="border-slate-200 hover:bg-slate-100 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                    className="border-slate-200 hover:bg-slate-100 text-slate-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
                                   >
                                     View Profile
                                   </Button>
                                   <Button
                                     variant="outline"
                                     onClick={() => setSelectedEnquiryForAssessment(enq)}
-                                    className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                    className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
                                   >
                                     Assessments
                                   </Button>
                                 </div>
                               </div>
 
-                              <div className="p-6">
+                              <div className="p-4">
                                 <AdmissionJourneyTimeline
                                   enquiry={enq}
                                   stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
@@ -1161,6 +1180,25 @@ const Enquiries = () => {
         }}
         data={selectedEnquiryForContact}
         type="school"
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setEnquiryToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Enquiry"
+        itemType="enquiry"
+        itemInfo={enquiryToDelete ? {
+          'Enquiry ID': enquiryToDelete.enquiryId,
+          'Student Name': enquiryToDelete.studentName,
+          'Parent Name': enquiryToDelete.parentName,
+          'Class': enquiryToDelete.classSeeking,
+        } : {}}
+        isDeleting={isDeleting}
       />
 
       {/* Edit Enquiry Modal */}
