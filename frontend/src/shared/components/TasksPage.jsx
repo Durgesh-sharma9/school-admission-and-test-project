@@ -88,6 +88,7 @@ const CalendarPicker = ({
   const handleDayClick = (day) => {
     const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     setSelectedDate(dStr);
+    setCalendarOpen(false);
     if (onSelectComplete) onSelectComplete();
   };
 
@@ -124,6 +125,10 @@ const CalendarPicker = ({
           const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const isSelected = selectedDate === dStr;
           const { hasOverdue, hasPending, hasCompleted } = getDayTaskIndicators(day);
+          
+          const today = new Date();
+          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+          const isToday = dStr === todayStr;
 
           return (
             <button
@@ -131,16 +136,20 @@ const CalendarPicker = ({
               key={day}
               onClick={() => handleDayClick(day)}
               className={`h-9 w-full rounded-lg flex flex-col justify-between items-center py-1 transition-all text-xs font-bold relative cursor-pointer ${
-                isSelected ? 'bg-indigo-650 text-white shadow-xs' : 'hover:bg-slate-200/50 text-slate-700'
+                isSelected 
+                  ? 'bg-indigo-600 text-white border-2 border-indigo-600 shadow-md' 
+                  : isToday 
+                  ? 'border-2 border-blue-400 text-slate-700 hover:bg-slate-200/50'
+                  : 'hover:bg-slate-200/50 text-slate-700'
               }`}
             >
               <span>{day}</span>
               
               {/* Colored indicators row */}
               <div className="flex gap-0.5 justify-center items-center h-1.5 w-full">
-                {hasOverdue && <span className="h-1.5 w-1.5 bg-red-500 rounded-full" title="Overdue tasks" />}
-                {hasPending && <span className="h-1.5 w-1.5 bg-blue-500 rounded-full" title="Pending tasks" />}
-                {hasCompleted && <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full" title="Completed tasks" />}
+                {hasOverdue && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-red-500'}`} title="Overdue tasks" />}
+                {hasPending && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-blue-500'}`} title="Pending tasks" />}
+                {hasCompleted && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-emerald-500'}`} title="Completed tasks" />}
               </div>
             </button>
           );
@@ -870,7 +879,7 @@ const TasksPage = ({ module = 'school' }) => {
             title="Change Date"
           >
             <Calendar className="h-3.5 w-3.5" />
-            <span>Change Date</span>
+            <span>{selectedDate ? new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Change Date'}</span>
           </button>
           <button
             onClick={() => fetchData(true)}
