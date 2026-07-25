@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
+import Button from '../../../shared/components/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../school/contexts/AuthContext';
 import api from '../../school/services/schoolApi';
 import Button from '../../../shared/components/Button';
@@ -92,6 +92,18 @@ const ThankYouCmsPage = () => {
   const [saving, setSaving] = useState(false);
   const [uploadingBrochure, setUploadingBrochure] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const handleResize = () => {
+      const availableHeight = window.innerHeight - 150;
+      const calculatedScale = Math.min(1, Math.max(0.48, availableHeight / 500));
+      setScale(calculatedScale);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // File Upload Handlers
   const handleFileUpload = async (e, type) => {
@@ -226,22 +238,25 @@ const ThankYouCmsPage = () => {
     }
   };
 
+  const phoneWidth = 280;
+  const phoneHeight = 495;
+
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-4 text-left">
       <div>
-        <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Enquiry Banner Settings</h2>
-        <p className="text-slate-500 text-xs mt-1">
+        <h2 className="text-lg font-black text-slate-900 tracking-tight">Enquiry Banner Settings</h2>
+        <p className="text-slate-500 text-xs mt-0.5">
           Configure real-time brochures and updates parents receive instantly upon submitting registration applications.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
-        {/* Left configurations panel - 60% (6 cols of 10) */}
-        <div className="lg:col-span-6 space-y-6">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* Left configurations panel - 65% width */}
+        <div className="w-full lg:w-[65%] space-y-4">
           
           {/* Section 1: Social Links Configuration */}
-          <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <LinkIcon className="h-4 w-4 text-indigo-500" />
                 Follow Us Links ({socialLinks.length}/4)
@@ -250,24 +265,24 @@ const ThankYouCmsPage = () => {
                 type="button"
                 onClick={handleAddSocial}
                 disabled={socialLinks.length >= 4}
-                className="inline-flex items-center px-2.5 py-1 text-[10px] font-bold bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="h-3 w-3 mr-1" />
                 Add Link
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {socialLinks.map((link, idx) => (
                 <div key={idx} className="flex gap-2 items-center">
-                  <div className="flex items-center justify-center h-9 w-9 bg-slate-50 rounded-xl text-slate-500 border border-slate-100 flex-shrink-0">
-                    {getPlatformIcon(link.platform, "h-4.5 w-4.5")}
+                  <div className="flex items-center justify-center h-8 w-8 bg-slate-50 rounded-lg text-slate-500 border border-slate-100 flex-shrink-0">
+                    {getPlatformIcon(link.platform, "h-4 w-4")}
                   </div>
 
                   <select
                     value={link.platform}
                     onChange={(e) => handleUpdateSocial(idx, 'platform', e.target.value)}
-                    className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   >
                     {['Instagram', 'Facebook', 'YouTube', 'WhatsApp', 'LinkedIn', 'X (Twitter)', 'Telegram', 'College Website', 'Other'].map(p => (
                       <option key={p} value={p}>{p}</option>
@@ -279,13 +294,13 @@ const ThankYouCmsPage = () => {
                     value={link.url}
                     onChange={(e) => handleUpdateSocial(idx, 'url', e.target.value)}
                     placeholder="https://yoursocial.com/url"
-                    className="flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="flex-1 rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   />
 
                   <button
                     type="button"
                     onClick={() => handleDeleteSocial(idx)}
-                    className="p-2 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 hover:bg-rose-100/50 transition-colors flex-shrink-0"
+                    className="p-1.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 hover:bg-rose-100/50 transition-colors flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -293,7 +308,7 @@ const ThankYouCmsPage = () => {
               ))}
 
               {socialLinks.length === 0 && (
-                <div className="py-4 text-center text-xs text-slate-450 border border-dashed border-slate-200 rounded-xl">
+                <div className="py-3 text-center text-xs text-slate-450 border border-dashed border-slate-200 rounded-xl">
                   No social follow links configured. Click "Add Link" to get started.
                 </div>
               )}
@@ -301,23 +316,23 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 2: Brochure Upload */}
-          <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
               <FileText className="h-4 w-4 text-blue-500" />
               Admission Brochure File
             </h4>
 
             {admissionBrochure?.url ? (
-              <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                <div className="flex items-center space-x-3.5 truncate pr-4">
-                  <div className="h-9 w-9 rounded-lg bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0 border border-red-100">
-                    <FileText className="h-5 w-5" />
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
+                <div className="flex items-center space-x-3 truncate pr-4">
+                  <div className="h-8 w-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0 border border-red-100">
+                    <FileText className="h-4.5 w-4.5" />
                   </div>
                   <div className="truncate text-left">
                     <span className="text-xs font-bold text-slate-700 block truncate">
                       {admissionBrochure.filename || 'College Brochure'}
                     </span>
-                    <span className="text-[10px] text-slate-400 block font-semibold uppercase">
+                    <span className="text-[9px] text-slate-400 block font-semibold uppercase">
                       {admissionBrochure.type || 'PDF'} File
                     </span>
                   </div>
@@ -327,26 +342,26 @@ const ThankYouCmsPage = () => {
                     href={admissionBrochure.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2 hover:bg-slate-200/55 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
+                    className="p-1.5 hover:bg-slate-200/55 rounded-lg text-slate-400 hover:text-slate-700 transition-colors"
                   >
-                    <Eye className="h-4.5 w-4.5" />
+                    <Eye className="h-4 w-4" />
                   </a>
                   <button
                     type="button"
                     onClick={() => handleDeleteItem('brochure')}
-                    className="p-2 hover:bg-rose-50 rounded-lg text-rose-500 hover:text-rose-700 transition-colors"
+                    className="p-1.5 hover:bg-rose-50 rounded-lg text-rose-500 hover:text-rose-700 transition-colors"
                   >
-                    <Trash2 className="h-4.5 w-4.5" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all bg-slate-50/40">
-                <Upload className="h-6 w-6 text-slate-400 mb-2" />
+              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all bg-slate-50/40">
+                <Upload className="h-5 w-5 text-slate-400 mb-1.5" />
                 <span className="text-xs font-bold text-slate-655 block">
                   {uploadingBrochure ? 'Uploading File...' : 'Drag & Drop Brochure'}
                 </span>
-                <span className="text-[10px] text-slate-400 mt-1 font-semibold">PDF or Image up to 5MB max size</span>
+                <span className="text-[9px] text-slate-400 mt-0.5 font-semibold">PDF or Image up to 5MB max size</span>
                 <input
                   type="file"
                   accept=".pdf,image/*"
@@ -359,24 +374,24 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 3: Banner Image Upload */}
-          <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
               <ImageIcon className="h-4 w-4 text-emerald-500" />
               Banner Image
             </h4>
 
             {banner ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                  <div className="flex items-center space-x-3.5 truncate pr-4">
-                    <div className="h-9 w-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
-                      <ImageIcon className="h-5 w-5" />
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
+                  <div className="flex items-center space-x-3 truncate pr-4">
+                    <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                      <ImageIcon className="h-4.5 w-4.5" />
                     </div>
                     <div className="truncate text-left">
                       <span className="text-xs font-bold text-slate-700 block truncate">
                         {banner.split('/').pop() || 'Enquiry_Banner_Image.jpg'}
                       </span>
-                      <span className="text-[10px] text-slate-400 block font-semibold uppercase">
+                      <span className="text-[9px] text-slate-400 block font-semibold uppercase">
                         Active Image
                       </span>
                     </div>
@@ -384,7 +399,7 @@ const ThankYouCmsPage = () => {
                   <button
                     type="button"
                     onClick={() => handleDeleteItem('banner')}
-                    className="p-2 hover:bg-rose-50 rounded-lg text-rose-500 hover:text-rose-700 transition-colors shrink-0"
+                    className="p-1.5 hover:bg-rose-50 rounded-lg text-rose-500 hover:text-rose-700 transition-colors shrink-0"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
                   </button>
@@ -392,16 +407,16 @@ const ThankYouCmsPage = () => {
                 <img
                   src={banner}
                   alt="Banner preview"
-                  className="h-32 w-full object-cover rounded-xl border border-slate-200"
+                  className="h-28 w-full object-cover rounded-xl border border-slate-200"
                 />
               </div>
             ) : (
-              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all bg-slate-50/40">
-                <Upload className="h-6 w-6 text-slate-400 mb-2" />
+              <div className="relative border-2 border-dashed border-slate-200 hover:border-indigo-400/80 rounded-xl p-4 flex flex-col items-center justify-center text-center transition-all bg-slate-50/40">
+                <Upload className="h-5 w-5 text-slate-400 mb-1.5" />
                 <span className="text-xs font-bold text-slate-655 block">
                   {uploadingBanner ? 'Uploading Banner...' : 'Drag & Drop Banner Image'}
                 </span>
-                <span className="text-[10px] text-slate-400 mt-1 font-semibold">PNG, JPG, WEBP formats up to 5MB</span>
+                <span className="text-[9px] text-slate-400 mt-0.5 font-semibold">PNG, JPG, WEBP formats up to 5MB</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -414,21 +429,21 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 4: Welcome / Thank You Message Info Card */}
-          <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
               <Sparkles className="h-4 w-4 text-purple-500" />
               Welcome / Success Message Preview
             </h4>
-            <div className="bg-slate-50 border border-slate-150 rounded-xl p-3.5 text-slate-600 text-xs leading-normal text-left">
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-3 text-slate-600 text-xs leading-normal text-left">
               <span className="font-semibold text-slate-700 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Post-submission message description:</span>
               Thank you, <span className="font-bold text-slate-800">John Doe</span>. Your application for admission has been registered successfully. Our team will contact you shortly.
             </div>
           </div>
 
           {/* Action Trigger Save */}
-          <div className="pt-2">
+          <div className="pt-1">
             <Button
-              className="w-full py-3 text-xs font-bold rounded-xl"
+              className="w-full py-2.5 text-xs font-bold rounded-xl"
               onClick={handleSaveCms}
               isLoading={saving}
             >
@@ -437,41 +452,58 @@ const ThankYouCmsPage = () => {
           </div>
         </div>
 
-        {/* Right live mobile mockup preview - 40% (4 cols of 10) */}
-        <div className="lg:col-span-4 flex flex-col items-center sticky top-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Live Parent Preview</span>
+        {/* Right live mobile mockup preview - 35% width, sticky and auto-scaled */}
+        <div className="w-full lg:w-[35%] flex flex-col items-center sticky top-4">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Live Parent Preview</span>
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-250 tracking-wider animate-pulse">
               LIVE
             </span>
           </div>
 
-          <div className="w-[305px] border-[7px] border-slate-800 rounded-[2.2rem] shadow-2xl h-[535px] bg-slate-50 overflow-hidden relative flex flex-col scale-[0.95] sm:scale-100 origin-top">
-            {/* Phone speaker notch */}
-            <div className="absolute top-0 inset-x-0 h-4 bg-slate-800 flex justify-center items-start z-20">
-              <div className="w-16 h-2 bg-black rounded-b-lg animate-in" />
-            </div>
-
-            {/* Browser layout content using true live preview component */}
-            <div className="flex-1 overflow-y-auto pt-5 pb-2 text-xs bg-slate-50 scrollbar-none">
-              <div className="scale-[0.82] origin-top p-1 pb-4">
-                <EnquiryBannerPreview
-                  logo={school?.logo}
-                  name={school?.name}
-                  cms={{
-                    socialLinks,
-                    admissionBrochure,
-                    banner
-                  }}
-                  type="college"
-                  isMock={true}
-                />
+          <div 
+            style={{ 
+              width: `${phoneWidth * scale}px`, 
+              height: `${phoneHeight * scale}px`,
+              transition: 'all 0.15s ease-out' 
+            }} 
+            className="relative flex items-center justify-center overflow-hidden"
+          >
+            <div 
+              style={{ 
+                width: `${phoneWidth}px`, 
+                height: `${phoneHeight}px`, 
+                transform: `scale(${scale})`, 
+                transformOrigin: 'center center' 
+              }} 
+              className="border-[6px] border-slate-800 rounded-[2rem] shadow-xl bg-slate-50 overflow-hidden relative flex flex-col flex-shrink-0"
+            >
+              {/* Phone speaker notch */}
+              <div className="absolute top-0 inset-x-0 h-3.5 bg-slate-800 flex justify-center items-start z-20">
+                <div className="w-12 h-1.5 bg-black rounded-b-md" />
               </div>
-            </div>
 
-            {/* Bottom handle bar */}
-            <div className="h-3.5 bg-slate-800 flex justify-center items-center">
-              <div className="w-20 h-1 bg-slate-600 rounded-full" />
+              {/* Browser layout content using true live preview component without internal scrolling */}
+              <div className="flex-1 overflow-hidden pt-4 pb-1 text-xs bg-slate-50 select-none">
+                <div className="scale-[0.80] origin-top p-0.5 pb-2">
+                  <EnquiryBannerPreview
+                    logo={school?.logo}
+                    name={school?.name}
+                    cms={{
+                      socialLinks,
+                      admissionBrochure,
+                      banner
+                    }}
+                    type="college"
+                    isMock={true}
+                  />
+                </div>
+              </div>
+
+              {/* Bottom handle bar */}
+              <div className="h-3 bg-slate-800 flex justify-center items-center">
+                <div className="w-16 h-0.5 bg-slate-600 rounded-full" />
+              </div>
             </div>
           </div>
         </div>

@@ -112,51 +112,51 @@ const EnquiryBannerPreview = ({
 
   if (type === 'school') {
     return (
-      <div className="w-full bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col text-slate-800 text-center font-sans">
+      <div className={`w-full bg-white ${isMock ? 'rounded-2xl shadow-md border-slate-100' : 'rounded-3xl shadow-xl border-slate-100'} border overflow-hidden flex flex-col text-slate-800 text-center font-sans`}>
         {/* Top school branding block */}
-        <div className="bg-indigo-600 p-6 flex flex-col items-center text-center space-y-2 text-white">
+        <div className={`bg-indigo-600 ${isMock ? 'p-3' : 'p-6'} flex flex-col items-center text-center space-y-1 text-white`}>
           {logo ? (
             <img
               src={logo}
               alt={name || 'School Logo'}
-              className="h-12 w-12 rounded-xl object-cover bg-white p-0.5 mb-1"
+              className={`${isMock ? 'h-8 w-8 rounded-lg mb-0.5' : 'h-12 w-12 rounded-xl mb-1'} object-cover bg-white p-0.5`}
             />
           ) : (
-            <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center font-extrabold text-white text-xl">
+            <div className={`${isMock ? 'h-8 w-8 rounded-lg text-sm' : 'h-12 w-12 rounded-xl text-xl'} bg-white/10 flex items-center justify-center font-extrabold text-white`}>
               {(name || 'S').charAt(0).toUpperCase()}
             </div>
           )}
-          <h3 className="font-bold text-base">{name || 'School Name'}</h3>
+          <h3 className={`font-bold ${isMock ? 'text-xs' : 'text-base'}`}>{name || 'School Name'}</h3>
         </div>
 
         {/* Content body */}
-        <div className="p-6 sm:p-8 space-y-6 text-center overflow-y-auto">
+        <div className={`${isMock ? 'p-3.5 space-y-3.5' : 'p-6 sm:p-8 space-y-6'} text-center overflow-y-auto scrollbar-none`}>
           {/* 1. Success Message */}
-          <div className="space-y-4">
-            <div className="h-14 w-14 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
-              <Sparkles className="h-6 w-6" />
+          <div className={isMock ? 'space-y-2' : 'space-y-4'}>
+            <div className={`${isMock ? 'h-9 w-9' : 'h-14 w-14'} rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm`}>
+              <Sparkles className={isMock ? 'h-4 w-4' : 'h-6 w-6'} />
             </div>
 
-            <div className="space-y-2">
-              <h2 className="text-xl font-black text-slate-800 tracking-tight">
+            <div className={isMock ? 'space-y-0.5' : 'space-y-2'}>
+              <h2 className={`${isMock ? 'text-sm' : 'text-xl'} font-black text-slate-800 tracking-tight`}>
                 Enquiry Submitted!
               </h2>
-              <p className="text-xs text-slate-500 leading-relaxed px-2">
+              <p className={`${isMock ? 'text-[10px]' : 'text-xs'} text-slate-500 leading-relaxed px-1`}>
                 Dear <span className="font-semibold text-slate-700">{parentName}</span>, your admission enquiry for <span className="font-semibold text-slate-700">{studentName}</span> has been saved.
               </p>
             </div>
 
             {/* Enquiry details ID card */}
-            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left">
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-slate-100/50">
-                <span className="text-slate-400 font-semibold uppercase">Registration Status</span>
-                <span className="font-bold text-indigo-650 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-[10px]">
+            <div className={`bg-slate-50 ${isMock ? 'rounded-xl p-2 px-3' : 'rounded-2xl p-4'} border border-slate-100 text-left`}>
+              <div className="flex justify-between items-center text-xs pb-1.5 border-b border-slate-100/50">
+                <span className="text-slate-400 font-semibold uppercase text-[9px]">Registration Status</span>
+                <span className="font-bold text-indigo-650 bg-indigo-50 border border-indigo-100 px-1.5 py-0.2 rounded text-[9px]">
                   New Enquiry
                 </span>
               </div>
-              <div className="flex justify-between items-center text-xs pt-2">
-                <span className="text-slate-400 font-semibold uppercase">Enquiry ID</span>
-                <span className="font-black text-slate-800 tracking-wide">
+              <div className="flex justify-between items-center text-xs pt-1.5">
+                <span className="text-slate-400 font-semibold uppercase text-[9px]">Enquiry ID</span>
+                <span className={`font-black text-slate-800 tracking-wide ${isMock ? 'text-[11px]' : 'text-xs'}`}>
                   {enquiryId}
                 </span>
               </div>
@@ -165,11 +165,11 @@ const EnquiryBannerPreview = ({
 
           {/* 2. Banner Image */}
           {bannerUrl && (
-            <div className="rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+            <div className={`${isMock ? 'rounded-xl' : 'rounded-2xl'} overflow-hidden border border-slate-100 shadow-sm`}>
               <img
                 src={bannerUrl}
                 alt="School Banner"
-                className="w-full h-36 object-cover"
+                className={`w-full ${isMock ? 'h-20' : 'h-36'} object-cover`}
               />
             </div>
           )}
@@ -182,10 +182,10 @@ const EnquiryBannerPreview = ({
               target={isMock ? '_self' : '_blank'}
               rel="noreferrer"
               onClick={(e) => { if (isMock) { e.preventDefault(); toast.success('Mock Brochure download clicked'); } }}
-              className="w-full inline-flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-colors"
+              className={`w-full inline-flex items-center justify-center ${isMock ? 'px-3 py-2 text-[10px] rounded-lg shadow-xs' : 'px-4 py-3 text-xs rounded-xl shadow-md'} bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-colors`}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              Download Admission Brochure ({brochureType === 'pdf' ? 'PDF' : 'Image'})
+              <FileText className={`${isMock ? 'h-3.5 w-3.5 mr-1.5' : 'h-4 w-4 mr-2'}`} />
+              Download Brochure ({brochureType === 'pdf' ? 'PDF' : 'Img'})
             </a>
           )}
 
@@ -197,20 +197,20 @@ const EnquiryBannerPreview = ({
               target={isMock ? '_self' : '_blank'}
               rel="noreferrer"
               onClick={(e) => { if (isMock) { e.preventDefault(); toast.success('Mock Fee Structure download clicked'); } }}
-              className="w-full inline-flex items-center justify-center px-4 py-3 bg-amber-500 hover:bg-amber-605 text-white rounded-xl font-bold text-xs shadow-md transition-colors"
+              className={`w-full inline-flex items-center justify-center ${isMock ? 'px-3 py-2 text-[10px] rounded-lg shadow-xs' : 'px-4 py-3 text-xs rounded-xl shadow-md'} bg-amber-500 hover:bg-amber-605 text-white font-bold transition-colors`}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              Download Fee Structure ({feeType === 'pdf' ? 'PDF' : 'Image'})
+              <FileText className={`${isMock ? 'h-3.5 w-3.5 mr-1.5' : 'h-4 w-4 mr-2'}`} />
+              Download Fee Structure ({feeType === 'pdf' ? 'PDF' : 'Img'})
             </a>
           )}
 
           {/* 5. Follow Us & Social Icons */}
           {socialLinks.length > 0 && (
-            <div className="space-y-3 pt-2">
+            <div className={`${isMock ? 'space-y-1.5 pt-0.5' : 'space-y-3 pt-2'}`}>
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">
                 Stay Connected
               </span>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2">
                 {socialLinks.map((link, lIdx) => (
                   <a
                     key={lIdx}
@@ -218,7 +218,7 @@ const EnquiryBannerPreview = ({
                     target={isMock ? '_self' : '_blank'}
                     rel="noreferrer"
                     onClick={(e) => { if (isMock) { e.preventDefault(); toast.success(`Mock link to ${link.platform} clicked`); } }}
-                    className="p-2.5 bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 rounded-full text-slate-650 hover:text-indigo-600 transition-all shadow-xs"
+                    className={`${isMock ? 'p-1.5' : 'p-2.5'} bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 rounded-full text-slate-650 hover:text-indigo-600 transition-all shadow-xs`}
                     title={link.platform}
                   >
                     {getSocialIconByPlatform(link.platform)}
@@ -229,8 +229,8 @@ const EnquiryBannerPreview = ({
           )}
 
           {/* Actions depending on role */}
-          <div className="pt-4 border-t border-slate-100">
-            <div className="text-[10px] text-slate-400 italic">
+          <div className={`${isMock ? 'pt-2' : 'pt-4'} border-t border-slate-100`}>
+            <div className="text-[9px] text-slate-400 italic">
               You can close this window now. We have sent a confirmation copy to our desk.
             </div>
           </div>
@@ -241,40 +241,40 @@ const EnquiryBannerPreview = ({
 
   // College View Layout
   return (
-    <div className="w-full bg-white rounded-3xl p-8 border border-slate-100 shadow-xl space-y-6 text-slate-800 text-center font-sans">
+    <div className={`w-full bg-white ${isMock ? 'rounded-2xl p-3.5 border border-slate-100 shadow-md space-y-3.5' : 'rounded-3xl p-8 border border-slate-105 shadow-xl space-y-6'} text-slate-800 text-center font-sans`}>
       {/* Animated Check Icon */}
-      <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
-        <CheckCircle2 className="h-8 w-8" />
+      <div className={`${isMock ? 'h-9 w-9' : 'h-16 w-16'} rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-100 shadow-sm`}>
+        <CheckCircle2 className={isMock ? 'h-5.5 w-5.5' : 'h-8 w-8'} />
       </div>
 
       {/* Welcome Headers */}
-      <div className="space-y-2">
-        <h2 className="text-xl font-extrabold text-slate-800">Application Submitted Successfully!</h2>
-        <p className="text-xs text-slate-500 leading-normal">
+      <div className={isMock ? 'space-y-0.5' : 'space-y-2'}>
+        <h2 className={`${isMock ? 'text-sm font-bold' : 'text-xl font-extrabold'} text-slate-800`}>Application Submitted Successfully!</h2>
+        <p className={`${isMock ? 'text-[10px]' : 'text-xs'} text-slate-500 leading-normal`}>
           Thank you, <span className="font-bold text-slate-700">{studentName}</span>. Your application for admission has been registered successfully.
         </p>
       </div>
 
       {/* Application Reference Card */}
-      <div className="bg-slate-50 border border-slate-150 rounded-2xl p-4 text-center">
-        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Your Application ID</span>
-        <span className="text-xl font-mono font-extrabold text-indigo-650 tracking-wide mt-1 block">{enquiryId}</span>
-        <p className="text-[9px] text-slate-400 mt-2">Please quote this ID for counselling updates and verification lookups.</p>
+      <div className={`bg-slate-50 border border-slate-150 ${isMock ? 'rounded-xl p-2 px-3' : 'rounded-2xl p-4'} text-center`}>
+        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Your Application ID</span>
+        <span className={`${isMock ? 'text-sm font-black' : 'text-xl font-extrabold'} font-mono text-indigo-650 tracking-wide mt-0.5 block`}>{enquiryId}</span>
+        <p className="text-[9px] text-slate-450 mt-1">Please quote this ID for counselling updates and verification lookups.</p>
       </div>
 
       {/* Banner image if college banner CMS exists */}
       {bannerUrl && (
-        <div className="rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+        <div className={`${isMock ? 'rounded-xl' : 'rounded-2xl'} overflow-hidden border border-slate-100 shadow-sm`}>
           <img
             src={bannerUrl}
             alt="College Banner"
-            className="w-full h-36 object-cover"
+            className={`w-full ${isMock ? 'h-20' : 'h-36'} object-cover`}
           />
         </div>
       )}
 
       {/* Dynamic Action Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
         {/* Download Brochure (If exists) */}
         {brochureUrl && (
           <a
@@ -282,9 +282,9 @@ const EnquiryBannerPreview = ({
             target={isMock ? '_self' : '_blank'}
             rel="noreferrer"
             onClick={(e) => { if (isMock) { e.preventDefault(); toast.success('Mock Brochure download clicked'); } }}
-            className="py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-xs"
+            className={`py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg ${isMock ? 'text-[10px]' : 'text-xs'} transition-all flex items-center justify-center space-x-1.5 shadow-xs`}
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3.5 w-3.5" />
             <span>Download Brochure</span>
           </a>
         )}
@@ -293,18 +293,18 @@ const EnquiryBannerPreview = ({
         <a
           href="#"
           onClick={(e) => { e.preventDefault(); toast.success('Mock Chat Help clicked'); }}
-          className="py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-250 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-2"
+          className={`py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-250 font-bold rounded-lg ${isMock ? 'text-[10px]' : 'text-xs'} transition-all flex items-center justify-center space-x-1.5`}
         >
-          <MessageSquare className="h-4 w-4" />
+          <MessageSquare className="h-3.5 w-3.5" />
           <span>WhatsApp Admission Help</span>
         </a>
       </div>
 
       {/* Social links */}
       {socialLinks.length > 0 && (
-        <div className="border-t border-slate-100 pt-5 space-y-3">
-          <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Follow Us</h4>
-          <div className="flex items-center justify-center gap-3">
+        <div className={`border-t border-slate-100 ${isMock ? 'pt-2.5 space-y-1.5' : 'pt-5 space-y-3'}`}>
+          <h4 className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Follow Us</h4>
+          <div className="flex items-center justify-center gap-2">
             {socialLinks.map((social, idx) => (
               <a
                 key={idx}
@@ -312,17 +312,17 @@ const EnquiryBannerPreview = ({
                 target={isMock ? '_self' : '_blank'}
                 rel="noreferrer"
                 onClick={(e) => { if (isMock) { e.preventDefault(); toast.success(`Mock link to ${social.platform} clicked`); } }}
-                className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-650 rounded-xl border border-slate-100 transition-colors shadow-2xs"
+                className={`${isMock ? 'p-1.5' : 'p-2'} bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-650 rounded-xl border border-slate-100 transition-colors shadow-2xs`}
                 title={social.platform}
               >
-                {getPlatformIcon(social.platform, "h-5 w-5")}
+                {getPlatformIcon(social.platform, isMock ? "h-4 w-4" : "h-5 w-5")}
               </a>
             ))}
           </div>
         </div>
       )}
 
-      <div className="pt-2 text-[10px] text-slate-400 font-medium">
+      <div className={`${isMock ? 'pt-1.5' : 'pt-2'} text-[9px] text-slate-450 font-semibold`}>
         Powered by {name || 'College Admin'}
       </div>
     </div>
