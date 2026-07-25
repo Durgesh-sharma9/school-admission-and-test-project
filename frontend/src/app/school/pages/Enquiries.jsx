@@ -36,6 +36,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
+import CRMProfileModal from '../../../shared/components/CRMProfileModal';
 
 const Enquiries = () => {
   const { school } = useAuth();
@@ -1210,305 +1211,36 @@ const Enquiries = () => {
         />
       )}
 
-      {/* View Enquiry Details Modal */}
-      {viewModalOpen && selectedEnquiryForView && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-3xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-8 animate-in fade-in-50 duration-200"
-          >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center space-x-2">
-                <Eye className="h-4.5 w-4.5 text-[#6D5DF6]" />
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
-                  Enquiry Details: {selectedEnquiryForView.enquiryId}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2 font-bold text-xs">
-                {/* Edit Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setViewModalOpen(false);
-                    setSelectedEnquiryForEdit(selectedEnquiryForView);
-                    setEditStatus(selectedEnquiryForView.status);
-                    setEditModalOpen(true);
-                  }}
-                  className="border-[#E5E7EB] hover:bg-slate-150 text-slate-705 h-8 px-3 rounded-lg text-xs"
-                >
-                  Edit Enquiry
-                </Button>
-
-                {/* Convert to Registered Button */}
-                {!selectedEnquiryForView.isConvertedToAdmission ? (
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      if (window.confirm("Are you sure you want to convert this enquiry to registered admission?")) {
-                        await handleConvertAdmission(selectedEnquiryForView._id);
-                        setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
-                      }
-                    }}
-                    className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 rounded-lg text-xs"
-                  >
-                    Convert to Registered
-                  </Button>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-250">
-                    <Check className="h-3.5 w-3.5 text-emerald-600" />
-                    Registered
-                  </span>
-                )}
-
-                {/* Close Button */}
-                <button
-                  onClick={() => {
-                    setViewModalOpen(false);
-                    setSelectedEnquiryForView(null);
-                  }}
-                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors ml-1"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto text-left">
-              {/* Category 1: Student Information */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
-                  <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                    Student Information
-                  </h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Student Name</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.studentName || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Gender</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.gender || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Date of Birth</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
-                      {selectedEnquiryForView.dob ? new Date(selectedEnquiryForView.dob).toLocaleDateString() : '—'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Class Seeking</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.classSeeking || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Previous School</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.previousSchool || selectedEnquiryForView.currentSchool || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Previous Class</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.previousClass || selectedEnquiryForView.currentClass || '—'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category 2: Parent / Guardian Information */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
-                  <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
-                    <Users className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                    Parent / Guardian Information
-                  </h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Parent Name</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.parentName || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Mobile Number</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.mobile || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">WhatsApp Number</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.whatsapp || '—'}</span>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <span className="text-slate-400 font-semibold block uppercase">Email Address</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.email || '—'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category 3: Address Information */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
-                  <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
-                    <MapPin className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                    Address Details
-                  </h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">State</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.state || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Locality / Area</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.area || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">City</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.city || '—'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Society / Township</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.society || '—'}</span>
-                  </div>
-                  <div className="sm:col-span-3">
-                    <span className="text-slate-400 font-semibold block uppercase">Full Address</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.fullAddress || '—'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category 4: Other / Metadata */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
-                  <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
-                    <Calendar className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                    Enquiry Metadata & Info
-                  </h4>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Source</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
-                      {selectedEnquiryForView.source === 'Other' && selectedEnquiryForView.sourceOtherSpecify
-                        ? `Other (${selectedEnquiryForView.sourceOtherSpecify})`
-                        : selectedEnquiryForView.source || '—'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Current Status</span>
-                    <div className="mt-0.5">
-                      <span className="inline-flex px-2.5 py-1 text-xs font-bold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100">
-                        {selectedEnquiryForView.status || 'New Enquiry'}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Submission Date</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
-                      {selectedEnquiryForView.saveDate || '—'} ({selectedEnquiryForView.saveTime || '—'})
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Created Date</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
-                      {selectedEnquiryForView.createdAt ? new Date(selectedEnquiryForView.createdAt).toLocaleString() : '—'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Updated Date</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">
-                      {selectedEnquiryForView.updatedAt ? new Date(selectedEnquiryForView.updatedAt).toLocaleString() : '—'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block uppercase">Enquiry ID</span>
-                    <span className="font-bold text-slate-700 text-sm mt-0.5 block">{selectedEnquiryForView.enquiryId || '—'}</span>
-                  </div>
-                  <div className="sm:col-span-3">
-                    <span className="text-slate-400 font-semibold block uppercase">Parent Expectations</span>
-                    <p className="font-semibold text-slate-700 text-sm mt-1 p-3 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed whitespace-pre-wrap">
-                      {selectedEnquiryForView.expectations || 'No expectations provided.'}
-                    </p>
-                  </div>
-                  <div className="sm:col-span-3">
-                    <span className="text-slate-400 font-semibold block uppercase">Notes</span>
-                    <p className="font-semibold text-slate-700 text-sm mt-1 p-3 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed whitespace-pre-wrap">
-                      {selectedEnquiryForView.notes || 'No notes added for this enquiry.'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category 5: Automatically Detected Future/Custom Fields */}
-              {(() => {
-                const knownKeys = ['_id', 'schoolId', 'studentName', 'gender', 'dob', 'classSeeking', 'currentSchool', 'currentClass', 'previousSchool', 'previousClass', 'parentName', 'mobile', 'whatsapp', 'email', 'state', 'city', 'area', 'society', 'fullAddress', 'notes', 'source', 'expectations', 'enquiryId', 'saveDate', 'saveTime', 'status', 'isConvertedToAdmission', 'convertedAt', 'isDeleted', 'createdAt', 'updatedAt', '__v'];
-                const customFields = Object.keys(selectedEnquiryForView).filter(key => !knownKeys.includes(key));
-                if (customFields.length === 0) return null;
-                return (
-                  <div className="space-y-4 pt-2">
-                    <div className="flex items-center space-x-2 pb-2 border-b border-slate-100">
-                      <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                        Custom / Dynamic Fields
-                      </h4>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      {customFields.map(key => (
-                        <div key={key}>
-                          <span className="text-slate-400 font-semibold block uppercase">{key}</span>
-                          <span className="font-bold text-slate-700 text-sm mt-0.5 block text-left">
-                            {typeof selectedEnquiryForView[key] === 'object' 
-                              ? JSON.stringify(selectedEnquiryForView[key]) 
-                              : String(selectedEnquiryForView[key]) || '—'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-              {/* Category 6: Admission Journey CRM Timeline */}
-              <div className="space-y-4 pt-4 border-t border-slate-100">
-                <div className="flex items-center space-x-2 pb-2">
-                  <div className="p-1.5 bg-indigo-50 text-[#6D5DF6] rounded-lg">
-                    <GitCommit className="h-4 w-4" />
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
-                    Journey Timeline Pipeline
-                  </h4>
-                </div>
-                <AdmissionJourneyTimeline
-                  enquiry={selectedEnquiryForView}
-                  stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                  onSaveJourney={async (updatedJourney) => {
-                    await handleSaveJourney(selectedEnquiryForView._id, updatedJourney);
-                    setSelectedEnquiryForView(prev => ({ ...prev, journey: updatedJourney }));
-                  }}
-                  counselorName={school?.name || 'Admin'}
-                />
-              </div>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setViewModalOpen(false);
-                  setSelectedEnquiryForView(null);
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      {/* Reusable Premium CRM Profile Modal */}
+      <CRMProfileModal
+        isOpen={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedEnquiryForView(null);
+        }}
+        data={selectedEnquiryForView}
+        type="school"
+        onEdit={() => {
+          setSelectedEnquiryForEdit(selectedEnquiryForView);
+          setEditStatus(selectedEnquiryForView.status);
+          setEditModalOpen(true);
+        }}
+        onConvert={async () => {
+          if (window.confirm("Are you sure you want to convert this enquiry to registered admission?")) {
+            await handleConvertAdmission(selectedEnquiryForView._id);
+            setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
+          }
+        }}
+        onSaveJourney={async (updatedJourney) => {
+          await handleSaveJourney(selectedEnquiryForView._id, updatedJourney);
+          setSelectedEnquiryForView(prev => ({ ...prev, journey: updatedJourney }));
+        }}
+        onAssessments={() => {
+          setSelectedEnquiryForAssessment(selectedEnquiryForView);
+        }}
+        schoolName={school?.name || 'Admin'}
+        stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+      />
 
       {/* Edit Enquiry Modal */}
       {editModalOpen && selectedEnquiryForEdit && (

@@ -5,6 +5,7 @@ import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import toast from 'react-hot-toast';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
+import CRMProfileModal from '../../../shared/components/CRMProfileModal';
 import {
   Search,
   Filter,
@@ -679,351 +680,31 @@ const Applications = () => {
         </div>
       )}
 
-      {/* ── Center Student Details Modal (Redesigned SaaS Light Theme) ── */}
-      <AnimatePresence>
-        {detailsModalOpen && selectedApp && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setDetailsModalOpen(false)}
-              className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px]"
-            />
-            {/* Centered Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98, y: 10 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-0 z-55 flex items-center justify-center p-4 sm:p-6 md:p-10 pointer-events-none"
-            >
-              <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xl w-full max-w-[950px] max-h-[85vh] flex flex-col text-slate-800 text-left pointer-events-auto overflow-hidden">
-                {/* Sticky Header */}
-                <div className="p-6 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sticky top-0 z-25">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                      <GraduationCap className="h-5 w-5 text-indigo-600" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] uppercase font-extrabold bg-indigo-50 border border-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-lg tracking-wider">
-                          {selectedApp.applicationId}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] uppercase border tracking-wide ${STATUS_COLOR_MAP[STAGE_MAP_TO_STATUS[selectedApp.stage] || 'New']}`}>
-                          {STAGE_MAP_TO_STATUS[selectedApp.stage] || 'New'}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedApp.studentName}</h3>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => {
-                        setDetailsModalOpen(false);
-                        handleOpenContactModal(selectedApp);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-250 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-all text-xs font-bold shadow-xs"
-                    >
-                      <PhoneCall className="h-3.5 w-3.5" />
-                      Contact Applicant
-                    </button>
-                    <button
-                      onClick={() => setDetailsModalOpen(false)}
-                      className="p-2 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-xl transition-colors border border-transparent hover:border-slate-100"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content Panel (Internal scroll only, Light theme) */}
-                <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
-                  {/* Grid Layout of Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    {/* CARD 1: Student Information */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Info className="h-4.5 w-4.5 text-indigo-500" />
-                        Student Information
-                      </h4>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-xs">
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">FULL NAME</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.studentName}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">DATE OF BIRTH</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{new Date(selectedApp.dob).toLocaleDateString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">GENDER</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.gender}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">CATEGORY</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.category || 'General'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">MOBILE NUMBER</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.mobile}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">EMAIL ADDRESS</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block truncate" title={selectedApp.email}>{selectedApp.email}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">NATIONALITY</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.nationality || 'Indian'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">CITY / TOWN</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.city}</span>
-                        </div>
-                      </div>
-                      <div className="text-xs pt-3.5 border-t border-slate-100">
-                        <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px] mb-1">FULL ADDRESS</span>
-                        <span className="font-semibold text-slate-600 leading-normal">{selectedApp.address}</span>
-                      </div>
-                    </div>
-
-                    {/* CARD 2: Course & Admission Details */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Building className="h-4.5 w-4.5 text-indigo-500" />
-                        Course Details
-                      </h4>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-xs">
-                        <div className="col-span-2">
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">DEPARTMENT</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.departmentId?.name || 'N/A'}</span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">SELECTED COURSE</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.courseId?.name || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">SPECIALIZATION</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.specialization || '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">MODE OF STUDY</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.modeOfStudy || 'Regular'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">HOSTEL OPTION</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.hostelRequired ? 'Required' : 'Not Required'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">TRANSPORT OPTION</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.transportRequired ? 'Required' : 'Not Required'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CARD 3: Parent / Guardian Details */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Briefcase className="h-4.5 w-4.5 text-indigo-500" />
-                        Parent Details
-                      </h4>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-xs">
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">FATHER'S NAME</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.fatherName || '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">MOTHER'S NAME</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.motherName || '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">GUARDIAN NAME</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.parentName}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">PARENT MOBILE</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block">{selectedApp.parentMobile}</span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">PARENT EMAIL</span>
-                          <span className="font-bold text-slate-800 text-sm mt-0.5 block truncate" title={selectedApp.parentEmail}>{selectedApp.parentEmail || '—'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CARD 4: Academic Details */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Award className="h-4.5 w-4.5 text-indigo-500" />
-                        Academic Details
-                      </h4>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center">
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">10th Board</span>
-                          <span className="text-base font-extrabold text-slate-850 mt-1 block">{selectedApp.tenthPercentage}%</span>
-                          <span className="text-[9px] text-slate-500 block mt-1 leading-normal truncate">{selectedApp.tenthBoard} ({selectedApp.tenthYear})</span>
-                        </div>
-                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center">
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">12th Board</span>
-                          <span className="text-base font-extrabold text-slate-850 mt-1 block">{selectedApp.twelfthPercentage}%</span>
-                          <span className="text-[9px] text-slate-500 block mt-1 leading-normal truncate">{selectedApp.twelfthBoard} ({selectedApp.twelfthYear})</span>
-                        </div>
-                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center">
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Graduation</span>
-                          <span className="text-base font-extrabold text-slate-850 mt-1 block">
-                            {selectedApp.graduationPercentage ? `${selectedApp.graduationPercentage}%` : 'N/A'}
-                          </span>
-                          <span className="text-[9px] text-slate-500 block mt-1 leading-normal truncate">
-                            {selectedApp.graduationDegree || '-'} ({selectedApp.graduationYear || '-'})
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* CARD 5: Uploaded Documents */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs md:col-span-2">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <FileText className="h-4.5 w-4.5 text-indigo-500" />
-                        Documents
-                      </h4>
-                      {selectedApp.documents.length === 0 ? (
-                        <p className="text-slate-400 text-xs">No documents uploaded by applicant.</p>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {selectedApp.documents.map((doc) => (
-                            <div key={doc._id} className="flex items-center justify-between p-3.5 bg-slate-50/70 rounded-xl border border-slate-100 text-xs">
-                              <div>
-                                <span className="font-bold text-slate-800 block text-xs">{doc.name}</span>
-                                <span className={`inline-block mt-1.5 px-2 py-0.5 rounded font-extrabold text-[8px] uppercase tracking-wide border ${
-                                  doc.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : doc.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-amber-50 text-amber-700 border-amber-100'
-                                }`}>
-                                  {doc.status}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-1.5 shrink-0">
-                                <a
-                                  href={doc.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-indigo-600 font-bold hover:underline hover:text-indigo-500 text-[11px] mr-2"
-                                >
-                                  View File
-                                </a>
-                                <button
-                                  onClick={() => handleDocVerify(doc._id, 'Verified')}
-                                  className="p-2 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 rounded-lg transition-colors border border-transparent hover:border-emerald-200"
-                                  title="Verify Certificate"
-                                >
-                                  <CheckCircle className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDocVerify(doc._id, 'Rejected')}
-                                  className="p-2 hover:bg-rose-100 text-rose-600 hover:text-rose-700 rounded-lg transition-colors border border-transparent hover:border-rose-200"
-                                  title="Reject / Flag Certificate"
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* CARD 6: Status History */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs md:col-span-2">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Clock className="h-4.5 w-4.5 text-indigo-500" />
-                        Status History
-                      </h4>
-                      <div className="space-y-2">
-                        {(() => {
-                          const statusLogs = selectedApp.notes.filter(note => note.note.includes('Status updated to:') || note.note.includes('Stage updated to:'));
-                          if (statusLogs.length === 0) {
-                            return <p className="text-slate-400 text-xs italic">No status updates logged yet.</p>;
-                          }
-                          return statusLogs.map((log, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-xs bg-slate-50 border border-slate-100 p-3 rounded-xl">
-                              <span className="font-semibold text-slate-650">{log.note}</span>
-                              <span className="text-[10px] text-slate-400 font-medium">{new Date(log.date).toLocaleString()}</span>
-                            </div>
-                          ));
-                        })()}
-                      </div>
-                    </div>
-
-                    {/* CARD 7: Application Timeline & Counselor Notes */}
-                    <div className="bg-white border border-slate-200/60 rounded-xl p-6 space-y-4 shadow-xs md:col-span-2">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <MessageCircle className="h-4.5 w-4.5 text-indigo-500" />
-                        Application Timeline & remarks
-                      </h4>
-                      <form onSubmit={handleAddNote} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newNote}
-                          onChange={(e) => setNewNote(e.target.value)}
-                          placeholder="Log follow-up notes, call remarks or candidate feedback..."
-                          className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-450 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
-                        />
-                        <Button type="submit" className="py-2 px-4.5 text-xs font-bold shrink-0">
-                          Add Remark
-                        </Button>
-                      </form>
-
-                      <div className="space-y-3 mt-4">
-                        {(() => {
-                          const customNotes = selectedApp.notes.filter(note => !note.note.includes('Status updated to:') && !note.note.includes('Stage updated to:'));
-                          if (customNotes.length === 0) {
-                            return <p className="text-slate-400 text-xs italic">No counseling follow-up logs yet.</p>;
-                          }
-                          return customNotes.map((note, idx) => (
-                            <div key={idx} className="p-3.5 bg-slate-50/70 border border-slate-100 rounded-xl">
-                              <p className="text-xs text-slate-700 leading-relaxed">{note.note}</p>
-                              <div className="flex justify-between items-center mt-2.5 text-[10px] text-slate-450 font-bold uppercase tracking-wider">
-                                <span>Counselor: {note.counselorName || 'System'}</span>
-                                <span>{new Date(note.date).toLocaleString()}</span>
-                              </div>
-                            </div>
-                          ));
-                        })()}
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Sticky Footer */}
-                <div className="p-5 border-t border-slate-100 bg-white flex items-center justify-between sticky bottom-0 z-25">
-                  {/* Status update select inline inside modal */}
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Status:</span>
-                    <select
-                      value={STAGE_MAP_TO_STATUS[selectedApp.stage] || 'New'}
-                      onChange={(e) => handleStatusChangeDirectly(selectedApp._id, e.target.value)}
-                      className={`px-3 py-1.5 rounded-full font-bold text-[10px] uppercase border cursor-pointer focus:outline-none transition-all shadow-xs ${STATUS_COLOR_MAP[STAGE_MAP_TO_STATUS[selectedApp.stage] || 'New']}`}
-                    >
-                      {STATUS_OPTIONS.map(opt => (
-                        <option key={opt} value={opt} className="bg-white text-slate-800 uppercase font-semibold">
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button
-                    onClick={() => setDetailsModalOpen(false)}
-                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 hover:border-slate-300 transition-all shadow-xs"
-                  >
-                    Close Details
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Center Student Details Modal (Redesigned Reusable CRMProfileModal) */}
+      <CRMProfileModal
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setSelectedApp(null);
+        }}
+        data={selectedApp}
+        type="college"
+        onSaveJourney={async (updatedJourney) => {
+          await handleSaveJourney(selectedApp._id, updatedJourney);
+          setSelectedApp(prev => ({ ...prev, journey: updatedJourney }));
+        }}
+        onDocVerify={handleDocVerify}
+        onAddNote={async (noteText) => {
+          const res = await api.post(`/college/applications/${selectedApp._id}/note`, { note: noteText });
+          if (res.success) {
+            toast.success('Counseling note logged successfully!');
+            setSelectedApp(res.data);
+            fetchApplications();
+          }
+        }}
+        schoolName="Admin"
+        stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+      />
 
       {/* ── Contact Applicant Modal ── */}
       <AnimatePresence>
