@@ -33,7 +33,8 @@ import {
   ChevronDown,
   Info,
   Award,
-  Briefcase
+  Briefcase,
+  GitCommit
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -517,8 +518,7 @@ const Applications = () => {
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)} 
-                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/55 transition-colors cursor-pointer ${
+                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/55 transition-colors ${
                           expandedAppId === app._id ? 'bg-indigo-50/20' : ''
                         }`}
                       >
@@ -526,7 +526,7 @@ const Applications = () => {
                         <td className="py-4 px-6">
                           <div>
                             <p className="font-bold text-slate-850">{app.studentName}</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.mobile}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.parentMobile || app.mobile}</p>
                           </div>
                         </td>
                         <td className="py-4 px-6 font-semibold text-slate-700">
@@ -557,23 +557,42 @@ const Applications = () => {
                           })}
                         </td>
                         <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => handleViewDetails(app._id)}
-                              className="inline-flex items-center space-x-1 px-3 py-2 bg-slate-55 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors border border-slate-100 font-bold"
-                              title="View Full Profile Card"
+                          <div className="flex items-center justify-end gap-2 font-bold">
+                            {/* Timeline Toggle Button */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                                expandedAppId === app._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6]' : ''
+                              }`}
+                              onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
+                              title={expandedAppId === app._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
                             >
-                              <Eye className="h-4 w-4" />
-                              <span className="text-[10px] px-0.5">View</span>
-                            </button>
-                            <button
+                              <GitCommit className="h-4 w-4" />
+                              <span>{expandedAppId === app._id ? "Hide Timeline" : "Timeline"}</span>
+                            </Button>
+
+                            {/* View Button */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                              onClick={() => handleViewDetails(app._id)}
+                              title="View Complete Details"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+
+                            {/* Contact Button */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-emerald-250 text-emerald-705 hover:bg-emerald-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                               onClick={() => handleOpenContactModal(app)}
-                              className="inline-flex items-center space-x-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors border border-emerald-250 font-bold"
                               title="Quick Contact CRM"
                             >
-                              <PhoneCall className="h-4 w-4" />
-                              <span className="text-[10px] px-0.5">Contact</span>
-                            </button>
+                              <PhoneCall className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </td>
                       </tr>

@@ -29,7 +29,8 @@ import {
   Users,
   MapPin,
   Calendar,
-  Sparkles
+  Sparkles,
+  GitCommit
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
@@ -703,7 +704,6 @@ const Enquiries = () => {
                   <th className="px-6 py-4">Student Name</th>
                   <th className="px-6 py-4">Parent Details</th>
                   <th className="px-6 py-4">Class</th>
-                  <th className="px-6 py-4">City</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Date Submited</th>
                   <th className="px-6 py-4 text-center">Actions</th>
@@ -713,8 +713,7 @@ const Enquiries = () => {
                 {enquiries.map((enq) => (
                   <React.Fragment key={enq._id}>
                     <tr 
-                      onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)} 
-                      className={`hover:bg-slate-50/50 transition-colors cursor-pointer ${
+                      className={`hover:bg-slate-50/50 transition-colors ${
                         expandedEnquiryId === enq._id ? 'bg-indigo-50/20' : ''
                       }`}
                     >
@@ -749,7 +748,6 @@ const Enquiries = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-medium">{enq.classSeeking}</td>
-                      <td className="px-6 py-4 font-medium">{enq.city}</td>
                       <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                         {/* Interactive inline status change */}
                         <select
@@ -768,12 +766,26 @@ const Enquiries = () => {
                         <span className="block text-[10px]">{enq.saveTime}</span>
                       </td>
                       <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-1.5">
+                        <div className="flex items-center justify-center gap-1.5 font-bold">
+                          {/* Timeline Toggle Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                              expandedEnquiryId === enq._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6]' : ''
+                            }`}
+                            onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
+                            title={expandedEnquiryId === enq._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
+                          >
+                            <GitCommit className="h-4 w-4" />
+                            <span>{expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}</span>
+                          </Button>
+
                           {/* View Button */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                             onClick={() => {
                               setSelectedEnquiryForView(enq);
                               setViewModalOpen(true);
@@ -787,7 +799,7 @@ const Enquiries = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                             onClick={() => {
                               setSelectedEnquiryForEdit(enq);
                               setEditStatus(enq.status);
@@ -802,7 +814,7 @@ const Enquiries = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-md p-1.5"
+                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                             onClick={() => setSelectedEnquiryForAssessment(enq)}
                             title="Assign/Manage Assessments"
                           >
@@ -814,14 +826,14 @@ const Enquiries = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-md p-1.5"
+                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                               onClick={() => handleConvertAdmission(enq._id)}
                               title="Convert to Registered Admission"
                             >
                               <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
                             </Button>
                           ) : (
-                            <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-md border border-emerald-100/50" title="Admission Confirmed">
+                            <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-lg border border-emerald-100/50 h-8 w-8 justify-center" title="Admission Confirmed">
                               <Check className="h-3.5 w-3.5 text-emerald-600" />
                             </span>
                           )}
@@ -830,7 +842,7 @@ const Enquiries = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-md p-1.5"
+                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
                             onClick={() => handleDeleteEnquiry(enq._id)}
                             title="Delete Enquiry"
                           >
@@ -844,7 +856,7 @@ const Enquiries = () => {
                     <AnimatePresence>
                       {expandedEnquiryId === enq._id && (
                         <tr className="bg-[#F8FAFC]">
-                          <td colSpan={9} className="px-6 py-6 border-b border-[#E5E7EB]">
+                          <td colSpan={8} className="px-6 py-6 border-b border-[#E5E7EB]">
                             <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
                               {/* Top Information Bar / Enquiry Header */}
                               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
