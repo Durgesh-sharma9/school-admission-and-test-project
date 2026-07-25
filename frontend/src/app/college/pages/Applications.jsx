@@ -357,7 +357,7 @@ const Applications = () => {
       </div>
 
       {/* Advanced Filter Section */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl border border-slate-100 p-3.5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {/* Search Term */}
           <div className="space-y-1">
@@ -503,39 +503,39 @@ const Applications = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50">
-                  <th className="py-3.5 px-6">App ID</th>
-                  <th className="py-3.5 px-6">Student</th>
-                  <th className="py-3.5 px-6">Department</th>
-                  <th className="py-3.5 px-6">Course</th>
-                  <th className="py-3.5 px-6">Status</th>
-                  <th className="py-3.5 px-6">Created Date</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
+                  <th className="py-2.5 px-6">App ID</th>
+                  <th className="py-2.5 px-6">Student</th>
+                  <th className="py-2.5 px-6">Department</th>
+                  <th className="py-2.5 px-6">Course</th>
+                  <th className="py-2.5 px-6">Status</th>
+                  <th className="py-2.5 px-6">Created Date</th>
+                  <th className="py-2.5 px-6 text-right w-[220px]">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredApplications.map((app) => {
+              <tbody className="divide-y divide-slate-100">
+                {filteredApplications.map((app, index) => {
                   const currentStatus = STAGE_MAP_TO_STATUS[app.stage] || 'New';
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/55 transition-colors ${
-                          expandedAppId === app._id ? 'bg-indigo-50/20' : ''
+                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/75 transition-colors ${
+                          expandedAppId === app._id ? 'bg-indigo-50/30 font-semibold' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
                         }`}
                       >
-                        <td className="py-4 px-6 font-bold text-indigo-650">{app.applicationId}</td>
-                        <td className="py-4 px-6">
+                        <td className="py-2.5 px-6 font-bold text-indigo-650 whitespace-nowrap">{app.applicationId}</td>
+                        <td className="py-2.5 px-6">
                           <div>
-                            <p className="font-bold text-slate-850">{app.studentName}</p>
+                            <p className="font-semibold text-slate-850">{app.studentName}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.parentMobile || app.mobile}</p>
                           </div>
                         </td>
-                        <td className="py-4 px-6 font-semibold text-slate-700">
+                        <td className="py-2.5 px-6 font-semibold text-slate-700">
                           {app.departmentId?.name || 'N/A'}
                         </td>
-                        <td className="py-4 px-6 font-semibold text-slate-700">
+                        <td className="py-2.5 px-6 font-semibold text-slate-700">
                           {app.courseId?.name || 'N/A'}
                         </td>
-                        <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-2.5 px-6" onClick={(e) => e.stopPropagation()}>
                           {/* Inline status dropdown */}
                           <select
                             value={currentStatus}
@@ -549,26 +549,26 @@ const Applications = () => {
                             ))}
                           </select>
                         </td>
-                        <td className="py-4 px-6 font-semibold text-slate-555">
+                        <td className="py-2.5 px-6 font-semibold text-slate-555">
                           {new Date(app.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric'
                           })}
                         </td>
-                        <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-2.5 px-6 text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-2 font-bold">
                             {/* Timeline Toggle Button */}
                             <Button
                               variant="outline"
                               size="sm"
-                              className={`border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                                expandedAppId === app._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6]' : ''
+                              className={`border-[#E5E7EB] hover:bg-slate-100 text-slate-700 h-10 px-3.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                                expandedAppId === app._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6] hover:bg-indigo-100' : ''
                               }`}
                               onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
                               title={expandedAppId === app._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
                             >
-                              <GitCommit className="h-4 w-4" />
+                              <GitCommit className="h-4 w-4 text-current" />
                               <span>{expandedAppId === app._id ? "Hide Timeline" : "Timeline"}</span>
                             </Button>
 
@@ -576,22 +576,22 @@ const Applications = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                              className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                               onClick={() => handleViewDetails(app._id)}
                               title="View Complete Details"
                             >
-                              <Eye className="h-3.5 w-3.5" />
+                              <Eye className="h-4 w-4" />
                             </Button>
 
                             {/* Contact Button */}
                             <Button
                               variant="outline"
                               size="sm"
-                              className="border-emerald-250 text-emerald-705 hover:bg-emerald-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                              className="border-emerald-250 text-emerald-705 hover:bg-emerald-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                               onClick={() => handleOpenContactModal(app)}
                               title="Quick Contact CRM"
                             >
-                              <PhoneCall className="h-3.5 w-3.5" />
+                              <PhoneCall className="h-4 w-4" />
                             </Button>
                           </div>
                         </td>

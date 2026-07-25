@@ -13,6 +13,7 @@ const AdmissionJourneyTimeline = ({
 }) => {
   const [selectedStageIndex, setSelectedStageIndex] = useState(0);
   const [hoveredStageIndex, setHoveredStageIndex] = useState(null);
+  const [hoveredStageRect, setHoveredStageRect] = useState(null);
 
   // Modal and Editing states
   const [timelineModalOpen, setTimelineModalOpen] = useState(false);
@@ -190,7 +191,7 @@ const AdmissionJourneyTimeline = ({
   ];
 
   return (
-    <div className="space-y-3.5 text-left font-sans">
+    <div className="space-y-3.5 text-left font-sans relative timeline-container-ref">
       {/* Connected Horizontal Timeline Scroller */}
       <div className="overflow-x-auto pb-2.5 scrollbar-thin bg-[#F8FAFC]/55 p-3 rounded-xl border border-[#E5E7EB]">
         <div className="flex items-center w-max py-2 px-1">
@@ -199,7 +200,6 @@ const AdmissionJourneyTimeline = ({
 
             if (isAddNode) {
               const previousCompleted = normalizedJourney[idx - 1]?.completedAt;
-              const isHovered = hoveredStageIndex === idx;
 
               return (
                 <React.Fragment key="add-node">
@@ -221,8 +221,23 @@ const AdmissionJourneyTimeline = ({
                       setModalNotes('');
                       setTimelineModalOpen(true);
                     }}
-                    onMouseEnter={() => setHoveredStageIndex(idx)}
-                    onMouseLeave={() => setHoveredStageIndex(null)}
+                    onMouseEnter={(e) => {
+                      setHoveredStageIndex(idx);
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const parentEl = e.currentTarget.closest('.timeline-container-ref');
+                      if (parentEl) {
+                        const parentRect = parentEl.getBoundingClientRect();
+                        setHoveredStageRect({
+                          top: rect.top - parentRect.top,
+                          left: rect.left - parentRect.left + (rect.width / 2),
+                          idx
+                        });
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredStageIndex(null);
+                      setHoveredStageRect(null);
+                    }}
                     className="flex flex-col items-center shrink-0 cursor-pointer relative transition-transform duration-200 hover:scale-105"
                   >
                     <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#6D5DF6] bg-indigo-50/20 text-[#6D5DF6] flex items-center justify-center font-bold relative hover:bg-indigo-50">
@@ -233,14 +248,6 @@ const AdmissionJourneyTimeline = ({
                     <span className="text-[11px] font-semibold mt-2 block whitespace-nowrap text-slate-500">
                       + Add Stage
                     </span>
-
-                    {/* Tooltip on Hover */}
-                    {isHovered && (
-                      <div className="absolute z-35 bottom-14 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-[10.5px] p-2.5 rounded-lg shadow-xl w-44 pointer-events-none text-center border border-slate-700/60 leading-normal">
-                        <div className="font-extrabold text-[#6D5DF6]">Add Stage</div>
-                        <div className="text-slate-300 mt-0.5 font-medium">Continue Admission Journey</div>
-                      </div>
-                    )}
                   </div>
                 </React.Fragment>
               );
@@ -248,7 +255,6 @@ const AdmissionJourneyTimeline = ({
 
             const status = getStageStatus(stage, idx);
             const isSelected = selectedStageIndex === idx;
-            const isHovered = hoveredStageIndex === idx;
 
             return (
               <React.Fragment key={idx}>
@@ -263,8 +269,23 @@ const AdmissionJourneyTimeline = ({
                 {/* Circle & Label Container */}
                 <div
                   onClick={() => setSelectedStageIndex(idx)}
-                  onMouseEnter={() => setHoveredStageIndex(idx)}
-                  onMouseLeave={() => setHoveredStageIndex(null)}
+                  onMouseEnter={(e) => {
+                    setHoveredStageIndex(idx);
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const parentEl = e.currentTarget.closest('.timeline-container-ref');
+                    if (parentEl) {
+                      const parentRect = parentEl.getBoundingClientRect();
+                      setHoveredStageRect({
+                        top: rect.top - parentRect.top,
+                        left: rect.left - parentRect.left + (rect.width / 2),
+                        idx
+                      });
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredStageIndex(null);
+                    setHoveredStageRect(null);
+                  }}
                   className="flex flex-col items-center shrink-0 cursor-pointer relative transition-transform duration-200"
                 >
                   {/* Circle Node */}
@@ -304,28 +325,54 @@ const AdmissionJourneyTimeline = ({
                   {getFollowUpStatusBadge(stage) && (
                     <div className="mt-1">{getFollowUpStatusBadge(stage)}</div>
                   )}
-
-                  {/* Interactive Tooltip on Hover */}
-                  {isHovered && (
-                    <div className="absolute z-35 bottom-14 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-[10.5px] p-3 rounded-xl shadow-xl w-52 pointer-events-none transition-all duration-200 text-left border border-slate-700/60 leading-normal">
-                      <div className="font-extrabold border-b border-slate-700 pb-1 mb-1.5 flex items-center justify-between">
-                        <span className="truncate">{stage.stage}</span>
-                        <span className="text-[8.5px] bg-[#6D5DF6] text-white px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">{status}</span>
-                      </div>
-                      <div className="space-y-1 text-slate-300 font-medium">
-                        <div>📅 Created: {new Date(stage.createdAt || stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                        {stage.completedAt && <div className="text-emerald-450"> briefs: {new Date(stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
-                        {stage.followUpDate && !stage.completedAt && <div>📞 Follow-up: {new Date(stage.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
-                        {stage.notes && <div className="italic truncate border-t border-slate-800/80 pt-1 mt-1 text-slate-400">"{stage.notes}"</div>}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </React.Fragment>
             );
           })}
         </div>
       </div>
+
+      {/* Non-Clipping Absolute Positioned Tooltip */}
+      {hoveredStageRect && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: '0px', 
+            left: `${hoveredStageRect.left}px`,
+            transform: 'translate(-50%, -105%)',
+            zIndex: 60
+          }}
+          className="bg-slate-900 text-white text-[10.5px] p-3 rounded-xl shadow-xl w-52 pointer-events-none transition-all duration-150 text-left border border-slate-700/60 leading-normal"
+        >
+          {(() => {
+            const stage = displayNodes[hoveredStageRect.idx];
+            if (!stage) return null;
+            if (stage.isAddNode) {
+              return (
+                <>
+                  <div className="font-extrabold text-[#6D5DF6]">Add Stage</div>
+                  <div className="text-slate-300 mt-0.5 font-medium">Continue Admission Journey</div>
+                </>
+              );
+            }
+            const status = getStageStatus(stage, hoveredStageRect.idx);
+            return (
+              <>
+                <div className="font-extrabold border-b border-slate-700 pb-1 mb-1.5 flex items-center justify-between">
+                  <span className="truncate">{stage.stage}</span>
+                  <span className="text-[8.5px] bg-[#6D5DF6] text-white px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">{status}</span>
+                </div>
+                <div className="space-y-1 text-slate-300 font-medium">
+                  <div>📅 Created: {new Date(stage.createdAt || stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  {stage.completedAt && <div className="text-emerald-450">✔ Completed: {new Date(stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
+                  {stage.followUpDate && !stage.completedAt && <div>📞 Follow-up: {new Date(stage.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
+                  {stage.notes && <div className="italic truncate border-t border-slate-800/80 pt-1 mt-1 text-slate-455">"{stage.notes}"</div>}
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Selected Stage Detail Panel */}
       {(() => {

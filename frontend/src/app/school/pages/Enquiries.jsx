@@ -513,7 +513,7 @@ const Enquiries = () => {
       </div>
 
       {/* Advanced Filters Block */}
-      <div className="bg-white rounded-2xl border border-slate-105 p-5 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl border border-slate-105 p-3.5 shadow-xs space-y-3">
         {/* Row 1: Search and Export */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full text-left">
@@ -700,24 +700,24 @@ const Enquiries = () => {
                       className="rounded text-indigo-600 focus:ring-indigo-500/20"
                     />
                   </th>
-                  <th className="px-6 py-4">Enquiry ID</th>
-                  <th className="px-6 py-4">Student Name</th>
-                  <th className="px-6 py-4">Parent Details</th>
-                  <th className="px-6 py-4">Class</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Date Submited</th>
-                  <th className="px-6 py-4 text-center">Actions</th>
+                  <th className="px-6 py-2.5">Enquiry ID</th>
+                  <th className="px-6 py-2.5">Student Name</th>
+                  <th className="px-6 py-2.5">Parent Details</th>
+                  <th className="px-6 py-2.5">Class</th>
+                  <th className="px-6 py-2.5">Status</th>
+                  <th className="px-6 py-2.5">Date Submited</th>
+                  <th className="px-6 py-2.5 text-center w-[360px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                {enquiries.map((enq) => (
+              <tbody className="divide-y divide-slate-100">
+                {enquiries.map((enq, index) => (
                   <React.Fragment key={enq._id}>
                     <tr 
-                      className={`hover:bg-slate-50/50 transition-colors ${
-                        expandedEnquiryId === enq._id ? 'bg-indigo-50/20' : ''
+                      className={`hover:bg-slate-50/75 transition-colors ${
+                        expandedEnquiryId === enq._id ? 'bg-indigo-50/30 font-semibold' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
                       }`}
                     >
-                      <td className="px-6 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-6 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(enq._id)}
@@ -725,30 +725,30 @@ const Enquiries = () => {
                           className="rounded text-indigo-600 focus:ring-indigo-500/20"
                         />
                       </td>
-                      <td className="px-6 py-4 font-bold text-slate-800">{enq.enquiryId}</td>
-                      <td className="px-6 py-4 font-semibold text-slate-800">
-                        {enq.studentName}
-                        <span className="block text-[10px] text-slate-400 font-medium">
+                      <td className="px-6 py-2.5 font-bold text-slate-800 whitespace-nowrap">{enq.enquiryId}</td>
+                      <td className="px-6 py-2.5 text-slate-800">
+                        <div className="font-semibold text-slate-850 leading-normal">{enq.studentName}</div>
+                        <span className="block text-[10px] text-slate-450 font-medium">
                           {enq.gender}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-2.5">
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
                             setViewingParentMobile(enq.mobile);
                           }}
-                          className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline"
+                          className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline leading-normal"
                           title="View Parent & Family History Profile"
                         >
                           {enq.parentName}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-medium block">
+                        <span className="text-[10px] text-slate-450 font-medium block">
                           📞 {enq.mobile}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-medium">{enq.classSeeking}</td>
-                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-6 py-2.5 font-medium text-slate-700">{enq.classSeeking}</td>
+                      <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
                         {/* Interactive inline status change */}
                         <select
                           value={enq.status}
@@ -761,23 +761,23 @@ const Enquiries = () => {
                           <option value="Admission Confirmed">Admission Confirmed</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-xs text-slate-400 font-medium">
+                      <td className="px-6 py-2.5 text-xs text-slate-450 font-medium">
                         {enq.saveDate}
                         <span className="block text-[10px]">{enq.saveTime}</span>
                       </td>
-                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-1.5 font-bold">
+                      <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-2 font-bold">
                           {/* Timeline Toggle Button */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className={`border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                              expandedEnquiryId === enq._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6]' : ''
+                            className={`border-[#E5E7EB] hover:bg-slate-100 text-slate-700 h-10 px-3.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                              expandedEnquiryId === enq._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6] hover:bg-indigo-100' : ''
                             }`}
                             onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
                             title={expandedEnquiryId === enq._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
                           >
-                            <GitCommit className="h-4 w-4" />
+                            <GitCommit className="h-4 w-4 text-current" />
                             <span>{expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}</span>
                           </Button>
 
@@ -785,21 +785,21 @@ const Enquiries = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                             onClick={() => {
                               setSelectedEnquiryForView(enq);
                               setViewModalOpen(true);
                             }}
                             title="View Complete Details"
                           >
-                            <Eye className="h-3.5 w-3.5" />
+                            <Eye className="h-4 w-4" />
                           </Button>
 
                           {/* Edit Button */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                             onClick={() => {
                               setSelectedEnquiryForEdit(enq);
                               setEditStatus(enq.status);
@@ -807,18 +807,18 @@ const Enquiries = () => {
                             }}
                             title="Edit Status"
                           >
-                            <Edit className="h-3.5 w-3.5" />
+                            <Edit className="h-4 w-4" />
                           </Button>
 
                           {/* Assign Assessment Button */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                             onClick={() => setSelectedEnquiryForAssessment(enq)}
                             title="Assign/Manage Assessments"
                           >
-                            <FileQuestion className="h-3.5 w-3.5 text-indigo-500" />
+                            <FileQuestion className="h-4 w-4 text-indigo-500" />
                           </Button>
 
                           {/* Convert to Admission Button */}
@@ -826,15 +826,15 @@ const Enquiries = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                              className="border-emerald-250 text-emerald-700 hover:bg-emerald-50 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                               onClick={() => handleConvertAdmission(enq._id)}
                               title="Convert to Registered Admission"
                             >
-                              <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                              <UserCheck className="h-4 w-4 text-emerald-605" />
                             </Button>
                           ) : (
-                            <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-lg border border-emerald-100/50 h-8 w-8 justify-center" title="Admission Confirmed">
-                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 h-10 w-10 rounded-lg justify-center transition-all" title="Admission Confirmed">
+                              <Check className="h-4.5 w-4.5 text-emerald-600" />
                             </span>
                           )}
 
@@ -842,11 +842,11 @@ const Enquiries = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-lg p-1.5 h-8 w-8 flex items-center justify-center"
+                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                             onClick={() => handleDeleteEnquiry(enq._id)}
                             title="Delete Enquiry"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>
@@ -856,7 +856,7 @@ const Enquiries = () => {
                     <AnimatePresence>
                       {expandedEnquiryId === enq._id && (
                         <tr className="bg-[#F8FAFC]">
-                          <td colSpan={8} className="px-6 py-6 border-b border-[#E5E7EB]">
+                          <td colSpan={8} className="px-6 py-4 border-b border-[#E5E7EB]">
                             <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
                               {/* Top Information Bar / Enquiry Header */}
                               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
