@@ -97,11 +97,47 @@ const Enquiries = () => {
   const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
   const [editStatus, setEditStatus] = useState('');
   const [saving, setSaving] = useState(false);
+  const [activeContactMenuId, setActiveContactMenuId] = useState(null);
 
   // Parent History States
   const [viewingParentMobile, setViewingParentMobile] = useState(null);
   const [parentHistoryData, setParentHistoryData] = useState(null);
   const [parentHistoryLoading, setParentHistoryLoading] = useState(false);
+
+  const formatSubmissionDate = (saveDate, saveTime) => {
+    if (!saveDate) return '—';
+    try {
+      const parts = saveDate.split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        
+        let hour = 0;
+        let minute = 0;
+        if (saveTime) {
+          const timeParts = saveTime.split(':');
+          if (timeParts.length >= 2) {
+            hour = parseInt(timeParts[0], 10);
+            minute = parseInt(timeParts[1], 10);
+          }
+        }
+        
+        const d = new Date(year, month, day, hour, minute);
+        const formattedDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const formattedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return (
+          <>
+            <span className="block font-semibold text-slate-800">{formattedDate}</span>
+            <span className="block text-[10px] text-slate-450 mt-0.5">{formattedTime}</span>
+          </>
+        );
+      }
+      return <span className="block font-semibold text-slate-800">{saveDate} {saveTime || ''}</span>;
+    } catch {
+      return <span className="block font-semibold text-slate-800">{saveDate} {saveTime || ''}</span>;
+    }
+  };
 
   useEffect(() => {
     const fetchParentHistory = async () => {
@@ -706,7 +742,7 @@ const Enquiries = () => {
                   <th className="px-6 py-2.5">Class</th>
                   <th className="px-6 py-2.5">Status</th>
                   <th className="px-6 py-2.5">Date Submited</th>
-                  <th className="px-6 py-2.5 text-center w-[360px]">Actions</th>
+                  <th className="px-6 py-2.5 text-center w-[300px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -748,22 +784,21 @@ const Enquiries = () => {
                         </span>
                       </td>
                       <td className="px-6 py-2.5 font-medium text-slate-700">{enq.classSeeking}</td>
-                      <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
-                        {/* Interactive inline status change */}
+                      <td className="px-6 py-2.5 text-center font-bold" onClick={(e) => e.stopPropagation()}>
+                        {/* Interactive inline status change centered and compact */}
                         <select
                           value={enq.status}
                           onChange={(e) => handleStatusChange(enq._id, e.target.value)}
-                          className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 rounded border-none hover:bg-slate-100 px-1 py-0.5"
+                          className="bg-slate-50 hover:bg-slate-100 text-[11px] font-bold text-slate-705 focus:outline-none rounded-lg border border-slate-200 px-2 py-1 w-28 text-center cursor-pointer appearance-none"
                         >
-                          <option value="New Enquiry">New Enquiry</option>
-                          <option value="Hold">Hold</option>
-                          <option value="Not Interested">Not Interested</option>
-                          <option value="Admission Confirmed">Admission Confirmed</option>
+                          <option value="New Enquiry">NEW</option>
+                          <option value="Hold">HOLD</option>
+                          <option value="Not Interested">REJECTED</option>
+                          <option value="Admission Confirmed">CONFIRMED</option>
                         </select>
                       </td>
-                      <td className="px-6 py-2.5 text-xs text-slate-450 font-medium">
-                        {enq.saveDate}
-                        <span className="block text-[10px]">{enq.saveTime}</span>
+                      <td className="px-6 py-2.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                        {formatSubmissionDate(enq.saveDate, enq.saveTime)}
                       </td>
                       <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-2 font-bold">
@@ -795,20 +830,89 @@ const Enquiries = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
 
-                          {/* Edit Button */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
-                            onClick={() => {
-                              setSelectedEnquiryForEdit(enq);
-                              setEditStatus(enq.status);
-                              setEditModalOpen(true);
-                            }}
-                            title="Edit Status"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          {/* Dedicated Contact Dropdown Popover */}
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all ${
+                                activeContactMenuId === enq._id ? 'bg-indigo-50 border-[#6D5DF6]' : ''
+                              }`}
+                              onClick={() => setActiveContactMenuId(activeContactMenuId === enq._id ? null : enq._id)}
+                              title="Contact Options"
+                            >
+                              <Phone className="h-4 w-4" />
+                            </Button>
+
+                            {activeContactMenuId === enq._id && (
+                              <>
+                                <div className="fixed inset-0 z-40" onClick={() => setActiveContactMenuId(null)} />
+                                <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E5E7EB] rounded-lg shadow-xl py-1.5 z-50 text-left text-xs font-semibold">
+                                  <a
+                                    href={`tel:${enq.mobile}`}
+                                    onClick={() => setActiveContactMenuId(null)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                  >
+                                    <span>📞</span> Call Parent
+                                  </a>
+                                  <a
+                                    href={`https://wa.me/${enq.mobile}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => setActiveContactMenuId(null)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                  >
+                                    <span>💬</span> WhatsApp
+                                  </a>
+                                  {enq.email ? (
+                                    <a
+                                      href={`mailto:${enq.email}`}
+                                      onClick={() => setActiveContactMenuId(null)}
+                                      className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                    >
+                                      <span>✉</span> Email
+                                    </a>
+                                  ) : (
+                                    <span className="flex items-center gap-2 px-3 py-2 text-slate-300 cursor-not-allowed">
+                                      <span>✉</span> Email (N/A)
+                                    </span>
+                                  )}
+                                  <a
+                                    href={`sms:${enq.mobile}`}
+                                    onClick={() => setActiveContactMenuId(null)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                  >
+                                    <span>📱</span> SMS
+                                  </a>
+                                  <div className="border-t border-slate-100 my-1" />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(enq.mobile);
+                                      toast.success('Mobile number copied!');
+                                      setActiveContactMenuId(null);
+                                    }}
+                                    className="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                  >
+                                    <span>📋</span> Copy Mobile
+                                  </button>
+                                  {enq.email && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(enq.email);
+                                        toast.success('Email copied!');
+                                        setActiveContactMenuId(null);
+                                      }}
+                                      className="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
+                                    >
+                                      <span>📋</span> Copy Email
+                                    </button>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
 
                           {/* Assign Assessment Button */}
                           <Button
@@ -821,28 +925,11 @@ const Enquiries = () => {
                             <FileQuestion className="h-4 w-4 text-indigo-500" />
                           </Button>
 
-                          {/* Convert to Admission Button */}
-                          {!enq.isConvertedToAdmission ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-emerald-250 text-emerald-700 hover:bg-emerald-50 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
-                              onClick={() => handleConvertAdmission(enq._id)}
-                              title="Convert to Registered Admission"
-                            >
-                              <UserCheck className="h-4 w-4 text-emerald-605" />
-                            </Button>
-                          ) : (
-                            <span className="inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 h-10 w-10 rounded-lg justify-center transition-all" title="Admission Confirmed">
-                              <Check className="h-4.5 w-4.5 text-emerald-600" />
-                            </span>
-                          )}
-
                           {/* Soft Delete Enquiry Action */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            className="border-rose-100 hover:bg-rose-50 text-rose-655 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
                             onClick={() => handleDeleteEnquiry(enq._id)}
                             title="Delete Enquiry"
                           >
@@ -908,36 +995,11 @@ const Enquiries = () => {
                                   </Button>
                                   <Button
                                     variant="outline"
-                                    onClick={() => {
-                                      setSelectedEnquiryForEdit(enq);
-                                      setEditStatus(enq.status);
-                                      setEditModalOpen(true);
-                                    }}
-                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
-                                  >
-                                    Edit Status
-                                  </Button>
-                                  <Button
-                                    variant="outline"
                                     onClick={() => setSelectedEnquiryForAssessment(enq)}
                                     className="border-indigo-100 hover:bg-indigo-50/50 text-[#6D5DF6] h-8 px-3 text-xs font-bold rounded-lg transition-all"
                                   >
                                     Assessments
                                   </Button>
-                                  {!enq.isConvertedToAdmission ? (
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => handleConvertAdmission(enq._id)}
-                                      className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
-                                    >
-                                      Convert to Registered
-                                    </Button>
-                                  ) : (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-250">
-                                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                                      Registered
-                                    </span>
-                                  )}
                                   <Button
                                     variant="outline"
                                     onClick={() => handleDeleteEnquiry(enq._id)}
@@ -1155,20 +1217,60 @@ const Enquiries = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-3xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-8 animate-in fade-in-50 duration-200"
           >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <Eye className="h-4.5 w-4.5 text-indigo-650" />
-                Enquiry Details: {selectedEnquiryForView.enquiryId}
-              </h3>
-              <button
-                onClick={() => {
-                  setViewModalOpen(false);
-                  setSelectedEnquiryForView(null);
-                }}
-                className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center space-x-2">
+                <Eye className="h-4.5 w-4.5 text-[#6D5DF6]" />
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
+                  Enquiry Details: {selectedEnquiryForView.enquiryId}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2 font-bold text-xs">
+                {/* Edit Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setViewModalOpen(false);
+                    setSelectedEnquiryForEdit(selectedEnquiryForView);
+                    setEditStatus(selectedEnquiryForView.status);
+                    setEditModalOpen(true);
+                  }}
+                  className="border-[#E5E7EB] hover:bg-slate-150 text-slate-705 h-8 px-3 rounded-lg text-xs"
+                >
+                  Edit Enquiry
+                </Button>
+
+                {/* Convert to Registered Button */}
+                {!selectedEnquiryForView.isConvertedToAdmission ? (
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      if (window.confirm("Are you sure you want to convert this enquiry to registered admission?")) {
+                        await handleConvertAdmission(selectedEnquiryForView._id);
+                        setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
+                      }
+                    }}
+                    className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 rounded-lg text-xs"
+                  >
+                    Convert to Registered
+                  </Button>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-250">
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    Registered
+                  </span>
+                )}
+
+                {/* Close Button */}
+                <button
+                  onClick={() => {
+                    setViewModalOpen(false);
+                    setSelectedEnquiryForView(null);
+                  }}
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors ml-1"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto text-left">
@@ -1370,6 +1472,26 @@ const Enquiries = () => {
                   </div>
                 );
               })()}
+              {/* Category 6: Admission Journey CRM Timeline */}
+              <div className="space-y-4 pt-4 border-t border-slate-100">
+                <div className="flex items-center space-x-2 pb-2">
+                  <div className="p-1.5 bg-indigo-50 text-[#6D5DF6] rounded-lg">
+                    <GitCommit className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-800 tracking-wide uppercase">
+                    Journey Timeline Pipeline
+                  </h4>
+                </div>
+                <AdmissionJourneyTimeline
+                  enquiry={selectedEnquiryForView}
+                  stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                  onSaveJourney={async (updatedJourney) => {
+                    await handleSaveJourney(selectedEnquiryForView._id, updatedJourney);
+                    setSelectedEnquiryForView(prev => ({ ...prev, journey: updatedJourney }));
+                  }}
+                  counselorName={school?.name || 'Admin'}
+                />
+              </div>
             </div>
 
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
