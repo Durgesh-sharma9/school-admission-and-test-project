@@ -6,6 +6,7 @@ import Button from '../../../shared/components/Button';
 import toast from 'react-hot-toast';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import CRMProfileModal from '../../../shared/components/CRMProfileModal';
+import ContactModal from '../../../shared/components/ContactModal';
 import {
   Search,
   Filter,
@@ -706,183 +707,16 @@ const Applications = () => {
         stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
       />
 
-      {/* ── Contact Applicant Modal ── */}
-      <AnimatePresence>
-        {contactModalOpen && contactApp && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setContactModalOpen(false)}
-              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-            />
-            {/* Centered Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-0 z-55 flex items-center justify-center p-4"
-            >
-              <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col text-left">
-                {/* Modal Header */}
-                <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-gradient-to-r from-slate-50 to-white">
-                  <div>
-                    <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-xl bg-emerald-100 flex items-center justify-center">
-                        <PhoneCall className="h-4 w-4 text-emerald-600" />
-                      </div>
-                      Contact Applicant
-                    </h3>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                      <span>
-                        <span className="font-bold text-slate-700">{contactApp.studentName}</span>
-                      </span>
-                      <span className="h-1 w-1 rounded-full bg-slate-300 inline-block" />
-                      <span className="font-semibold text-indigo-600">{contactApp.applicationId}</span>
-                      <span className="h-1 w-1 rounded-full bg-slate-300 inline-block" />
-                      <span>{contactApp.courseId?.name || 'N/A'}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setContactModalOpen(false)}
-                    className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-100"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-
-                {/* Applicant Info Summary */}
-                <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/50">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold mb-0.5">Student Mobile</p>
-                      <p className="font-semibold text-slate-700">{contactApp.mobile || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold mb-0.5">Parent Mobile</p>
-                      <p className="font-semibold text-slate-700">{contactApp.parentMobile || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold mb-0.5">Email</p>
-                      <p className="font-semibold text-slate-700 truncate">{contactApp.email || contactApp.parentEmail || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 uppercase font-bold mb-0.5">Current Status</p>
-                      <span className="px-2 py-0.5 rounded-full font-bold text-[9px] bg-indigo-50 text-indigo-600 uppercase tracking-wide">
-                        {STAGE_MAP_TO_STATUS[contactApp.stage] || 'New'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Action Cards */}
-                <div className="px-6 py-6 overflow-y-auto">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-4">Quick Contact Actions</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                    {/* 📞 Call Student */}
-                    <a
-                      href={contactApp.mobile ? `tel:${contactApp.mobile}` : '#'}
-                      onClick={(e) => { if (!contactApp.mobile) { e.preventDefault(); toast.error('Student mobile number not available'); } }}
-                      className="group flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 rounded-xl bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center shrink-0 transition-colors">
-                        <Phone className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">Call Student</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{contactApp.mobile || 'No number'}</p>
-                      </div>
-                    </a>
-
-                    {/* 📞 Call Parent */}
-                    <a
-                      href={contactApp.parentMobile ? `tel:${contactApp.parentMobile}` : '#'}
-                      onClick={(e) => { if (!contactApp.parentMobile) { e.preventDefault(); toast.error('Parent mobile number not available'); } }}
-                      className="group flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white hover:bg-violet-50 hover:border-violet-300 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 rounded-xl bg-violet-100 group-hover:bg-violet-200 flex items-center justify-center shrink-0 transition-colors">
-                        <Users className="h-5 w-5 text-violet-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-violet-700 transition-colors">Call Parent</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{contactApp.parentName ? `${contactApp.parentName} — ` : ''}{contactApp.parentMobile || 'No number'}</p>
-                      </div>
-                    </a>
-
-                    {/* 💬 WhatsApp Student */}
-                    <a
-                      href={contactApp.mobile ? `https://wa.me/${formatWhatsApp(contactApp.mobile)}` : '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => { if (!contactApp.mobile) { e.preventDefault(); toast.error('Student mobile number not available'); } }}
-                      className="group flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white hover:bg-green-50 hover:border-green-300 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 rounded-xl bg-green-100 group-hover:bg-green-200 flex items-center justify-center shrink-0 transition-colors">
-                        <MessageCircle className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-green-700 transition-colors">WhatsApp Student</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{contactApp.mobile || 'No number'}</p>
-                      </div>
-                    </a>
-
-                    {/* 💬 WhatsApp Parent */}
-                    <a
-                      href={contactApp.parentMobile ? `https://wa.me/${formatWhatsApp(contactApp.parentMobile)}` : '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => { if (!contactApp.parentMobile) { e.preventDefault(); toast.error('Parent mobile number not available'); } }}
-                      className="group flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 rounded-xl bg-emerald-100 group-hover:bg-emerald-200 flex items-center justify-center shrink-0 transition-colors">
-                        <MessageCircle className="h-5 w-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">WhatsApp Parent</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{contactApp.parentName ? `${contactApp.parentName} — ` : ''}{contactApp.parentMobile || 'No number'}</p>
-                      </div>
-                    </a>
-
-                    {/* 📧 Send Email Student */}
-                    <a
-                      href={`mailto:${contactApp.email || contactApp.parentEmail || ''}`}
-                      onClick={(e) => {
-                        if (!contactApp.email && !contactApp.parentEmail) {
-                          e.preventDefault();
-                          toast.error('No email address available');
-                        }
-                      }}
-                      className="group sm:col-span-2 flex items-center gap-4 p-4 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50 hover:border-amber-300 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 rounded-xl bg-amber-100 group-hover:bg-amber-200 flex items-center justify-center shrink-0 transition-colors">
-                        <Mail className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 group-hover:text-amber-700 transition-colors">Email Student</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{contactApp.email || contactApp.parentEmail || 'No email'}</p>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Modal Footer */}
-                <div className="px-6 py-4 border-t border-slate-100 flex justify-end">
-                  <button
-                    onClick={() => setContactModalOpen(false)}
-                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Reusable ContactModal component */}
+      <ContactModal
+        isOpen={contactModalOpen}
+        onClose={() => {
+          setContactModalOpen(false);
+          setContactApp(null);
+        }}
+        data={contactApp}
+        type="college"
+      />
     </div>
   );
 };

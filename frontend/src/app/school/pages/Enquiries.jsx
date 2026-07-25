@@ -37,6 +37,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import CRMProfileModal from '../../../shared/components/CRMProfileModal';
+import ContactModal from '../../../shared/components/ContactModal';
 
 const Enquiries = () => {
   const { school } = useAuth();
@@ -99,7 +100,8 @@ const Enquiries = () => {
   const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
   const [editStatus, setEditStatus] = useState('');
   const [saving, setSaving] = useState(false);
-  const [activeContactMenuId, setActiveContactMenuId] = useState(null);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [selectedEnquiryForContact, setSelectedEnquiryForContact] = useState(null);
 
   // Parent History States
   const [viewingParentMobile, setViewingParentMobile] = useState(null);
@@ -832,89 +834,19 @@ const Enquiries = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
 
-                          {/* Dedicated Contact Dropdown Popover */}
-                          <div className="relative">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className={`border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all ${
-                                activeContactMenuId === enq._id ? 'bg-indigo-50 border-[#6D5DF6]' : ''
-                              }`}
-                              onClick={() => setActiveContactMenuId(activeContactMenuId === enq._id ? null : enq._id)}
-                              title="Contact Options"
-                            >
-                              <Phone className="h-4 w-4" />
-                            </Button>
-
-                            {activeContactMenuId === enq._id && (
-                              <>
-                                <div className="fixed inset-0 z-40" onClick={() => setActiveContactMenuId(null)} />
-                                <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E5E7EB] rounded-lg shadow-xl py-1.5 z-50 text-left text-xs font-semibold">
-                                  <a
-                                    href={`tel:${enq.mobile}`}
-                                    onClick={() => setActiveContactMenuId(null)}
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                  >
-                                    <span>📞</span> Call Parent
-                                  </a>
-                                  <a
-                                    href={`https://wa.me/${enq.mobile}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    onClick={() => setActiveContactMenuId(null)}
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                  >
-                                    <span>💬</span> WhatsApp
-                                  </a>
-                                  {enq.email ? (
-                                    <a
-                                      href={`mailto:${enq.email}`}
-                                      onClick={() => setActiveContactMenuId(null)}
-                                      className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                    >
-                                      <span>✉</span> Email
-                                    </a>
-                                  ) : (
-                                    <span className="flex items-center gap-2 px-3 py-2 text-slate-300 cursor-not-allowed">
-                                      <span>✉</span> Email (N/A)
-                                    </span>
-                                  )}
-                                  <a
-                                    href={`sms:${enq.mobile}`}
-                                    onClick={() => setActiveContactMenuId(null)}
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                  >
-                                    <span>📱</span> SMS
-                                  </a>
-                                  <div className="border-t border-slate-100 my-1" />
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(enq.mobile);
-                                      toast.success('Mobile number copied!');
-                                      setActiveContactMenuId(null);
-                                    }}
-                                    className="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                  >
-                                    <span>📋</span> Copy Mobile
-                                  </button>
-                                  {enq.email && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        navigator.clipboard.writeText(enq.email);
-                                        toast.success('Email copied!');
-                                        setActiveContactMenuId(null);
-                                      }}
-                                      className="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-slate-50 text-slate-705"
-                                    >
-                                      <span>📋</span> Copy Email
-                                    </button>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                          </div>
+                          {/* Contact Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            onClick={() => {
+                              setSelectedEnquiryForContact(enq);
+                              setContactModalOpen(true);
+                            }}
+                            title="Contact Student & Parents"
+                          >
+                            <Phone className="h-4 w-4" />
+                          </Button>
 
                           {/* Assign Assessment Button */}
                           <Button
@@ -1240,6 +1172,17 @@ const Enquiries = () => {
         }}
         schoolName={school?.name || 'Admin'}
         stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+      />
+
+      {/* Shared Reusable ContactModal */}
+      <ContactModal
+        isOpen={contactModalOpen}
+        onClose={() => {
+          setContactModalOpen(false);
+          setSelectedEnquiryForContact(null);
+        }}
+        data={selectedEnquiryForContact}
+        type="school"
       />
 
       {/* Edit Enquiry Modal */}
