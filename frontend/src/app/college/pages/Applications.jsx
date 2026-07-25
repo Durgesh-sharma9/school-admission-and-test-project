@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../school/services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
+import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
 import toast from 'react-hot-toast';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import CRMProfileModal from '../../../shared/components/CRMProfileModal';
@@ -94,6 +95,8 @@ const Applications = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest'); // newest, oldest
+  const [timelineFilter, setTimelineFilter] = useState('');
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   // Details Modal state
   const [selectedApp, setSelectedApp] = useState(null);
@@ -332,6 +335,14 @@ const Applications = () => {
       if (appDate > end) return false;
     }
 
+    // 6. Timeline filter (based on latest journey stage)
+    if (timelineFilter) {
+      const latestStage = app.journey && app.journey.length > 0 
+        ? app.journey[app.journey.length - 1].stage 
+        : null;
+      if (latestStage !== timelineFilter) return false;
+    }
+
     return true;
   }).sort((a, b) => {
     const dateA = new Date(a.createdAt);
@@ -355,126 +366,89 @@ const Applications = () => {
       </div>
 
       {/* Advanced Filter Section */}
-      <div className="bg-white rounded-2xl border-0 shadow-[0_2px_20px_rgb(0,0,0,0.03)] p-5 space-y-4">
-        
-        {/* Row 1: Search and Export */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 w-full text-left">
-            <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-              <Search size={18} />
-            </span>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by ID, name, email, mobile..."
-              className="w-full pl-11 pr-4 py-3 bg-[#f8f9fe] rounded-xl border border-transparent text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white transition-all shadow-inner"
-            />
-          </div>
-          <Button
-            variant="outline"
-            className="flex items-center justify-center gap-2 shrink-0 px-5 py-3 w-full md:w-auto text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50"
-            onClick={handleExportCSV}
-          >
-            Export CSV / Excel
-          </Button>
-        </div>
+      <CollapsibleFilters
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        onExport={handleExportCSV}
+        isExpanded={filtersExpanded}
+        onToggleExpand={() => setFiltersExpanded(!filtersExpanded)}
+        searchPlaceholder="Search by ID, name, email, mobile..."
+        className="border-0 shadow-[0_2px_20px_rgb(0,0,0,0.03)]"
+      >
+        <FilterRow>
+          {/* Status Filter */}
+          <SelectFilter
+            label="Status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: '', label: 'All Statuses' },
+              ...STATUS_OPTIONS.map(opt => ({ value: opt, label: opt }))
+            ]}
+            placeholder="All Statuses"
+          />
 
-        {/* Row 2: Selectors */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-xs">
-          
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
-            >
-              <option value="">All Statuses</option>
-              {STATUS_OPTIONS.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
+          {/* Department Filter */}
+          <SelectFilter
+            label="Department"
+            value={departmentFilter}
+            onChange={setDepartmentFilter}
+            options={[
+              { value: '', label: 'All Departments' },
+              ...uniqueDepts.map(dept => ({ value: dept.id, label: dept.name }))
+            ]}
+            placeholder="All Departments"
+          />
 
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Department</label>
-            <select
-              value={departmentFilter}
-              onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
-            >
-              <option value="">All Departments</option>
-              {uniqueDepts.map(dept => (
-                <option key={dept.id} value={dept.id}>{dept.name}</option>
-              ))}
-            </select>
-          </div>
+          {/* Course Filter */}
+          <SelectFilter
+            label="Course"
+            value={courseFilter}
+            onChange={setCourseFilter}
+            options={[
+              { value: '', label: 'All Courses' },
+              ...uniqueCourses.map(course => ({ value: course.id, label: course.name }))
+            ]}
+            placeholder="All Courses"
+          />
+        </FilterRow>
 
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Course</label>
-            <select
-              value={courseFilter}
-              onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
-            >
-              <option value="">All Courses</option>
-              {uniqueCourses.map(course => (
-                <option key={course.id} value={course.id}>{course.name}</option>
-              ))}
-            </select>
-          </div>
+        <FilterRow>
+          {/* Start Date */}
+          <DateFilter
+            label="Start Date"
+            value={startDate}
+            onChange={setStartDate}
+          />
 
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Start Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-gray-700 font-bold focus:bg-white"
-            />
-          </div>
+          {/* End Date */}
+          <DateFilter
+            label="End Date"
+            value={endDate}
+            onChange={setEndDate}
+          />
 
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">End Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-gray-700 font-bold focus:bg-white"
-            />
-          </div>
+          {/* Sort By */}
+          <SelectFilter
+            label="Sort By"
+            value={sortBy}
+            onChange={setSortBy}
+            options={[
+              { value: 'newest', label: 'Newest first' },
+              { value: 'oldest', label: 'Oldest first' },
+            ]}
+            placeholder="Sort By"
+          />
+        </FilterRow>
 
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
-            >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-6 flex items-end">
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setStatusFilter('');
-                setDepartmentFilter('');
-                setCourseFilter('');
-                setStartDate('');
-                setEndDate('');
-                setSortBy('newest');
-              }}
-              className="text-[11px] font-bold text-purple-600 hover:text-purple-700 hover:underline transition-colors"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        </div>
-      </div>
+        <FilterRow>
+          {/* Timeline Filter */}
+          <TimelineFilter
+            value={timelineFilter}
+            onChange={setTimelineFilter}
+          />
+        </FilterRow>
+      </CollapsibleFilters>
 
       {/* Main Table or Empty State */}
       <div className="bg-white border-0 rounded-3xl shadow-[0_2px_20px_rgb(0,0,0,0.03)] overflow-hidden">

@@ -5,6 +5,7 @@ import Loader from '../../../shared/components/Loader';
 import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
+import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import AdmissionForm from '../components/AdmissionForm';
@@ -57,7 +58,9 @@ const Enquiries = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [timelineFilter, setTimelineFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   // Admission Journey Timeline States
   const [expandedEnquiryId, setExpandedEnquiryId] = useState(null);
@@ -177,6 +180,7 @@ const Enquiries = () => {
           startDate,
           endDate,
           sortBy,
+          timeline: timelineFilter,
         },
       });
       if (response.success) {
@@ -277,11 +281,11 @@ const Enquiries = () => {
 
   useEffect(() => {
     setPage(1); // Reset page on filter/search change
-  }, [search, statusFilter, classFilter, startDate, endDate, sortBy, limit]);
+  }, [search, statusFilter, classFilter, startDate, endDate, sortBy, limit, timelineFilter]);
 
   useEffect(() => {
     fetchEnquiries();
-  }, [page, search, statusFilter, classFilter, startDate, endDate, sortBy, limit]);
+  }, [page, search, statusFilter, classFilter, startDate, endDate, sortBy, limit, timelineFilter]);
 
   // Handle select all rows
   const handleSelectAll = (e) => {
@@ -554,117 +558,99 @@ const Enquiries = () => {
       </div>
 
       {/* Advanced Filters Block */}
-      <div className="bg-white rounded-2xl border border-slate-105 p-3.5 shadow-xs space-y-3">
-        {/* Row 1: Search and Export */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 w-full text-left">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-              <Search size={18} />
-            </span>
-            <input
-              type="text"
-              placeholder="Search by ID, candidate name, parent name, mobile..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all"
-            />
-          </div>
-          <Button
-            variant="outline"
-            className="flex items-center justify-center gap-1.5 shrink-0 px-4 py-2.5 w-full md:w-auto text-xs font-semibold text-slate-700 bg-white"
-            onClick={handleExportCSV}
-          >
-            Export CSV / Excel
-          </Button>
-        </div>
-
-        {/* Row 2: Selectors */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-xs">
+      <CollapsibleFilters
+        searchValue={search}
+        onSearchChange={setSearch}
+        onExport={handleExportCSV}
+        isExpanded={filtersExpanded}
+        onToggleExpand={() => setFiltersExpanded(!filtersExpanded)}
+        searchPlaceholder="Search by ID, candidate name, parent name, mobile..."
+      >
+        <FilterRow>
           {/* Status Filter */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1">Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-2 text-slate-750 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white"
-            >
-              <option value="">All Statuses</option>
-              <option value="New Enquiry">New Enquiry</option>
-              <option value="Hold">On Hold</option>
-              <option value="Not Interested">Not Interested</option>
-              <option value="Admission Confirmed">Admission Confirmed</option>
-            </select>
-          </div>
+          <SelectFilter
+            label="Status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: '', label: 'All Statuses' },
+              { value: 'New Enquiry', label: 'New Enquiry' },
+              { value: 'Hold', label: 'On Hold' },
+              { value: 'Not Interested', label: 'Not Interested' },
+              { value: 'Admission Confirmed', label: 'Admission Confirmed' },
+            ]}
+            placeholder="All Statuses"
+          />
 
           {/* Class Filter */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-455 uppercase mb-1">Class Seeking</label>
-            <select
-              value={classFilter}
-              onChange={(e) => setClassFilter(e.target.value)}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-2 text-slate-750 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white"
-            >
-              <option value="">All Classes</option>
-              {['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map(c => (
-                <option key={c} value={c}>Class {c}</option>
-              ))}
-            </select>
-          </div>
+          <SelectFilter
+            label="Class Seeking"
+            value={classFilter}
+            onChange={setClassFilter}
+            options={[
+              { value: '', label: 'All Classes' },
+              ...['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map(c => ({
+                value: c,
+                label: `Class ${c}`
+              }))
+            ]}
+            placeholder="All Classes"
+          />
 
+          {/* Timeline Filter */}
+          <TimelineFilter
+            value={timelineFilter}
+            onChange={setTimelineFilter}
+          />
+        </FilterRow>
+
+        <FilterRow>
           {/* Start Date */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1">Start Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-700 font-medium focus:bg-white"
-            />
-          </div>
+          <DateFilter
+            label="Start Date"
+            value={startDate}
+            onChange={setStartDate}
+          />
 
           {/* End Date */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1">End Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-700 font-medium focus:bg-white"
-            />
-          </div>
+          <DateFilter
+            label="End Date"
+            value={endDate}
+            onChange={setEndDate}
+          />
 
           {/* Sort By */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1">Sort By</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-2 text-slate-755 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name_asc">Name (A-Z)</option>
-              <option value="name_desc">Name (Z-A)</option>
-              <option value="class">Class Seeking</option>
-            </select>
-          </div>
+          <SelectFilter
+            label="Sort By"
+            value={sortBy}
+            onChange={setSortBy}
+            options={[
+              { value: 'newest', label: 'Newest First' },
+              { value: 'oldest', label: 'Oldest First' },
+              { value: 'name_asc', label: 'Name (A-Z)' },
+              { value: 'name_desc', label: 'Name (Z-A)' },
+              { value: 'class', label: 'Class Seeking' },
+            ]}
+            placeholder="Sort By"
+          />
+        </FilterRow>
 
+        <FilterRow>
           {/* Page Size */}
-          <div className="text-left">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase mb-1">Page Size</label>
-            <select
-              value={limit}
-              onChange={(e) => setLimit(parseInt(e.target.value, 10))}
-              className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-2 text-slate-750 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white"
-            >
-              <option value={5}>5 per page</option>
-              <option value={10}>10 per page</option>
-              <option value={20}>20 per page</option>
-              <option value={50}>50 per page</option>
-            </select>
-          </div>
-        </div>
-      </div>
+          <SelectFilter
+            label="Page Size"
+            value={limit.toString()}
+            onChange={(val) => setLimit(parseInt(val, 10))}
+            options={[
+              { value: '5', label: '5 per page' },
+              { value: '10', label: '10 per page' },
+              { value: '20', label: '20 per page' },
+              { value: '50', label: '50 per page' },
+            ]}
+            placeholder="Page Size"
+          />
+        </FilterRow>
+      </CollapsibleFilters>
 
       {/* Selected Action floating bar */}
       <AnimatePresence>
