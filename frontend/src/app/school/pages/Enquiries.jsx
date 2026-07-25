@@ -30,7 +30,8 @@ import {
   MapPin,
   Calendar,
   Sparkles,
-  GitCommit
+  GitCommit,
+  Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
