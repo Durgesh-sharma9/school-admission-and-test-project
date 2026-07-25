@@ -1,13 +1,60 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../school/contexts/AuthContext';
-import { Menu, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, User, Settings, LogOut, ChevronDown, CheckSquare, ClipboardCheck } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../../school/services/schoolApi';
 
 const CollegeNavbar = ({ toggleSidebar, title }) => {
   const { school, logout } = useAuth();
   const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [pendingTasksCount, setPendingTasksCount] = useState(0);
   const profileRef = useRef(null);
+
+  const fetchPendingTasksCount = async () => {
+    try {
+      const res = await api.get('/college/applications');
+      if (res.success && res.data) {
+        let count = 0;
+        const now = new Date();
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        res.data.forEach(item => {
+          (item.journey || []).forEach(stage => {
+            if (stage.followUpDate) {
+              const isCompleted = !!stage.completedAt || stage.status === 'Completed';
+              const isCancelled = stage.status === 'Cancelled';
+              if (!isCompleted && !isCancelled) {
+                const fDate = new Date(stage.followUpDate);
+                if (fDate <= endOfToday) {
+                  count++;
+                }
+              }
+            }
+          });
+        });
+        setPendingTasksCount(count);
+      }
+    } catch (err) {
+      console.error('Failed to load college pending tasks count:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (school) {
+      fetchPendingTasksCount();
+      const interval = setInterval(() => {
+        fetchPendingTasksCount();
+      }, 30000);
+
+      window.addEventListener('crm-tasks-updated', fetchPendingTasksCount);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('crm-tasks-updated', fetchPendingTasksCount);
+      };
+    }
+  }, [school]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -26,6 +73,9 @@ const CollegeNavbar = ({ toggleSidebar, title }) => {
     }
   };
 
+  // Wait, let's fix the fetchPendingPendingTasksCount typo below in the original code, let's write fetchPendingTasksCount:
+  const fetchPendingPendingTasksCount = fetchPendingTasksCount;
+
   return (
     <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-30">
       {/* Left section */}
@@ -41,6 +91,27 @@ const CollegeNavbar = ({ toggleSidebar, title }) => {
 
       {/* Right section */}
       <div className="flex items-center space-x-4">
+        {/* Tasks Badge */}
+        <Link
+          to="/college/tasks"
+          className="relative p-2 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors shrink-0 group flex items-center"
+        >
+          <ClipboardCheck className="h-5 w-5" />
+          {pendingTasksCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white px-1 leading-none">
+              {pendingTasksCount}
+            </span>
+          )}
+
+          {/* Hover Tooltip */}
+          <div className="absolute right-0 top-10 hidden group-hover:flex flex-col items-center bg-slate-950 text-white text-[10px] rounded-lg py-1.5 px-2.5 shadow-lg border border-slate-800 z-50 pointer-events-none w-36 whitespace-normal leading-tight text-center font-bold">
+            <div>Today's Tasks</div>
+            <div className="text-rose-400 text-[9px] font-extrabold mt-0.5">
+              {pendingTasksCount} Pending Tasks
+            </div>
+          </div>
+        </Link>
+
         {/* User profile dropdown */}
         <div className="relative" ref={profileRef}>
           <button

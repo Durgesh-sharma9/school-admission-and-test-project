@@ -58,6 +58,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+
+    window.addEventListener('crm-tasks-updated', fetchDashboardData);
+    return () => {
+      window.removeEventListener('crm-tasks-updated', fetchDashboardData);
+    };
   }, []);
 
   const totalEnquiries = enquiryStats?.total || 0;

@@ -52,10 +52,40 @@ const Navbar = ({ toggleSidebar, title }) => {
   const [unreadAnnouncementCount, setUnreadAnnouncementCount] = useState(0);
   const [urgentAnnouncement, setUrgentAnnouncement] = useState(null);
   const [selectedAnnouncementDetail, setSelectedAnnouncementDetail] = useState(null);
+  const [pendingTasksCount, setPendingTasksCount] = useState(0);
 
   const profileRef = useRef(null);
   const bellRef = useRef(null);
   const annRef = useRef(null);
+
+  const fetchPendingTasksCount = async () => {
+    try {
+      const res = await api.get('/enquiries', { params: { limit: 10000 } });
+      if (res.success && res.data) {
+        let count = 0;
+        const now = new Date();
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        res.data.forEach(item => {
+          (item.journey || []).forEach(stage => {
+            if (stage.followUpDate) {
+              const isCompleted = !!stage.completedAt || stage.status === 'Completed';
+              const isCancelled = stage.status === 'Cancelled';
+              if (!isCompleted && !isCancelled) {
+                const fDate = new Date(stage.followUpDate);
+                if (fDate <= endOfToday) {
+                  count++;
+                }
+              }
+            }
+          });
+        });
+        setPendingTasksCount(count);
+      }
+    } catch (err) {
+      console.error('Failed to load pending tasks count:', err);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -90,11 +120,19 @@ const Navbar = ({ toggleSidebar, title }) => {
     if (school) {
       fetchNotifications();
       fetchAnnouncements();
+      fetchPendingTasksCount();
       const interval = setInterval(() => {
         fetchNotifications();
         fetchAnnouncements();
+        fetchPendingTasksCount();
       }, 30000);
-      return () => clearInterval(interval);
+
+      window.addEventListener('crm-tasks-updated', fetchPendingTasksCount);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('crm-tasks-updated', fetchPendingTasksCount);
+      };
     }
   }, [school]);
 
@@ -261,6 +299,27 @@ const Navbar = ({ toggleSidebar, title }) => {
               </div>
             )}
           </div>
+
+          {/* Tasks Badge */}
+          <Link
+            to="/tasks"
+            className="relative p-2 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors shrink-0 group flex items-center"
+          >
+            <ClipboardCheck className="h-5 w-5" />
+            {pendingTasksCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-white px-1 leading-none">
+                {pendingTasksCount}
+              </span>
+            )}
+
+            {/* Hover Tooltip */}
+            <div className="absolute right-0 top-10 hidden group-hover:flex flex-col items-center bg-slate-950 text-white text-[10px] rounded-lg py-1.5 px-2.5 shadow-lg border border-slate-800 z-50 pointer-events-none w-36 whitespace-normal leading-tight text-center font-bold">
+              <div>Today's Tasks</div>
+              <div className="text-rose-400 text-[9px] font-extrabold mt-0.5">
+                {pendingTasksCount} Pending Tasks
+              </div>
+            </div>
+          </Link>
 
           <div className="relative" ref={bellRef}>
             <button

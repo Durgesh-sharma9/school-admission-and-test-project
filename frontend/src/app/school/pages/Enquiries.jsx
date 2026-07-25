@@ -89,7 +89,7 @@ const Enquiries = () => {
     }
   };
 
-  
+
   // Communication Modal States
   const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [messageType, setMessageType] = useState('whatsapp'); // whatsapp or email
@@ -126,7 +126,7 @@ const Enquiries = () => {
         const year = parseInt(parts[0], 10);
         const month = parseInt(parts[1], 10) - 1;
         const day = parseInt(parts[2], 10);
-        
+
         let hour = 0;
         let minute = 0;
         if (saveTime) {
@@ -136,7 +136,7 @@ const Enquiries = () => {
             minute = parseInt(timeParts[1], 10);
           }
         }
-        
+
         const d = new Date(year, month, day, hour, minute);
         const formattedDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
         const formattedTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -209,7 +209,7 @@ const Enquiries = () => {
 
   const handleDeleteConfirm = async () => {
     if (!enquiryToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const response = await api.delete(`/enquiries/${enquiryToDelete._id}`);
@@ -408,7 +408,7 @@ const Enquiries = () => {
       toast.error('None of the selected enquiries have valid email addresses.');
       return;
     }
-    
+
     // Draft bulk email with BCC
     const bccList = selectedList.map((e) => e.email).join(',');
     const subject = encodeURIComponent('Admission Follow-up');
@@ -528,15 +528,14 @@ const Enquiries = () => {
                     <td className="px-6 py-4 font-bold text-slate-850">{enq.studentName}</td>
                     <td className="px-6 py-4 text-slate-600">{enq.classSeeking}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                        enq.status === 'Admission Confirmed'
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${enq.status === 'Admission Confirmed'
                           ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
                           : enq.status === 'Hold'
-                          ? 'bg-amber-50 border-amber-100 text-amber-705'
-                          : enq.status === 'Not Interested'
-                          ? 'bg-rose-50 border-rose-100 text-rose-700'
-                          : 'bg-indigo-50 border-indigo-100 text-indigo-700'
-                      }`}>
+                            ? 'bg-amber-50 border-amber-100 text-amber-705'
+                            : enq.status === 'Not Interested'
+                              ? 'bg-rose-50 border-rose-100 text-rose-700'
+                              : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+                        }`}>
                         {enq.status}
                       </span>
                     </td>
@@ -756,12 +755,11 @@ const Enquiries = () => {
               <tbody className="divide-y divide-slate-100">
                 {enquiries.map((enq, index) => (
                   <React.Fragment key={enq._id}>
-                    <tr 
-                      className={`transition-all duration-200 ${
-                        expandedEnquiryId === enq._id 
-                          ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm' 
+                    <tr
+                      className={`transition-all duration-200 ${expandedEnquiryId === enq._id
+                          ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm'
                           : 'hover:bg-slate-50 border-l-4 border-l-transparent'
-                      } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}
+                        } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}
                     >
                       <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
                         <input
@@ -795,18 +793,17 @@ const Enquiries = () => {
                       </td>
                       <td className="px-6 py-2 font-medium text-slate-700 text-xs">{enq.classSeeking}</td>
                       <td className="px-6 py-2 font-bold" onClick={(e) => e.stopPropagation()}>
-                        
+
                         <div className="relative inline-block w-[120px]">
                           <select
                             value={enq.status}
                             onChange={(e) => handleStatusChange(enq._id, e.target.value)}
                             className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
-                              ${
-                                enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
+                              ${enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
                                 enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
-                                enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
-                                enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
-                                'bg-slate-50 text-slate-700 border-slate-200'
+                                  enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
+                                    enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
+                                      'bg-slate-50 text-slate-700 border-slate-200'
                               }
                             `}
                           >
@@ -826,14 +823,13 @@ const Enquiries = () => {
                       </td>
                       <td className="px-6 py-2" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5">
-                          
+
                           {/* USING STANDARD HTML BUTTONS FOR ICONS */}
                           <button
-                            className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${
-                              expandedEnquiryId === enq._id 
-                                ? 'bg-indigo-50 border-indigo-200 text-indigo-600 shadow-xs' 
+                            className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${expandedEnquiryId === enq._id
+                                ? 'bg-indigo-50 border-indigo-200 text-indigo-600 shadow-xs'
                                 : 'bg-white border-slate-200 text-slate-500 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600'
-                            }`}
+                              }`}
                             onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
                             title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
                           >
@@ -886,9 +882,9 @@ const Enquiries = () => {
                       {expandedEnquiryId === enq._id && (
                         <tr className="bg-indigo-50/40">
                           <td colSpan={8} className="px-4 py-4 border-b border-indigo-100">
-                            
+
                             <div className="bg-white border border-indigo-100 rounded-xl shadow-sm overflow-hidden">
-                              
+
                               <div className="bg-gradient-to-r from-indigo-50 to-slate-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100">
                                 <div className="space-y-1 text-left">
                                   <div className="flex flex-wrap items-center gap-2">
@@ -896,13 +892,12 @@ const Enquiries = () => {
                                     <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
                                       {enq.enquiryId}
                                     </span>
-                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border tracking-wider ${
-                                      enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
-                                      enq.status === 'Hold' ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                                      enq.status === 'Not Interested' ? 'bg-rose-50 border-rose-200 text-rose-700' :
-                                      enq.status === 'Admission Confirmed' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
-                                      'bg-slate-50 border-slate-200 text-slate-700'
-                                    }`}>
+                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border tracking-wider ${enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                                        enq.status === 'Hold' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                                          enq.status === 'Not Interested' ? 'bg-rose-50 border-rose-200 text-rose-700' :
+                                            enq.status === 'Admission Confirmed' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                                              'bg-slate-50 border-slate-200 text-slate-700'
+                                      }`}>
                                       {enq.status === 'New Enquiry' ? 'NEW' : enq.status === 'Not Interested' ? 'REJECTED' : enq.status === 'Admission Confirmed' ? 'CONFIRMED' : enq.status.toUpperCase()}
                                     </span>
                                   </div>
@@ -1083,7 +1078,7 @@ const Enquiries = () => {
                           {messageType === 'whatsapp' ? enq.whatsapp || enq.mobile : enq.email || 'No email provided'}
                         </span>
                       </div>
-                      
+
                       {messageType === 'whatsapp' ? (
                         <Button
                           variant="secondary"

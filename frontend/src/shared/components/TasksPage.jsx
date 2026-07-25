@@ -19,6 +19,7 @@ import {
   Download,
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
   Plus,
   Play,
   ArrowUpRight,
@@ -34,6 +35,120 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// --- INLINE CUSTOM CALENDAR PICKER WITH TASK STATUS DOTS ---
+const CalendarPicker = ({
+  rawTasks,
+  selectedDate,
+  setSelectedDate,
+  getLocalDateString,
+  onSelectComplete
+}) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth(); // 0-indexed
+
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  const blanks = Array(firstDayIndex).fill(null);
+  const days = Array.from({ length: totalDays }, (_, i) => i + 1);
+
+  const prevMonth = () => {
+    setCurrentMonth(new Date(year, month - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentMonth(new Date(year, month + 1, 1));
+  };
+
+  const monthYearLabel = currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+  // Scan tasks on a specific date to output indicators
+  const getDayTaskIndicators = (day) => {
+    const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayTasks = rawTasks.filter(task => {
+      return getLocalDateString(task.followUpDate) === dStr;
+    });
+
+    let hasOverdue = false;
+    let hasPending = false;
+    let hasCompleted = false;
+
+    dayTasks.forEach(task => {
+      if (task.status === 'Completed') hasCompleted = true;
+      else if (task.status === 'Overdue') hasOverdue = true;
+      else if (task.status === 'Pending') hasPending = true;
+    });
+
+    return { hasOverdue, hasPending, hasCompleted };
+  };
+
+  const handleDayClick = (day) => {
+    const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    setSelectedDate(dStr);
+    if (onSelectComplete) onSelectComplete();
+  };
+
+  return (
+    <div className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-4 font-sans text-left">
+      {/* Month switcher header */}
+      <div className="flex justify-between items-center pb-2 border-b border-slate-200 mb-3">
+        <button
+          type="button"
+          onClick={prevMonth}
+          className="p-1 hover:bg-slate-200 rounded-lg text-slate-700 font-bold select-none cursor-pointer transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <span className="text-xs font-black text-slate-800 uppercase tracking-wider">{monthYearLabel}</span>
+        <button
+          type="button"
+          onClick={nextMonth}
+          className="p-1 hover:bg-slate-200 rounded-lg text-slate-700 font-bold select-none cursor-pointer transition-colors"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Grid of weekdays */}
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-black text-slate-400 uppercase mb-2">
+        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(w => <span key={w}>{w}</span>)}
+      </div>
+
+      {/* Grid of days */}
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {blanks.map((_, i) => <div key={`b-${i}`} className="h-9" />)}
+        {days.map(day => {
+          const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const isSelected = selectedDate === dStr;
+          const { hasOverdue, hasPending, hasCompleted } = getDayTaskIndicators(day);
+
+          return (
+            <button
+              type="button"
+              key={day}
+              onClick={() => handleDayClick(day)}
+              className={`h-9 w-full rounded-lg flex flex-col justify-between items-center py-1 transition-all text-xs font-bold relative cursor-pointer ${
+                isSelected ? 'bg-indigo-650 text-white shadow-xs' : 'hover:bg-slate-200/50 text-slate-700'
+              }`}
+            >
+              <span>{day}</span>
+              
+              {/* Colored indicators row */}
+              <div className="flex gap-0.5 justify-center items-center h-1.5 w-full">
+                {hasOverdue && <span className="h-1.5 w-1.5 bg-red-500 rounded-full" title="Overdue tasks" />}
+                {hasPending && <span className="h-1.5 w-1.5 bg-blue-500 rounded-full" title="Pending tasks" />}
+                {hasCompleted && <span className="h-1.5 w-1.5 bg-emerald-500 rounded-full" title="Completed tasks" />}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const TasksPage = ({ module = 'school' }) => {
   const navigate = useNavigate();
@@ -53,9 +168,12 @@ const TasksPage = ({ module = 'school' }) => {
   const [dateFilter, setDateFilter] = useState('today'); // today, tomorrow, week, custom, all
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('all'); // all, high, medium, low
   const [typeFilter, setTypeFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all'); // all, pending, completed, overdue
+  const [statusFilter, setStatusFilter] = useState('all'); // default to all - completed tasks must stay visible
+
+  // Custom Selected Date state
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   // Modals State
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
@@ -70,6 +188,16 @@ const TasksPage = ({ module = 'school' }) => {
   // CRM Profile Modal State
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedProfileTask, setSelectedProfileTask] = useState(null);
+
+  // Helper date format YYYY-MM-DD
+  function getLocalDateString(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   // Fetch data function
   const fetchData = async (isManualRefresh = false) => {
@@ -113,14 +241,16 @@ const TasksPage = ({ module = 'school' }) => {
         if (stage.followUpDate) {
           const followUpTime = new Date(stage.followUpDate);
           const isCompleted = !!stage.completedAt || stage.status === 'Completed';
+          // Backend status enum: 'Current', 'Upcoming', 'Completed', 'Cancelled', 'Overdue'
+          // 'Current' and 'Upcoming' are the "pending" states from backend
           const isCancelled = stage.status === 'Cancelled';
           
-          let derivedStatus = 'Pending';
+          let derivedStatus = 'Pending'; // display label
           if (isCompleted) {
             derivedStatus = 'Completed';
           } else if (isCancelled) {
             derivedStatus = 'Cancelled';
-          } else if (followUpTime < startOfToday) {
+          } else if (followUpTime < startOfToday && stage.status !== 'Completed' && stage.status !== 'Cancelled') {
             derivedStatus = 'Overdue';
           }
 
@@ -174,103 +304,72 @@ const TasksPage = ({ module = 'school' }) => {
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const startOfTomorrow = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
+    const endOfTomorrow = new Date(endOfToday.getTime() + 24 * 60 * 60 * 1000);
 
     let todayCount = 0;
-    let callsCount = 0;
-    let followUpsCount = 0;
-    let meetingsCount = 0;
-    let whatsappCount = 0;
-    let emailsCount = 0;
-    let documentsCount = 0;
-    let completedCount = 0;
+    let tomorrowCount = 0;
     let overdueCount = 0;
+    let pendingCount = 0;
+    let completedCount = 0;
+    let totalCount = 0;
 
     rawTasks.forEach((task) => {
       const taskDate = new Date(task.followUpDate);
-      const isToday = taskDate >= startOfToday && taskDate <= endOfToday;
+      totalCount++;
 
       if (task.status === 'Completed') {
         completedCount++;
       } else if (task.status === 'Cancelled') {
-        // Ignored
+        // not counted in pending
       } else {
-        // Pending / Overdue
-        if (isToday) {
-          todayCount++;
-        }
+        pendingCount++;
         if (task.status === 'Overdue') {
           overdueCount++;
+        } else if (taskDate >= startOfToday && taskDate <= endOfToday) {
+          todayCount++;
+        } else if (taskDate >= startOfTomorrow && taskDate <= endOfTomorrow) {
+          tomorrowCount++;
         }
-        
-        // Count total active pending types
-        const stageLower = task.stage.toLowerCase();
-        if (stageLower.includes('call')) callsCount++;
-        if (stageLower.includes('follow-up') || stageLower.includes('followup')) followUpsCount++;
-        if (stageLower.includes('meeting') || stageLower.includes('visit') || stageLower.includes('counsel')) meetingsCount++;
-        if (stageLower.includes('whatsapp')) whatsappCount++;
-        if (stageLower.includes('email')) emailsCount++;
-        if (stageLower.includes('doc')) documentsCount++;
       }
     });
 
-    return {
-      todayCount,
-      overdueCount,
-      callsCount,
-      followUpsCount,
-      meetingsCount,
-      whatsappCount,
-      emailsCount,
-      documentsCount,
-      completedCount
-    };
+    return { todayCount, tomorrowCount, overdueCount, pendingCount, completedCount, totalCount };
   }, [rawTasks]);
 
   // Clicking KPI summary card directly toggles filtration
   const handleKpiClick = (kpiName) => {
     if (activeKpi === kpiName) {
-      // Reset to defaults
       setActiveKpi('all');
       setDateFilter('today');
       setStatusFilter('all');
       setTypeFilter('all');
+      setSelectedDate(null);
     } else {
       setActiveKpi(kpiName);
-      // Apply filters corresponding to clicked KPI
+      setSelectedDate(null);
       if (kpiName === 'today') {
         setDateFilter('today');
+        setStatusFilter('pending');
+        setTypeFilter('all');
+      } else if (kpiName === 'tomorrow') {
+        setDateFilter('tomorrow');
         setStatusFilter('pending');
         setTypeFilter('all');
       } else if (kpiName === 'overdue') {
         setStatusFilter('overdue');
         setDateFilter('all');
         setTypeFilter('all');
-      } else if (kpiName === 'calls') {
-        setTypeFilter('call');
+      } else if (kpiName === 'pending') {
         setStatusFilter('pending');
         setDateFilter('all');
-      } else if (kpiName === 'followups') {
-        setTypeFilter('follow-up');
-        setStatusFilter('pending');
-        setDateFilter('all');
-      } else if (kpiName === 'meetings') {
-        setTypeFilter('meeting');
-        setStatusFilter('pending');
-        setDateFilter('all');
-      } else if (kpiName === 'whatsapp') {
-        setTypeFilter('whatsapp');
-        setStatusFilter('pending');
-        setDateFilter('all');
-      } else if (kpiName === 'emails') {
-        setTypeFilter('email');
-        setStatusFilter('pending');
-        setDateFilter('all');
-      } else if (kpiName === 'documents') {
-        setTypeFilter('document');
-        setStatusFilter('pending');
-        setDateFilter('all');
+        setTypeFilter('all');
       } else if (kpiName === 'completed') {
         setStatusFilter('completed');
+        setDateFilter('all');
+        setTypeFilter('all');
+      } else if (kpiName === 'total') {
+        setStatusFilter('all');
         setDateFilter('all');
         setTypeFilter('all');
       }
@@ -279,14 +378,15 @@ const TasksPage = ({ module = 'school' }) => {
 
   // Compile active task list applying search & filters
   const filteredTasks = useMemo(() => {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const todayStr = getLocalDateString(new Date());
+    const tomorrowStr = getLocalDateString(new Date(Date.now() + 24 * 60 * 60 * 1000));
     
-    const startOfTomorrow = new Date(startOfToday.getTime() + 24 * 60 * 60 * 1000);
-    const endOfTomorrow = new Date(endOfToday.getTime() + 24 * 60 * 60 * 1000);
-
-    const endOfWeek = new Date(endOfToday.getTime() + 7 * 24 * 60 * 60 * 1000);
+    // Find week boundaries
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const distanceToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const mondayStr = getLocalDateString(new Date(today.getTime() + distanceToMon * 24 * 60 * 60 * 1005));
+    const sundayStr = getLocalDateString(new Date(today.getTime() + (distanceToMon + 6) * 24 * 60 * 60 * 1005));
 
     return rawTasks
       .filter((task) => {
@@ -302,32 +402,46 @@ const TasksPage = ({ module = 'school' }) => {
           if (!matchSearch) return false;
         }
 
-        // 2. Date Filter
-        const taskDate = new Date(task.followUpDate);
-        if (dateFilter === 'today') {
-          const isToday = taskDate >= startOfToday && taskDate <= endOfToday;
-          if (!isToday && task.status !== 'Overdue') return false;
-        } else if (dateFilter === 'tomorrow') {
-          const isTomorrow = taskDate >= startOfTomorrow && taskDate <= endOfTomorrow;
-          if (!isTomorrow) return false;
-        } else if (dateFilter === 'week') {
-          const isThisWeek = taskDate >= startOfToday && taskDate <= endOfWeek;
-          if (!isThisWeek && task.status !== 'Overdue') return false;
-        } else if (dateFilter === 'custom') {
-          if (customStartDate) {
-            const limitStart = new Date(customStartDate);
-            limitStart.setHours(0, 0, 0, 0);
-            if (taskDate < limitStart) return false;
+        // 2. Date Filtering
+        if (selectedDate) {
+          const taskDateStr = getLocalDateString(task.followUpDate);
+          if (selectedDate === todayStr) {
+            // Show today's tasks, overdue tasks, AND completed tasks that were due today
+            if (taskDateStr !== todayStr && task.status !== 'Overdue') return false;
+          } else {
+            // Show strictly tasks for the selected date (including completed ones for that date)
+            if (taskDateStr !== selectedDate) return false;
           }
-          if (customEndDate) {
-            const limitEnd = new Date(customEndDate);
-            limitEnd.setHours(23, 59, 59, 999);
-            if (taskDate > limitEnd) return false;
+        } else {
+          // Standard dropdown date filter
+          const taskDate = new Date(task.followUpDate);
+          if (dateFilter === 'today') {
+            const taskDateStr = getLocalDateString(task.followUpDate);
+            // Include: today's tasks + overdue tasks
+            if (taskDateStr !== todayStr && task.status !== 'Overdue') return false;
+          } else if (dateFilter === 'today_only') {
+            const taskDateStr = getLocalDateString(task.followUpDate);
+            // Include ONLY today's tasks — no overdue, no other dates
+            if (taskDateStr !== todayStr) return false;
+          } else if (dateFilter === 'tomorrow') {
+            const taskDateStr = getLocalDateString(task.followUpDate);
+            if (taskDateStr !== tomorrowStr) return false;
+          } else if (dateFilter === 'week') {
+            const taskDateStr = getLocalDateString(task.followUpDate);
+            if ((taskDateStr < mondayStr || taskDateStr > sundayStr) && task.status !== 'Overdue') return false;
+          } else if (dateFilter === 'custom') {
+            if (customStartDate) {
+              const limitStart = new Date(customStartDate);
+              limitStart.setHours(0, 0, 0, 0);
+              if (taskDate < limitStart) return false;
+            }
+            if (customEndDate) {
+              const limitEnd = new Date(customEndDate);
+              limitEnd.setHours(23, 59, 59, 999);
+              if (taskDate > limitEnd) return false;
+            }
           }
         }
-
-        // 3. Priority Filter
-        if (priorityFilter !== 'all' && task.priority.toLowerCase() !== priorityFilter) return false;
 
         // 4. Task Type Filter
         if (typeFilter !== 'all') {
@@ -344,10 +458,14 @@ const TasksPage = ({ module = 'school' }) => {
         }
 
         // 5. Status Filter
-        if (statusFilter !== 'all') {
-          if (statusFilter === 'pending' && task.status !== 'Pending' && task.status !== 'Overdue') return false;
-          if (statusFilter === 'completed' && task.status !== 'Completed') return false;
-          if (statusFilter === 'overdue' && task.status !== 'Overdue') return false;
+        if (statusFilter === 'pending') {
+          if (task.status === 'Completed' || task.status === 'Cancelled') return false;
+        } else if (statusFilter === 'completed') {
+          if (task.status !== 'Completed') return false;
+        } else if (statusFilter === 'cancelled') {
+          if (task.status !== 'Cancelled') return false;
+        } else if (statusFilter === 'overdue') {
+          if (task.status !== 'Overdue') return false;
         }
 
         return true;
@@ -357,15 +475,14 @@ const TasksPage = ({ module = 'school' }) => {
         const getSortWeight = (task) => {
           if (task.status === 'Overdue') return 0;
           
-          const taskDate = new Date(task.followUpDate);
-          const isToday = taskDate >= startOfToday && taskDate <= endOfToday;
+          const taskDate = getLocalDateString(task.followUpDate);
+          const isToday = taskDate === todayStr;
           if (task.status === 'Pending' && isToday) return 1;
 
           if (task.status === 'Completed') {
             if (task.completedAt) {
-              const compDate = new Date(task.completedAt);
-              const compToday = compDate >= startOfToday && compDate <= endOfToday;
-              if (compToday) return 2;
+              const compDateStr = getLocalDateString(task.completedAt);
+              if (compDateStr === todayStr) return 2;
             }
             return 4; // Other completed
           }
@@ -378,7 +495,7 @@ const TasksPage = ({ module = 'school' }) => {
 
         return new Date(a.followUpDate) - new Date(b.followUpDate);
       });
-  }, [rawTasks, search, dateFilter, customStartDate, customEndDate, priorityFilter, typeFilter, statusFilter]);
+  }, [rawTasks, search, dateFilter, customStartDate, customEndDate, typeFilter, statusFilter, selectedDate]);
 
   // Bulk actions handlers
   const handleSelectAll = (e) => {
@@ -436,9 +553,7 @@ const TasksPage = ({ module = 'school' }) => {
       ? `/enquiries/${task.itemId}`
       : `/college/applications/${task.itemId}/stage`;
 
-    const payload = module === 'school'
-      ? { journey: updatedJourney }
-      : { journey: updatedJourney };
+    const payload = { journey: updatedJourney };
 
     // Optimistic UI updates
     setItems((prev) =>
@@ -457,6 +572,9 @@ const TasksPage = ({ module = 'school' }) => {
     if (response.success) {
       setItems((prev) => prev.map((item) => (item._id === task.itemId ? response.data : item)));
     }
+
+    // Trigger Navbar count update live!
+    window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
   };
 
   const handleSaveJourney = async (itemId, updatedJourney) => {
@@ -464,9 +582,7 @@ const TasksPage = ({ module = 'school' }) => {
       ? `/enquiries/${itemId}`
       : `/college/applications/${itemId}/stage`;
 
-    const payload = module === 'school'
-      ? { journey: updatedJourney }
-      : { journey: updatedJourney };
+    const payload = { journey: updatedJourney };
 
     // Optimistic UI updates
     setItems((prev) =>
@@ -492,6 +608,7 @@ const TasksPage = ({ module = 'school' }) => {
           }));
         }
         toast.success('Journey updated successfully');
+        window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
       } else {
         toast.error('Failed to update journey');
       }
@@ -545,6 +662,19 @@ const TasksPage = ({ module = 'school' }) => {
     try {
       await updateTaskDatabase(task, 'Completed', new Date(), task.followUpDate, task.notes);
       toast.success('Task marked completed!', { id: toastId });
+      fetchData();
+    } catch (err) {
+      toast.error('Action failed: ' + err.message, { id: toastId });
+    }
+  };
+
+  // Single Quick Reopen / Undo Complete
+  const handleUndoComplete = async (task) => {
+    const toastId = toast.loading('Reopening task...');
+    try {
+      // Send 'Current' — the correct backend enum value for a pending/active stage
+      await updateTaskDatabase(task, 'Current', null, task.followUpDate, task.notes);
+      toast.success('Task marked pending!', { id: toastId });
       fetchData();
     } catch (err) {
       toast.error('Action failed: ' + err.message, { id: toastId });
@@ -605,7 +735,7 @@ const TasksPage = ({ module = 'school' }) => {
       toast.error('No tasks found to export.');
       return;
     }
-    const headers = ['Task Type', 'Student Name', 'Parent Name', 'Phone', 'Email', 'Reference ID', 'Due Date', 'Priority', 'Notes', 'Created By', 'Status'];
+    const headers = ['Task Type', 'Student Name', 'Parent Name', 'Phone', 'Email', 'Reference ID', 'Due Date', 'Notes', 'Created By', 'Status'];
     const rows = filteredTasks.map((t) => [
       t.stage,
       t.studentName,
@@ -614,7 +744,6 @@ const TasksPage = ({ module = 'school' }) => {
       t.email,
       t.enquiryId,
       new Date(t.followUpDate).toLocaleString(),
-      t.priority,
       t.notes.replace(/,/g, ' '),
       t.createdBy,
       t.status
@@ -673,14 +802,18 @@ const TasksPage = ({ module = 'school' }) => {
     const endOfTomorrow = new Date(endOfToday.getTime() + 24 * 60 * 60 * 1000);
 
     const taskDate = new Date(task.followUpDate);
-    if (taskDate >= startOfToday && taskDate <= endOfToday) {
+    const taskDateStr = getLocalDateString(task.followUpDate);
+    const todayStr = getLocalDateString(now);
+    const tomorrowStr = getLocalDateString(startOfTomorrow);
+
+    if (taskDateStr === todayStr) {
       return {
         text: 'Today',
         classes: 'bg-blue-50 text-blue-700 border-blue-250'
       };
     }
 
-    if (taskDate >= startOfTomorrow && taskDate <= endOfTomorrow) {
+    if (taskDateStr === tomorrowStr) {
       return {
         text: 'Tomorrow',
         classes: 'bg-amber-50 text-amber-700 border-amber-250'
@@ -693,20 +826,52 @@ const TasksPage = ({ module = 'school' }) => {
     };
   };
 
+  // Task type icon helper
+  const getTaskTypeIcon = (stage) => {
+    const s = (stage || '').toLowerCase();
+    if (s.includes('call')) return '📞';
+    if (s.includes('whatsapp')) return '💬';
+    if (s.includes('email')) return '📧';
+    if (s.includes('meeting') || s.includes('visit') || s.includes('counsel')) return '📅';
+    if (s.includes('doc')) return '📄';
+    if (s.includes('follow')) return '📝';
+    if (s.includes('regist') || s.includes('fee')) return '💳';
+    if (s.includes('admiss') || s.includes('confirm')) return '🎓';
+    return '📌';
+  };
+
   return (
-    <div className="space-y-6 text-left font-sans max-w-[1600px] mx-auto px-4 py-2">
+    <div className="space-y-5 text-left font-sans max-w-[1600px] mx-auto px-4 py-2">
+
       {/* 1. PAGE HEADER */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4 mt-2">
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <CheckSquare className="h-5 w-5 text-indigo-600" />
-            Today's CRM Work Queue
+            {selectedDate ? `Tasks for ${new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : "Today's CRM Work Queue"}
+            {selectedDate && (
+              <button
+                onClick={() => setSelectedDate(null)}
+                className="ml-2 text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full flex items-center gap-1 cursor-pointer border border-rose-100"
+                title="Clear Date"
+              >
+                Clear Date <X className="h-3 w-3" />
+              </button>
+            )}
           </h2>
           <p className="text-slate-500 text-xs font-semibold">
             Everything requiring action today in one place.
           </p>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={() => setCalendarOpen(true)}
+            className="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-bold transition-all shadow-md shadow-indigo-650/10 gap-1.5 cursor-pointer"
+            title="Change Date"
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            <span>Change Date</span>
+          </button>
           <button
             onClick={() => fetchData(true)}
             disabled={refreshing}
@@ -727,22 +892,18 @@ const TasksPage = ({ module = 'school' }) => {
         </div>
       </div>
 
-      {/* 2. KPI CARDS (Bigger cards around 72-78px height, softer shadows, clickable) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
+      {/* 2. KPI CARDS — 6 cards only */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { key: 'today', name: "Today's Tasks", val: metrics.todayCount, ring: 'blue', normal: 'bg-blue-50/60 border-blue-200 text-blue-800 hover:bg-blue-100/70', active: 'bg-blue-100/90 border-blue-500 ring-2 ring-blue-500/10 text-blue-900 shadow-xs' },
-          { key: 'overdue', name: 'Overdue', val: metrics.overdueCount, ring: 'red', normal: 'bg-red-50/60 border-red-200 text-red-800 hover:bg-red-100/70 animate-pulse', active: 'bg-red-100/90 border-red-500 ring-2 ring-red-500/10 text-red-900 shadow-xs' },
-          { key: 'calls', name: 'Calls', val: metrics.callsCount, ring: 'sky', normal: 'bg-sky-50/60 border-sky-200 text-sky-800 hover:bg-sky-100/70', active: 'bg-sky-100/90 border-sky-500 ring-2 ring-sky-500/10 text-sky-900 shadow-xs' },
-          { key: 'followups', name: 'Follow Ups', val: metrics.followUpsCount, ring: 'purple', normal: 'bg-purple-50/60 border-purple-200 text-purple-800 hover:bg-purple-100/70', active: 'bg-purple-100/90 border-purple-500 ring-2 ring-purple-500/10 text-purple-900 shadow-xs' },
-          { key: 'meetings', name: 'Meetings', val: metrics.meetingsCount, ring: 'green', normal: 'bg-green-50/60 border-green-200 text-green-800 hover:bg-green-100/70', active: 'bg-green-100/90 border-green-500 ring-2 ring-green-500/10 text-green-900 shadow-xs' },
-          { key: 'whatsapp', name: 'WhatsApp', val: metrics.whatsappCount, ring: 'green', normal: 'bg-emerald-50/60 border-emerald-200 text-emerald-800 hover:bg-emerald-100/70', active: 'bg-emerald-100/90 border-emerald-500 ring-2 ring-emerald-500/10 text-emerald-900 shadow-xs' },
-          { key: 'emails', name: 'Emails', val: metrics.emailsCount, ring: 'indigo', normal: 'bg-indigo-50/60 border-indigo-200 text-indigo-800 hover:bg-indigo-100/70', active: 'bg-indigo-100/90 border-indigo-500 ring-2 ring-indigo-500/10 text-indigo-900 shadow-xs' },
-          { key: 'documents', name: 'Documents', val: metrics.documentsCount, ring: 'orange', normal: 'bg-orange-50/60 border-orange-200 text-orange-850 hover:bg-orange-100/70', active: 'bg-orange-100/90 border-orange-500 ring-2 ring-orange-500/10 text-orange-900 shadow-xs' },
-          { key: 'completed', name: 'Completed', val: metrics.completedCount, ring: 'teal', normal: 'bg-teal-50/60 border-teal-200 text-teal-800 hover:bg-teal-100/70', active: 'bg-teal-100/90 border-teal-500 ring-2 ring-teal-500/10 text-teal-900 shadow-xs' }
+          { key: 'today',     name: "Today",     val: metrics.todayCount,     normal: 'bg-blue-50/60 border-blue-200 text-blue-800 hover:bg-blue-100/70',       active: 'bg-blue-100/90 border-blue-500 ring-2 ring-blue-500/10 text-blue-900 shadow-xs' },
+          { key: 'tomorrow',  name: "Tomorrow",  val: metrics.tomorrowCount,  normal: 'bg-amber-50/60 border-amber-200 text-amber-800 hover:bg-amber-100/70',   active: 'bg-amber-100/90 border-amber-500 ring-2 ring-amber-500/10 text-amber-900 shadow-xs' },
+          { key: 'overdue',   name: "Overdue",   val: metrics.overdueCount,   normal: 'bg-rose-50/60 border-rose-200 text-rose-800 hover:bg-rose-100/70',       active: 'bg-rose-100/90 border-rose-500 ring-2 ring-rose-500/10 text-rose-900 shadow-xs' },
+          { key: 'pending',   name: "Pending",   val: metrics.pendingCount,   normal: 'bg-indigo-50/60 border-indigo-200 text-indigo-800 hover:bg-indigo-100/70', active: 'bg-indigo-100/90 border-indigo-500 ring-2 ring-indigo-500/10 text-indigo-900 shadow-xs' },
+          { key: 'completed', name: "Completed", val: metrics.completedCount, normal: 'bg-emerald-50/60 border-emerald-200 text-emerald-800 hover:bg-emerald-100/70', active: 'bg-emerald-100/90 border-emerald-500 ring-2 ring-emerald-500/10 text-emerald-900 shadow-xs' },
+          { key: 'total',     name: "Total",     val: metrics.totalCount,     normal: 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100/70',   active: 'bg-slate-100/90 border-slate-500 ring-2 ring-slate-500/10 text-slate-900 shadow-xs' },
         ].map((card) => {
           const isActive = activeKpi === card.key;
           const kpiStyles = isActive ? card.active : card.normal;
-
           return (
             <button
               type="button"
@@ -768,10 +929,10 @@ const TasksPage = ({ module = 'school' }) => {
             onClick={() => {
               setActiveKpi('all');
               setDateFilter('today');
-              setPriorityFilter('all');
               setTypeFilter('all');
               setStatusFilter('all');
               setSearch('');
+              setSelectedDate(null);
             }}
             className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold"
           >
@@ -782,7 +943,7 @@ const TasksPage = ({ module = 'school' }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
           {/* Search Box */}
           <div className="text-left space-y-1">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase">Search Record</label>
+            <label className="block text-[10px] font-bold text-slate-455 uppercase">Search Record</label>
             <div className="relative">
               <input
                 type="text"
@@ -797,32 +958,21 @@ const TasksPage = ({ module = 'school' }) => {
 
           {/* Due Date Selector */}
           <div className="text-left space-y-1">
-            <label className="block text-[10px] font-bold text-slate-450 uppercase">Due Date</label>
+            <label className="block text-[10px] font-bold text-slate-455 uppercase">Due Date</label>
             <select
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setSelectedDate(null); // Clear calendar selection when choosing standard dropdown
+              }}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-750 focus:bg-white cursor-pointer"
             >
               <option value="today">Today + Overdue</option>
+              <option value="today_only">Today Only</option>
               <option value="tomorrow">Tomorrow</option>
               <option value="week">Next 7 Days</option>
               <option value="all">All Dates</option>
               <option value="custom">Custom Range</option>
-            </select>
-          </div>
-
-          {/* Priority */}
-          <div className="text-left space-y-1">
-            <label className="block text-[10px] font-bold text-slate-455 uppercase">Priority</label>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-755 focus:bg-white cursor-pointer"
-            >
-              <option value="all">All Priorities</option>
-              <option value="high">High Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="low">Low Priority</option>
             </select>
           </div>
 
@@ -855,10 +1005,10 @@ const TasksPage = ({ module = 'school' }) => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-755 focus:bg-white cursor-pointer"
             >
-              <option value="all">All Statuses</option>
+              <option value="all">All</option>
               <option value="pending">Pending</option>
               <option value="completed">Completed</option>
-              <option value="overdue">Overdue</option>
+              <option value="cancelled">Cancelled</option>
             </select>
           </div>
         </div>
@@ -925,9 +1075,9 @@ const TasksPage = ({ module = 'school' }) => {
             🎉
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-black text-slate-805">Great!</h3>
-            <p className="text-slate-450 text-xs font-semibold">
-              No pending tasks today.
+            <h3 className="text-sm font-black text-slate-805">No tasks found</h3>
+            <p className="text-slate-455 text-xs font-semibold">
+              No tasks match the current filters.
             </p>
           </div>
           <button
@@ -935,6 +1085,7 @@ const TasksPage = ({ module = 'school' }) => {
               setDateFilter('week');
               setStatusFilter('pending');
               setActiveKpi('all');
+              setSelectedDate(null);
             }}
             className="px-4.5 py-2 bg-indigo-600 hover:bg-indigo-705 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
           >
@@ -961,7 +1112,6 @@ const TasksPage = ({ module = 'school' }) => {
                   <th className="px-4 py-3">Phone</th>
                   <th className="px-4 py-3">Reference</th>
                   <th className="px-4 py-3 min-w-[105px]">Due Date</th>
-                  <th className="px-4 py-3">Priority</th>
                   <th className="px-4 py-3 text-center">Status</th>
                   <th className="px-4 py-3 text-right min-w-[165px]">Actions</th>
                 </tr>
@@ -976,10 +1126,12 @@ const TasksPage = ({ module = 'school' }) => {
                     <tr
                       key={task.id}
                       onClick={() => handleViewProfileClick(task)}
-                      className={`hover:bg-slate-50/70 transition-colors cursor-pointer ${
-                        isCompleted ? 'opacity-55 bg-slate-50/30' : ''
+                      className={`transition-colors cursor-pointer ${
+                        isCompleted
+                          ? 'opacity-50 bg-slate-50 hover:opacity-60 hover:bg-slate-100/60'
+                          : 'hover:bg-slate-50/70'
                       }`}
-                      style={{ height: '58px' }} // Target row height 56-60px
+                      style={{ height: '58px' }}
                     >
                       {/* Checkbox */}
                       <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
@@ -994,7 +1146,9 @@ const TasksPage = ({ module = 'school' }) => {
                       {/* Task Type */}
                       <td className="px-4 py-3">
                         <div className="flex flex-col">
-                          <span className="font-bold text-slate-800 text-[11.5px]">{task.stage}</span>
+                          <span className={`font-bold text-[11.5px] ${
+                            isCompleted ? 'line-through text-slate-400' : 'text-slate-800'
+                          }`}>{task.stage}</span>
                           {task.notes && (
                             <span className="text-[9.5px] text-slate-400 truncate max-w-[150px] font-medium block mt-0.5" title={task.notes}>
                               {task.notes}
@@ -1031,17 +1185,6 @@ const TasksPage = ({ module = 'school' }) => {
                             {new Date(task.followUpDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: true })}
                           </span>
                         </div>
-                      </td>
-
-                      {/* Priority */}
-                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[8.5px] font-extrabold uppercase tracking-wider ${
-                          task.priority === 'High' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                          task.priority === 'Medium' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                          'bg-slate-50 text-slate-655 border border-slate-205'
-                        }`}>
-                          {task.priority}
-                        </span>
                       </td>
 
                       {/* Status Badges with custom colors (Centered) */}
@@ -1101,14 +1244,22 @@ const TasksPage = ({ module = 'school' }) => {
                             <User className="h-3.5 w-3.5" />
                           </button>
 
-                          {/* Quick Mark Complete */}
-                          {!isCompleted && (
+                          {/* Quick Mark Complete or Undo */}
+                          {!isCompleted ? (
                             <button
                               onClick={() => handleQuickComplete(task)}
                               className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors cursor-pointer"
                               title="Mark Complete"
                             >
                               <Check className="h-3.5 w-3.5" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleUndoComplete(task)}
+                              className="p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors cursor-pointer"
+                              title="Undo Complete (Mark Pending)"
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" />
                             </button>
                           )}
 
@@ -1140,7 +1291,15 @@ const TasksPage = ({ module = 'school' }) => {
                                 <Plus className="h-3.5 w-3.5 text-slate-400" />
                                 Add Notes
                               </button>
-                              {!isCompleted && (
+                              {isCompleted ? (
+                                <button
+                                  onClick={() => handleUndoComplete(task)}
+                                  className="w-full px-2.5 py-1.5 text-[10.5px] text-amber-700 hover:bg-amber-50 flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <RefreshCw className="h-3.5 w-3.5 text-amber-500" />
+                                  Mark Pending
+                                </button>
+                              ) : (
                                 <button
                                   onClick={() => handleQuickSkip(task)}
                                   className="w-full px-2.5 py-1.5 text-[10.5px] text-rose-650 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer"
@@ -1163,6 +1322,54 @@ const TasksPage = ({ module = 'school' }) => {
       )}
 
       {/* 5. DETAILS DIALOGS & OVERLAYS SYSTEM */}
+
+      {/* Calendar Picker Popup Modal */}
+      <AnimatePresence>
+        {calendarOpen && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-5 w-full max-w-md space-y-4 shadow-xl border border-slate-100"
+            >
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-1.5 text-indigo-850 font-black text-xs uppercase tracking-wider">
+                  <Calendar className="h-4 w-4 text-indigo-500" />
+                  <span>Choose Date</span>
+                </div>
+                <button
+                  onClick={() => setCalendarOpen(false)}
+                  className="text-slate-455 hover:text-slate-700 cursor-pointer p-1 rounded-lg hover:bg-slate-100"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <CalendarPicker
+                rawTasks={rawTasks}
+                selectedDate={selectedDate || getLocalDateString(new Date())}
+                setSelectedDate={(d) => {
+                  setSelectedDate(d);
+                  setCalendarOpen(false);
+                }}
+                getLocalDateString={getLocalDateString}
+                onSelectComplete={() => setCalendarOpen(false)}
+              />
+
+              <div className="pt-2 border-t border-slate-100 text-right">
+                <button
+                  type="button"
+                  onClick={() => setCalendarOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-705 rounded-xl text-xs font-bold transition-all cursor-pointer text-center"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Reschedule Picker Modal */}
       <AnimatePresence>

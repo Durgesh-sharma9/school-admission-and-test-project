@@ -31,7 +31,7 @@ const AssessmentBuilder = () => {
   const [className, setClassName] = useState('');
   const [duration, setDuration] = useState(30);
   const [instructions, setInstructions] = useState('');
-  
+
   // Dynamic Sections state
   const [sections, setSections] = useState([
     { name: 'Section A', questions: [] }
@@ -107,7 +107,7 @@ const AssessmentBuilder = () => {
     const currentName = sections[sectionIndex].name;
     const newName = window.prompt('Rename section to:', currentName);
     if (!newName || !newName.trim() || newName === currentName) return;
-    
+
     const updated = [...sections];
     updated[sectionIndex].name = newName.trim();
     setSections(updated);
@@ -217,7 +217,7 @@ const AssessmentBuilder = () => {
       ...q,
       question: `${q.question} (Copy)`,
     };
-    
+
     const updated = [...sections];
     updated[sectionIndex].questions.splice(questionIndex + 1, 0, duplicatedQuestion);
     setSections(updated);

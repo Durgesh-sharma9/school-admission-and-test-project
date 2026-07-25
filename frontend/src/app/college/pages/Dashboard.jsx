@@ -81,6 +81,16 @@ const Dashboard = () => {
   useEffect(() => {
     fetchDashboardData();
     fetchTodayFollowups();
+
+    const handleUpdate = () => {
+      fetchDashboardData();
+      fetchTodayFollowups();
+    };
+
+    window.addEventListener('crm-tasks-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('crm-tasks-updated', handleUpdate);
+    };
   }, []);
 
   if (loading) {
