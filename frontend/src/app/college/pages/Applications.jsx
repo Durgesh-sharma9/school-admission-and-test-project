@@ -559,41 +559,37 @@ const Applications = () => {
                           })}
                         </td>
                         <td className="py-2.5 px-6 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-2 font-bold">
+                          <div className="flex items-center justify-end gap-3">
                             {/* Timeline Toggle Button */}
                             <Button
                               variant="outline"
-                              size="sm"
-                              className={`border-[#E5E7EB] hover:bg-slate-100 text-slate-700 h-10 px-3.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                                expandedAppId === app._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6] hover:bg-indigo-100' : ''
+                              className={`h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl transition-all shadow-2xs hover:shadow-xs hover:bg-purple-50 hover:border-purple-250 hover:text-purple-600 ${
+                                expandedAppId === app._id ? 'bg-purple-50 border-purple-300 text-purple-600 shadow-xs' : 'bg-slate-50/40 text-slate-500'
                               }`}
                               onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
-                              title={expandedAppId === app._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
+                              title={expandedAppId === app._id ? "Hide Timeline" : "Timeline"}
                             >
-                              <GitCommit className="h-4 w-4 text-current" />
-                              <span>{expandedAppId === app._id ? "Hide Timeline" : "Timeline"}</span>
+                              <GitCommit className="h-5 w-5" strokeWidth={2} />
                             </Button>
 
-                            {/* View Button */}
+                            {/* View Details Button */}
                             <Button
                               variant="outline"
-                              size="sm"
-                              className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                              className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-blue-50/80 hover:border-blue-250 hover:text-blue-600 hover:shadow-xs transition-all shadow-2xs"
                               onClick={() => handleViewDetails(app._id)}
-                              title="View Complete Details"
+                              title="View Details"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-5 w-5" strokeWidth={2} />
                             </Button>
 
                             {/* Contact Button */}
                             <Button
                               variant="outline"
-                              size="sm"
-                              className="border-emerald-250 text-emerald-705 hover:bg-emerald-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                              className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-emerald-50/80 hover:border-emerald-250 hover:text-emerald-600 hover:shadow-xs transition-all shadow-2xs"
                               onClick={() => handleOpenContactModal(app)}
-                              title="Quick Contact CRM"
+                              title="Contact"
                             >
-                              <PhoneCall className="h-4 w-4" />
+                              <Phone className="h-5 w-5" strokeWidth={2} />
                             </Button>
                           </div>
                         </td>

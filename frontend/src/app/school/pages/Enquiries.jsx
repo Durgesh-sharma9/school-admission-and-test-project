@@ -805,69 +805,63 @@ const Enquiries = () => {
                         {formatSubmissionDate(enq.saveDate, enq.saveTime)}
                       </td>
                       <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-2 font-bold">
+                        <div className="flex items-center justify-center gap-3">
                           {/* Timeline Toggle Button */}
                           <Button
                             variant="outline"
-                            size="sm"
-                            className={`border-[#E5E7EB] hover:bg-slate-100 text-slate-700 h-10 px-3.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                              expandedEnquiryId === enq._id ? 'bg-indigo-50 border-[#6D5DF6] text-[#6D5DF6] hover:bg-indigo-100' : ''
+                            className={`h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl transition-all shadow-2xs hover:shadow-xs hover:bg-purple-50 hover:border-purple-250 hover:text-purple-600 ${
+                              expandedEnquiryId === enq._id ? 'bg-purple-50 border-purple-300 text-purple-600 shadow-xs' : 'bg-slate-50/40 text-slate-500'
                             }`}
                             onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
-                            title={expandedEnquiryId === enq._id ? "Hide Timeline Accordion" : "View Timeline Accordion"}
+                            title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
                           >
-                            <GitCommit className="h-4 w-4 text-current" />
-                            <span>{expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}</span>
+                            <GitCommit className="h-5 w-5" strokeWidth={2} />
                           </Button>
 
-                          {/* View Button */}
+                          {/* View Details Button */}
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-blue-50/80 hover:border-blue-250 hover:text-blue-600 hover:shadow-xs transition-all shadow-2xs"
                             onClick={() => {
                               setSelectedEnquiryForView(enq);
                               setViewModalOpen(true);
                             }}
-                            title="View Complete Details"
+                            title="View Details"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-5 w-5" strokeWidth={2} />
                           </Button>
 
                           {/* Contact Button */}
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="border-slate-200 text-slate-650 hover:bg-slate-100 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-emerald-50/80 hover:border-emerald-250 hover:text-emerald-600 hover:shadow-xs transition-all shadow-2xs"
                             onClick={() => {
                               setSelectedEnquiryForContact(enq);
                               setContactModalOpen(true);
                             }}
-                            title="Contact Student & Parents"
+                            title="Contact"
                           >
-                            <Phone className="h-4 w-4" />
+                            <Phone className="h-5 w-5" strokeWidth={2} />
                           </Button>
 
-                          {/* Assign Assessment Button */}
+                          {/* Documents / Assessment Button */}
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-amber-50/80 hover:border-amber-250 hover:text-amber-600 hover:shadow-xs transition-all shadow-2xs"
                             onClick={() => setSelectedEnquiryForAssessment(enq)}
-                            title="Assign/Manage Assessments"
+                            title="Documents"
                           >
-                            <FileQuestion className="h-4 w-4 text-indigo-500" />
+                            <FileQuestion className="h-5 w-5" strokeWidth={2} />
                           </Button>
 
-                          {/* Soft Delete Enquiry Action */}
+                          {/* Delete Button */}
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="border-rose-100 hover:bg-rose-50 text-rose-655 rounded-lg h-10 w-10 flex items-center justify-center transition-all"
+                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-rose-50/80 hover:border-rose-250 hover:text-rose-600 hover:shadow-xs transition-all shadow-2xs"
                             onClick={() => handleDeleteEnquiry(enq._id)}
-                            title="Delete Enquiry"
+                            title="Delete"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-5 w-5" strokeWidth={2} />
                           </Button>
                         </div>
                       </td>
