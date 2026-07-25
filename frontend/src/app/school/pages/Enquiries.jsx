@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Badge from '../components/Badge';
@@ -32,9 +33,13 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
+import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 
 const Enquiries = () => {
   const { school } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const expandId = searchParams.get('expand');
+
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -48,6 +53,32 @@ const Enquiries = () => {
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [selectedIds, setSelectedIds] = useState([]);
+
+  // Admission Journey Timeline States
+  const [expandedEnquiryId, setExpandedEnquiryId] = useState(null);
+
+  // Handle deep-linking query parameter: ?expand=ID
+  useEffect(() => {
+    if (expandId) {
+      setSearch(expandId);
+      setExpandedEnquiryId(expandId);
+    }
+  }, [expandId]);
+
+  const handleSaveJourney = async (enquiryId, updatedJourney) => {
+    try {
+      const response = await api.put(`/enquiries/${enquiryId}`, {
+        journey: updatedJourney
+      });
+      if (response.success) {
+        toast.success('Admission journey updated successfully!');
+        setEnquiries(prev => prev.map(enq => enq._id === enquiryId ? { ...enq, journey: response.data.journey } : enq));
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to update journey');
+      throw err;
+    }
+  };
 
   
   // Communication Modal States
@@ -680,125 +711,151 @@ const Enquiries = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {enquiries.map((enq) => (
-                  <tr key={enq._id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 text-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(enq._id)}
-                        onChange={() => handleSelectRow(enq._id)}
-                        className="rounded text-indigo-600 focus:ring-indigo-500/20"
-                      />
-                    </td>
-                    <td className="px-6 py-4 font-bold text-slate-800">{enq.enquiryId}</td>
-                    <td className="px-6 py-4 font-semibold text-slate-800">
-                      {enq.studentName}
-                      <span className="block text-[10px] text-slate-400 font-medium">
-                        {enq.gender}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        onClick={() => setViewingParentMobile(enq.mobile)}
-                        className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline"
-                        title="View Parent & Family History Profile"
-                      >
-                        {enq.parentName}
-                      </span>
-                      <span className="text-[10px] text-slate-400 font-medium block">
-                        📞 {enq.mobile}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-medium">{enq.classSeeking}</td>
-                    <td className="px-6 py-4 font-medium">{enq.city}</td>
-                    <td className="px-6 py-4">
-                      {/* Interactive inline status change */}
-                      <select
-                        value={enq.status}
-                        onChange={(e) => handleStatusChange(enq._id, e.target.value)}
-                        className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 rounded border-none hover:bg-slate-100 px-1 py-0.5"
-                      >
-                        <option value="New Enquiry">New Enquiry</option>
-                        <option value="Hold">Hold</option>
-                        <option value="Not Interested">Not Interested</option>
-                        <option value="Admission Confirmed">Admission Confirmed</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-slate-400 font-medium">
-                      {enq.saveDate}
-                      <span className="block text-[10px]">{enq.saveTime}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-1.5">
-                        {/* View Button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
-                          onClick={() => {
-                            setSelectedEnquiryForView(enq);
-                            setViewModalOpen(true);
+                  <React.Fragment key={enq._id}>
+                    <tr 
+                      onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)} 
+                      className={`hover:bg-slate-50/50 transition-colors cursor-pointer ${
+                        expandedEnquiryId === enq._id ? 'bg-indigo-50/20' : ''
+                      }`}
+                    >
+                      <td className="px-6 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(enq._id)}
+                          onChange={() => handleSelectRow(enq._id)}
+                          className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                        />
+                      </td>
+                      <td className="px-6 py-4 font-bold text-slate-800">{enq.enquiryId}</td>
+                      <td className="px-6 py-4 font-semibold text-slate-800">
+                        {enq.studentName}
+                        <span className="block text-[10px] text-slate-400 font-medium">
+                          {enq.gender}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setViewingParentMobile(enq.mobile);
                           }}
-                          title="View Complete Details"
+                          className="font-semibold text-slate-750 block cursor-pointer hover:text-indigo-650 hover:underline"
+                          title="View Parent & Family History Profile"
                         >
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
-
-                        {/* Edit Button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
-                          onClick={() => {
-                            setSelectedEnquiryForEdit(enq);
-                            setEditStatus(enq.status);
-                            setEditModalOpen(true);
-                          }}
-                          title="Edit Status"
+                          {enq.parentName}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-medium block">
+                          📞 {enq.mobile}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-medium">{enq.classSeeking}</td>
+                      <td className="px-6 py-4 font-medium">{enq.city}</td>
+                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                        {/* Interactive inline status change */}
+                        <select
+                          value={enq.status}
+                          onChange={(e) => handleStatusChange(enq._id, e.target.value)}
+                          className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 rounded border-none hover:bg-slate-100 px-1 py-0.5"
                         >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-
-                        {/* Assign Assessment Button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-md p-1.5"
-                          onClick={() => setSelectedEnquiryForAssessment(enq)}
-                          title="Assign/Manage Assessments"
-                        >
-                          <FileQuestion className="h-3.5 w-3.5 text-indigo-500" />
-                        </Button>
-
-                        {/* Convert to Admission Button */}
-                        {!enq.isConvertedToAdmission ? (
+                          <option value="New Enquiry">New Enquiry</option>
+                          <option value="Hold">Hold</option>
+                          <option value="Not Interested">Not Interested</option>
+                          <option value="Admission Confirmed">Admission Confirmed</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-400 font-medium">
+                        {enq.saveDate}
+                        <span className="block text-[10px]">{enq.saveTime}</span>
+                      </td>
+                      <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-1.5">
+                          {/* View Button */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-md p-1.5"
-                            onClick={() => handleConvertAdmission(enq._id)}
-                            title="Convert to Registered Admission"
+                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                            onClick={() => {
+                              setSelectedEnquiryForView(enq);
+                              setViewModalOpen(true);
+                            }}
+                            title="View Complete Details"
                           >
-                            <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                            <Eye className="h-3.5 w-3.5" />
                           </Button>
-                        ) : (
-                          <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-md border border-emerald-100/50" title="Admission Confirmed">
-                            <Check className="h-3.5 w-3.5 text-emerald-600" />
-                          </span>
-                        )}
 
-                        {/* Soft Delete Enquiry Action */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-md p-1.5"
-                          onClick={() => handleDeleteEnquiry(enq._id)}
-                          title="Delete Enquiry"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
+                          {/* Edit Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-md p-1.5"
+                            onClick={() => {
+                              setSelectedEnquiryForEdit(enq);
+                              setEditStatus(enq.status);
+                              setEditModalOpen(true);
+                            }}
+                            title="Edit Status"
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+
+                          {/* Assign Assessment Button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-md p-1.5"
+                            onClick={() => setSelectedEnquiryForAssessment(enq)}
+                            title="Assign/Manage Assessments"
+                          >
+                            <FileQuestion className="h-3.5 w-3.5 text-indigo-500" />
+                          </Button>
+
+                          {/* Convert to Admission Button */}
+                          {!enq.isConvertedToAdmission ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-md p-1.5"
+                              onClick={() => handleConvertAdmission(enq._id)}
+                              title="Convert to Registered Admission"
+                            >
+                              <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                            </Button>
+                          ) : (
+                            <span className="inline-flex items-center text-xs font-bold text-emerald-650 bg-emerald-50/70 p-1.5 rounded-md border border-emerald-100/50" title="Admission Confirmed">
+                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            </span>
+                          )}
+
+                          {/* Soft Delete Enquiry Action */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-rose-100 hover:bg-rose-50 text-rose-650 rounded-md p-1.5"
+                            onClick={() => handleDeleteEnquiry(enq._id)}
+                            title="Delete Enquiry"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Expandable CRM Journey Timeline Row */}
+                    <AnimatePresence>
+                      {expandedEnquiryId === enq._id && (
+                        <tr className="bg-slate-50/30">
+                          <td colSpan={9} className="px-6 py-5 border-b border-slate-100/85">
+                            <AdmissionJourneyTimeline
+                              enquiry={enq}
+                              stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                              onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
+                              counselorName={school?.name || 'Admin'}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

@@ -259,9 +259,52 @@ const collegeApplicationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'School',
     required: true,
-  }
+  },
+  journey: [{
+    stage: {
+      type: String,
+      required: true,
+      enum: ['Form Submitted', 'Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']
+    },
+    status: {
+      type: String,
+      enum: ['Completed', 'Current', 'Upcoming', 'Cancelled', 'Overdue'],
+      default: 'Current'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    completedAt: {
+      type: Date
+    },
+    followUpDate: {
+      type: Date
+    },
+    notes: {
+      type: String,
+      default: ''
+    },
+    createdBy: {
+      type: String,
+      default: 'Admin'
+    }
+  }]
 }, {
   timestamps: true
+});
+
+collegeApplicationSchema.pre('save', function(next) {
+  if (!this.journey || this.journey.length === 0) {
+    this.journey = [{
+      stage: 'Form Submitted',
+      status: 'Completed',
+      createdAt: this.createdAt || new Date(),
+      completedAt: this.createdAt || new Date(),
+      notes: 'Initial admission application submitted.'
+    }];
+  }
+  next();
 });
 
 module.exports = mongoose.model('CollegeApplication', collegeApplicationSchema);

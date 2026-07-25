@@ -66,17 +66,19 @@ const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [localities, setLocalities] = useState([]);
   const [recentEnquiriesList, setRecentEnquiriesList] = useState([]);
+  const [todayFollowups, setTodayFollowups] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [resEnq, resAsm, resAnl, resLoc, resEnqList] = await Promise.all([
+      const [resEnq, resAsm, resAnl, resLoc, resEnqList, resFollowups] = await Promise.all([
         api.get('/enquiries/stats').catch(() => ({ success: false })),
         api.get('/assessments/assignments/stats').catch(() => ({ success: false })),
         api.get('/analytics/overview').catch(() => ({ success: false })),
         api.get('/localities?type=approved&limit=50').catch(() => ({ success: false })),
-        api.get('/enquiries?limit=100').catch(() => ({ success: false }))
+        api.get('/enquiries?limit=100').catch(() => ({ success: false })),
+        api.get('/enquiries/followups/today').catch(() => ({ success: false }))
       ]);
 
       if (resEnq.success) setEnquiryStats(resEnq.stats);
@@ -84,6 +86,7 @@ const Dashboard = () => {
       if (resAnl.success) setAnalytics(resAnl.data);
       if (resLoc.success) setLocalities(resLoc.data || []);
       if (resEnqList.success) setRecentEnquiriesList(resEnqList.data || []);
+      if (resFollowups.success) setTodayFollowups(resFollowups.data || []);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -545,8 +548,71 @@ const Dashboard = () => {
                 <span className="font-extrabold text-slate-800">{src.value}</span>
               </div>
             ))}
-          </div>
         </div>
+      </div>
+    </div>
+
+    {/* ROW 5.5: Today's Follow-ups CRM Widget */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs space-y-4 text-left">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <PhoneCall className="h-4.5 w-4.5 text-indigo-650" />
+            <div>
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                Today's Follow-ups Reminders
+              </h3>
+              <p className="text-[10px] text-slate-400">Immediate follow-up schedules mapped from the admission pipeline stages</p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-[10px] font-bold">
+            {todayFollowups.length} Reminders
+          </span>
+        </div>
+
+        {todayFollowups.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 border border-dashed border-slate-100 rounded-xl">
+            <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" />
+            <p className="font-semibold text-slate-500 text-xs">All Caught Up!</p>
+            <p className="text-[10px] text-slate-400">No pending follow-ups scheduled for today.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Student Name</th>
+                  <th className="px-4 py-3">Active Stage</th>
+                  <th className="px-4 py-3">Follow-up Date</th>
+                  <th className="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-55 font-semibold text-slate-700">
+                {todayFollowups.map((fup) => (
+                  <tr key={fup._id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 font-bold text-slate-900">{fup.studentName}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase">
+                        {fup.stage}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {new Date(fup.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="primary"
+                        onClick={() => navigate(`/dashboard/enquiries?expand=${fup.enquiryId}`)}
+                        className="h-8 px-3 text-[10px] font-bold shadow-xs bg-[#4F46E5] hover:bg-[#4338CA] text-white border-transparent rounded-lg"
+                      >
+                        View Enquiry
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* ROW 6, 7, 8: RECENT ACTIVITY, PENDING TASKS, ASSESSMENT ANALYTICS */}

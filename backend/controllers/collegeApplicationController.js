@@ -19,7 +19,8 @@ const generateApplicationId = () => {
 const getApplications = async (req, res) => {
   try {
     const collegeId = req.school.id;
-    const { search, stage, courseId, departmentId, paymentStatus } = req.query;
+    const { search, stage, courseId, departmentId, paymentStatus, todayFollowups } = req.query;
+    const mongoose = require('mongoose');
 
     const query = { schoolId: collegeId };
 
@@ -28,13 +29,28 @@ const getApplications = async (req, res) => {
     if (departmentId) query.departmentId = departmentId;
     if (paymentStatus) query.paymentStatus = paymentStatus;
 
+    if (todayFollowups === 'true') {
+      const now = new Date();
+      const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      query.journey = {
+        $elemMatch: {
+          completedAt: { $exists: false },
+          followUpDate: { $lte: endOfToday }
+        }
+      };
+    }
+
     if (search) {
-      query.$or = [
+      const searchConditions = [
         { studentName: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } },
         { mobile: { $regex: search, $options: 'i' } },
         { applicationId: { $regex: search, $options: 'i' } }
       ];
+      if (mongoose.Types.ObjectId.isValid(search)) {
+        searchConditions.push({ _id: new mongoose.Types.ObjectId(search) });
+      }
+      query.$or = searchConditions;
     }
 
     const applications = await CollegeApplication.find(query)
@@ -42,7 +58,21 @@ const getApplications = async (req, res) => {
       .populate('departmentId', 'name code')
       .sort({ createdAt: -1 });
 
-    return res.json({ success: true, data: applications });
+    const applicationsMapped = applications.map(app => {
+      const obj = app.toObject();
+      if (!obj.journey || obj.journey.length === 0) {
+        obj.journey = [{
+          stage: 'Form Submitted',
+          status: 'Completed',
+          createdAt: app.createdAt,
+          completedAt: app.createdAt,
+          notes: 'Initial admission application submitted.'
+        }];
+      }
+      return obj;
+    });
+
+    return res.json({ success: true, data: applicationsMapped });
   } catch (error) {
     console.error('Get applications error:', error);
     return res.status(500).json({ success: false, message: 'Server error fetching applications' });
@@ -65,7 +95,18 @@ const getApplicationById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Application not found' });
     }
 
-    return res.json({ success: true, data: application });
+    const obj = application.toObject();
+    if (!obj.journey || obj.journey.length === 0) {
+      obj.journey = [{
+        stage: 'Form Submitted',
+        status: 'Completed',
+        createdAt: application.createdAt,
+        completedAt: application.createdAt,
+        notes: 'Initial admission application submitted.'
+      }];
+    }
+
+    return res.json({ success: true, data: obj });
   } catch (error) {
     console.error('Get application details error:', error);
     return res.status(500).json({ success: false, message: 'Server error fetching application details' });
@@ -200,30 +241,71 @@ const submitApplication = async (req, res) => {
   }
 };
 
-// @desc    Update application stage
-// @route   PUT /api/v1/college/applications/:id/stage
-// @access  Private (College Admin)
+const mapJourneyStageToAppStage = (journeyStage) => {
+  const allowed = [
+    'Counselling Assigned',
+    'Call Scheduled',
+    'Call Completed',
+    'Campus Visit',
+    'Documents Pending',
+    'Documents Verified',
+    'Selected',
+    'Rejected',
+    'Admission Confirmed'
+  ];
+  if (allowed.includes(journeyStage)) {
+    return journeyStage;
+  }
+  switch (journeyStage) {
+    case 'Call':
+    case 'WhatsApp':
+    case 'Email':
+    case 'Meeting':
+      return 'Call Scheduled';
+    case 'Documents Requested':
+      return 'Documents Pending';
+    case 'Documents Submitted':
+      return 'Documents Verified';
+    case 'Counselling Session':
+    case 'Department Discussion':
+    case 'Course Selection':
+    case 'Scholarship Discussion':
+      return 'Selected';
+    case 'Closed':
+      return 'Rejected';
+    default:
+      return 'Counselling Assigned';
+  }
+};
+
 const updateApplicationStage = async (req, res) => {
   try {
     const collegeId = req.school.id;
     const { id } = req.params;
-    const { stage, note } = req.body;
-
-    if (!stage) {
-      return res.status(400).json({ success: false, message: 'Stage is required' });
-    }
+    const { stage, note, journey } = req.body;
 
     const app = await CollegeApplication.findOne({ _id: id, schoolId: collegeId });
     if (!app) {
       return res.status(404).json({ success: false, message: 'Application not found' });
     }
 
-    app.stage = stage;
-    app.notes.push({
-      note: note || `Stage updated to: ${stage}`,
-      counselorName: req.school.name,
-      date: new Date()
-    });
+    if (journey) {
+      app.journey = journey;
+      // For backward compatibility, update app.stage to the latest stage name in the journey
+      if (journey.length > 0) {
+        app.stage = mapJourneyStageToAppStage(journey[journey.length - 1].stage);
+      }
+    } else {
+      if (!stage) {
+        return res.status(400).json({ success: false, message: 'Stage is required' });
+      }
+      app.stage = stage;
+      app.notes.push({
+        note: note || `Stage updated to: ${stage}`,
+        counselorName: req.school.name,
+        date: new Date()
+      });
+    }
 
     await app.save();
     return res.json({ success: true, message: 'Stage updated successfully', data: app });

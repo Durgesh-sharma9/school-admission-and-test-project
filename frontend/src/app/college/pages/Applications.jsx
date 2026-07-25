@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../school/services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import toast from 'react-hot-toast';
+import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import {
   Search,
   Filter,
@@ -67,9 +68,20 @@ const STATUS_OPTIONS = ['New', 'Hold', 'Not Interested', 'Admission Confirmed'];
 
 const Applications = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const expandId = searchParams.get('expand');
+  const [expandedAppId, setExpandedAppId] = useState(null);
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Handle deep-linking query parameter: ?expand=ID
+  useEffect(() => {
+    if (expandId) {
+      setSearchTerm(expandId);
+      setExpandedAppId(expandId);
+    }
+  }, [expandId]);
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');
@@ -171,6 +183,21 @@ const Applications = () => {
       }
     } catch (error) {
       toast.error('Failed to update status');
+    }
+  };
+
+  const handleSaveJourney = async (appId, updatedJourney) => {
+    try {
+      const response = await api.put(`/college/applications/${appId}/stage`, {
+        journey: updatedJourney
+      });
+      if (response.success) {
+        toast.success('Admission journey updated successfully!');
+        setApplications(prev => prev.map(app => app._id === appId ? { ...app, journey: response.data.journey, stage: response.data.stage } : app));
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to update journey');
+      throw err;
     }
   };
 
@@ -488,62 +515,85 @@ const Applications = () => {
                 {filteredApplications.map((app) => {
                   const currentStatus = STAGE_MAP_TO_STATUS[app.stage] || 'New';
                   return (
-                    <tr key={app._id} className="border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/55 transition-colors">
-                      <td className="py-4 px-6 font-bold text-indigo-650">{app.applicationId}</td>
-                      <td className="py-4 px-6">
-                        <div>
-                          <p className="font-bold text-slate-850">{app.studentName}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.mobile}</p>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 font-semibold text-slate-700">
-                        {app.departmentId?.name || 'N/A'}
-                      </td>
-                      <td className="py-4 px-6 font-semibold text-slate-700">
-                        {app.courseId?.name || 'N/A'}
-                      </td>
-                      <td className="py-4 px-6">
-                        {/* Inline status dropdown */}
-                        <select
-                          value={currentStatus}
-                          onChange={(e) => handleStatusChangeDirectly(app._id, e.target.value)}
-                          className={`px-3 py-1.5 rounded-full font-bold text-[10px] uppercase border cursor-pointer focus:outline-none transition-all ${STATUS_COLOR_MAP[currentStatus]}`}
-                        >
-                          {STATUS_OPTIONS.map(opt => (
-                            <option key={opt} value={opt} className="bg-white text-slate-800 uppercase font-semibold">
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="py-4 px-6 font-semibold text-slate-550">
-                        {new Date(app.createdAt).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleViewDetails(app._id)}
-                            className="inline-flex items-center space-x-1 px-3 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors border border-slate-100 font-bold"
-                            title="View Full Profile Card"
+                    <React.Fragment key={app._id}>
+                      <tr 
+                        onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)} 
+                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/55 transition-colors cursor-pointer ${
+                          expandedAppId === app._id ? 'bg-indigo-50/20' : ''
+                        }`}
+                      >
+                        <td className="py-4 px-6 font-bold text-indigo-650">{app.applicationId}</td>
+                        <td className="py-4 px-6">
+                          <div>
+                            <p className="font-bold text-slate-850">{app.studentName}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.mobile}</p>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 font-semibold text-slate-700">
+                          {app.departmentId?.name || 'N/A'}
+                        </td>
+                        <td className="py-4 px-6 font-semibold text-slate-700">
+                          {app.courseId?.name || 'N/A'}
+                        </td>
+                        <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
+                          {/* Inline status dropdown */}
+                          <select
+                            value={currentStatus}
+                            onChange={(e) => handleStatusChangeDirectly(app._id, e.target.value)}
+                            className={`px-3 py-1.5 rounded-full font-bold text-[10px] uppercase border cursor-pointer focus:outline-none transition-all ${STATUS_COLOR_MAP[currentStatus]}`}
                           >
-                            <Eye className="h-4 w-4" />
-                            <span className="text-[10px] px-0.5">View</span>
-                          </button>
-                          <button
-                            onClick={() => handleOpenContactModal(app)}
-                            className="inline-flex items-center space-x-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors border border-emerald-250 font-bold"
-                            title="Quick Contact CRM"
-                          >
-                            <PhoneCall className="h-4 w-4" />
-                            <span className="text-[10px] px-0.5">Contact</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                            {STATUS_OPTIONS.map(opt => (
+                              <option key={opt} value={opt} className="bg-white text-slate-800 uppercase font-semibold">
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="py-4 px-6 font-semibold text-slate-555">
+                          {new Date(app.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </td>
+                        <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleViewDetails(app._id)}
+                              className="inline-flex items-center space-x-1 px-3 py-2 bg-slate-55 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors border border-slate-100 font-bold"
+                              title="View Full Profile Card"
+                            >
+                              <Eye className="h-4 w-4" />
+                              <span className="text-[10px] px-0.5">View</span>
+                            </button>
+                            <button
+                              onClick={() => handleOpenContactModal(app)}
+                              className="inline-flex items-center space-x-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors border border-emerald-250 font-bold"
+                              title="Quick Contact CRM"
+                            >
+                              <PhoneCall className="h-4 w-4" />
+                              <span className="text-[10px] px-0.5">Contact</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expandable CRM Journey Timeline Row */}
+                      <AnimatePresence>
+                        {expandedAppId === app._id && (
+                          <tr className="bg-slate-50/30">
+                            <td colSpan={7} className="px-6 py-5 border-b border-slate-100/85">
+                              <AdmissionJourneyTimeline
+                                enquiry={app}
+                                stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                                onSaveJourney={(updatedJourney) => handleSaveJourney(app._id, updatedJourney)}
+                                counselorName="Admin"
+                              />
+                            </td>
+                          </tr>
+                        )}
+                      </AnimatePresence>
+                    </React.Fragment>
                   );
                 })}
               </tbody>

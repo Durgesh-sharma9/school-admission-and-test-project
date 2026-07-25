@@ -50,9 +50,9 @@ const getEnquiries = async (req, res) => {
       if (endDate) query.saveDate.$lte = endDate;
     }
 
-    // Apply search filter if provided (matching name, parent, mobile, state, city, area, society, previousSchool, source, sourceOtherSpecify, or enquiryId)
+    // Apply search filter if provided (matching name, parent, mobile, state, city, area, society, previousSchool, source, sourceOtherSpecify, enquiryId, or direct _id)
     if (search) {
-      query.$or = [
+      const searchConditions = [
         { studentName: { $regex: search, $options: 'i' } },
         { parentName: { $regex: search, $options: 'i' } },
         { mobile: { $regex: search, $options: 'i' } },
@@ -65,6 +65,10 @@ const getEnquiries = async (req, res) => {
         { source: { $regex: search, $options: 'i' } },
         { sourceOtherSpecify: { $regex: search, $options: 'i' } },
       ];
+      if (mongoose.Types.ObjectId.isValid(search)) {
+        searchConditions.push({ _id: new mongoose.Types.ObjectId(search) });
+      }
+      query.$or = searchConditions;
     }
 
     // Determine Sort options
@@ -83,13 +87,23 @@ const getEnquiries = async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit, 10));
 
-    // Calculate statistics (Total, New, Hold, Confirmed, Not Interested) for the dashboard dashboard
-    // We can fetch it in this route or a separate stats endpoint.
-    // Fetching stats here is efficient, but let's build a dedicated stats route for clean MVC separation.
-    
+    const enquiriesMapped = enquiries.map(enq => {
+      const obj = enq.toObject();
+      if (!obj.journey || obj.journey.length === 0) {
+        obj.journey = [{
+          stage: 'Form Submitted',
+          status: 'Completed',
+          createdAt: enq.createdAt,
+          completedAt: enq.createdAt,
+          notes: 'Initial admission form submitted.'
+        }];
+      }
+      return obj;
+    });
+
     return res.json({
       success: true,
-      data: enquiries,
+      data: enquiriesMapped,
       pagination: {
         total,
         page: parseInt(page, 10),
@@ -527,6 +541,51 @@ const parentRecognition = async (req, res) => {
   }
 };
 
+const getTodayFollowups = async (req, res) => {
+  try {
+    const schoolId = req.school.id;
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const enquiries = await Enquiry.find({
+      schoolId: new mongoose.Types.ObjectId(schoolId),
+      isDeleted: { $ne: true },
+      journey: {
+        $elemMatch: {
+          completedAt: { $exists: false },
+          followUpDate: { $lte: endOfToday }
+        }
+      }
+    });
+
+    const followups = [];
+    enquiries.forEach(enq => {
+      const activeStage = (enq.journey || []).find(s => !s.completedAt);
+      if (activeStage && activeStage.followUpDate && new Date(activeStage.followUpDate) <= endOfToday) {
+        const excludedStages = ['Admission Confirmed', 'Rejected', 'Closed'];
+        if (!excludedStages.includes(activeStage.stage)) {
+          followups.push({
+            _id: enq._id,
+            enquiryId: enq.enquiryId,
+            studentName: enq.studentName,
+            stage: activeStage.stage,
+            followUpDate: activeStage.followUpDate
+          });
+        }
+      }
+    });
+
+    return res.json({
+      success: true,
+      data: followups
+    });
+  } catch (error) {
+    console.error('getTodayFollowups error:', error);
+    return res.status(500).json({ success: false, message: 'Server error retrieving today followups' });
+  }
+};
+
 module.exports = {
   getEnquiries,
   getDashboardStats,
@@ -537,4 +596,5 @@ module.exports = {
   convertToAdmission,
   deleteEnquiry,
   parentRecognition,
+  getTodayFollowups,
 };

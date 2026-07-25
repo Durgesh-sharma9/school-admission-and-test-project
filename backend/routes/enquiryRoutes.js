@@ -10,12 +10,14 @@ const {
   convertToAdmission,
   deleteEnquiry,
   parentRecognition,
+  getTodayFollowups,
 } = require('../controllers/enquiryController');
 const { protect } = require('../middleware/auth');
 
 // Private Routes
 router.get('/', protect, getEnquiries);
 router.get('/stats', protect, getDashboardStats);
+router.get('/followups/today', protect, getTodayFollowups);
 router.post('/', protect, createEnquiryManual);
 router.put('/:id', protect, updateEnquiry);
 router.patch('/:id/status', protect, updateEnquiryStatus);

@@ -160,8 +160,51 @@ const enquirySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  journey: [{
+    stage: {
+      type: String,
+      required: true,
+      enum: ['Form Submitted', 'Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']
+    },
+    status: {
+      type: String,
+      enum: ['Completed', 'Current', 'Upcoming', 'Cancelled', 'Overdue'],
+      default: 'Current'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    completedAt: {
+      type: Date
+    },
+    followUpDate: {
+      type: Date
+    },
+    notes: {
+      type: String,
+      default: ''
+    },
+    createdBy: {
+      type: String,
+      default: 'Admin'
+    }
+  }]
 }, {
   timestamps: true,
+});
+
+enquirySchema.pre('save', function(next) {
+  if (!this.journey || this.journey.length === 0) {
+    this.journey = [{
+      stage: 'Form Submitted',
+      status: 'Completed',
+      createdAt: this.createdAt || new Date(),
+      completedAt: this.createdAt || new Date(),
+      notes: 'Initial admission form submitted.'
+    }];
+  }
+  next();
 });
 
 enquirySchema.pre('validate', function(next) {

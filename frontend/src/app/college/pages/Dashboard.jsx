@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../school/contexts/AuthContext';
 import Loader from '../../../shared/components/Loader';
 import api from '../../school/services/schoolApi';
 import toast from 'react-hot-toast';
+import Button from '../../../shared/components/Button';
 import {
   ClipboardList,
   Clock,
@@ -13,7 +15,9 @@ import {
   Award,
   Home,
   Compass,
-  DollarSign
+  DollarSign,
+  PhoneCall,
+  CheckCircle2
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -33,8 +37,10 @@ const COLORS = ['#4f46e5', '#06b6d4', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'
 
 const Dashboard = () => {
   const { school } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [todayFollowups, setTodayFollowups] = useState([]);
 
   const fetchDashboardData = async () => {
     try {
@@ -50,8 +56,31 @@ const Dashboard = () => {
     }
   };
 
+  const fetchTodayFollowups = async () => {
+    try {
+      const res = await api.get('/college/applications?todayFollowups=true');
+      if (res.success) {
+        const mapped = res.data.map(app => {
+          const activeIndex = (app.journey || []).findIndex(s => !s.completedAt);
+          const activeStage = activeIndex !== -1 ? app.journey[activeIndex] : null;
+          return {
+            _id: app._id,
+            studentName: app.studentName,
+            applicationId: app.applicationId,
+            stage: activeStage ? activeStage.stage : app.stage,
+            followUpDate: activeStage ? activeStage.followUpDate : null
+          };
+        });
+        setTodayFollowups(mapped);
+      }
+    } catch (error) {
+      console.error('Failed to load today followups:', error);
+    }
+  };
+
   useEffect(() => {
     fetchDashboardData();
+    fetchTodayFollowups();
   }, []);
 
   if (loading) {
@@ -124,6 +153,69 @@ const Dashboard = () => {
             </motion.div>
           );
         })}
+      </div>
+
+      {/* Today's Follow-ups CRM Widget */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs space-y-4 text-left">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <PhoneCall className="h-4.5 w-4.5 text-indigo-650" />
+            <div>
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                Today's Follow-ups Reminders
+              </h3>
+              <p className="text-[10px] text-slate-400">Immediate follow-up schedules mapped from the admission pipeline stages</p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full text-[10px] font-bold">
+            {todayFollowups.length} Reminders
+          </span>
+        </div>
+
+        {todayFollowups.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 border border-dashed border-slate-100 rounded-xl">
+            <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 mb-2" />
+            <p className="font-semibold text-slate-500 text-xs">All Caught Up!</p>
+            <p className="text-[10px] text-slate-400">No pending follow-ups scheduled for today.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Student Name</th>
+                  <th className="px-4 py-3">Active Stage</th>
+                  <th className="px-4 py-3">Follow-up Date</th>
+                  <th className="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 font-semibold text-slate-700">
+                {todayFollowups.map((fup) => (
+                  <tr key={fup._id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 font-bold text-slate-900">{fup.studentName}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase">
+                        {fup.stage}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {fup.followUpDate ? new Date(fup.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="primary"
+                        onClick={() => navigate(`/college/applications?expand=${fup._id}`)}
+                        className="h-8 px-3 text-[10px] font-bold shadow-xs bg-[#4F46E5] hover:bg-[#4338CA] text-white border-transparent rounded-lg"
+                      >
+                        View Application
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Visual Analytics */}
