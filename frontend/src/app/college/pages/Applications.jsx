@@ -64,7 +64,7 @@ const STATUS_COLOR_MAP = {
   'New': 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500/20',
   'Hold': 'bg-orange-50 text-orange-700 border-orange-200 focus:ring-orange-500/20',
   'Not Interested': 'bg-red-50 text-red-700 border-red-200 focus:ring-red-500/20',
-  'Admission Confirmed': 'bg-green-50 text-green-700 border-green-200 focus:ring-green-500/20'
+  'Admission Confirmed': 'bg-teal-50 text-teal-700 border-teal-200 focus:ring-teal-500/20'
 };
 
 const STATUS_OPTIONS = ['New', 'Hold', 'Not Interested', 'Admission Confirmed'];
@@ -344,47 +344,51 @@ const Applications = () => {
   });
 
   return (
-    <div className="space-y-6 text-left relative">
+    <div className="space-y-6 text-left max-w-7xl mx-auto">
+      
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Applications CRM Desk</h2>
-          <p className="text-slate-500 text-xs mt-0.5">Filter, track status, verify documents, and log counseling details.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="text-xs py-2 px-4 bg-white" onClick={handleExportCSV}>
-            Export CSV
-          </Button>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Applications CRM Desk</h2>
+          <p className="text-gray-500 text-sm mt-1 font-medium">Filter, track status, verify documents, and log counseling details.</p>
         </div>
       </div>
 
       {/* Advanced Filter Section */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-3.5 shadow-xs space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Search Term */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Search Applicant</label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                <Search className="h-4 w-4" />
-              </span>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Name, email, mobile, ID..."
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-              />
-            </div>
+      <div className="bg-white rounded-2xl border-0 shadow-[0_2px_20px_rgb(0,0,0,0.03)] p-5 space-y-4">
+        
+        {/* Row 1: Search and Export */}
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative flex-1 w-full text-left">
+            <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+              <Search size={18} />
+            </span>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by ID, name, email, mobile..."
+              className="w-full pl-11 pr-4 py-3 bg-[#f8f9fe] rounded-xl border border-transparent text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white transition-all shadow-inner"
+            />
           </div>
+          <Button
+            variant="outline"
+            className="flex items-center justify-center gap-2 shrink-0 px-5 py-3 w-full md:w-auto text-xs font-bold text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50"
+            onClick={handleExportCSV}
+          >
+            Export CSV / Excel
+          </Button>
+        </div>
 
-          {/* Status Dropdown */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Status</label>
+        {/* Row 2: Selectors */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-xs">
+          
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Status</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
             >
               <option value="">All Statuses</option>
               {STATUS_OPTIONS.map(opt => (
@@ -393,13 +397,12 @@ const Applications = () => {
             </select>
           </div>
 
-          {/* Department Dropdown */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Department</label>
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Department</label>
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
             >
               <option value="">All Departments</option>
               {uniqueDepts.map(dept => (
@@ -408,13 +411,12 @@ const Applications = () => {
             </select>
           </div>
 
-          {/* Course Dropdown */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Course</label>
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Course</label>
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
             >
               <option value="">All Courses</option>
               {uniqueCourses.map(course => (
@@ -423,43 +425,39 @@ const Applications = () => {
             </select>
           </div>
 
-          {/* Date Range - Start */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Start Date</label>
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Start Date</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-gray-700 font-bold focus:bg-white"
             />
           </div>
 
-          {/* Date Range - End */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">End Date</label>
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">End Date</label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-gray-700 font-bold focus:bg-white"
             />
           </div>
 
-          {/* Sorting */}
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-400">Sort By</label>
+          <div className="text-left">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sort By</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+              className="w-full bg-[#f8f9fe] rounded-xl border border-transparent px-3.5 py-2.5 text-gray-700 font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:bg-white"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
             </select>
           </div>
 
-          {/* Clear Filters */}
-          <div className="flex items-end">
+          <div className="md:col-span-6 flex items-end">
             <button
               onClick={() => {
                 setSearchTerm('');
@@ -470,212 +468,219 @@ const Applications = () => {
                 setEndDate('');
                 setSortBy('newest');
               }}
-              className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
+              className="text-[11px] font-bold text-purple-600 hover:text-purple-700 hover:underline transition-colors"
             >
-              Reset Filters
+              Clear All Filters
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Table or Empty State */}
-      {loading ? (
-        <div className="py-12">
-          <Loader message="Fetching applications dashboard..." />
-        </div>
-      ) : filteredApplications.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center space-y-4">
-          <div className="h-16 w-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
-            <ClipboardList className="h-8 w-8 text-slate-350" />
+      <div className="bg-white border-0 rounded-3xl shadow-[0_2px_20px_rgb(0,0,0,0.03)] overflow-hidden">
+        {loading ? (
+          <div className="py-20 text-center text-gray-400 bg-gray-50/50">
+            <Loader message="Fetching applications dashboard..." />
           </div>
-          <div>
-            <h3 className="text-base font-bold text-slate-800">No Applications Found</h3>
-            <p className="text-slate-500 text-xs mt-1">Try modifying your filter options or add a manual admission entry.</p>
+        ) : filteredApplications.length === 0 ? (
+          <div className="py-20 text-center text-gray-400 bg-gray-50/50">
+            <ClipboardList size={48} className="mx-auto text-gray-300 mb-4" />
+            <h3 className="font-bold text-gray-500 text-lg">No Applications Found</h3>
+            <p className="text-sm text-gray-400 mt-1 font-medium">Try modifying your filter options or add a manual admission entry.</p>
+            <div className="pt-4">
+              <Button onClick={() => navigate('/college/admission-form')} className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-5 py-2.5 shadow-md">
+                <Plus size={16} className="mr-1.5" />
+                Create Manual Admission
+              </Button>
+            </div>
           </div>
-          <div className="pt-2">
-            <Button onClick={() => navigate('/college/admission-form')} className="px-5 py-2.5 text-xs font-bold shadow-md shadow-indigo-600/10">
-              <Plus className="h-4 w-4 mr-1.5" />
-              Create Manual Admission
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xs">
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50">
-                  <th className="py-2.5 px-6">App ID</th>
-                  <th className="py-2.5 px-6">Student</th>
-                  <th className="py-2.5 px-6">Department</th>
-                  <th className="py-2.5 px-6">Course</th>
-                  <th className="py-2.5 px-6">Status</th>
-                  <th className="py-2.5 px-6">Created Date</th>
-                  <th className="py-2.5 px-6 text-right w-[220px]">Actions</th>
+            <table className="w-full text-left text-sm text-gray-700">
+              <thead className="text-[11px] text-gray-400 font-black uppercase tracking-wider bg-[#f8f9fe] border-b border-gray-100">
+                <tr>
+                  <th className="py-5 px-6">App ID</th>
+                  <th className="py-5 px-6">Student</th>
+                  <th className="py-5 px-6">Department</th>
+                  <th className="py-5 px-6">Course</th>
+                  <th className="py-5 px-6">Status</th>
+                  <th className="py-5 px-6">Created Date</th>
+                  <th className="py-5 px-6 text-center w-[180px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-gray-50">
                 {filteredApplications.map((app, index) => {
                   const currentStatus = STAGE_MAP_TO_STATUS[app.stage] || 'New';
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        className={`border-b border-slate-50 text-xs text-slate-600 hover:bg-slate-50/75 transition-colors ${
-                          expandedAppId === app._id ? 'bg-indigo-50/30 font-semibold' : index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'
+                        className={`hover:bg-purple-50/20 transition-colors ${
+                          expandedAppId === app._id ? 'bg-indigo-50/20' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
                         }`}
                       >
-                        <td className="py-2.5 px-6 font-bold text-indigo-650 whitespace-nowrap">{app.applicationId}</td>
-                        <td className="py-2.5 px-6">
-                          <div>
-                            <p className="font-semibold text-slate-850">{app.studentName}</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">{app.email} | {app.parentMobile || app.mobile}</p>
-                          </div>
+                        <td className="py-3.5 px-6 font-black text-gray-900 whitespace-nowrap">{app.applicationId}</td>
+                        <td className="py-3.5 px-6 text-gray-800">
+                          <div className="font-bold text-gray-900 leading-tight">{app.studentName}</div>
+                          <span className="block text-[10px] text-gray-500 font-semibold mt-0.5">
+                            {app.email} | {app.parentMobile || app.mobile}
+                          </span>
                         </td>
-                        <td className="py-2.5 px-6 font-semibold text-slate-700">
+                        <td className="py-3.5 px-6 font-bold text-gray-600">
                           {app.departmentId?.name || 'N/A'}
                         </td>
-                        <td className="py-2.5 px-6 font-semibold text-slate-700">
+                        <td className="py-3.5 px-6 font-bold text-gray-600">
                           {app.courseId?.name || 'N/A'}
                         </td>
-                        <td className="py-2.5 px-6" onClick={(e) => e.stopPropagation()}>
-                          {/* Inline status dropdown */}
-                          <select
-                            value={currentStatus}
-                            onChange={(e) => handleStatusChangeDirectly(app._id, e.target.value)}
-                            className={`px-3 py-1.5 rounded-full font-bold text-[10px] uppercase border cursor-pointer focus:outline-none transition-all ${STATUS_COLOR_MAP[currentStatus]}`}
-                          >
-                            {STATUS_OPTIONS.map(opt => (
-                              <option key={opt} value={opt} className="bg-white text-slate-800 uppercase font-semibold">
-                                {opt}
-                              </option>
-                            ))}
-                          </select>
+                        <td className="py-3.5 px-6 font-bold text-center" onClick={(e) => e.stopPropagation()}>
+                          
+                          {/* Colorful Status Dropdown */}
+                          <div className="relative inline-block w-[140px]">
+                            <select
+                              value={currentStatus}
+                              onChange={(e) => handleStatusChangeDirectly(app._id, e.target.value)}
+                              className={`w-full text-[10px] font-black uppercase rounded-lg pl-3 pr-7 py-2 cursor-pointer appearance-none transition-all outline-none border shadow-sm focus:ring-2 focus:ring-offset-1 ${
+                                currentStatus === 'New' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
+                                currentStatus === 'Hold' ? 'bg-orange-50 text-orange-700 border-orange-200 focus:ring-orange-500' :
+                                currentStatus === 'Not Interested' ? 'bg-red-50 text-red-700 border-red-200 focus:ring-red-500' :
+                                currentStatus === 'Admission Confirmed' ? 'bg-teal-50 text-teal-700 border-teal-200 focus:ring-teal-500' :
+                                'bg-purple-50 text-purple-700 border-purple-200 focus:ring-purple-500'
+                              }`}
+                            >
+                              {STATUS_OPTIONS.map(opt => (
+                                <option key={opt} value={opt} className="bg-white text-gray-800 uppercase font-bold">
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                              <ChevronDown size={14} className="opacity-50" />
+                            </div>
+                          </div>
+
                         </td>
-                        <td className="py-2.5 px-6 font-semibold text-slate-555">
+                        <td className="py-3.5 px-6 text-xs text-gray-700 font-semibold whitespace-nowrap">
                           {new Date(app.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric'
                           })}
                         </td>
-                        <td className="py-2.5 px-6 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-3">
-                            {/* Timeline Toggle Button */}
-                            <Button
-                              variant="outline"
-                              className={`h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl transition-all shadow-2xs hover:shadow-xs hover:bg-purple-50 hover:border-purple-250 hover:text-purple-600 ${
-                                expandedAppId === app._id ? 'bg-purple-50 border-purple-300 text-purple-600 shadow-xs' : 'bg-slate-50/40 text-slate-500'
+                        <td className="py-3.5 px-6 text-center" onClick={(e) => e.stopPropagation()}>
+                          
+                          {/* Correct Action Buttons using standard <button> tag */}
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${
+                                expandedAppId === app._id 
+                                  ? 'bg-purple-600 text-white shadow-md shadow-purple-200 border-transparent' 
+                                  : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600'
                               }`}
                               onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
                               title={expandedAppId === app._id ? "Hide Timeline" : "Timeline"}
                             >
-                              <GitCommit className="h-5 w-5" strokeWidth={2} />
-                            </Button>
+                              <GitCommit size={18} strokeWidth={2} />
+                            </button>
 
-                            {/* View Details Button */}
-                            <Button
-                              variant="outline"
-                              className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-blue-50/80 hover:border-blue-250 hover:text-blue-600 hover:shadow-xs transition-all shadow-2xs"
+                            <button
+                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:shadow-xs transition-all shadow-sm"
                               onClick={() => handleViewDetails(app._id)}
                               title="View Details"
                             >
-                              <Eye className="h-5 w-5" strokeWidth={2} />
-                            </Button>
+                              <Eye size={18} strokeWidth={2} />
+                            </button>
 
-                            {/* Contact Button */}
-                            <Button
-                              variant="outline"
-                              className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-emerald-50/80 hover:border-emerald-250 hover:text-emerald-600 hover:shadow-xs transition-all shadow-2xs"
+                            <button
+                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm"
                               onClick={() => handleOpenContactModal(app)}
                               title="Contact"
                             >
-                              <Phone className="h-5 w-5" strokeWidth={2} />
-                            </Button>
+                              <Phone size={18} strokeWidth={2} />
+                            </button>
                           </div>
                         </td>
                       </tr>
 
-                    {/* Expandable CRM Journey Timeline Row */}
-                    <AnimatePresence>
-                      {expandedAppId === app._id && (
-                        <tr className="bg-[#F8FAFC]">
-                          <td colSpan={7} className="px-6 py-6 border-b border-[#E5E7EB]">
-                            <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
-                              {/* Top Information Bar / Application Header */}
-                              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
-                                <div className="space-y-1.5 text-left">
-                                  <div className="flex flex-wrap items-center gap-2.5">
-                                    <h3 className="text-[18px] font-semibold text-slate-800 leading-none">{app.studentName}</h3>
-                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-[#6D5DF6] border border-indigo-100">
-                                      {app.applicationId}
-                                    </span>
-                                    {/* Status Badge */}
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-wider ${
-                                      app.stage === 'Counselling Assigned' || app.stage === 'New'
-                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
-                                        : app.stage === 'Call Scheduled' || app.stage === 'Hold'
-                                        ? 'bg-amber-50 border-amber-250 text-amber-700'
-                                        : app.stage === 'Rejected' || app.stage === 'Not Interested'
-                                        ? 'bg-rose-50 border-rose-250 text-rose-750'
-                                        : app.stage === 'Admission Confirmed' || app.stage === 'Confirmed'
-                                        ? 'bg-emerald-50 border-emerald-250 text-emerald-700'
-                                        : 'bg-purple-50 border-purple-250 text-purple-750'
-                                    }`}>
-                                      {STAGE_MAP_TO_STATUS[app.stage] ? STAGE_MAP_TO_STATUS[app.stage].toUpperCase() : 'NEW'}
-                                    </span>
-                                  </div>
-
-                                  {/* Metadata Line */}
-                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-semibold">
-                                    <span>Course Seeking: <strong>{app.courseId?.name || 'N/A'} ({app.departmentId?.name || 'N/A'})</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-350" />
-                                    <span>City: <strong>{app.city}</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
-                                    <span>Parent: <strong>{app.parentName} ({app.parentMobile})</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
-                                    <span>Submitted: <strong>{new Date(app.createdAt).toLocaleDateString()}</strong></span>
-                                  </div>
+                      {/* Distinct Timeline Section Highlight */}
+                      <AnimatePresence>
+                        {expandedAppId === app._id && (
+                          <tr className="bg-indigo-50/40">
+                            <td colSpan={7} className="p-0 border-b border-indigo-100">
+                              <motion.div 
+                                initial={{ opacity: 0, height: 0 }} 
+                                animate={{ opacity: 1, height: 'auto' }} 
+                                exit={{ opacity: 0, height: 0 }}
+                                className="m-4 lg:m-6 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border-2 border-indigo-100 overflow-hidden"
+                              >
+                                
+                                {/* Gradient Header */}
+                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 flex justify-between items-center text-white">
+                                  <h4 className="font-black flex items-center gap-2 tracking-wide uppercase text-sm">
+                                    <GitCommit size={20} /> CRM Application Journey
+                                  </h4>
+                                  <button onClick={() => setExpandedAppId(null)} className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition-all">
+                                    <X size={18} />
+                                  </button>
                                 </div>
 
-                                {/* Action Buttons Header Right */}
-                                <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => handleViewDetails(app._id)}
-                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
-                                  >
-                                    View Profile
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => handleOpenContactModal(app)}
-                                    className="border-emerald-250 hover:bg-emerald-50 text-emerald-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
-                                  >
-                                    Quick Contact
-                                  </Button>
-                                </div>
-                              </div>
+                                <div className="p-6 space-y-6">
+                                  
+                                  {/* Student Info Top Bar */}
+                                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5">
+                                    <div className="space-y-2 text-left">
+                                      <div className="flex flex-wrap items-center gap-3">
+                                        <h3 className="text-xl font-black text-gray-900 leading-none">{app.studentName}</h3>
+                                        <span className="px-3 py-1 rounded-md text-[10px] font-black bg-purple-100 text-purple-700">
+                                          {app.applicationId}
+                                        </span>
+                                      </div>
+                                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 font-bold">
+                                        <span>Course Seeking: <strong className="text-gray-700">{app.courseId?.name || 'N/A'} ({app.departmentId?.name || 'N/A'})</strong></span>
+                                        <span className="h-1 w-1 rounded-full bg-gray-300" />
+                                        <span>City: <strong className="text-gray-700">{app.city}</strong></span>
+                                        <span className="h-1 w-1 rounded-full bg-gray-300" />
+                                        <span>Parent: <strong className="text-gray-700">{app.parentName} ({app.parentMobile})</strong></span>
+                                      </div>
+                                    </div>
 
-                              {/* CRM Admissions Journey Timeline */}
-                              <AdmissionJourneyTimeline
-                                enquiry={app}
-                                stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                                onSaveJourney={(updatedJourney) => handleSaveJourney(app._id, updatedJourney)}
-                                counselorName="Admin"
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </AnimatePresence>
+                                    <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
+                                      <button
+                                        onClick={() => handleViewDetails(app._id)}
+                                        className="h-9 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all"
+                                      >
+                                        View Profile
+                                      </button>
+                                      <button
+                                        onClick={() => handleOpenContactModal(app)}
+                                        className="h-9 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl transition-all"
+                                      >
+                                        Quick Contact
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* CRM Admissions Journey Timeline */}
+                                  <div className="bg-[#f8f9fe] rounded-2xl p-6 border border-gray-100">
+                                    <AdmissionJourneyTimeline
+                                      enquiry={app}
+                                      stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                                      onSaveJourney={(updatedJourney) => handleSaveJourney(app._id, updatedJourney)}
+                                      counselorName="Admin"
+                                    />
+                                  </div>
+                                </div>
+                              </motion.div>
+                            </td>
+                          </tr>
+                        )}
+                      </AnimatePresence>
                     </React.Fragment>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Center Student Details Modal (Redesigned Reusable CRMProfileModal) */}
       <CRMProfileModal

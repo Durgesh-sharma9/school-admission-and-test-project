@@ -31,7 +31,8 @@ import {
   Calendar,
   Sparkles,
   GitCommit,
-  Phone
+  Phone,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentPortalModal from '../components/AssessmentPortalModal';
@@ -422,7 +423,7 @@ const Enquiries = () => {
             }}
             className="p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded-xl text-slate-550 hover:text-slate-800 transition-colors shadow-xs"
           >
-            <ChevronLeft className="h-4.5 w-4.5" />
+            <ChevronLeft size={20} />
           </button>
           <div>
             <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Parent Family History Profile</h2>
@@ -558,7 +559,7 @@ const Enquiries = () => {
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full text-left">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-              <Search className="h-4.5 w-4.5" />
+              <Search size={18} />
             </span>
             <input
               type="text"
@@ -687,7 +688,7 @@ const Enquiries = () => {
                   setMessageModalOpen(true);
                 }}
               >
-                <MessageSquare className="h-4 w-4 mr-1.5" />
+                <MessageSquare size={16} className="mr-1.5" />
                 WhatsApp Selected
               </Button>
               <Button
@@ -699,7 +700,7 @@ const Enquiries = () => {
                   setMessageModalOpen(true);
                 }}
               >
-                <Mail className="h-4 w-4 mr-1.5" />
+                <Mail size={16} className="mr-1.5" />
                 Email Selected
               </Button>
               <button
@@ -714,12 +715,12 @@ const Enquiries = () => {
       </AnimatePresence>
 
       {/* Main Table view */}
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <Loader message="Loading enquiries..." />
         ) : enquiries.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
-            <AlertCircle className="h-10 w-10 mx-auto text-slate-300 mb-3" />
+            <AlertCircle size={40} className="mx-auto text-slate-300 mb-3" />
             <p className="font-semibold text-slate-500">No enquiries found</p>
             <p className="text-xs text-slate-400 mt-1">
               Try adjusting your search criteria or register a new form submission.
@@ -728,7 +729,7 @@ const Enquiries = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-700">
-              <thead className="text-xs text-slate-400 font-bold uppercase tracking-wider bg-slate-50 border-b border-slate-100 sticky top-0">
+              <thead className="text-xs text-slate-400 font-bold uppercase tracking-wider bg-slate-50 border-b border-slate-200 sticky top-0">
                 <tr>
                   <th className="px-6 py-4 w-12 text-center">
                     <input
@@ -788,128 +789,130 @@ const Enquiries = () => {
                         </span>
                       </td>
                       <td className="px-6 py-2.5 font-medium text-slate-700">{enq.classSeeking}</td>
-                      <td className="px-6 py-2.5 text-center font-bold" onClick={(e) => e.stopPropagation()}>
-                        {/* Interactive inline status change centered and compact */}
-                        <select
-                          value={enq.status}
-                          onChange={(e) => handleStatusChange(enq._id, e.target.value)}
-                          className="bg-slate-50 hover:bg-slate-100 text-[11px] font-bold text-slate-705 focus:outline-none rounded-lg border border-slate-200 px-2 py-1 w-28 text-center cursor-pointer appearance-none"
-                        >
-                          <option value="New Enquiry">NEW</option>
-                          <option value="Hold">HOLD</option>
-                          <option value="Not Interested">REJECTED</option>
-                          <option value="Admission Confirmed">CONFIRMED</option>
-                        </select>
+                      <td className="px-6 py-2.5 font-bold" onClick={(e) => e.stopPropagation()}>
+                        
+                        <div className="relative inline-block w-[120px]">
+                          <select
+                            value={enq.status}
+                            onChange={(e) => handleStatusChange(enq._id, e.target.value)}
+                            className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-2 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
+                              ${
+                                enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
+                                enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
+                                enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
+                                enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
+                                'bg-slate-50 text-slate-700 border-slate-200'
+                              }
+                            `}
+                          >
+                            <option value="New Enquiry">NEW</option>
+                            <option value="Hold">HOLD</option>
+                            <option value="Not Interested">REJECTED</option>
+                            <option value="Admission Confirmed">CONFIRMED</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                            <ChevronDown size={14} className="opacity-50" />
+                          </div>
+                        </div>
+
                       </td>
                       <td className="px-6 py-2.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
                         {formatSubmissionDate(enq.saveDate, enq.saveTime)}
                       </td>
                       <td className="px-6 py-2.5" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-3">
-                          {/* Timeline Toggle Button */}
-                          <Button
-                            variant="outline"
-                            className={`h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl transition-all shadow-2xs hover:shadow-xs hover:bg-purple-50 hover:border-purple-250 hover:text-purple-600 ${
-                              expandedEnquiryId === enq._id ? 'bg-purple-50 border-purple-300 text-purple-600 shadow-xs' : 'bg-slate-50/40 text-slate-500'
+                        <div className="flex items-center justify-center gap-2">
+                          
+                          {/* USING STANDARD HTML BUTTONS FOR ICONS */}
+                          <button
+                            className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${
+                              expandedEnquiryId === enq._id 
+                                ? 'bg-indigo-50 border-indigo-200 text-indigo-600 shadow-xs' 
+                                : 'bg-white border-slate-200 text-slate-500 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600'
                             }`}
                             onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
                             title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
                           >
-                            <GitCommit className="h-5 w-5" strokeWidth={2} />
-                          </Button>
+                            <GitCommit size={18} strokeWidth={2} />
+                          </button>
 
-                          {/* View Details Button */}
-                          <Button
-                            variant="outline"
-                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-blue-50/80 hover:border-blue-250 hover:text-blue-600 hover:shadow-xs transition-all shadow-2xs"
+                          <button
+                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:shadow-xs transition-all shadow-sm"
                             onClick={() => {
                               setSelectedEnquiryForView(enq);
                               setViewModalOpen(true);
                             }}
                             title="View Details"
                           >
-                            <Eye className="h-5 w-5" strokeWidth={2} />
-                          </Button>
+                            <Eye size={18} strokeWidth={2} />
+                          </button>
 
-                          {/* Contact Button */}
-                          <Button
-                            variant="outline"
-                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-emerald-50/80 hover:border-emerald-250 hover:text-emerald-600 hover:shadow-xs transition-all shadow-2xs"
+                          <button
+                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm"
                             onClick={() => {
                               setSelectedEnquiryForContact(enq);
                               setContactModalOpen(true);
                             }}
                             title="Contact"
                           >
-                            <Phone className="h-5 w-5" strokeWidth={2} />
-                          </Button>
+                            <Phone size={18} strokeWidth={2} />
+                          </button>
 
-                          {/* Documents / Assessment Button */}
-                          <Button
-                            variant="outline"
-                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-amber-50/80 hover:border-amber-250 hover:text-amber-600 hover:shadow-xs transition-all shadow-2xs"
+                          <button
+                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 hover:shadow-xs transition-all shadow-sm"
                             onClick={() => setSelectedEnquiryForAssessment(enq)}
-                            title="Documents"
+                            title="Documents / Assessment"
                           >
-                            <FileQuestion className="h-5 w-5" strokeWidth={2} />
-                          </Button>
+                            <FileQuestion size={18} strokeWidth={2} />
+                          </button>
 
-                          {/* Delete Button */}
-                          <Button
-                            variant="outline"
-                            className="h-11 w-11 p-0 flex items-center justify-center border border-slate-200/60 rounded-xl bg-slate-50/40 text-slate-500 hover:bg-rose-50/80 hover:border-rose-250 hover:text-rose-600 hover:shadow-xs transition-all shadow-2xs"
+                          <button
+                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 hover:shadow-xs transition-all shadow-sm"
                             onClick={() => handleDeleteEnquiry(enq._id)}
                             title="Delete"
                           >
-                            <Trash2 className="h-5 w-5" strokeWidth={2} />
-                          </Button>
+                            <Trash2 size={18} strokeWidth={2} />
+                          </button>
+
                         </div>
                       </td>
                     </tr>
 
-                    {/* Expandable CRM Journey Timeline Row */}
                     <AnimatePresence>
                       {expandedEnquiryId === enq._id && (
-                        <tr className="bg-[#F8FAFC]">
-                          <td colSpan={8} className="px-6 py-4 border-b border-[#E5E7EB]">
-                            <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-xs space-y-6">
-                              {/* Top Information Bar / Enquiry Header */}
-                              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-5">
+                        <tr className="bg-slate-50">
+                          <td colSpan={8} className="px-6 py-6 border-b border-slate-200">
+                            
+                            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                              
+                              <div className="bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200">
                                 <div className="space-y-1.5 text-left">
                                   <div className="flex flex-wrap items-center gap-2.5">
-                                    <h3 className="text-[18px] font-semibold text-slate-800 leading-none">{enq.studentName}</h3>
-                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-[#6D5DF6] border border-indigo-100">
+                                    <h3 className="text-lg font-bold text-slate-800 leading-none">{enq.studentName}</h3>
+                                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
                                       {enq.enquiryId}
                                     </span>
-                                    {/* Status Badge */}
-                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border tracking-wider ${
-                                      enq.status === 'New Enquiry' || enq.status === 'New'
-                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
-                                        : enq.status === 'Hold'
-                                        ? 'bg-amber-50 border-amber-250 text-amber-700'
-                                        : enq.status === 'Not Interested' || enq.status === 'Rejected'
-                                        ? 'bg-rose-50 border-rose-250 text-rose-750'
-                                        : enq.status === 'Admission Confirmed' || enq.status === 'Confirmed'
-                                        ? 'bg-emerald-50 border-emerald-250 text-emerald-700'
-                                        : 'bg-purple-50 border-purple-250 text-purple-750'
+                                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border tracking-wider ${
+                                      enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                                      enq.status === 'Hold' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                                      enq.status === 'Not Interested' ? 'bg-rose-50 border-rose-200 text-rose-700' :
+                                      enq.status === 'Admission Confirmed' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
+                                      'bg-slate-50 border-slate-200 text-slate-700'
                                     }`}>
                                       {enq.status === 'New Enquiry' ? 'NEW' : enq.status === 'Not Interested' ? 'REJECTED' : enq.status === 'Admission Confirmed' ? 'CONFIRMED' : enq.status.toUpperCase()}
                                     </span>
                                   </div>
 
-                                  {/* Metadata Line */}
-                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-semibold">
+                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-500 font-semibold">
                                     <span>Class seeking: <strong>{enq.classSeeking}</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-350" />
+                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
                                     <span>City: <strong>{enq.city}</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
                                     <span>Parent: <strong>{enq.parentName} ({enq.mobile})</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-355" />
+                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
                                     <span>Submitted: <strong>{enq.saveDate} {enq.saveTime}</strong></span>
                                   </div>
                                 </div>
 
-                                {/* Action Buttons Header Right */}
                                 <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
                                   <Button
                                     variant="outline"
@@ -917,34 +920,29 @@ const Enquiries = () => {
                                       setSelectedEnquiryForView(enq);
                                       setViewModalOpen(true);
                                     }}
-                                    className="border-[#E5E7EB] hover:bg-slate-50 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                    className="border-slate-200 hover:bg-slate-100 text-slate-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
                                   >
                                     View Profile
                                   </Button>
                                   <Button
                                     variant="outline"
                                     onClick={() => setSelectedEnquiryForAssessment(enq)}
-                                    className="border-indigo-100 hover:bg-indigo-50/50 text-[#6D5DF6] h-8 px-3 text-xs font-bold rounded-lg transition-all"
+                                    className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 h-8 px-3 text-xs font-bold rounded-lg transition-all"
                                   >
                                     Assessments
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => handleDeleteEnquiry(enq._id)}
-                                    className="border-[#E5E7EB] text-[#EF4444] hover:bg-red-50/50 h-8 px-3 text-xs font-bold rounded-lg transition-all hover:border-red-200"
-                                  >
-                                    Delete
                                   </Button>
                                 </div>
                               </div>
 
-                              {/* CRM Admissions Journey Timeline */}
-                              <AdmissionJourneyTimeline
-                                enquiry={enq}
-                                stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                                onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
-                                counselorName={school?.name || 'Admin'}
-                              />
+                              <div className="p-6">
+                                <AdmissionJourneyTimeline
+                                  enquiry={enq}
+                                  stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                                  onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
+                                  counselorName={school?.name || 'Admin'}
+                                />
+                              </div>
+
                             </div>
                           </td>
                         </tr>
@@ -960,7 +958,7 @@ const Enquiries = () => {
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white border border-slate-100 px-6 py-4 rounded-2xl shadow-xs">
+        <div className="flex items-center justify-between bg-white border border-slate-200 px-6 py-4 rounded-2xl shadow-sm">
           <p className="text-xs font-medium text-slate-500">
             Showing Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
             <span className="font-semibold text-slate-800">{totalPages}</span> ({totalRecords} records)
@@ -969,16 +967,16 @@ const Enquiries = () => {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft className="h-4.5 w-4.5" />
+              <ChevronLeft size={18} />
             </button>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight className="h-4.5 w-4.5" />
+              <ChevronRight size={18} />
             </button>
           </div>
         </div>
@@ -990,14 +988,14 @@ const Enquiries = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
+            className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
           >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                 {messageType === 'whatsapp' ? (
-                  <MessageSquare className="h-4.5 w-4.5 text-emerald-600" />
+                  <MessageSquare size={18} className="text-emerald-600" />
                 ) : (
-                  <Mail className="h-4.5 w-4.5 text-blue-600" />
+                  <Mail size={18} className="text-blue-600" />
                 )}
                 Draft Personalized Message
               </h3>
@@ -1005,12 +1003,12 @@ const Enquiries = () => {
                 onClick={() => setMessageModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                <X size={20} />
               </button>
             </div>
 
             <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Customize your template message below. Placeholders like{' '}
                 <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
                   [Parent Name]
@@ -1039,7 +1037,7 @@ const Enquiries = () => {
                         setMessageTemplate(selected.body);
                       }
                     }}
-                    className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-950 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   >
                     <option value="">Select a saved template blueprint</option>
                     {school?.communicationTemplates
@@ -1060,7 +1058,7 @@ const Enquiries = () => {
                   value={messageTemplate}
                   onChange={(e) => setMessageTemplate(e.target.value)}
                   rows={5}
-                  className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                 />
               </div>
 
@@ -1069,14 +1067,14 @@ const Enquiries = () => {
                 <label className="block text-xs font-semibold text-slate-700 uppercase text-left">
                   Recipients ({selectedIds.length})
                 </label>
-                <div className="max-h-40 overflow-y-auto border border-slate-100 rounded-lg p-2 divide-y divide-slate-50 text-xs">
+                <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2 divide-y divide-slate-100 text-xs">
                   {getSelectedEnquiriesDetails().map((enq) => (
                     <div key={enq._id} className="py-2 flex items-center justify-between">
                       <div className="text-left">
                         <span className="font-semibold text-slate-800 block">
                           {enq.parentName} ({enq.studentName})
                         </span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-slate-500">
                           {messageType === 'whatsapp' ? enq.whatsapp || enq.mobile : enq.email || 'No email provided'}
                         </span>
                       </div>
@@ -1107,18 +1105,18 @@ const Enquiries = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
               {messageType === 'email' ? (
                 <Button
                   variant="primary"
                   onClick={launchBulkEmail}
-                  className="bg-indigo-600 hover:bg-indigo-700 border-none"
+                  className="bg-indigo-600 hover:bg-indigo-700 border-none text-white"
                 >
-                  <Send className="h-4 w-4 mr-1.5" />
+                  <Send size={16} className="mr-1.5" />
                   BCC Mail All Recipients
                 </Button>
               ) : (
-                <p className="text-[10px] text-slate-400 italic">
+                <p className="text-[10px] text-slate-500 italic">
                   Note: WhatsApp doesn't support bulk api links. Trigger each message separately.
                 </p>
               )}
@@ -1185,11 +1183,11 @@ const Enquiries = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-4xl bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-8"
+            className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-8"
           >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <Edit className="h-4.5 w-4.5 text-indigo-650" />
+                <Edit size={20} className="text-indigo-600" />
                 Edit Enquiry: {selectedEnquiryForEdit.studentName}
               </h3>
               <button
@@ -1199,7 +1197,7 @@ const Enquiries = () => {
                 }}
                 className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X size={20} />
               </button>
             </div>
 
@@ -1212,7 +1210,7 @@ const Enquiries = () => {
               />
             </div>
 
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
