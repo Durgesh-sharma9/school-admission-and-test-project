@@ -266,6 +266,7 @@ const Applications = () => {
         setApplications(prev => prev.filter(app => app._id !== appToDelete._id));
         setDeleteModalOpen(false);
         setAppToDelete(null);
+        window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
       }
     } catch (error) {
       toast.error(error.message || 'Failed to delete application');
@@ -290,6 +291,7 @@ const Applications = () => {
           setSelectedApp(res.data);
         }
         fetchApplications();
+        window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
       }
     } catch (error) {
       toast.error('Failed to update status');
@@ -304,6 +306,7 @@ const Applications = () => {
       if (response.success) {
         toast.success('Admission journey updated successfully!');
         setApplications(prev => prev.map(app => app._id === appId ? { ...app, journey: response.data.journey, stage: response.data.stage } : app));
+        window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
       }
     } catch (err) {
       toast.error(err.message || 'Failed to update journey');

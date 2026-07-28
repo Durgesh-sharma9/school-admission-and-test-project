@@ -191,6 +191,7 @@ const AdmissionForm = () => {
       const res = await api.post('/college/applications/submit', payload);
       if (res.success) {
         toast.success('Manual admission application registered successfully!');
+        window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
         // Reset form
         setFormData({
           studentName: '',

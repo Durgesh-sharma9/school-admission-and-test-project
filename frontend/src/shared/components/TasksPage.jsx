@@ -173,7 +173,7 @@ const TasksPage = ({ module = 'school' }) => {
 
   // Filters State
   const [search, setSearch] = useState('');
-  const [dateFilter, setDateFilter] = useState(module === 'college' ? 'all' : 'today'); // today, today_only, tomorrow, week, custom, all
+  const [dateFilter, setDateFilter] = useState('today'); // today, today_only, tomorrow, week, custom, all
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');

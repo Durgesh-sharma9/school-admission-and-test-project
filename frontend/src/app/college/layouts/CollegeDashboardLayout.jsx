@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../school/contexts/AuthContext';
 import CollegeSidebar from '../components/CollegeSidebar';
-import CollegeNavbar from '../components/CollegeNavbar';
+import Navbar from '../../school/components/Navbar';
 import Loader from '../../../shared/components/Loader';
 
 const CollegeDashboardLayout = () => {
@@ -48,7 +48,7 @@ const CollegeDashboardLayout = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
-        <CollegeNavbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} title={getPageTitle()} />
+        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} title={getPageTitle()} module="college" />
 
         {/* Trial Expired Warning Banner */}
         {!isTrialActive && (

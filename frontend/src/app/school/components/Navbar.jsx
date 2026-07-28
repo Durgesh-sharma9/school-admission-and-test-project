@@ -37,7 +37,7 @@ const getPopupTitle = (announcement) => {
   }
 };
 
-const Navbar = ({ toggleSidebar, title }) => {
+const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
   const { school, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -60,7 +60,9 @@ const Navbar = ({ toggleSidebar, title }) => {
 
   const fetchPendingTasksCount = async () => {
     try {
-      const res = await api.get('/enquiries', { params: { limit: 10000 } });
+      const url = module === 'school' ? '/enquiries' : '/college/applications';
+      const params = module === 'school' ? { limit: 10000 } : {};
+      const res = await api.get(url, { params });
       if (res.success && res.data) {
         let count = 0;
         const now = new Date();
@@ -118,12 +120,16 @@ const Navbar = ({ toggleSidebar, title }) => {
 
   useEffect(() => {
     if (school) {
-      fetchNotifications();
-      fetchAnnouncements();
-      fetchPendingTasksCount();
-      const interval = setInterval(() => {
+      if (module === 'school') {
         fetchNotifications();
         fetchAnnouncements();
+      }
+      fetchPendingTasksCount();
+      const interval = setInterval(() => {
+        if (module === 'school') {
+          fetchNotifications();
+          fetchAnnouncements();
+        }
         fetchPendingTasksCount();
       }, 30000);
 
@@ -134,7 +140,7 @@ const Navbar = ({ toggleSidebar, title }) => {
         window.removeEventListener('crm-tasks-updated', fetchPendingTasksCount);
       };
     }
-  }, [school]);
+  }, [school, module]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -233,76 +239,78 @@ const Navbar = ({ toggleSidebar, title }) => {
             </div>
           )}
 
-          <div className="relative" ref={annRef}>
-            <button
-              onClick={() => {
-                setAnnouncementDrawerOpen(!announcementDrawerOpen);
-                if (!announcementDrawerOpen) fetchAnnouncements();
-              }}
-              className="relative p-2 rounded-lg text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-colors"
-            >
-              <Megaphone className="h-5 w-5" />
-              {unreadAnnouncementCount > 0 && (
-                <span className="absolute top-1 right-1 h-4 w-4 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
-                  {unreadAnnouncementCount}
-                </span>
-              )}
-            </button>
+          {module === 'school' && (
+            <div className="relative" ref={annRef}>
+              <button
+                onClick={() => {
+                  setAnnouncementDrawerOpen(!announcementDrawerOpen);
+                  if (!announcementDrawerOpen) fetchAnnouncements();
+                }}
+                className="relative p-2 rounded-lg text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-colors"
+              >
+                <Megaphone className="h-5 w-5" />
+                {unreadAnnouncementCount > 0 && (
+                  <span className="absolute top-1 right-1 h-4 w-4 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                    {unreadAnnouncementCount}
+                  </span>
+                )}
+              </button>
 
-            {announcementDrawerOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-lg border border-gray-100 py-2.5 z-50 text-left">
-                <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-                    <Megaphone className="w-4 h-4 text-orange-500" />
-                    Platform Updates & Notices
-                  </span>
-                  <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
-                    {unreadAnnouncementCount} Unread
-                  </span>
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {announcements.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-gray-400">No system updates at this time.</div>
-                  ) : (
-                    announcements.map((ann) => (
-                      <div
-                        key={ann._id}
-                        onClick={() => setSelectedAnnouncementDetail(ann)}
-                        className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors text-left cursor-pointer ${
-                          !ann.isRead ? 'bg-orange-50/40' : ''
-                        }`}
-                      >
-                        <div className="mt-0.5 shrink-0">
-                          {ann.priority === 'Critical' || ann.priority === 'High' ? (
-                            <div className="h-7 w-7 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
-                              <AlertTriangle className="h-4 w-4" />
-                            </div>
-                          ) : (
-                            <div className="h-7 w-7 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center">
-                              <Megaphone className="h-4 w-4" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-1">
-                            <p className="text-xs font-bold text-gray-800 truncate">{ann.title}</p>
-                            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 shrink-0">
-                              {ann.category}
-                            </span>
+              {announcementDrawerOpen && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-lg border border-gray-100 py-2.5 z-50 text-left">
+                  <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                      <Megaphone className="w-4 h-4 text-orange-500" />
+                      Platform Updates & Notices
+                    </span>
+                    <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                      {unreadAnnouncementCount} Unread
+                    </span>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {announcements.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-gray-400">No system updates at this time.</div>
+                    ) : (
+                      announcements.map((ann) => (
+                        <div
+                          key={ann._id}
+                          onClick={() => setSelectedAnnouncementDetail(ann)}
+                          className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors text-left cursor-pointer ${
+                            !ann.isRead ? 'bg-orange-50/40' : ''
+                          }`}
+                        >
+                          <div className="mt-0.5 shrink-0">
+                            {ann.priority === 'Critical' || ann.priority === 'High' ? (
+                              <div className="h-7 w-7 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
+                                <AlertTriangle className="h-4 w-4" />
+                              </div>
+                            ) : (
+                              <div className="h-7 w-7 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center">
+                                <Megaphone className="h-4 w-4" />
+                              </div>
+                            )}
                           </div>
-                          <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{ann.message}</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="text-xs font-bold text-gray-800 truncate">{ann.title}</p>
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 shrink-0">
+                                {ann.category}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{ann.message}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Tasks Badge */}
           <Link
-            to="/tasks"
+            to={module === 'school' ? '/tasks' : '/college/tasks'}
             className="relative p-2 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors shrink-0 group flex items-center"
           >
             <ClipboardCheck className="h-5 w-5" />
@@ -321,64 +329,66 @@ const Navbar = ({ toggleSidebar, title }) => {
             </div>
           </Link>
 
-          <div className="relative" ref={bellRef}>
-            <button
-              onClick={() => {
-                setBellOpen(!bellOpen);
-                if (!bellOpen) fetchNotifications();
-              }}
-              className="relative p-2 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-            >
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-pink-500 rounded-full border-2 border-white" />
-              )}
-            </button>
+          {module === 'school' && (
+            <div className="relative" ref={bellRef}>
+              <button
+                onClick={() => {
+                  setBellOpen(!bellOpen);
+                  if (!bellOpen) fetchNotifications();
+                }}
+                className="relative p-2 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-pink-500 rounded-full border-2 border-white" />
+                )}
+              </button>
 
-            {bellOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg border border-gray-100 py-2.5 z-50 text-left">
-                <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
-                  <span className="text-xs font-bold text-gray-800">Activity Alerts</span>
-                  {unreadCount > 0 && (
-                    <button onClick={handleMarkAllRead} className="text-[10px] text-purple-600 hover:underline font-bold">
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-72 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-gray-400">No notifications yet.</div>
-                  ) : (
-                    notifications.map((notif) => (
-                      <button
-                        key={notif._id}
-                        onClick={() => handleNotificationClick(notif)}
-                        className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors text-left ${
-                          !notif.isRead ? 'bg-purple-50/40' : ''
-                        }`}
-                      >
-                        <div className="mt-0.5 shrink-0">
-                          {notif.type === 'new_enquiry' && (
-                            <div className="h-7 w-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center"><FileText className="h-4 w-4" /></div>
-                          )}
-                          {notif.type === 'admission_confirmed' && (
-                            <div className="h-7 w-7 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>
-                          )}
-                          {['status_changed', 'assessment_assigned', 'assessment_completed'].includes(notif.type) && (
-                            <div className="h-7 w-7 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center"><ClipboardCheck className="h-4 w-4" /></div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-800 truncate">{notif.title}</p>
-                          <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{notif.message}</p>
-                        </div>
+              {bellOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg border border-gray-100 py-2.5 z-50 text-left">
+                  <div className="px-4 py-2 border-b border-gray-50 flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-800">Activity Alerts</span>
+                    {unreadCount > 0 && (
+                      <button onClick={handleMarkAllRead} className="text-[10px] text-purple-600 hover:underline font-bold">
+                        Mark all read
                       </button>
-                    ))
-                  )}
+                    )}
+                  </div>
+                  <div className="max-h-72 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-gray-400">No notifications yet.</div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <button
+                          key={notif._id}
+                          onClick={() => handleNotificationClick(notif)}
+                          className={`w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors text-left ${
+                            !notif.isRead ? 'bg-purple-50/40' : ''
+                          }`}
+                        >
+                          <div className="mt-0.5 shrink-0">
+                            {notif.type === 'new_enquiry' && (
+                              <div className="h-7 w-7 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center"><FileText className="h-4 w-4" /></div>
+                            )}
+                            {notif.type === 'admission_confirmed' && (
+                              <div className="h-7 w-7 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center"><UserCheck className="h-4 w-4" /></div>
+                            )}
+                            {['status_changed', 'assessment_assigned', 'assessment_completed'].includes(notif.type) && (
+                              <div className="h-7 w-7 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center"><ClipboardCheck className="h-4 w-4" /></div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-800 truncate">{notif.title}</p>
+                            <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{notif.message}</p>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           <div className="relative" ref={profileRef}>
             <button
@@ -406,7 +416,7 @@ const Navbar = ({ toggleSidebar, title }) => {
                   <p className="text-[10px] text-gray-400 truncate">{school?.email}</p>
                 </div>
                 <Link
-                  to="/settings"
+                  to={module === 'school' ? '/settings' : '/college/settings'}
                   onClick={() => setProfileDropdownOpen(false)}
                   className="flex items-center space-x-2.5 px-4 py-2 text-xs text-gray-600 hover:bg-purple-50 hover:text-purple-600 font-medium"
                 >
@@ -414,7 +424,12 @@ const Navbar = ({ toggleSidebar, title }) => {
                   <span>Settings</span>
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to log out?')) {
+                      logout();
+                      navigate('/login');
+                    }
+                  }}
                   className="w-full flex items-center space-x-2.5 px-4 py-2 text-xs text-red-500 hover:bg-red-50 font-medium border-t border-gray-50"
                 >
                   <LogOut className="h-4 w-4" />
