@@ -88,7 +88,6 @@ const CalendarPicker = ({
   const handleDayClick = (day) => {
     const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     setSelectedDate(dStr);
-    setCalendarOpen(false);
     if (onSelectComplete) onSelectComplete();
   };
 
@@ -174,7 +173,7 @@ const TasksPage = ({ module = 'school' }) => {
 
   // Filters State
   const [search, setSearch] = useState('');
-  const [dateFilter, setDateFilter] = useState('today'); // today, tomorrow, week, custom, all
+  const [dateFilter, setDateFilter] = useState(module === 'college' ? 'all' : 'today'); // today, today_only, tomorrow, week, custom, all
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
