@@ -93,34 +93,34 @@ const CalendarPicker = ({
   };
 
   return (
-    <div className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-4 font-sans text-left">
+    <div className="w-full bg-[#FCFCFF] border border-slate-200/80 rounded-2xl p-4 font-sans text-left shadow-md">
       {/* Month switcher header */}
-      <div className="flex justify-between items-center pb-2 border-b border-slate-200 mb-3">
+      <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
         <button
           type="button"
           onClick={prevMonth}
-          className="p-1 hover:bg-slate-200 rounded-lg text-slate-700 font-bold select-none cursor-pointer transition-colors"
+          className="p-2 hover:bg-[#F5F3FF] hover:text-indigo-600 rounded-full text-slate-600 font-bold select-none cursor-pointer transition-all duration-200"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <span className="text-xs font-black text-slate-800 uppercase tracking-wider">{monthYearLabel}</span>
+        <span className="text-sm font-bold text-slate-900 tracking-tight">{monthYearLabel}</span>
         <button
           type="button"
           onClick={nextMonth}
-          className="p-1 hover:bg-slate-200 rounded-lg text-slate-700 font-bold select-none cursor-pointer transition-colors"
+          className="p-2 hover:bg-[#F5F3FF] hover:text-indigo-600 rounded-full text-slate-600 font-bold select-none cursor-pointer transition-all duration-200"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
       {/* Grid of weekdays */}
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-black text-slate-400 uppercase mb-2">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-medium text-[#7C8AA5] uppercase mb-3">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(w => <span key={w}>{w}</span>)}
       </div>
 
       {/* Grid of days */}
-      <div className="grid grid-cols-7 gap-1 text-center">
-        {blanks.map((_, i) => <div key={`b-${i}`} className="h-9" />)}
+      <div className="grid grid-cols-7 gap-1.5 text-center">
+        {blanks.map((_, i) => <div key={`b-${i}`} className="h-10" />)}
         {days.map(day => {
           const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const isSelected = selectedDate === dStr;
@@ -135,21 +135,21 @@ const CalendarPicker = ({
               type="button"
               key={day}
               onClick={() => handleDayClick(day)}
-              className={`h-9 w-full rounded-lg flex flex-col justify-between items-center py-1 transition-all text-xs font-bold relative cursor-pointer ${
+              className={`h-10 w-full rounded-xl flex flex-col justify-between items-center py-1.5 transition-all duration-200 text-xs font-bold relative cursor-pointer ${
                 isSelected 
-                  ? 'bg-indigo-600 text-white border-2 border-indigo-600 shadow-md' 
+                  ? 'bg-gradient-to-br from-[#6D5DF6] to-[#4F46E5] text-white border-2 border-[#6D5DF6] shadow-lg shadow-indigo-500/30 scale-105' 
                   : isToday 
-                  ? 'border-2 border-blue-400 text-slate-700 hover:bg-slate-200/50'
-                  : 'hover:bg-slate-200/50 text-slate-700'
+                  ? 'bg-[#EEF5FF] border-2 border-[#3B82F6] text-[#3B82F6] hover:bg-[#F5F3FF]'
+                  : 'hover:bg-[#F5F3FF] text-slate-700 hover:shadow-sm'
               }`}
             >
               <span>{day}</span>
               
               {/* Colored indicators row */}
-              <div className="flex gap-0.5 justify-center items-center h-1.5 w-full">
-                {hasOverdue && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-red-500'}`} title="Overdue tasks" />}
-                {hasPending && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-blue-500'}`} title="Pending tasks" />}
-                {hasCompleted && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-emerald-500'}`} title="Completed tasks" />}
+              <div className="flex gap-1 justify-center items-center h-2 w-full">
+                {hasOverdue && <span className={`h-2 w-2 rounded-full ${isSelected ? 'bg-white' : 'bg-[#EF4444]'}`} title="Overdue tasks" />}
+                {hasPending && <span className={`h-2 w-2 rounded-full ${isSelected ? 'bg-white' : 'bg-[#3B82F6]'}`} title="Pending tasks" />}
+                {hasCompleted && <span className={`h-2 w-2 rounded-full ${isSelected ? 'bg-white' : 'bg-[#22C55E]'}`} title="Completed tasks" />}
               </div>
             </button>
           );
@@ -899,32 +899,6 @@ const TasksPage = ({ module = 'school' }) => {
             <span>Export</span>
           </button>
         </div>
-      </div>
-
-      {/* 2. KPI CARDS — 6 cards only */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {[
-          { key: 'today',     name: "Today",     val: metrics.todayCount,     normal: 'bg-blue-50/60 border-blue-200 text-blue-800 hover:bg-blue-100/70',       active: 'bg-blue-100/90 border-blue-500 ring-2 ring-blue-500/10 text-blue-900 shadow-xs' },
-          { key: 'tomorrow',  name: "Tomorrow",  val: metrics.tomorrowCount,  normal: 'bg-amber-50/60 border-amber-200 text-amber-800 hover:bg-amber-100/70',   active: 'bg-amber-100/90 border-amber-500 ring-2 ring-amber-500/10 text-amber-900 shadow-xs' },
-          { key: 'overdue',   name: "Overdue",   val: metrics.overdueCount,   normal: 'bg-rose-50/60 border-rose-200 text-rose-800 hover:bg-rose-100/70',       active: 'bg-rose-100/90 border-rose-500 ring-2 ring-rose-500/10 text-rose-900 shadow-xs' },
-          { key: 'pending',   name: "Pending",   val: metrics.pendingCount,   normal: 'bg-indigo-50/60 border-indigo-200 text-indigo-800 hover:bg-indigo-100/70', active: 'bg-indigo-100/90 border-indigo-500 ring-2 ring-indigo-500/10 text-indigo-900 shadow-xs' },
-          { key: 'completed', name: "Completed", val: metrics.completedCount, normal: 'bg-emerald-50/60 border-emerald-200 text-emerald-800 hover:bg-emerald-100/70', active: 'bg-emerald-100/90 border-emerald-500 ring-2 ring-emerald-500/10 text-emerald-900 shadow-xs' },
-          { key: 'total',     name: "Total",     val: metrics.totalCount,     normal: 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100/70',   active: 'bg-slate-100/90 border-slate-500 ring-2 ring-slate-500/10 text-slate-900 shadow-xs' },
-        ].map((card) => {
-          const isActive = activeKpi === card.key;
-          const kpiStyles = isActive ? card.active : card.normal;
-          return (
-            <button
-              type="button"
-              key={card.key}
-              onClick={() => handleKpiClick(card.key)}
-              className={`h-[76px] rounded-xl border ${kpiStyles} text-center flex flex-col justify-center items-center shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer select-none`}
-            >
-              <span className="text-[10px] uppercase tracking-wider font-extrabold opacity-75">{card.name}</span>
-              <span className="text-xl font-black mt-1 leading-none">{card.val}</span>
-            </button>
-          );
-        })}
       </div>
 
       {/* 3. FILTER CARD (Rounded-2xl, soft shadow, matching Enquiries filters) */}
