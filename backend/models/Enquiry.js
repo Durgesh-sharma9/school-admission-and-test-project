@@ -160,6 +160,22 @@ const enquirySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  journeyStatus: {
+    type: String,
+    enum: ['ACTIVE', 'CLOSED'],
+    default: 'ACTIVE'
+  },
+  closedBy: {
+    type: String,
+    default: ''
+  },
+  closedAt: {
+    type: Date
+  },
+  closedStage: {
+    type: String,
+    default: ''
+  },
   journey: [{
     stage: {
       type: String,

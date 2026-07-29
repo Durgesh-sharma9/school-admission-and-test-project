@@ -298,14 +298,31 @@ const Applications = () => {
     }
   };
 
-  const handleSaveJourney = async (appId, updatedJourney) => {
+  const handleSaveJourney = async (appId, updatedJourney, journeyStatus, closedMetadata) => {
     try {
-      const response = await api.put(`/college/applications/${appId}/stage`, {
-        journey: updatedJourney
-      });
+      const payload = { journey: updatedJourney };
+      if (journeyStatus) payload.journeyStatus = journeyStatus;
+      if (closedMetadata) {
+        payload.closedBy = closedMetadata.closedBy;
+        payload.closedAt = closedMetadata.closedAt;
+        payload.closedStage = closedMetadata.closedStage;
+      } else if (journeyStatus === 'ACTIVE') {
+        payload.closedBy = '';
+        payload.closedAt = null;
+        payload.closedStage = '';
+      }
+      const response = await api.put(`/college/applications/${appId}/stage`, payload);
       if (response.success) {
         toast.success('Admission journey updated successfully!');
-        setApplications(prev => prev.map(app => app._id === appId ? { ...app, journey: response.data.journey, stage: response.data.stage } : app));
+        setApplications(prev => prev.map(app => app._id === appId ? { 
+          ...app, 
+          journey: response.data.journey, 
+          stage: response.data.stage, 
+          journeyStatus: response.data.journeyStatus,
+          closedBy: response.data.closedBy,
+          closedAt: response.data.closedAt,
+          closedStage: response.data.closedStage
+        } : app));
         window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
       }
     } catch (err) {
@@ -738,9 +755,15 @@ const Applications = () => {
                             </button>
 
                             <button
-                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm"
-                              onClick={() => handleOpenContactModal(app)}
-                              title="Contact"
+                              className={`h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm ${app.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              onClick={() => {
+                                if (app.journeyStatus === 'CLOSED') {
+                                  toast.error('This journey has been closed. Contact blocked.');
+                                  return;
+                                }
+                                handleOpenContactModal(app);
+                              }}
+                              title={app.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
                             >
                               <Phone size={18} strokeWidth={2} />
                             </button>
@@ -806,8 +829,15 @@ const Applications = () => {
                                         View Profile
                                       </button>
                                       <button
-                                        onClick={() => handleOpenContactModal(app)}
-                                        className="h-7 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg transition-all text-[10px]"
+                                        onClick={() => {
+                                          if (app.journeyStatus === 'CLOSED') {
+                                            toast.error('This journey has been closed. Contact blocked.');
+                                            return;
+                                          }
+                                          handleOpenContactModal(app);
+                                        }}
+                                        className={`h-7 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg transition-all text-[10px] ${app.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        title={app.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Quick Contact"}
                                       >
                                         Quick Contact
                                       </button>
@@ -819,7 +849,7 @@ const Applications = () => {
                                     <AdmissionJourneyTimeline
                                       enquiry={app}
                                       stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                                      onSaveJourney={(updatedJourney) => handleSaveJourney(app._id, updatedJourney)}
+                                      onSaveJourney={(updatedJourney, journeyStatus, closedMetadata) => handleSaveJourney(app._id, updatedJourney, journeyStatus, closedMetadata)}
                                       counselorName="Admin"
                                     />
                                   </div>
@@ -847,9 +877,17 @@ const Applications = () => {
         }}
         data={selectedApp}
         type="college"
-        onSaveJourney={async (updatedJourney) => {
-          await handleSaveJourney(selectedApp._id, updatedJourney);
-          setSelectedApp(prev => ({ ...prev, journey: updatedJourney }));
+        onSaveJourney={async (updatedJourney, journeyStatus, closedMetadata) => {
+          await handleSaveJourney(selectedApp._id, updatedJourney, journeyStatus, closedMetadata);
+          setSelectedApp(prev => ({
+            ...prev,
+            journey: updatedJourney,
+            journeyStatus: journeyStatus || prev.journeyStatus,
+            closedBy: closedMetadata ? closedMetadata.closedBy : (journeyStatus === 'ACTIVE' ? '' : prev.closedBy),
+            closedAt: closedMetadata ? closedMetadata.closedAt : (journeyStatus === 'ACTIVE' ? null : prev.closedAt),
+            closedStage: closedMetadata ? closedMetadata.closedStage : (journeyStatus === 'ACTIVE' ? '' : prev.closedStage),
+            stage: ['Admission Confirmed', 'Rejected', 'Closed'].includes(updatedJourney[updatedJourney.length - 1].stage) ? updatedJourney[updatedJourney.length - 1].stage : prev.stage
+          }));
         }}
         onDocVerify={handleDocVerify}
         onAddNote={async (noteText) => {

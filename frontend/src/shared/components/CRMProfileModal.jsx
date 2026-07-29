@@ -158,6 +158,11 @@ const CRMProfileModal = ({
                 <span className={`px-2 py-0.5 rounded-full font-black text-[9px] uppercase border tracking-wider ${getStatusColor()}`}>
                   {getStatusText()}
                 </span>
+                {data.journeyStatus === 'CLOSED' && (
+                  <span className="px-2 py-0.5 rounded-full font-black text-[9px] uppercase border tracking-wider bg-slate-100 border-slate-200 text-slate-600" title="This journey has been closed. No further stages can be added.">
+                    🔒 Journey Closed
+                  </span>
+                )}
               </div>
               <h3 className="text-base font-black text-slate-900 mt-1">{studentName}</h3>
             </div>
@@ -165,7 +170,7 @@ const CRMProfileModal = ({
 
           <div className="flex items-center gap-2 font-bold text-xs">
             {/* Edit Button */}
-            {onEdit && (
+            {onEdit && data.journeyStatus !== 'CLOSED' && (
               <Button
                 variant="outline"
                 onClick={() => {
@@ -179,7 +184,7 @@ const CRMProfileModal = ({
             )}
 
             {/* Convert Button */}
-            {!isAlreadyRegistered && onConvert && (
+            {!isAlreadyRegistered && onConvert && data.journeyStatus !== 'CLOSED' && (
               <Button
                 variant="primary"
                 onClick={onConvert}
@@ -409,7 +414,7 @@ const CRMProfileModal = ({
                 >
                   <div className="p-5 space-y-4 text-left">
                     {/* Add note form */}
-                    {onAddNote && (
+                    {onAddNote && data.journeyStatus !== 'CLOSED' && (
                       <form onSubmit={handleLocalAddNote} className="flex gap-2">
                         <input
                           type="text"
@@ -493,7 +498,7 @@ const CRMProfileModal = ({
                               >
                                 View File
                               </a>
-                              {onDocVerify && (
+                              {onDocVerify && data.journeyStatus !== 'CLOSED' && (
                                 <>
                                   <button
                                     onClick={() => onDocVerify(doc._id, 'Verified')}

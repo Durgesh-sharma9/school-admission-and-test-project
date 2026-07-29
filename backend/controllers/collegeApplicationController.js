@@ -282,12 +282,17 @@ const updateApplicationStage = async (req, res) => {
   try {
     const collegeId = req.school.id;
     const { id } = req.params;
-    const { stage, note, journey } = req.body;
+    const { stage, note, journey, journeyStatus, closedBy, closedAt, closedStage } = req.body;
 
     const app = await CollegeApplication.findOne({ _id: id, schoolId: collegeId });
     if (!app) {
       return res.status(404).json({ success: false, message: 'Application not found' });
     }
+
+    if (journeyStatus !== undefined) app.journeyStatus = journeyStatus;
+    if (closedBy !== undefined) app.closedBy = closedBy;
+    if (closedAt !== undefined) app.closedAt = closedAt;
+    if (closedStage !== undefined) app.closedStage = closedStage;
 
     if (journey) {
       app.journey = journey;

@@ -23,6 +23,10 @@ const AdmissionJourneyTimeline = ({
   const [modalNotes, setModalNotes] = useState('');
   const [editingStageIndex, setEditingStageIndex] = useState(-1);
   const [saving, setSaving] = useState(false);
+  const [showConfirmCloseModal, setShowConfirmCloseModal] = useState(false);
+  const [pendingStageData, setPendingStageData] = useState(null);
+  const [showConfirmReopenModal, setShowConfirmReopenModal] = useState(false);
+  const [showFinalNodePopup, setShowFinalNodePopup] = useState(false);
 
   // Normalize the journey list to always guarantee 'Form Submitted' is at index 0
   const getNormalizedJourney = () => {
@@ -107,8 +111,8 @@ const AdmissionJourneyTimeline = ({
   };
 
   // Helper to persist normalized journey list updates to parent callback
-  const saveNormalizedJourney = async (updatedNormalized) => {
-    await onSaveJourney(updatedNormalized);
+  const saveNormalizedJourney = async (updatedNormalized, journeyStatus) => {
+    await onSaveJourney(updatedNormalized, journeyStatus);
   };
 
   // Complete active stage handler
@@ -172,6 +176,13 @@ const AdmissionJourneyTimeline = ({
         });
       }
 
+      if (['Admission Confirmed', 'Rejected', 'Closed'].includes(modalStage)) {
+        setPendingStageData(updatedJourney);
+        setShowConfirmCloseModal(true);
+        setSaving(false);
+        return;
+      }
+
       await saveNormalizedJourney(updatedJourney);
       setTimelineModalOpen(false);
       setEditingStageIndex(-1);
@@ -184,14 +195,114 @@ const AdmissionJourneyTimeline = ({
     }
   };
 
-  // Append virtual "Add Node" at the end of the journey list
+  // Append virtual "Add Node" or "Locked Node" at the end of the journey list
   const displayNodes = [
     ...normalizedJourney,
-    { isAddNode: true }
+    ...(enquiry.journeyStatus === 'CLOSED' ? [{ isLockedNode: true }] : [{ isAddNode: true }])
   ];
+
+  const closedStage = enquiry.closedStage || normalizedJourney[normalizedJourney.length - 1]?.stage || 'Closed';
+  const closedOn = enquiry.closedAt ? new Date(enquiry.closedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A';
+  const closedBy = enquiry.closedBy || 'Admin';
+
+  const getCardTheme = () => {
+    if (closedStage === 'Admission Confirmed') {
+      return {
+        bg: 'bg-emerald-50/30 border-emerald-200',
+        text: 'text-emerald-800',
+        badge: 'bg-emerald-100 border-emerald-200 text-emerald-805 font-black uppercase',
+        dot: 'bg-emerald-500',
+        border: 'border-emerald-100'
+      };
+    }
+    if (closedStage === 'Rejected') {
+      return {
+        bg: 'bg-rose-50/30 border-rose-200',
+        text: 'text-rose-850',
+        badge: 'bg-rose-100 border-rose-200 text-rose-805 font-black uppercase',
+        dot: 'bg-rose-500',
+        border: 'border-rose-100'
+      };
+    }
+    return {
+      bg: 'bg-slate-50 border-slate-200',
+      text: 'text-slate-700',
+      badge: 'bg-slate-100 border-slate-200 text-slate-705 font-black uppercase',
+      dot: 'bg-slate-500',
+      border: 'border-slate-200'
+    };
+  };
+
+  const theme = getCardTheme();
+
+  const handleReopenJourney = async () => {
+    setSaving(true);
+    try {
+      await saveNormalizedJourney(normalizedJourney, 'ACTIVE', null);
+      setShowConfirmReopenModal(false);
+      setShowFinalNodePopup(false);
+      toast.success("Journey reopened successfully! Timeline unlocked.");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || 'Failed to reopen journey');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-4 text-left font-sans relative timeline-container-ref">
+      {enquiry.journeyStatus === 'CLOSED' && (
+        <div className={`border rounded-xl p-5 shadow-xs transition-all ${theme.bg}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-3 text-left">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-slate-800">
+                  🔒 Journey Closed
+                </span>
+                <span className={`px-2 py-0.5 rounded-md text-[9px] border ${theme.badge}`}>
+                  {closedStage}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Status</span>
+                  <span className="font-extrabold text-slate-700 mt-0.5 block">Closed</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Final Stage</span>
+                  <span className="font-extrabold text-slate-700 mt-0.5 block">{closedStage}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Closed On</span>
+                  <span className="font-extrabold text-slate-700 mt-0.5 block">{closedOn}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Closed By</span>
+                  <span className="font-extrabold text-slate-700 mt-0.5 block">{closedBy}</span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-500 font-semibold leading-relaxed pt-1.5 border-t border-dashed border-slate-200">
+                This journey has been completed. No further stages can be added.
+              </p>
+            </div>
+
+            <div className="shrink-0 text-left sm:text-right">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowConfirmReopenModal(true)}
+                className="border-slate-300 hover:bg-white text-slate-700 hover:border-slate-400 px-4 py-2 text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+              >
+                Reopen Journey
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Unified Timeline Card Container */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
         
@@ -200,6 +311,32 @@ const AdmissionJourneyTimeline = ({
           <div className="flex items-center w-max py-1 px-1">
           {displayNodes.map((stage, idx) => {
             const isAddNode = stage.isAddNode;
+            const isLockedNode = stage.isLockedNode;
+
+            if (isLockedNode) {
+              return (
+                <React.Fragment key="locked-node">
+                  {idx > 0 && (
+                    <div className="h-1.5 w-16 mx-3 rounded-full bg-slate-300" />
+                  )}
+
+                  {/* Locked Timeline Circle Node */}
+                  <div
+                    title="This journey has been closed. No further stages can be added."
+                    className="flex flex-col items-center shrink-0 cursor-not-allowed relative"
+                  >
+                    <div className="w-8 h-8 rounded-full border-2 border-slate-300 bg-slate-100 text-slate-400 flex items-center justify-center font-bold">
+                      <span className="text-xs">🔒</span>
+                    </div>
+
+                    {/* Label below circle */}
+                    <span className="text-[11px] font-semibold mt-2 block whitespace-nowrap text-slate-400">
+                      Timeline Locked
+                    </span>
+                  </div>
+                </React.Fragment>
+              );
+            }
 
             if (isAddNode) {
               const previousCompleted = normalizedJourney[idx - 1]?.completedAt;
@@ -253,6 +390,7 @@ const AdmissionJourneyTimeline = ({
               );
             }
 
+            const isFinalStageNode = enquiry.journeyStatus === 'CLOSED' && idx === normalizedJourney.length - 1;
             const status = getStageStatus(stage, idx);
             const isSelected = selectedStageIndex === idx;
 
@@ -261,14 +399,19 @@ const AdmissionJourneyTimeline = ({
                 {idx > 0 && (
                   <div 
                     className={`h-1.5 w-16 mx-3 rounded-full transition-colors duration-300 ${
-                      normalizedJourney[idx - 1].completedAt ? 'bg-emerald-500' : 'bg-slate-200'
+                      (normalizedJourney[idx - 1].completedAt || enquiry.journeyStatus === 'CLOSED') ? 'bg-emerald-500' : 'bg-slate-200'
                     }`}
                   />
                 )}
 
                 {/* Circle & Label Container */}
                 <div
-                  onClick={() => setSelectedStageIndex(idx)}
+                  onClick={() => {
+                    setSelectedStageIndex(idx);
+                    if (isFinalStageNode) {
+                      setShowFinalNodePopup(true);
+                    }
+                  }}
                   onMouseEnter={(e) => {
                     setHoveredStageIndex(idx);
                     const circleEl = e.currentTarget.querySelector('div');
@@ -287,20 +430,34 @@ const AdmissionJourneyTimeline = ({
                 >
                   {/* Circle Node */}
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 font-bold relative ${
-                    status === 'Completed'
+                    isFinalStageNode
+                      ? (closedStage === 'Admission Confirmed'
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-md'
+                        : closedStage === 'Rejected'
+                        ? 'bg-rose-500 border-rose-500 text-white shadow-md'
+                        : 'bg-slate-500 border-slate-500 text-white shadow-md')
+                      : status === 'Completed'
                       ? 'bg-emerald-500 border-emerald-500 text-white shadow-md'
                       : status === 'Current' || status === 'Overdue'
                       ? 'bg-indigo-500 border-indigo-500 text-white shadow-lg shadow-indigo-500/20 scale-105'
                       : 'bg-white border-slate-300 text-slate-400 hover:border-slate-400'
                   }`}>
-                    {status === 'Completed' ? (
+                    {isFinalStageNode ? (
+                      closedStage === 'Admission Confirmed' ? (
+                        <Check className="h-4 w-4 text-white" />
+                      ) : closedStage === 'Rejected' ? (
+                        <span className="text-[10px]">❌</span>
+                      ) : (
+                        <span className="text-[10px]">🔒</span>
+                      )
+                    ) : status === 'Completed' ? (
                       <Check className="h-4 w-4 text-white" />
                     ) : (
                       <span className="text-[10px] font-black">{idx + 1}</span>
                     )}
 
                     {/* Glow Overlay for Current */}
-                    {(status === 'Current' || status === 'Overdue') && (
+                    {!isFinalStageNode && (status === 'Current' || status === 'Overdue') && (
                       <span className="absolute inset-0 rounded-full border border-white/40 animate-ping opacity-75 pointer-events-none" />
                     )}
                   </div>
@@ -309,7 +466,7 @@ const AdmissionJourneyTimeline = ({
                   <span className={`text-[11px] font-semibold mt-2 block whitespace-nowrap transition-colors duration-200 ${
                     isSelected ? 'text-indigo-600 font-bold' : 'text-slate-700'
                   }`}>
-                    {stage.stage}
+                    {isFinalStageNode ? `${stage.stage} (Final)` : stage.stage}
                   </span>
 
                   {stage.completedAt && (
@@ -479,7 +636,7 @@ const AdmissionJourneyTimeline = ({
 
             {/* Footer Actions */}
             <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-1.5">
-              {!stage.completedAt && (
+              {enquiry.journeyStatus !== 'CLOSED' && !stage.completedAt && (
                 <Button
                   variant="primary"
                   onClick={() => handleMarkComplete(selectedStageIndex)}
@@ -489,7 +646,7 @@ const AdmissionJourneyTimeline = ({
                 </Button>
               )}
 
-              {stage.stage !== 'Form Submitted' && (
+              {enquiry.journeyStatus !== 'CLOSED' && stage.stage !== 'Form Submitted' && (
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -512,7 +669,7 @@ const AdmissionJourneyTimeline = ({
                 </Button>
               )}
 
-              {isLatest && selectedStageIndex > 0 ? (
+              {enquiry.journeyStatus !== 'CLOSED' && isLatest && selectedStageIndex > 0 ? (
                 <Button
                   variant="outline"
                   onClick={() => handleDeleteStage(selectedStageIndex)}
@@ -551,31 +708,38 @@ const AdmissionJourneyTimeline = ({
               </div>
 
               <div className="p-6 space-y-4 text-left">
-                {/* Segmented Control for Interaction Types */}
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-600 uppercase">Interaction Type *</label>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {['Call', 'WhatsApp', 'Email', 'Meeting', 'Other'].map(opt => {
-                      const isSelected = modalSelectedOption === opt;
+                {/* Selectable Stage Options Chips directly */}
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-600 uppercase">Select Timeline / Pipeline Stage *</label>
+                  <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50/50">
+                    {stageOptions.filter(opt => opt !== 'Other').map(opt => {
+                      const isSelected = modalStage === opt;
+                      
+                      let chipClass = '';
+                      if (opt === 'Admission Confirmed') {
+                        chipClass = isSelected
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs font-black'
+                          : 'bg-emerald-50 border-emerald-250 text-emerald-700 hover:bg-emerald-100 font-bold';
+                      } else if (opt === 'Rejected') {
+                        chipClass = isSelected
+                          ? 'bg-rose-600 border-rose-600 text-white shadow-xs font-black'
+                          : 'bg-rose-50 border-rose-250 text-rose-700 hover:bg-rose-100 font-bold';
+                      } else if (opt === 'Closed') {
+                        chipClass = isSelected
+                          ? 'bg-slate-700 border-slate-700 text-white shadow-xs font-black'
+                          : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200/50 font-bold';
+                      } else {
+                        chipClass = isSelected
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs font-bold'
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50';
+                      }
+
                       return (
                         <button
                           key={opt}
                           type="button"
-                          onClick={() => {
-                            setModalSelectedOption(opt);
-                            if (opt !== 'Other') {
-                              setModalStage(opt);
-                            } else {
-                              // Default first choice among non-segmented options
-                              const nonSegmented = stageOptions.filter(o => !['Call', 'WhatsApp', 'Email', 'Meeting'].includes(o));
-                              setModalStage(nonSegmented[0] || 'Admission Confirmed');
-                            }
-                          }}
-                          className={`py-2 rounded-lg text-[10px] font-bold border transition-all text-center ${
-                            isSelected
-                              ? 'bg-[#6D5DF6] border-[#6D5DF6] text-white shadow-xs'
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100/75'
-                          }`}
+                          onClick={() => setModalStage(opt)}
+                          className={`px-3 py-1.5 rounded-lg text-[10.5px] border transition-all text-center cursor-pointer ${chipClass}`}
                         >
                           {opt}
                         </button>
@@ -583,29 +747,6 @@ const AdmissionJourneyTimeline = ({
                     })}
                   </div>
                 </div>
-
-                {/* Dropdown for other stages if 'Other' is selected in segmented control */}
-                {modalSelectedOption === 'Other' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-1.5"
-                  >
-                    <label className="block text-[10px] font-black text-slate-600 uppercase">Select Pipeline Stage *</label>
-                    <select
-                      value={modalStage}
-                      onChange={(e) => setModalStage(e.target.value)}
-                      className="w-full bg-[#F8FAFC] rounded-lg border border-[#E5E7EB] px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#6D5DF6]/30 focus:bg-white transition-all font-semibold"
-                      required
-                    >
-                      {stageOptions
-                        .filter(o => !['Call', 'WhatsApp', 'Email', 'Meeting'].includes(o))
-                        .map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                    </select>
-                  </motion.div>
-                )}
 
                 {/* Follow-up Date */}
                 {!['Admission Confirmed', 'Rejected', 'Closed'].includes(modalStage) && (
@@ -656,6 +797,223 @@ const AdmissionJourneyTimeline = ({
           </motion.div>
         </div>
       )}
+      {/* 2. Confirmation modal for final stages */}
+      <AnimatePresence>
+        {showConfirmCloseModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden"
+            >
+              <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span>Complete Journey?</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmCloseModal(false)}
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 text-left">
+                <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                  You are adding a final stage.
+                </p>
+                <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                  Do you also want to close this student's journey?
+                </p>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed bg-slate-50 border border-slate-100 p-3 rounded-lg">
+                  🔒 After closing the journey, no new stages can be added unless the journey is reopened.
+                </p>
+              </div>
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-2 text-xs font-bold">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowConfirmCloseModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-705 hover:bg-slate-100 font-bold transition-all text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      await saveNormalizedJourney(pendingStageData);
+                      setShowConfirmCloseModal(false);
+                      setTimelineModalOpen(false);
+                      setEditingStageIndex(-1);
+                      toast.success("Stage saved! Timeline remains ACTIVE.");
+                    } catch (err) {
+                      console.error(err);
+                      toast.error(err.message || 'Failed to save stage');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  className="px-4 py-2 border border-indigo-200 text-indigo-700 hover:bg-indigo-50 rounded-lg font-bold transition-all text-xs"
+                >
+                  Continue Journey
+                </Button>
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      await saveNormalizedJourney(pendingStageData, 'CLOSED', {
+                        closedBy: counselorName,
+                        closedAt: new Date(),
+                        closedStage: pendingStageData[pendingStageData.length - 1]?.stage || modalStage
+                      });
+                      setShowConfirmCloseModal(false);
+                      setTimelineModalOpen(false);
+                      setEditingStageIndex(-1);
+                      toast.success("Stage saved and timeline marked as CLOSED!");
+                    } catch (err) {
+                      console.error(err);
+                      toast.error(err.message || 'Failed to save stage');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  className="px-4 py-2 bg-slate-850 hover:bg-slate-900 text-white rounded-lg font-bold transition-all border-transparent text-xs"
+                >
+                  Close Journey
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Reopen Journey Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmReopenModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden"
+            >
+              <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span>Reopen Journey?</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmReopenModal(false)}
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6 space-y-3 text-left">
+                <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                  This will unlock the journey and allow new stages to be added again.
+                </p>
+              </div>
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-2 text-xs font-bold">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowConfirmReopenModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-705 hover:bg-slate-100 font-bold transition-all text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleReopenJourney}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-all border-transparent text-xs"
+                >
+                  Reopen Journey
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Final Node Popup */}
+      <AnimatePresence>
+        {showFinalNodePopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden text-left"
+            >
+              <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span>Journey Closure Summary</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowFinalNodePopup(false)}
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 text-xs font-semibold">
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                  <div>
+                    <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Journey Status</span>
+                    <span className="font-extrabold text-slate-700 mt-0.5 block">Closed</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Final Stage</span>
+                    <span className="font-extrabold text-slate-700 mt-0.5 block">{closedStage}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Closed On</span>
+                    <span className="font-extrabold text-slate-700 mt-0.5 block">{closedOn}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Closed By</span>
+                    <span className="font-extrabold text-slate-700 mt-0.5 block">{closedBy}</span>
+                  </div>
+                </div>
+
+                <div className="pt-3.5 border-t border-slate-100 space-y-1">
+                  <span className="text-slate-400 font-bold block uppercase text-[9px] tracking-wider">Closure Notes / Reason</span>
+                  <p className="text-xs text-slate-655 bg-slate-50 border border-slate-100 p-3 rounded-lg leading-relaxed italic">
+                    "{normalizedJourney[normalizedJourney.length - 1]?.notes || 'No notes specified.'}"
+                  </p>
+                </div>
+              </div>
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-2 text-xs font-bold">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowFinalNodePopup(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-slate-705 hover:bg-slate-100 font-bold transition-all text-xs"
+                >
+                  Close
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowFinalNodePopup(false);
+                    setShowConfirmReopenModal(true);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-all border-transparent text-xs"
+                >
+                  Reopen Journey
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

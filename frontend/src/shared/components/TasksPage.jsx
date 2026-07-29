@@ -585,12 +585,22 @@ const TasksPage = ({ module = 'school' }) => {
     window.dispatchEvent(new CustomEvent('crm-tasks-updated'));
   };
 
-  const handleSaveJourney = async (itemId, updatedJourney) => {
+  const handleSaveJourney = async (itemId, updatedJourney, journeyStatus, closedMetadata) => {
     const url = module === 'school'
       ? `/enquiries/${itemId}`
       : `/college/applications/${itemId}/stage`;
 
     const payload = { journey: updatedJourney };
+    if (journeyStatus) payload.journeyStatus = journeyStatus;
+    if (closedMetadata) {
+      payload.closedBy = closedMetadata.closedBy;
+      payload.closedAt = closedMetadata.closedAt;
+      payload.closedStage = closedMetadata.closedStage;
+    } else if (journeyStatus === 'ACTIVE') {
+      payload.closedBy = '';
+      payload.closedAt = null;
+      payload.closedStage = '';
+    }
 
     // Optimistic UI updates
     setItems((prev) =>
@@ -598,7 +608,8 @@ const TasksPage = ({ module = 'school' }) => {
         if (item._id === itemId) {
           return {
             ...item,
-            journey: updatedJourney
+            journey: updatedJourney,
+            journeyStatus: journeyStatus || item.journeyStatus
           };
         }
         return item;
@@ -1492,8 +1503,8 @@ const TasksPage = ({ module = 'school' }) => {
           type={module === 'school' ? 'school' : 'college'}
           stageOptions={currentStageOptions}
           schoolName={currentUser}
-          onSaveJourney={async (updatedJourney) => {
-            await handleSaveJourney(selectedProfileTask.itemId, updatedJourney);
+          onSaveJourney={async (updatedJourney, journeyStatus, closedMetadata) => {
+            await handleSaveJourney(selectedProfileTask.itemId, updatedJourney, journeyStatus, closedMetadata);
           }}
           onAddNote={async (noteText) => {
             if (module === 'school') {

@@ -260,6 +260,22 @@ const collegeApplicationSchema = new mongoose.Schema({
     ref: 'School',
     required: true,
   },
+  journeyStatus: {
+    type: String,
+    enum: ['ACTIVE', 'CLOSED'],
+    default: 'ACTIVE'
+  },
+  closedBy: {
+    type: String,
+    default: ''
+  },
+  closedAt: {
+    type: Date
+  },
+  closedStage: {
+    type: String,
+    default: ''
+  },
   journey: [{
     stage: {
       type: String,

@@ -74,14 +74,31 @@ const Enquiries = () => {
     }
   }, [expandId]);
 
-  const handleSaveJourney = async (enquiryId, updatedJourney) => {
+  const handleSaveJourney = async (enquiryId, updatedJourney, journeyStatus, closedMetadata) => {
     try {
-      const response = await api.put(`/enquiries/${enquiryId}`, {
-        journey: updatedJourney
-      });
+      const payload = { journey: updatedJourney };
+      if (journeyStatus) payload.journeyStatus = journeyStatus;
+      if (closedMetadata) {
+        payload.closedBy = closedMetadata.closedBy;
+        payload.closedAt = closedMetadata.closedAt;
+        payload.closedStage = closedMetadata.closedStage;
+      } else if (journeyStatus === 'ACTIVE') {
+        payload.closedBy = '';
+        payload.closedAt = null;
+        payload.closedStage = '';
+      }
+      const response = await api.put(`/enquiries/${enquiryId}`, payload);
       if (response.success) {
         toast.success('Admission journey updated successfully!');
-        setEnquiries(prev => prev.map(enq => enq._id === enquiryId ? { ...enq, journey: response.data.journey } : enq));
+        setEnquiries(prev => prev.map(enq => enq._id === enquiryId ? { 
+          ...enq, 
+          journey: response.data.journey, 
+          journeyStatus: response.data.journeyStatus, 
+          status: response.data.status,
+          closedBy: response.data.closedBy,
+          closedAt: response.data.closedAt,
+          closedStage: response.data.closedStage
+        } : enq));
       }
     } catch (err) {
       toast.error(err.message || 'Failed to update journey');
@@ -848,15 +865,19 @@ const Enquiries = () => {
                           </button>
 
                           <button
-                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm"
-                            onClick={() => {
-                              setSelectedEnquiryForContact(enq);
-                              setContactModalOpen(true);
-                            }}
-                            title="Contact"
-                          >
-                            <Phone size={18} strokeWidth={2} />
-                          </button>
+                             className={`h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm ${enq.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                             onClick={() => {
+                               if (enq.journeyStatus === 'CLOSED') {
+                                 toast.error('This journey has been closed. Contact blocked.');
+                                 return;
+                               }
+                               setSelectedEnquiryForContact(enq);
+                               setContactModalOpen(true);
+                             }}
+                             title={enq.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
+                           >
+                             <Phone size={18} strokeWidth={2} />
+                           </button>
 
                           <button
                             className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 hover:shadow-xs transition-all shadow-sm"
@@ -938,7 +959,7 @@ const Enquiries = () => {
                                 <AdmissionJourneyTimeline
                                   enquiry={enq}
                                   stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                                  onSaveJourney={(updatedJourney) => handleSaveJourney(enq._id, updatedJourney)}
+                                  onSaveJourney={(updatedJourney, journeyStatus, closedMetadata) => handleSaveJourney(enq._id, updatedJourney, journeyStatus, closedMetadata)}
                                   counselorName={school?.name || 'Admin'}
                                 />
                               </div>
@@ -1155,9 +1176,17 @@ const Enquiries = () => {
             setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
           }
         }}
-        onSaveJourney={async (updatedJourney) => {
-          await handleSaveJourney(selectedEnquiryForView._id, updatedJourney);
-          setSelectedEnquiryForView(prev => ({ ...prev, journey: updatedJourney }));
+        onSaveJourney={async (updatedJourney, journeyStatus, closedMetadata) => {
+          await handleSaveJourney(selectedEnquiryForView._id, updatedJourney, journeyStatus, closedMetadata);
+          setSelectedEnquiryForView(prev => ({
+            ...prev,
+            journey: updatedJourney,
+            journeyStatus: journeyStatus || prev.journeyStatus,
+            closedBy: closedMetadata ? closedMetadata.closedBy : (journeyStatus === 'ACTIVE' ? '' : prev.closedBy),
+            closedAt: closedMetadata ? closedMetadata.closedAt : (journeyStatus === 'ACTIVE' ? null : prev.closedAt),
+            closedStage: closedMetadata ? closedMetadata.closedStage : (journeyStatus === 'ACTIVE' ? '' : prev.closedStage),
+            status: ['Admission Confirmed', 'Rejected', 'Closed'].includes(updatedJourney[updatedJourney.length - 1].stage) ? updatedJourney[updatedJourney.length - 1].stage : prev.status
+          }));
         }}
         onAssessments={() => {
           setSelectedEnquiryForAssessment(selectedEnquiryForView);
