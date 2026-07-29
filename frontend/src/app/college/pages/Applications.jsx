@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import AdmissionJourneyTimeline from '../../../shared/components/AdmissionJourneyTimeline';
 import CRMProfileModal from '../../../shared/components/CRMProfileModal';
 import ContactModal from '../../../shared/components/ContactModal';
+import AssessmentPortalModal from '../../school/components/AssessmentPortalModal';
 import {
   Search,
   Filter,
@@ -105,6 +106,7 @@ const Applications = () => {
   // Details Modal state
   const [selectedApp, setSelectedApp] = useState(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedEnquiryForAssessment, setSelectedEnquiryForAssessment] = useState(null);
   const [newNote, setNewNote] = useState('');
 
   // Contact Modal state
@@ -898,6 +900,9 @@ const Applications = () => {
             fetchApplications();
           }
         }}
+        onAssessments={() => {
+          setSelectedEnquiryForAssessment(selectedApp);
+        }}
         schoolName="Admin"
         stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Documents Requested', 'Documents Submitted', 'Counselling Session', 'Department Discussion', 'Course Selection', 'Scholarship Discussion', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
       />
@@ -1080,6 +1085,13 @@ const Applications = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {selectedEnquiryForAssessment && (
+        <AssessmentPortalModal
+          enquiry={selectedEnquiryForAssessment}
+          onClose={() => setSelectedEnquiryForAssessment(null)}
+        />
+      )}
     </div>
   );
 };

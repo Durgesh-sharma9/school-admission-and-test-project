@@ -5,6 +5,7 @@ import Loader from './Loader';
 import Button from './Button';
 import toast from 'react-hot-toast';
 import CRMProfileModal from './CRMProfileModal';
+import AssessmentPortalModal from '../../app/school/components/AssessmentPortalModal';
 import { useAuth } from '../../app/school/contexts/AuthContext';
 import {
   Phone,
@@ -196,6 +197,7 @@ const TasksPage = ({ module = 'school' }) => {
   // CRM Profile Modal State
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [selectedProfileTask, setSelectedProfileTask] = useState(null);
+  const [selectedEnquiryForAssessment, setSelectedEnquiryForAssessment] = useState(null);
 
   // Helper date format YYYY-MM-DD
   function getLocalDateString(date) {
@@ -1529,6 +1531,17 @@ const TasksPage = ({ module = 'school' }) => {
               }
             }
           }}
+          onAssessments={() => {
+            setSelectedEnquiryForAssessment(selectedProfileTask.rawItem);
+          }}
+        />
+      )}
+
+      {/* Assessment Portal Modal — opened from CRM Profile Modal */}
+      {selectedEnquiryForAssessment && (
+        <AssessmentPortalModal
+          enquiry={selectedEnquiryForAssessment}
+          onClose={() => setSelectedEnquiryForAssessment(null)}
         />
       )}
     </div>
