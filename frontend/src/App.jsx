@@ -170,8 +170,8 @@ function App() {
                     <Route path="/college/tasks" element={<CollegeTasksPage />} />
                     <Route path="/college/admission-form" element={<CollegeAdmissionForm />} />
                     <Route path="/college/academic-config" element={<CollegeAcademicConfigPage />} />
-                    <Route path="/college/counselling" element={<CollegeCounselling />} />
-                    <Route path="/college/documents" element={<CollegeDocuments />} />
+                    <Route path="/college/counselling" element={<Navigate to="/college/dashboard" replace />} />
+                    <Route path="/college/documents" element={<Navigate to="/college/dashboard" replace />} />
                     <Route path="/college/qr-links" element={<CollegeQrLinks />} />
                     <Route path="/college/thank-you-cms" element={<CollegeThankYouCms />} />
                     <Route path="/college/subscription" element={<CollegeSubscription />} />

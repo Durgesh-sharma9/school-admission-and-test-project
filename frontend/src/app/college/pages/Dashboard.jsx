@@ -346,6 +346,7 @@ const Dashboard = () => {
       .slice(0, 5);
 
     const sortedActivities = activityFeed
+      .filter(act => act.type !== 'Counselling Scheduled' && act.type !== 'Document Uploaded')
       .sort((a, b) => b.time - a.time)
       .slice(0, 10);
 
@@ -402,10 +403,6 @@ const Dashboard = () => {
             <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">
               {school?.name || 'Global College'}
             </h2>
-            <span className="bg-purple-50 text-purple-700 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-purple-100 flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-purple-600 animate-pulse" />
-              Free Trial
-            </span>
           </div>
           <p className="text-slate-500 text-xs font-semibold mt-1">
             Real-time College Admission CRM & Pipeline • Applications • Counselling • Departments • Admissions
@@ -426,27 +423,25 @@ const Dashboard = () => {
             <QrCode className="h-4 w-4 text-slate-550" />
             QR Poster
           </button>
-          <button
+          {/* <button
             onClick={() => navigate('/college/counselling')}
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <Calendar className="h-4 w-4 text-slate-550" />
             New Entrance Test
-          </button>
+          </button> */}
         </div>
       </div>
 
-      {/* ==================== ROW 1: 8 COMPACT KPI CARDS ==================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+      {/* ==================== ROW 1: 6 COMPACT KPI CARDS ==================== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { title: "Today's Apps", val: computedMetrics.todayApps, desc: "Applications today", icon: Clock, trend: "+12% vs yesterday", color: "indigo" },
-          { title: "This Month Apps", val: computedMetrics.thisMonthApps, desc: "Applications month", trend: "+8% vs last month", icon: ClipboardList, color: "purple" },
-          { title: "Today Follow-ups", val: todayFollowups.length, desc: "Actionable tasks", trend: "0 overdue tasks", icon: PhoneCall, color: "amber" },
-          { title: "Confirmed Adm", val: computedMetrics.confirmedCount, desc: "Admissions finalized", trend: "+5 new today", icon: CheckCircle2, color: "emerald" },
-          { title: "Conversion %", val: computedMetrics.conversionPercent, desc: "Admissions/Apps", trend: "Steady conversion", icon: TrendingUp, color: "fuchsia" },
-          { title: "Entrance Tests", val: computedMetrics.entranceTestCount, desc: "Tests registered", trend: "14 scheduled today", icon: FileText, color: "cyan" },
-          { title: "Active Plan", val: school?.subscription?.plan?.toUpperCase() || "FREE TRIAL", desc: "Enterprise plan", trend: "Pro version features", icon: Award, color: "purple" },
-          { title: "Registered Std", val: computedMetrics.registeredCount, desc: "Paid registration fees", trend: "Verified students", icon: Users, color: "indigo" }
+          { title: "Today's Applications", val: computedMetrics.todayApps, desc: "Applications today", icon: Clock, color: "indigo" },
+          { title: "This Month Applications", val: computedMetrics.thisMonthApps, desc: "Applications this month", icon: ClipboardList, color: "purple" },
+          { title: "Today's Follow-ups", val: todayFollowups.length, desc: "Follow-ups scheduled today", icon: PhoneCall, color: "amber" },
+          { title: "Confirmed Admissions", val: computedMetrics.confirmedCount, desc: "Admissions finalized", icon: CheckCircle2, color: "emerald" },
+          { title: "Conversion %", val: computedMetrics.conversionPercent, desc: "Admissions to applications ratio", icon: TrendingUp, color: "fuchsia" },
+          { title: "Entrance Tests", val: computedMetrics.entranceTestCount, desc: "Entrance tests registered", icon: FileText, color: "cyan" }
         ].map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
@@ -458,18 +453,14 @@ const Dashboard = () => {
               className="bg-white border border-slate-100 rounded-xl p-3.5 shadow-[0_4px_20px_rgb(0,0,0,0.01)] hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[9px] font-black uppercase text-slate-400 leading-none truncate max-w-[80%]">{kpi.title}</span>
+                <span className="text-[9px] font-black uppercase text-slate-400 leading-none truncate max-w-[85%]">{kpi.title}</span>
                 <span className={`h-6 w-6 rounded-lg bg-${kpi.color}-50 text-${kpi.color}-600 flex items-center justify-center shrink-0`}>
                   <Icon className="h-3.5 w-3.5" />
                 </span>
               </div>
               <div className="mt-3">
                 <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none">{kpi.val}</h3>
-                <p className="text-[10px] text-slate-400 font-semibold mt-1 leading-tight">{kpi.desc}</p>
-                <div className="mt-2.5 pt-2 border-t border-slate-50 flex items-center gap-1 text-[8px] font-bold text-slate-550">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                  <span className="truncate">{kpi.trend}</span>
-                </div>
+                <p className="text-[10px] text-slate-400 font-semibold mt-1.5 leading-tight">{kpi.desc}</p>
               </div>
             </motion.div>
           );
@@ -482,11 +473,11 @@ const Dashboard = () => {
           <Layers className="h-4 w-4 text-purple-500 animate-bounce" />
           Horizontal Admission Funnel & Pipeline
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
             { stage: 'Applications', count: computedMetrics.funnel.applications, color: 'bg-purple-600' },
-            { stage: 'Doc Verification', count: computedMetrics.funnel.docVerification, color: 'bg-indigo-600' },
-            { stage: 'Counselling Scheduled', count: computedMetrics.funnel.counselling, color: 'bg-pink-600' },
+            // { stage: 'Doc Verification', count: computedMetrics.funnel.docVerification, color: 'bg-indigo-600' },
+            // { stage: 'Counselling Scheduled', count: computedMetrics.funnel.counselling, color: 'bg-pink-600' },
             { stage: 'Department Assigned', count: computedMetrics.funnel.deptAssigned, color: 'bg-fuchsia-600' },
             { stage: 'Fee Pending', count: computedMetrics.funnel.feePending, color: 'bg-amber-600' },
             { stage: 'Admission Confirmed', count: computedMetrics.funnel.confirmed, color: 'bg-emerald-600' },
@@ -513,7 +504,7 @@ const Dashboard = () => {
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                {idx < 6 && (
+                {idx < 4 && (
                   <div className="hidden lg:block absolute -right-3 top-[40%] z-10 text-slate-300">
                     <ChevronRight className="h-5 w-5" />
                   </div>
@@ -659,7 +650,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ==================== ROW 5: TODAY'S COUNSELLING SCHEDULE ==================== */}
+      {/* ==================== ROW 5: TODAY'S COUNSELLING SCHEDULE (TEMPORARILY REMOVED) ==================== */}
+      {/* 
       <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
         <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <Calendar className="h-4.5 w-4.5 text-purple-500" />
@@ -715,8 +707,10 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+      */}
 
-      {/* ==================== ROW 6: PENDING DOCUMENTS ==================== */}
+      {/* ==================== ROW 6: PENDING DOCUMENTS (TEMPORARILY REMOVED) ==================== */}
+      {/* 
       <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
         <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <FileCheck className="h-4.5 w-4.5 text-purple-500" />
@@ -762,6 +756,7 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+      */}
 
       {/* ==================== ROW 7: OPERATIONAL PANEL ==================== */}
       <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
@@ -769,12 +764,12 @@ const Dashboard = () => {
           <Activity className="h-4.5 w-4.5 text-purple-500 animate-pulse" />
           Operational CRM Status Panel
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { title: "Today's Calls", val: computedMetrics.opTodayCalls, color: "border-indigo-100 bg-indigo-50/20 text-indigo-700" },
-            { title: "Pending Counselling", val: computedMetrics.opPendingCounselling, color: "border-purple-100 bg-purple-50/20 text-purple-700" },
+            // { title: "Pending Counselling", val: computedMetrics.opPendingCounselling, color: "border-purple-100 bg-purple-50/20 text-purple-700" },
             { title: "Pending Fee Collection", val: computedMetrics.opPendingFee, color: "border-amber-100 bg-amber-50/20 text-amber-700" },
-            { title: "Pending Verification", val: computedMetrics.opPendingVerification, color: "border-pink-100 bg-pink-50/20 text-pink-700" },
+            // { title: "Pending Verification", val: computedMetrics.opPendingVerification, color: "border-pink-100 bg-pink-50/20 text-pink-700" },
             { title: "Entrance Tests Today", val: computedMetrics.opEntranceToday, color: "border-emerald-100 bg-emerald-50/20 text-emerald-700" }
           ].map((op, idx) => (
             <div key={idx} className={`p-4 border rounded-xl flex flex-col justify-between ${op.color} shadow-xs`}>
@@ -828,14 +823,14 @@ const Dashboard = () => {
           <Settings className="h-4.5 w-4.5 text-purple-500" />
           Quick Action Dock
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
           {[
             { label: "Add Application", path: "/college/admission-form", icon: Plus, color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
             { label: "Generate QR", path: "/college/qr-links", icon: QrCode, color: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100" },
             { label: "Admission Desk Link", path: "/college/qr-links", icon: FileSpreadsheet, color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
-            { label: "Schedule Counselling", path: "/college/counselling", icon: Compass, color: "bg-pink-50 text-pink-700 hover:bg-pink-100" },
+            // { label: "Schedule Counselling", path: "/college/counselling", icon: Compass, color: "bg-pink-50 text-pink-700 hover:bg-pink-100" },
             { label: "Entrance Test Config", path: "/college/academic-config", icon: Layers, color: "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100" },
-            { label: "Verify Documents", path: "/college/documents", icon: FileCheck, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
+            // { label: "Verify Documents", path: "/college/documents", icon: FileCheck, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
             { label: "CRM Settings", path: "/college/settings", icon: Settings, color: "bg-slate-50 text-slate-700 hover:bg-slate-150" }
           ].map((dock, idx) => {
             const Icon = dock.icon;

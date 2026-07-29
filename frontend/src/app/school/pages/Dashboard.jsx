@@ -150,11 +150,6 @@ const Dashboard = () => {
         <div className="space-y-1.5 z-10">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-xl font-black tracking-tight">{school?.name || 'School CRM Dashboard'}</h1>
-            <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-              isTrialActive ? 'bg-teal-100 text-teal-700' : 'bg-orange-100 text-orange-700'
-            }`}>
-              {school?.subscription?.plan || 'Free Trial'}
-            </span>
           </div>
           <p className="text-gray-500 text-xs font-medium">Real-time SaaS Decision Engine • Locality Performance • CRM Funnel</p>
         </div>
@@ -173,16 +168,14 @@ const Dashboard = () => {
       </div>
 
       {/* ROW 1: COMPACT KPI SPARKLINE CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { title: "Today's Enquiries", value: todayEnquiries.length, trend: "+12%", spark: sparkline1, icon: Users, color: 'text-purple-600 bg-purple-50', line: '#8b5cf6' },
-          { title: "This Month", value: totalEnquiries, trend: "+18%", spark: sparkline2, icon: Inbox, color: 'text-blue-600 bg-blue-50', line: '#3b82f6' },
-          { title: "Pending Follow-Ups", value: followUpPendingCount, trend: "Requires Call", spark: sparkline1, icon: Clock, color: 'text-orange-500 bg-orange-50', line: '#f97316' },
-          { title: "Confirmed Admissions", value: confirmedAdmissions, trend: "+24%", spark: sparkline2, icon: CheckCircle, color: 'text-teal-600 bg-teal-50', line: '#14b8a6' },
-          { title: "Conversion %", value: `${conversionRate}%`, trend: "High Rate", spark: sparkline1, icon: TrendingUp, color: 'text-indigo-600 bg-indigo-50', line: '#6366f1' },
-          { title: "Test Completion", value: `${completionRate}%`, trend: `${completedCount}/${totalAssigned}`, spark: sparkline2, icon: ClipboardCheck, color: 'text-pink-600 bg-pink-50', line: '#ec4899' },
-          { title: "Active Plan", value: school?.subscription?.plan || 'Trial', trend: 'Active', spark: sparkline1, icon: ShieldCheck, color: 'text-red-500 bg-red-50', line: '#ef4444' },
-          { title: "Registered Students", value: confirmedAdmissions, trend: 'Enrolled', spark: sparkline2, icon: UserCheck, color: 'text-emerald-600 bg-emerald-50', line: '#10b981' },
+          { title: "Today's Enquiries", value: todayEnquiries.length, desc: "Enquiries created today", spark: sparkline1, icon: Users, color: 'text-purple-600 bg-purple-50', line: '#8b5cf6' },
+          { title: "This Month Enquiries", value: totalEnquiries, desc: "Enquiries created this month", spark: sparkline2, icon: Inbox, color: 'text-blue-600 bg-blue-50', line: '#3b82f6' },
+          { title: "Pending Follow-ups", value: followUpPendingCount, desc: "Follow-ups pending", spark: sparkline1, icon: Clock, color: 'text-orange-500 bg-orange-50', line: '#f97316' },
+          { title: "Confirmed Admissions", value: confirmedAdmissions, desc: "Finalized admissions", spark: sparkline2, icon: CheckCircle, color: 'text-teal-600 bg-teal-50', line: '#14b8a6' },
+          { title: "Conversion %", value: `${conversionRate}%`, desc: "Admissions to enquiries ratio", spark: sparkline1, icon: TrendingUp, color: 'text-indigo-600 bg-indigo-50', line: '#6366f1' },
+          { title: "Test Completion", value: `${completionRate}%`, desc: `${completedCount} of ${totalAssigned} completed`, spark: sparkline2, icon: ClipboardCheck, color: 'text-pink-600 bg-pink-50', line: '#ec4899' },
         ].map((card, idx) => {
           const Icon = card.icon;
           return (
@@ -193,7 +186,7 @@ const Dashboard = () => {
               </div>
               <div className="my-2 z-10">
                 <span className="text-xl font-black text-gray-800 tracking-tight block truncate">{card.value}</span>
-                <span className="text-[9px] font-semibold text-teal-500 flex items-center mt-0.5"><ArrowUpRight className="h-2.5 w-2.5 mr-0.5" />{card.trend}</span>
+                <span className="text-[9px] font-semibold text-gray-400 block mt-0.5 leading-tight truncate">{card.desc}</span>
               </div>
               <div className="absolute bottom-0 left-0 h-6 w-full opacity-40 group-hover:opacity-100 transition-opacity">
                 <ResponsiveContainer width="100%" height="100%">
