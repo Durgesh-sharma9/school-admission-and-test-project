@@ -547,7 +547,7 @@ const googleLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Google login error:', error);
-    return res.status(500).json({ success: false, message: 'Server error during Google authentication' });
+    return res.status(500).json({ success: false, message: 'Server error during Google authentication: ' + error.message, stack: error.stack });
   }
 };
 
