@@ -178,15 +178,7 @@ const AdmissionForm = () => {
         documents: []
       };
 
-      // Push document files catalog urls
-      if (formData.docPhoto) payload.documents.push({ name: 'Photo', url: formData.docPhoto });
-      if (formData.doc10th) payload.documents.push({ name: '10th Marksheet', url: formData.doc10th });
-      if (formData.doc12th) payload.documents.push({ name: '12th Marksheet', url: formData.doc12th });
-      if (formData.docGrad) payload.documents.push({ name: 'Graduation Marksheet', url: formData.docGrad });
-      if (formData.docTransfer) payload.documents.push({ name: 'Transfer Certificate', url: formData.docTransfer });
-      if (formData.category !== 'General' && formData.docCaste) {
-        payload.documents.push({ name: 'Caste Certificate', url: formData.docCaste });
-      }
+
 
       const res = await api.post('/college/applications/submit', payload);
       if (res.success) {
@@ -606,60 +598,7 @@ const AdmissionForm = () => {
           </div>
         </div>
 
-        {/* SECTION 6: Documents */}
-        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
-          <h3 className="text-xs font-extrabold text-indigo-650 uppercase tracking-wider pb-1 border-b">
-            6. Documents (File URL links)
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Student Photo (Required) *"
-              name="docPhoto"
-              value={formData.docPhoto}
-              onChange={handleChange}
-              placeholder="URL link to student photo"
-              required
-            />
-            <Input
-              label="10th Marksheet (Optional)"
-              name="doc10th"
-              value={formData.doc10th}
-              onChange={handleChange}
-              placeholder="URL link to 10th marksheet"
-            />
-            <Input
-              label="12th Marksheet (Optional)"
-              name="doc12th"
-              value={formData.doc12th}
-              onChange={handleChange}
-              placeholder="URL link to 12th marksheet"
-            />
-            <Input
-              label="Graduation Marksheet (Optional)"
-              name="docGrad"
-              value={formData.docGrad}
-              onChange={handleChange}
-              placeholder="URL link to graduation certificate"
-            />
-            <Input
-              label="Transfer Certificate (Optional)"
-              name="docTransfer"
-              value={formData.docTransfer}
-              onChange={handleChange}
-              placeholder="URL link to TC"
-            />
-            {formData.category !== 'General' && (
-              <Input
-                label="Category Certificate (Required) *"
-                name="docCaste"
-                value={formData.docCaste}
-                onChange={handleChange}
-                placeholder="URL link to Caste Certificate"
-                required
-              />
-            )}
-          </div>
-        </div>
+
 
         {/* Section 7: Submit Button */}
         <div className="flex items-center justify-between bg-indigo-50/50 rounded-2xl border border-indigo-100 p-5">
