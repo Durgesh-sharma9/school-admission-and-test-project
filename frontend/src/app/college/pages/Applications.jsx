@@ -481,14 +481,20 @@ const Applications = () => {
   });
 
   return (
-    <div className="space-y-6 text-left max-w-7xl mx-auto">
-      
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2">
-        <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Applications CRM Desk</h2>
-          <p className="text-gray-500 text-sm mt-1 font-medium">Filter, track status, verify documents, and log counseling details.</p>
+    <div className="min-h-screen bg-[#F9EEF3] px-3 md:px-5 lg:px-6 pb-6 pt-8 font-sans text-gray-800">
+      <div className="max-w-[1400px] mx-auto space-y-5">
+
+      {/* Page Header (No Card) */}
+      <div className="mb-5">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Applications CRM Desk</h1>
+          <div className="flex items-center h-[36px] px-[16px] bg-[#FCE7F3] border border-[#F9A8D4] text-[#DB2777] font-semibold text-xs rounded-[12px] shrink-0">
+            {filteredApplications.length} Records
+          </div>
         </div>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
+          Filter, track status, verify documents, and log counseling details.
+        </p>
       </div>
 
       {/* Advanced Filter Section */}
@@ -582,7 +588,7 @@ const Applications = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
-            className="bg-indigo-900 text-white rounded-xl px-5 py-3 shadow-md flex items-center justify-between flex-wrap gap-3"
+            className="bg-gradient-to-r from-[#7E63F6] to-[#9781F8] text-white rounded-xl px-5 py-3 card-flat flex items-center justify-between flex-wrap gap-3"
           >
             <span className="text-xs font-semibold">
               {selectedIds.length} applications selected
@@ -623,19 +629,22 @@ const Applications = () => {
         )}
       </AnimatePresence>
 
-      {/* Main Table or Empty State */}
-      <div className="bg-white border-0 rounded-3xl shadow-[0_2px_20px_rgb(0,0,0,0.03)] overflow-hidden">
+      {/* Main Table Card */}
+      <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 14px 35px rgba(233, 30, 99, 0.08)' }}>
+        <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
         {loading ? (
-          <div className="py-20 text-center text-gray-400 bg-gray-50/50">
-            <Loader message="Fetching applications dashboard..." />
+          <div className="py-20 text-center">
+            <Loader message="Fetching applications..." />
           </div>
         ) : filteredApplications.length === 0 ? (
-          <div className="py-20 text-center text-gray-400 bg-gray-50/50">
-            <ClipboardList size={48} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="font-bold text-gray-500 text-lg">No Applications Found</h3>
-            <p className="text-sm text-gray-400 mt-1 font-medium">Try modifying your filter options or add a manual admission entry.</p>
+          <div className="py-16 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[#7E63F6]/10 flex items-center justify-center mx-auto mb-4">
+              <ClipboardList size={28} className="text-[#7E63F6]" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-sm">No Applications Found</h3>
+            <p className="text-xs text-gray-400 font-medium mt-1">Try modifying your filter options or add a manual admission entry.</p>
             <div className="pt-4">
-              <Button onClick={() => navigate('/college/admission-form')} className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-5 py-2.5 shadow-md">
+              <Button onClick={() => navigate('/college/admission-form')} className="bg-gradient-to-r from-[#7E63F6] to-[#9781F8] text-white rounded-xl px-5 py-2.5 shadow-md">
                 <Plus size={16} className="mr-1.5" />
                 Create Manual Admission
               </Button>
@@ -644,61 +653,65 @@ const Applications = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-700">
-              <thead className="text-[11px] text-gray-400 font-black uppercase tracking-wider bg-[#f8f9fe] border-b border-gray-100">
-                <tr>
-                  <th className="py-2 px-6 w-12 text-center">
+              <thead className="text-[13px] text-[#5A3345] font-bold uppercase tracking-[0.6px] border-b border-[#F2C8DA] sticky top-0 shadow-[0_3px_10px_rgba(233,30,99,0.08)]" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '56px' }}>
+                <tr style={{ height: '56px' }}>
+                  <th className="py-0 px-5 w-12 text-center border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
                       checked={
                         filteredApplications.length > 0 && selectedIds.length === filteredApplications.length
                       }
-                      className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                      className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                     />
                   </th>
-                  <th className="py-2 px-6">App ID</th>
-                  <th className="py-2 px-6">Student</th>
-                  <th className="py-2 px-6">Department</th>
-                  <th className="py-2 px-6">Course</th>
-                  <th className="py-2 px-6">Status</th>
-                  <th className="py-2 px-6">Created Date</th>
-                  <th className="py-2 px-6 text-center w-[180px]">Actions</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">App ID</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Student</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Department</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Course</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Status</th>
+                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Created Date</th>
+                  <th className="py-0 px-5 text-center w-[180px] last:border-r-0 align-middle">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-[#E8ECF3]">
                 {filteredApplications.map((app, index) => {
                   const currentStatus = STAGE_MAP_TO_STATUS[app.stage] || 'New';
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        className={`transition-all duration-200 ${
+                        className={`transition-all duration-200 ease-out hover:bg-[#FFF7FA] ${
                           expandedAppId === app._id 
-                            ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm' 
-                            : 'hover:bg-slate-50 border-l-4 border-l-transparent'
-                        } ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}
+                            ? 'bg-[#FFF7FA] border-l-4 border-l-[#E91E63] shadow-xs' 
+                            : 'border-l-4 border-l-transparent'
+                        }`}
                       >
-                        <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-5 py-2.5 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(app._id)}
                             onChange={() => handleSelectRow(app._id)}
-                            className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                            className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                           />
                         </td>
-                        <td className="px-6 py-2 font-black text-slate-900 whitespace-nowrap text-sm">{app.applicationId}</td>
-                        <td className="px-6 py-2 text-slate-800">
-                          <div className="font-semibold text-slate-900 text-[13px] leading-tight">{app.studentName}</div>
-                          <span className="block text-[10px] text-slate-400 font-semibold mt-0.5">
+                        <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-[rgba(233,30,99,0.04)] last:border-r-0">{app.applicationId}</td>
+                        <td className="px-5 py-2.5 text-gray-800 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                          <div className="font-semibold text-gray-900 text-[13px] leading-tight">{app.studentName}</div>
+                          <span className="block text-[10px] text-gray-400 font-semibold mt-0.5">
                             {app.email} | {app.parentMobile || app.mobile}
                           </span>
                         </td>
-                        <td className="px-6 py-2 font-bold text-slate-600 text-xs">
-                          {app.departmentId?.name || 'N/A'}
+                        <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5091F8]/10 text-[#5091F8]">
+                            {app.departmentId?.name || 'N/A'}
+                          </span>
                         </td>
-                        <td className="px-6 py-2 font-bold text-slate-600 text-xs">
-                          {app.courseId?.name || 'N/A'}
+                        <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#7E63F6]/10 text-[#7E63F6]">
+                            {app.courseId?.name || 'N/A'}
+                          </span>
                         </td>
-                        <td className="px-6 py-2 font-bold text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-6 py-2 font-bold text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                           
                           {/* Colorful Status Dropdown */}
                           <div className="relative inline-block w-[140px]">
@@ -708,9 +721,9 @@ const Applications = () => {
                               className={`w-full text-[10px] font-black uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border shadow-sm focus:ring-2 focus:ring-offset-1 ${
                                 currentStatus === 'New' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
                                 currentStatus === 'Hold' ? 'bg-orange-50 text-orange-700 border-orange-200 focus:ring-orange-500' :
-                                currentStatus === 'Not Interested' ? 'bg-red-50 text-red-700 border-red-200 focus:ring-red-500' :
-                                currentStatus === 'Admission Confirmed' ? 'bg-teal-50 text-teal-700 border-teal-200 focus:ring-teal-500' :
-                                'bg-purple-50 text-purple-700 border-purple-200 focus:ring-purple-500'
+                                  currentStatus === 'Not Interested' ? 'bg-red-50 text-red-700 border-red-200 focus:ring-red-500' :
+                                    currentStatus === 'Admission Confirmed' ? 'bg-teal-50 text-teal-700 border-teal-200 focus:ring-teal-500' :
+                                      'bg-purple-50 text-purple-700 border-purple-200 focus:ring-purple-500'
                               }`}
                             >
                               {STATUS_OPTIONS.map(opt => (
@@ -725,39 +738,37 @@ const Applications = () => {
                           </div>
 
                         </td>
-                        <td className="px-6 py-2 text-xs text-slate-700 font-semibold whitespace-nowrap">
+                        <td className="px-5 py-2.5 text-xs text-gray-700 font-semibold whitespace-nowrap border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                           {new Date(app.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric'
                           })}
                         </td>
-                        <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
-                          
-                          {/* Correct Action Buttons using standard <button> tag */}
+                        <td className="px-5 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-center gap-1.5">
                             <button
-                              className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${
+                              className={`h-10 w-10 p-0 flex items-center justify-center border rounded-xl shadow-[0_3px_10px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] ${
                                 expandedAppId === app._id 
-                                  ? 'bg-purple-600 text-white shadow-md shadow-purple-200 border-transparent' 
-                                  : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600'
+                                  ? 'bg-[#6366F1]/15 border-[#6366F1]/30 text-[#6366F1]' 
+                                  : 'bg-[#EEF2FF] border-[#E8ECF3] text-[#6366F1] hover:bg-[#6366F1] hover:text-white hover:border-[#6366F1]'
                               }`}
                               onClick={() => setExpandedAppId(expandedAppId === app._id ? null : app._id)}
                               title={expandedAppId === app._id ? "Hide Timeline" : "Timeline"}
                             >
-                              <GitCommit size={18} strokeWidth={2} />
+                              <GitCommit size={16} strokeWidth={2} />
                             </button>
 
                             <button
-                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:shadow-xs transition-all shadow-sm"
+                              className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                               onClick={() => handleViewDetails(app._id)}
                               title="View Details"
                             >
-                              <Eye size={18} strokeWidth={2} />
+                              <Eye size={16} strokeWidth={2} />
                             </button>
 
                             <button
-                              className={`h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm ${app.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              className={`h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#ECFDF5] text-[#10B981] hover:bg-[#10B981] hover:text-white hover:border-[#10B981] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200 ${app.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
                               onClick={() => {
                                 if (app.journeyStatus === 'CLOSED') {
                                   toast.error('This journey has been closed. Contact blocked.');
@@ -767,15 +778,15 @@ const Applications = () => {
                               }}
                               title={app.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
                             >
-                              <Phone size={18} strokeWidth={2} />
+                              <Phone size={16} strokeWidth={2} />
                             </button>
 
                             <button
-                              className="h-9 w-9 p-0 flex items-center justify-center border border-gray-200 rounded-xl bg-gray-50 text-gray-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 hover:shadow-xs transition-all shadow-sm"
+                              className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FEF2F2] text-[#EF4444] hover:bg-[#EF4444] hover:text-white hover:border-[#EF4444] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                               onClick={() => handleDeleteClick(app)}
                               title="Delete"
                             >
-                              <Trash2 size={18} strokeWidth={2} />
+                              <Trash2 size={16} strokeWidth={2} />
                             </button>
                           </div>
                         </td>
@@ -1092,6 +1103,7 @@ const Applications = () => {
           onClose={() => setSelectedEnquiryForAssessment(null)}
         />
       )}
+    </div>
     </div>
   );
 };

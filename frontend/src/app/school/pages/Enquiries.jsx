@@ -579,15 +579,20 @@ const Enquiries = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Top action header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Enquiries Database</h2>
-          <p className="text-slate-500 text-sm mt-0.5">
-            Filter, modify statuses, convert registration stages, and send parents templated messages.
-          </p>
+    <div className="min-h-screen bg-[#F9EEF3] px-3 md:px-5 lg:px-6 pb-6 pt-8 font-sans text-gray-800">
+      <div className="max-w-[1400px] mx-auto space-y-5">
+
+      {/* Page Header (No Card) */}
+      <div className="mb-5">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiries Database</h1>
+          <div className="flex items-center h-[36px] px-[16px] bg-[#FCE7F3] border border-[#F9A8D4] text-[#DB2777] font-semibold text-xs rounded-[12px] shrink-0">
+            {totalRecords} Total Records
+          </div>
         </div>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
+          Filter, modify statuses, convert registration stages, and send parents templated messages.
+        </p>
       </div>
 
       {/* Advanced Filters Block */}
@@ -692,7 +697,7 @@ const Enquiries = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
-            className="bg-indigo-900 text-white rounded-xl px-5 py-3 shadow-md flex items-center justify-between flex-wrap gap-3"
+            className="bg-gradient-to-r from-[#7E63F6] to-[#9781F8] text-white rounded-xl px-5 py-3 card-flat flex items-center justify-between flex-wrap gap-3"
           >
             <span className="text-xs font-semibold">
               {selectedIds.length} enquiries selected
@@ -733,84 +738,91 @@ const Enquiries = () => {
         )}
       </AnimatePresence>
 
-      {/* Main Table view */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      {/* Main Table Card */}
+      <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 14px 35px rgba(233, 30, 99, 0.08)' }}>
+        <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
         {loading ? (
           <Loader message="Loading enquiries..." />
         ) : enquiries.length === 0 ? (
-          <div className="py-16 text-center text-slate-400">
-            <AlertCircle size={40} className="mx-auto text-slate-300 mb-3" />
-            <p className="font-semibold text-slate-500">No enquiries found</p>
-            <p className="text-xs text-slate-400 mt-1">
+          <div className="py-16 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[#7E63F6]/10 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle size={28} className="text-[#7E63F6]" />
+            </div>
+            <p className="font-bold text-gray-800 text-sm">No enquiries found</p>
+            <p className="text-xs text-gray-400 font-medium mt-1">
               Try adjusting your search criteria or register a new form submission.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-700">
-              <thead className="text-xs text-slate-400 font-bold uppercase tracking-wider bg-slate-50 border-b border-slate-200 sticky top-0">
-                <tr>
-                  <th className="px-6 py-4 w-12 text-center">
+            <table className="w-full text-left text-sm text-gray-700">
+              <thead className="text-[13px] text-[#5A3345] font-bold uppercase tracking-[0.6px] border-b border-[#F2C8DA] sticky top-0 shadow-[0_3px_10px_rgba(233,30,99,0.08)]" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '56px' }}>
+                <tr style={{ height: '56px' }}>
+                  <th className="px-5 py-0 w-12 text-center border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
                       checked={
                         enquiries.length > 0 && selectedIds.length === enquiries.length
                       }
-                      className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                      className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                     />
                   </th>
-                  <th className="px-6 py-2">Enquiry ID</th>
-                  <th className="px-6 py-2">Student Name</th>
-                  <th className="px-6 py-2">Parent Details</th>
-                  <th className="px-6 py-2">Class</th>
-                  <th className="px-6 py-2">Status</th>
-                  <th className="px-6 py-2">Date Submited</th>
-                  <th className="px-6 py-2 text-center w-[300px]">Actions</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Enquiry ID</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Student Name</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Parent Details</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Class</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Status</th>
+                  <th className="px-5 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Date Submited</th>
+                  <th className="px-5 py-0 text-center w-[300px] last:border-r-0 align-middle">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#E8ECF3]">
                 {enquiries.map((enq, index) => (
                   <React.Fragment key={enq._id}>
                     <tr
-                      className={`transition-all duration-200 ${expandedEnquiryId === enq._id
-                          ? 'bg-indigo-50/80 border-l-4 border-l-indigo-500 shadow-sm'
-                          : 'hover:bg-slate-50 border-l-4 border-l-transparent'
-                        } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}
+                      className={`transition-all duration-200 ease-out hover:bg-[#FFF7FA] ${
+                        expandedEnquiryId === enq._id
+                          ? 'bg-[#FFF7FA] border-l-4 border-l-[#E91E63] shadow-xs'
+                          : 'border-l-4 border-l-transparent'
+                      }`}
                     >
-                      <td className="px-6 py-2 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-5 py-2.5 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           checked={selectedIds.includes(enq._id)}
                           onChange={() => handleSelectRow(enq._id)}
-                          className="rounded text-indigo-600 focus:ring-indigo-500/20"
+                          className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                         />
                       </td>
-                      <td className="px-6 py-2 font-bold text-slate-900 whitespace-nowrap text-sm">{enq.enquiryId}</td>
-                      <td className="px-6 py-2 text-slate-800">
-                        <div className="font-semibold text-slate-900 text-[13px] leading-tight">{enq.studentName}</div>
-                        <span className="block text-[10px] text-slate-400 font-medium mt-0.5">
+                      <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-[rgba(233,30,99,0.04)] last:border-r-0">{enq.enquiryId}</td>
+                      <td className="px-5 py-2.5 text-gray-800 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <div className="font-semibold text-gray-900 text-[13px] leading-tight">{enq.studentName}</div>
+                        <span className="block text-[10px] text-gray-400 font-medium mt-0.5">
                           {enq.gender}
                         </span>
                       </td>
-                      <td className="px-6 py-2">
+                      <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
                             setViewingParentMobile(enq.mobile);
                           }}
-                          className="font-semibold text-slate-700 block cursor-pointer hover:text-indigo-600 hover:underline leading-tight text-xs"
+                          className="font-semibold text-gray-700 block cursor-pointer hover:text-[#E91E63] hover:underline leading-tight text-xs"
                           title="View Parent & Family History Profile"
                         >
                           {enq.parentName}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-medium block mt-0.5">
+                        <span className="text-[10px] text-gray-400 font-medium block mt-0.5">
                           📞 {enq.mobile}
                         </span>
                       </td>
-                      <td className="px-6 py-2 font-medium text-slate-700 text-xs">{enq.classSeeking}</td>
-                      <td className="px-6 py-2 font-bold" onClick={(e) => e.stopPropagation()}>
-
+                      <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E91E63]/10 text-[#E91E63]">
+                          {enq.classSeeking}
+                        </span>
+                      </td>
+                      <td className="px-5 py-2.5 font-bold border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                         <div className="relative inline-block w-[120px]">
                           <select
                             value={enq.status}
@@ -820,7 +832,7 @@ const Enquiries = () => {
                                 enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
                                   enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
                                     enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
-                                      'bg-slate-50 text-slate-700 border-slate-200'
+                                      'bg-gray-50 text-gray-700 border-gray-200'
                               }
                             `}
                           >
@@ -835,37 +847,35 @@ const Enquiries = () => {
                         </div>
 
                       </td>
-                      <td className="px-6 py-2 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                      <td className="px-5 py-2.5 text-xs font-semibold text-gray-700 whitespace-nowrap border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {formatSubmissionDate(enq.saveDate, enq.saveTime)}
                       </td>
-                      <td className="px-6 py-2" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-5 py-2.5" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5">
-
-                          {/* USING STANDARD HTML BUTTONS FOR ICONS */}
                           <button
-                            className={`h-9 w-9 p-0 flex items-center justify-center border rounded-xl transition-all shadow-sm ${expandedEnquiryId === enq._id
-                                ? 'bg-indigo-50 border-indigo-200 text-indigo-600 shadow-xs'
-                                : 'bg-white border-slate-200 text-slate-500 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600'
+                            className={`h-10 w-10 p-0 flex items-center justify-center border rounded-xl shadow-[0_3px_10px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] ${expandedEnquiryId === enq._id
+                                ? 'bg-[#6366F1]/15 border-[#6366F1]/30 text-[#6366F1]'
+                                : 'bg-[#EEF2FF] border-[#E8ECF3] text-[#6366F1] hover:bg-[#6366F1] hover:text-white hover:border-[#6366F1]'
                               }`}
                             onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
                             title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
                           >
-                            <GitCommit size={18} strokeWidth={2} />
+                            <GitCommit size={16} strokeWidth={2} />
                           </button>
 
                           <button
-                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:shadow-xs transition-all shadow-sm"
+                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                             onClick={() => {
                               setSelectedEnquiryForView(enq);
                               setViewModalOpen(true);
                             }}
                             title="View Details"
                           >
-                            <Eye size={18} strokeWidth={2} />
+                            <Eye size={16} strokeWidth={2} />
                           </button>
 
                           <button
-                             className={`h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 hover:shadow-xs transition-all shadow-sm ${enq.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                             className={`h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#ECFDF5] text-[#10B981] hover:bg-[#10B981] hover:text-white hover:border-[#10B981] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200 ${enq.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
                              onClick={() => {
                                if (enq.journeyStatus === 'CLOSED') {
                                  toast.error('This journey has been closed. Contact blocked.');
@@ -876,25 +886,24 @@ const Enquiries = () => {
                              }}
                              title={enq.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
                            >
-                             <Phone size={18} strokeWidth={2} />
+                             <Phone size={16} strokeWidth={2} />
                            </button>
 
                           <button
-                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 hover:shadow-xs transition-all shadow-sm"
+                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FFF7ED] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-white hover:border-[#F59E0B] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                             onClick={() => setSelectedEnquiryForAssessment(enq)}
                             title="Documents / Assessment"
                           >
-                            <FileQuestion size={18} strokeWidth={2} />
+                            <FileQuestion size={16} strokeWidth={2} />
                           </button>
 
                           <button
-                            className="h-9 w-9 p-0 flex items-center justify-center border border-slate-200 rounded-xl bg-white text-slate-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 hover:shadow-xs transition-all shadow-sm"
+                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FEF2F2] text-[#EF4444] hover:bg-[#EF4444] hover:text-white hover:border-[#EF4444] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                             onClick={() => handleDeleteClick(enq)}
                             title="Delete"
                           >
-                            <Trash2 size={18} strokeWidth={2} />
+                            <Trash2 size={16} strokeWidth={2} />
                           </button>
-
                         </div>
                       </td>
                     </tr>
@@ -979,23 +988,23 @@ const Enquiries = () => {
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white border border-slate-200 px-6 py-4 rounded-2xl shadow-sm">
-          <p className="text-xs font-medium text-slate-500">
-            Showing Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-            <span className="font-semibold text-slate-800">{totalPages}</span> ({totalRecords} records)
+        <div className="flex items-center justify-between bg-white border border-[#E8ECF3] px-5 py-3.5 rounded-xl card-flat">
+          <p className="text-xs font-medium text-gray-500">
+            Showing Page <span className="font-bold text-gray-800">{page}</span> of{' '}
+            <span className="font-bold text-gray-800">{totalPages}</span> ({totalRecords} records)
           </p>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight size={18} />
             </button>
@@ -1272,6 +1281,7 @@ const Enquiries = () => {
           </motion.div>
         </div>
       )}
+    </div>
     </div>
   );
 };

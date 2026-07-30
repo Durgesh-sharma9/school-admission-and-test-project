@@ -29,7 +29,7 @@ const CollapsibleFilters = ({
       {/* Row 1: Search and Export */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative flex-1 w-full text-left">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#94A3B8]">
             <Filter size={18} />
           </span>
           <input
@@ -37,13 +37,13 @@ const CollapsibleFilters = ({
             placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border border-[#E9EAF0] text-sm text-slate-800 placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all duration-200"
           />
         </div>
         <div className="flex items-center gap-2 shrink-0 w-full md:w-auto">
           <Button
             variant="outline"
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 w-full md:w-auto text-xs font-semibold text-slate-700 bg-white"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 w-full md:w-auto text-xs font-semibold text-slate-700 bg-white border border-[#E9EAF0] shadow-[0_4px_14px_rgba(15,23,42,0.03)] hover:bg-[#8B5CF6]/5 hover:text-[#8B5CF6] hover:border-[#8B5CF6]/20 transition-all duration-200"
             onClick={handleToggle}
           >
             {isExpanded ? (
@@ -60,7 +60,7 @@ const CollapsibleFilters = ({
           </Button>
           <Button
             variant="outline"
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 w-full md:w-auto text-xs font-semibold text-slate-700 bg-white"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 w-full md:w-auto text-xs font-semibold text-slate-700 bg-white border border-[#E9EAF0] shadow-[0_4px_14px_rgba(15,23,42,0.03)] hover:bg-[#EE5EAA]/5 hover:text-[#EE5EAA] hover:border-[#EE5EAA]/20 transition-all duration-200"
             onClick={onExport}
           >
             {exportLabel}
