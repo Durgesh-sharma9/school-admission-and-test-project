@@ -18,11 +18,19 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { useAuth } from '../contexts/AuthContext';
+import UpgradePage from '../../../shared/components/UpgradePage';
+
 const AssessmentList = () => {
+  const { school } = useAuth();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('');
+
+  if (school?.subscription?.assessmentEnabled !== true) {
+    return <UpgradePage />;
+  }
 
   const fetchAssessments = async () => {
     try {

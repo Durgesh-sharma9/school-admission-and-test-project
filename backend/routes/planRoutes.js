@@ -13,6 +13,9 @@ const {
 } = require('../controllers/planController');
 const { protectSuperAdmin } = require('../middleware/auth');
 
+// Public route for school/college admins to view available plans (must be before /:id route)
+router.get('/public', getPublicPlans);
+
 // Super Admin only routes
 router.get('/', protectSuperAdmin, getAllPlans);
 router.get('/:id', protectSuperAdmin, getPlanById);
@@ -22,8 +25,5 @@ router.delete('/:id', protectSuperAdmin, deletePlan);
 router.patch('/:id/archive', protectSuperAdmin, archivePlan);
 router.post('/:id/duplicate', protectSuperAdmin, duplicatePlan);
 router.patch('/reorder', protectSuperAdmin, reorderPlans);
-
-// Public route for school admins to view available plans (must be before /:id route)
-router.get('/public', getPublicPlans);
 
 module.exports = router;

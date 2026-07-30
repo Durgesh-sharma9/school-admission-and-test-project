@@ -6,6 +6,7 @@ import { SuperAdminAuthProvider } from './app/super-admin/contexts/SuperAdminAut
 import { Toaster } from 'react-hot-toast';
 import Loader from './shared/components/Loader';
 import ErrorBoundary from './shared/components/ErrorBoundary';
+import FeatureGate from './shared/components/FeatureGate';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'unconfigured';
 
@@ -59,7 +60,9 @@ const CollegePublicThankYou = lazy(() => import('./app/college/pages/PublicThank
 const SuperAdminLogin = lazy(() => import('./app/super-admin/pages/Login'));
 const SuperAdminDashboard = lazy(() => import('./app/super-admin/pages/Dashboard'));
 const SuperAdminSchools = lazy(() => import('./app/super-admin/pages/Schools'));
-const SuperAdminPlans = lazy(() => import('./app/super-admin/pages/Plans'));
+const SuperAdminSchoolPlans = lazy(() => import('./app/super-admin/pages/SchoolPlans'));
+const SuperAdminCollegePlans = lazy(() => import('./app/super-admin/pages/CollegePlans'));
+const SuperAdminSubscriptionRequests = lazy(() => import('./app/super-admin/pages/SubscriptionRequests'));
 const SuperAdminPayments = lazy(() => import('./app/super-admin/pages/Payments'));
 const SuperAdminLandingCMS = lazy(() => import('./app/super-admin/pages/LandingCMS'));
 const SuperAdminAnnouncements = lazy(() => import('./app/super-admin/pages/Announcements'));
@@ -137,10 +140,10 @@ function App() {
                     <Route path="/dashboard/tasks" element={<SchoolTasksPage />} />
                     <Route path="/dashboard/settings" element={<SchoolSettingsPage />} />
                     <Route path="/dashboard/subscription" element={<SchoolSubscription />} />
-                    <Route path="/dashboard/assessments" element={<SchoolAssessmentList />} />
-                    <Route path="/dashboard/assessments/create" element={<SchoolAssessmentBuilder />} />
-                    <Route path="/dashboard/assessments/new" element={<SchoolAssessmentBuilder />} />
-                    <Route path="/dashboard/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/dashboard/assessments" element={<FeatureGate><SchoolAssessmentList /></FeatureGate>} />
+                    <Route path="/dashboard/assessments/create" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
+                    <Route path="/dashboard/assessments/new" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
+                    <Route path="/dashboard/assessments/edit/:id" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
 
                     <Route path="/enquiries" element={<SchoolEnquiries />} />
                     <Route path="/tasks" element={<SchoolTasksPage />} />
@@ -152,11 +155,11 @@ function App() {
                     <Route path="/thank-you-cms" element={<SchoolThankYouCmsPage />} />
                     <Route path="/settings" element={<SchoolSettingsPage />} />
                     <Route path="/subscription" element={<SchoolSubscription />} />
-                    <Route path="/assessments" element={<SchoolAssessmentList />} />
-                    <Route path="/assessments/create" element={<SchoolAssessmentBuilder />} />
-                    <Route path="/assessments/new" element={<SchoolAssessmentBuilder />} />
-                    <Route path="/assessments/builder" element={<SchoolAssessmentBuilder />} />
-                    <Route path="/assessments/edit/:id" element={<SchoolAssessmentBuilder />} />
+                    <Route path="/assessments" element={<FeatureGate><SchoolAssessmentList /></FeatureGate>} />
+                    <Route path="/assessments/create" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
+                    <Route path="/assessments/new" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
+                    <Route path="/assessments/builder" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
+                    <Route path="/assessments/edit/:id" element={<FeatureGate><SchoolAssessmentBuilder /></FeatureGate>} />
                   </Route>
 
                   {/* College Public Routes */}
@@ -183,7 +186,9 @@ function App() {
                   <Route element={<SuperAdminLayout />}>
                     <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
                     <Route path="/super-admin/schools" element={<SuperAdminSchools />} />
-                    <Route path="/super-admin/plans" element={<SuperAdminPlans />} />
+                    <Route path="/super-admin/school-plans" element={<SuperAdminSchoolPlans />} />
+                    <Route path="/super-admin/college-plans" element={<SuperAdminCollegePlans />} />
+                    <Route path="/super-admin/subscription-requests" element={<SuperAdminSubscriptionRequests />} />
                     <Route path="/super-admin/payments" element={<SuperAdminPayments />} />
                     <Route path="/super-admin/announcements" element={<SuperAdminAnnouncements />} />
                     <Route path="/super-admin/landing-cms" element={<SuperAdminLandingCMS />} />

@@ -22,7 +22,9 @@ const SuperAdminLayout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/super-admin/dashboard', icon: LayoutDashboard },
     { name: 'Schools', href: '/super-admin/schools', icon: Building2 },
-    { name: 'Plans', href: '/super-admin/plans', icon: CreditCard },
+    { name: 'School Plans', href: '/super-admin/school-plans', icon: CreditCard },
+    { name: 'College Plans', href: '/super-admin/college-plans', icon: CreditCard },
+    { name: 'Subscription Requests', href: '/super-admin/subscription-requests', icon: Bell },
     { name: 'Payments', href: '/super-admin/payments', icon: DollarSign },
     { name: 'Announcements', href: '/super-admin/announcements', icon: MessageSquare },
     { name: 'Landing CMS', href: '/super-admin/landing-cms', icon: FileText },

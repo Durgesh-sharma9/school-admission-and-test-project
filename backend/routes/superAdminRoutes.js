@@ -74,4 +74,29 @@ router.get('/academic/requests', protect, getSuperAdminRequests);
 router.post('/academic/requests/:id/approve', protect, approveRequest);
 router.post('/academic/requests/:id/reject', protect, rejectRequest);
 
+const {
+  getAllPlans,
+  getPlanById,
+  createPlan,
+  updatePlan,
+  deletePlan
+} = require('../controllers/planController');
+const {
+  getSubscriptionRequests,
+  approveSubscriptionRequest,
+  rejectSubscriptionRequest
+} = require('../controllers/subscriptionController');
+
+// Subscription Plans
+router.get('/plans', protect, getAllPlans);
+router.get('/plans/:id', protect, getPlanById);
+router.post('/plans', protect, createPlan);
+router.put('/plans/:id', protect, updatePlan);
+router.delete('/plans/:id', protect, deletePlan);
+
+// Subscription Requests
+router.get('/subscription/requests', protect, getSubscriptionRequests);
+router.post('/subscription/requests/:id/approve', protect, approveSubscriptionRequest);
+router.post('/subscription/requests/:id/reject', protect, rejectSubscriptionRequest);
+
 module.exports = router;

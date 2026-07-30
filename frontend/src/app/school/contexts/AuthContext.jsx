@@ -86,7 +86,6 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // Subscription/Trial check
   const isTrialActive = () => {
     if (!school) return false;
     if (school.role === 'super-admin') return true; // Super admin always active
@@ -96,10 +95,16 @@ export const AuthProvider = ({ children }) => {
 
     if (subscription.status !== 'active') return false;
 
-    const trialEndDate = new Date(subscription.trialEnd);
+    const plan = subscription.plan || 'free-trial';
     const currentDate = new Date();
-    
-    return trialEndDate > currentDate;
+
+    if (plan === 'free-trial') {
+      const trialEndDate = new Date(subscription.trialEnd);
+      return trialEndDate > currentDate;
+    } else {
+      const expiryDate = subscription.expiryDate ? new Date(subscription.expiryDate) : null;
+      return expiryDate ? expiryDate > currentDate : true;
+    }
   };
 
   const value = {

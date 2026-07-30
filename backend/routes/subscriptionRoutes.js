@@ -3,21 +3,19 @@ const router = express.Router();
 const {
   getCurrentSubscription,
   changePlan,
-  renewSubscription,
-  cancelSubscription,
-  getSubscriptionHistory,
-  getAvailablePlans,
+  getSubscriptionRequests,
+  approveSubscriptionRequest,
+  rejectSubscriptionRequest
 } = require('../controllers/subscriptionController');
-const { protect } = require('../middleware/auth');
+const { protect, protectSuperAdmin } = require('../middleware/auth');
 
-// All subscription routes require authentication
-router.use(protect);
+// --- School / College Admin endpoints ---
+router.get('/current', protect, getCurrentSubscription);
+router.post('/request', protect, changePlan);
 
-router.get('/current', getCurrentSubscription);
-router.post('/change-plan', changePlan);
-router.post('/renew', renewSubscription);
-router.post('/cancel', cancelSubscription);
-router.get('/history', getSubscriptionHistory);
-router.get('/plans', getAvailablePlans);
+// --- Super Admin endpoints ---
+router.get('/requests', protectSuperAdmin, getSubscriptionRequests);
+router.post('/requests/:id/approve', protectSuperAdmin, approveSubscriptionRequest);
+router.post('/requests/:id/reject', protectSuperAdmin, rejectSubscriptionRequest);
 
 module.exports = router;

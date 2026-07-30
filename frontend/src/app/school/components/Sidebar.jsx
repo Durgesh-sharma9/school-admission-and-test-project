@@ -16,14 +16,17 @@ import {
   CreditCard
 } from 'lucide-react';
 
+import useSubscriptionAccess from '../hooks/useSubscriptionAccess';
+
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { school, logout } = useAuth();
+  const { assessmentEnabled } = useSubscriptionAccess();
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Enquiries', path: '/enquiries', icon: ClipboardList },
     { name: "Today's Tasks", path: '/tasks', icon: CheckSquare },
-    { name: 'Assessments', path: '/assessments', icon: FileQuestion },
+    ...(assessmentEnabled ? [{ name: 'Assessments', path: '/assessments', icon: FileQuestion }] : []),
     { name: 'Admission Form', path: '/admission-form', icon: FileText },
     { name: 'QR Code / Links', path: '/qr-code', icon: QrCode },
     { name: 'Enquiry Banner', path: '/thankyou-cms', icon: Sparkles },

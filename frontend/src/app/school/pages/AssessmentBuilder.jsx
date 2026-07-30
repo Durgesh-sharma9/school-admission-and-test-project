@@ -21,10 +21,18 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useAuth } from '../contexts/AuthContext';
+import UpgradePage from '../../../shared/components/UpgradePage';
+
 const AssessmentBuilder = () => {
+  const { school } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams(); // populated if editing
   const isEditMode = !!id;
+
+  if (school?.subscription?.assessmentEnabled !== true) {
+    return <UpgradePage />;
+  }
 
   // Primary Assessment info states
   const [name, setName] = useState('');
