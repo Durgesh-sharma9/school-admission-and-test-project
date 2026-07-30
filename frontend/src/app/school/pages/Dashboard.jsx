@@ -9,7 +9,7 @@ import {
   ArrowRight, BookOpen, ClipboardCheck, Award, FileQuestion, Clock, TrendingUp,
   FileText, Activity, MapPin, Calendar, Zap, BarChart3, PieChart as PieIcon,
   ShieldCheck, Layers, PhoneCall, ArrowUpRight, ArrowDownRight, Filter,
-  School as SchoolIcon, CheckCircle2, AlertCircle, UserCheck
+  School as SchoolIcon, CheckCircle2, AlertCircle, UserCheck, MoreVertical
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +17,32 @@ import {
   PieChart, Pie, Cell, LineChart, Line, CartesianGrid
 } from 'recharts';
 
-const COLORS = ['#8b5cf6', '#f97316', '#14b8a6', '#f43f5e', '#3b82f6', '#10b981', '#ec4899'];
+// Updated: Slightly lighter, softer color palette
+const COLORS = ['#7E63F6', '#EE5EAA', '#34D06D', '#F6A928', '#5091F8', '#25C5B5', '#9B86F8'];
+
+// Animation Variants for Premium Staggered Effect
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+};
 
 const Dashboard = () => {
   const { school, isTrialActive } = useAuth();
@@ -143,448 +168,494 @@ const Dashboard = () => {
   const sparkline2 = [{ v: 5 }, { v: 9 }, { v: 12 }, { v: 18 }, { v: 15 }, { v: 24 }, { v: 29 }];
 
   return (
-    <div className="space-y-6 text-left pb-12 max-w-7xl mx-auto">
-      
-      {/* HEADER BAR - LIGHT AND COMPACT */}
-      <div className="bg-white text-gray-900 rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="space-y-1.5 z-10">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-xl font-black tracking-tight">{school?.name || 'School CRM Dashboard'}</h1>
+    <div className="min-h-screen bg-[#F6F8FC] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
+      <motion.div
+        className="max-w-[1400px] mx-auto space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+
+        {/* TOPBAR / HEADER - COMPACT */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl p-3 md:p-4 shadow-sm border border-[#E8ECF3] flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{school?.name || 'Dashboard Overview'}</h1>
+            <p className="text-xs text-gray-500 font-medium">Pages / Dashboard</p>
           </div>
-          <p className="text-gray-500 text-xs font-medium">Real-time SaaS Decision Engine • Locality Performance • CRM Funnel</p>
-        </div>
 
-        <div className="flex items-center gap-2.5 z-10 flex-wrap">
-          <Link to="/admission-form" className="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition-all shadow-sm">
-            <FilePlus className="h-4 w-4 mr-1.5" /> + Add Enquiry
-          </Link>
-          <Link to="/qr-links" className="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 transition-all">
-            <QrCode className="h-4 w-4 mr-1.5 text-orange-500" /> QR Poster
-          </Link>
-          <Link to="/assessments/create" className="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 transition-all">
-            <BookOpen className="h-4 w-4 mr-1.5 text-teal-500" /> New Test
-          </Link>
-        </div>
-      </div>
-
-      {/* ROW 1: COMPACT KPI SPARKLINE CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {[
-          { title: "Today's Enquiries", value: todayEnquiries.length, desc: "Enquiries created today", spark: sparkline1, icon: Users, color: 'text-purple-600 bg-purple-50', line: '#8b5cf6' },
-          { title: "This Month Enquiries", value: totalEnquiries, desc: "Enquiries created this month", spark: sparkline2, icon: Inbox, color: 'text-blue-600 bg-blue-50', line: '#3b82f6' },
-          { title: "Pending Follow-ups", value: followUpPendingCount, desc: "Follow-ups pending", spark: sparkline1, icon: Clock, color: 'text-orange-500 bg-orange-50', line: '#f97316' },
-          { title: "Confirmed Admissions", value: confirmedAdmissions, desc: "Finalized admissions", spark: sparkline2, icon: CheckCircle, color: 'text-teal-600 bg-teal-50', line: '#14b8a6' },
-          { title: "Conversion %", value: `${conversionRate}%`, desc: "Admissions to enquiries ratio", spark: sparkline1, icon: TrendingUp, color: 'text-indigo-600 bg-indigo-50', line: '#6366f1' },
-          { title: "Test Completion", value: `${completionRate}%`, desc: `${completedCount} of ${totalAssigned} completed`, spark: sparkline2, icon: ClipboardCheck, color: 'text-pink-600 bg-pink-50', line: '#ec4899' },
-        ].map((card, idx) => {
-          const Icon = card.icon;
-          return (
-            <motion.div key={card.title} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: idx * 0.03 }} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow group relative overflow-hidden">
-              <div className="flex items-center justify-between z-10">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight truncate">{card.title}</span>
-                <div className={`p-1.5 rounded-lg ${card.color}`}><Icon className="h-3.5 w-3.5" /></div>
-              </div>
-              <div className="my-2 z-10">
-                <span className="text-xl font-black text-gray-800 tracking-tight block truncate">{card.value}</span>
-                <span className="text-[9px] font-semibold text-gray-400 block mt-0.5 leading-tight truncate">{card.desc}</span>
-              </div>
-              <div className="absolute bottom-0 left-0 h-6 w-full opacity-40 group-hover:opacity-100 transition-opacity">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={card.spark}>
-                    <Area type="monotone" dataKey="v" stroke={card.line} fill={card.line} fillOpacity={0.2} strokeWidth={1.5} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* ROW 2: CRM PIPELINE PROGRESS BARS */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Layers className="h-4 w-4 text-purple-600" />
-            <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">CRM Admission Funnel Pipeline</h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link to="/admission-form" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#7E63F6] to-[#9781F8] hover:shadow-md hover:shadow-[#7E63F6]/20 text-white transition-all duration-200">
+              <FilePlus className="h-3.5 w-3.5 mr-1.5" /> Add Enquiry
+            </Link>
+            <Link to="/qr-links" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-white text-gray-700 border border-[#E8ECF3] hover:bg-gray-50 hover:shadow-sm transition-all duration-200">
+              <QrCode className="h-3.5 w-3.5 mr-1.5 text-[#EE5EAA]" /> QR Poster
+            </Link>
+            <Link to="/assessments/create" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-white text-gray-700 border border-[#E8ECF3] hover:bg-gray-50 hover:shadow-sm transition-all duration-200">
+              <BookOpen className="h-3.5 w-3.5 mr-1.5 text-[#34D06D]" /> New Test
+            </Link>
           </div>
-          <Link to="/enquiries" className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center">
-            View All Enquiries <ArrowRight className="h-3.5 w-3.5 ml-1" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        </motion.div>
+
+        {/* ROW 1: COMPACT FLOATING KPI CARDS */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-x-4 gap-y-6 pt-4">
           {[
-            { label: 'Total Enquiries', count: totalEnquiries, pct: 100, color: 'bg-purple-600', text: 'text-purple-700', bg: 'bg-purple-50' },
-            { label: 'New Enquiries', count: newEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((newEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-blue-500', text: 'text-blue-700', bg: 'bg-blue-50' },
-            { label: 'Follow Up / Hold', count: holdEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((holdEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-orange-500', text: 'text-orange-600', bg: 'bg-orange-50' },
-            { label: 'Confirmed Admission', count: confirmedAdmissions, pct: conversionRate, color: 'bg-teal-500', text: 'text-teal-700', bg: 'bg-teal-50' },
-            { label: 'Not Interested', count: notInterestedCount, pct: totalEnquiries > 0 ? Math.round((notInterestedCount / totalEnquiries) * 100) : 0, color: 'bg-red-500', text: 'text-red-600', bg: 'bg-red-50' },
-            { label: 'Active Conversion', count: `${conversionRate}%`, pct: conversionRate, color: 'bg-indigo-600', text: 'text-indigo-700', bg: 'bg-indigo-50' },
-          ].map((stage) => (
-            <div key={stage.label} onClick={() => navigate('/enquiries')} className={`p-3 rounded-xl border border-transparent ${stage.bg} cursor-pointer hover:border-gray-200 transition-all space-y-2`}>
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-gray-700 text-[11px] truncate">{stage.label}</span>
-                <span className={`font-black text-xs ${stage.text}`}>{stage.count}</span>
-              </div>
-              <div className="w-full bg-white/60 h-2 rounded-full overflow-hidden shadow-inner">
-                <div className={`h-full rounded-full transition-all duration-500 ${stage.color}`} style={{ width: `${Math.max(stage.pct, 5)}%` }} />
-              </div>
-              <div className="flex justify-between text-[10px] text-gray-500 font-bold">
-                <span>Stage Share</span><span>{stage.pct}%</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            { title: "Today's Enquiries", value: todayEnquiries.length, desc: "Created today", spark: sparkline1, icon: Users, color: 'from-[#7E63F6] to-[#9781F8]', line: '#7E63F6' },
+            { title: "Monthly Enquiries", value: totalEnquiries, desc: "Created this month", spark: sparkline2, icon: Inbox, color: 'from-[#5091F8] to-[#78AAF9]', line: '#5091F8' },
+            { title: "Pending Follow-ups", value: followUpPendingCount, desc: "Follow-ups waiting", spark: sparkline1, icon: Clock, color: 'from-[#F6A928] to-[#F8C15D]', line: '#F6A928' },
+            { title: "Admissions", value: confirmedAdmissions, desc: "Finalized", spark: sparkline2, icon: CheckCircle, color: 'from-[#34D06D] to-[#60DF8F]', line: '#34D06D' },
+            { title: "Conversion", value: `${conversionRate}%`, desc: "Lead to admit ratio", spark: sparkline1, icon: TrendingUp, color: 'from-[#EE5EAA] to-[#F488C2]', line: '#EE5EAA' },
+            { title: "Test Completion", value: `${completionRate}%`, desc: `${completedCount}/${totalAssigned} finished`, spark: sparkline2, icon: ClipboardCheck, color: 'from-[#25C5B5] to-[#53D7C9]', line: '#25C5B5' },
+          ].map((card, idx) => {
+            const Icon = card.icon;
+            return (
+              <motion.div
+                key={card.title}
+                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)" }}
+                className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-3 relative flex flex-col group transition-all duration-300"
+              >
+                <div className="flex justify-between items-start">
+                  {/* COMPACT FLOATING ICON */}
+                  <div className={`absolute -top-3 left-3 w-10 h-10 rounded-lg shadow-md flex items-center justify-center bg-gradient-to-br ${card.color}`}>
+                    <Icon className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="w-full text-right pl-14 pt-0.5">
+                    <p className="text-[11px] font-semibold text-gray-500 mb-0.5 truncate">{card.title}</p>
+                    <h4 className="text-xl font-bold text-gray-800 leading-tight">{card.value}</h4>
+                  </div>
+                </div>
+                <hr className="my-2.5 border-[#E8ECF3]" />
+                <div className="flex items-center justify-between z-10">
+                  <span className="text-[10px] font-medium text-gray-400 truncate">{card.desc}</span>
+                </div>
+                <div className="absolute bottom-0 left-0 h-8 w-full opacity-20 group-hover:opacity-40 transition-opacity rounded-b-xl overflow-hidden pointer-events-none">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={card.spark}>
+                      <Area type="monotone" dataKey="v" stroke={card.line} fill={card.line} strokeWidth={0} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
-      {/* ROW 3 & ROW 4: LOCALITY & CLASS DEMAND */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <MapPin className="h-4 w-4 text-teal-600" />
-              <div>
-                <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Top Performing Locality</h3>
-                <p className="text-[10px] text-gray-400">High conversion geographic clusters</p>
-              </div>
+        {/* ROW 2: CRM PIPELINE PROGRESS */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative mt-6">
+          <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#7E63F6] to-[#9781F8] text-white flex justify-between items-center z-10">
+            <div>
+              <h6 className="text-sm font-bold tracking-wide">CRM Admission Funnel Pipeline</h6>
+              <p className="text-[10px] opacity-90 font-medium">Real-time stage distribution</p>
             </div>
-            {topLocality && (
-              <span className="px-2.5 py-1 bg-teal-50 text-teal-700 rounded-lg text-[10px] font-bold flex items-center">
-                <Award className="h-3 w-3 mr-1" /> Best: {topLocality.name} ({topLocality.conversionRate}%)
-              </span>
+            <Link to="/enquiries" className="text-white hover:text-gray-100 transition-colors bg-white/20 px-2.5 py-1 rounded-md text-xs font-semibold flex items-center">
+              View All <ArrowRight className="h-3 w-3 ml-1.5" />
+            </Link>
+          </div>
+
+          <div className="p-4 pt-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {[
+                { label: 'Total Enquiries', count: totalEnquiries, pct: 100, color: 'bg-[#7E63F6]' },
+                { label: 'New Enquiries', count: newEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((newEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-[#5091F8]' },
+                { label: 'Follow Up / Hold', count: holdEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((holdEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-[#F6A928]' },
+                { label: 'Confirmed Admission', count: confirmedAdmissions, pct: conversionRate, color: 'bg-[#34D06D]' },
+                { label: 'Not Interested', count: notInterestedCount, pct: totalEnquiries > 0 ? Math.round((notInterestedCount / totalEnquiries) * 100) : 0, color: 'bg-[#F26464]' },
+                { label: 'Active Conversion', count: `${conversionRate}%`, pct: conversionRate, color: 'bg-[#EE5EAA]' },
+              ].map((stage) => (
+                <div key={stage.label} onClick={() => navigate('/enquiries')} className="space-y-2 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-gray-500 text-xs truncate">{stage.label}</span>
+                  </div>
+                  <h4 className="font-bold text-xl text-gray-800">{stage.count}</h4>
+                  <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.max(stage.pct, 2)}%` }}
+                      transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+                      className={`h-full rounded-full ${stage.color}`}
+                    />
+                  </div>
+                  <div className="text-[10px] text-gray-400 font-medium text-right">{stage.pct}% Share</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ROW 3 & 4: CHARTS */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Locality Chart */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#EE5EAA] to-[#F488C2] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Top Performing Locality</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">High conversion geographic clusters</p>
+              </div>
+              {topLocality && (
+                <span className="px-2 py-1 bg-white/20 rounded-md text-xs font-bold flex items-center shadow-sm">
+                  <Award className="h-3 w-3 mr-1" /> {topLocality.name} ({topLocality.conversionRate}%)
+                </span>
+              )}
+            </div>
+
+            {localityMetrics.length === 0 ? (
+              <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No locality data available.</div>
+            ) : (
+              <div className="space-y-4">
+                <div className="h-52 w-full mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={localityMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                      <Bar dataKey="totalEnquiries" fill="#7E63F6" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
+                      <Bar dataKey="confirmedAdmissions" fill="#34D06D" radius={[4, 4, 0, 0]} name="Admissions" maxBarSize={30} animationDuration={1500} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             )}
           </div>
-          {localityMetrics.length === 0 ? (
-            <div className="h-56 flex items-center justify-center bg-gray-50 rounded-xl text-xs text-gray-400">No locality data.</div>
-          ) : (
-            <div className="space-y-3">
-              <div className="h-44 w-full">
+
+          {/* Class Demand Chart */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#5091F8] to-[#78AAF9] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Class-Wise Demand</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Enquiries breakdown by class</p>
+              </div>
+              <span className="px-2 py-1 bg-white/20 rounded-md text-xs font-bold shadow-sm">
+                Top: {mostRequestedClass}
+              </span>
+            </div>
+
+            {classDemandData.length === 0 ? (
+              <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No class demand metrics.</div>
+            ) : (
+              <div className="h-52 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={localityMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                    <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '12px', fontSize: '11px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-                    <Bar dataKey="totalEnquiries" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Enquiries" />
-                    <Bar dataKey="confirmedAdmissions" fill="#14b8a6" radius={[4, 4, 0, 0]} name="Admissions" />
+                  <BarChart data={classDemandData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
+                    <XAxis dataKey="class" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                    <Bar dataKey="enquiries" fill="#F6A928" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-50">
-                {localityMetrics.slice(0, 3).map((loc) => (
-                  <div key={loc.name} className="p-2 bg-gray-50 rounded-lg text-xs space-y-0.5">
-                    <span className="font-bold text-gray-800 truncate block text-[11px]">{loc.name}</span>
-                    <div className="flex justify-between text-[10px] text-gray-500">
-                      <span>Admissions: <strong>{loc.confirmedAdmissions}</strong></span>
-                      <span className="text-teal-600 font-bold">{loc.conversionRate}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="h-4 w-4 text-orange-500" />
-              <div>
-                <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Class-Wise Demand</h3>
-                <p className="text-[10px] text-gray-400">Enquiries breakdown</p>
-              </div>
-            </div>
-            <span className="px-2.5 py-1 bg-orange-50 text-orange-700 rounded-lg text-[10px] font-bold">Highest: {mostRequestedClass}</span>
-          </div>
-          {classDemandData.length === 0 ? (
-            <div className="h-56 flex items-center justify-center bg-gray-50 rounded-xl text-xs text-gray-400">No class demand metrics.</div>
-          ) : (
-            <div className="h-56 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={classDemandData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
-                  <XAxis dataKey="class" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                  <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '12px', fontSize: '11px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-                  <Bar dataKey="enquiries" fill="#f97316" radius={[4, 4, 0, 0]} name="Enquiries" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ROW 5: MONTHLY ADMISSION TRENDS & SOURCE BREAKDOWN */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-purple-600" />
-              <div>
-                <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Monthly Admission Trends</h3>
-                <p className="text-[10px] text-gray-400">Enquiries vs confirmed admissions</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 text-xs font-semibold">
-              <span className="flex items-center text-purple-600"><span className="h-2 w-2 rounded-full bg-purple-600 mr-1" /> Enquiries</span>
-              <span className="flex items-center text-teal-500"><span className="h-2 w-2 rounded-full bg-teal-500 mr-1" /> Admissions</span>
-            </div>
-          </div>
-          <div className="h-60 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorInq" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorAdm" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ borderRadius: '12px', fontSize: '11px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-                <Area type="monotone" dataKey="enquiries" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorInq)" strokeWidth={2} />
-                <Area type="monotone" dataKey="admissions" stroke="#14b8a6" fillOpacity={1} fill="url(#colorAdm)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2">
-            <PieIcon className="h-4 w-4 text-pink-500" />
-            <div>
-              <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Admission Source Analytics</h3>
-              <p className="text-[10px] text-gray-400">Inbound channel distribution</p>
-            </div>
-          </div>
-          {sourceMetrics.length === 0 ? (
-            <div className="h-48 flex items-center justify-center bg-gray-50 rounded-xl text-xs text-gray-400">No source attributes.</div>
-          ) : (
-            <div className="h-48 w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={sourceMetrics} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={35} paddingAngle={4}>
-                    {sourceMetrics.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '12px', fontSize: '11px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-          <div className="space-y-1.5 pt-2 border-t border-gray-50">
-            {sourceMetrics.slice(0, 4).map((src, idx) => (
-              <div key={src.name} className="flex justify-between items-center text-xs">
-                <span className="flex items-center text-gray-600 font-medium">
-                  <span className="h-2 w-2 rounded-full mr-2" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />{src.name}
-                </span>
-                <span className="font-extrabold text-gray-800">{src.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ROW 5.5: Today's Follow-ups CRM Widget (RESTORED) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4 text-left">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <PhoneCall className="h-4.5 w-4.5 text-indigo-500" />
-            <div>
-              <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Today's Follow-ups Reminders</h3>
-              <p className="text-[10px] text-gray-400">Immediate follow-up schedules mapped from the admission pipeline stages</p>
-            </div>
-          </div>
-          <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-bold">
-            {todayFollowups.length} Reminders
-          </span>
-        </div>
-
-        {todayFollowups.length === 0 ? (
-          <div className="py-8 text-center bg-gray-50 rounded-xl">
-            <CheckCircle2 className="h-8 w-8 mx-auto text-teal-500 mb-2" />
-            <p className="font-semibold text-gray-500 text-xs">All Caught Up!</p>
-            <p className="text-[10px] text-gray-400">No pending follow-ups scheduled for today.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-bold uppercase tracking-wider">
-                <tr>
-                  <th className="px-4 py-3 rounded-tl-lg">Student Name</th>
-                  <th className="px-4 py-3">Active Stage</th>
-                  <th className="px-4 py-3">Follow-up Date</th>
-                  <th className="px-4 py-3 text-right rounded-tr-lg">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 font-semibold text-gray-700">
-                {todayFollowups.map((fup) => (
-                  <tr key={fup._id} className="hover:bg-purple-50/30 transition-colors">
-                    <td className="px-4 py-3 font-bold text-gray-900">{fup.studentName}</td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 uppercase">
-                        {fup.stage}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {new Date(fup.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button variant="primary" onClick={() => navigate(`/dashboard/enquiries?expand=${fup.enquiryId}`)} className="h-8 px-3 text-[10px] font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
-                        View Enquiry
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* ROW 6, 7, 8: RECENT ACTIVITY, PENDING TASKS, ASSESSMENT ANALYTICS (RESTORED) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ROW 6: Audit Trail & Recent Activity */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2">
-            <Activity className="h-4 w-4 text-pink-500" />
-            <div>
-              <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Live Audit & Activity</h3>
-              <p className="text-[10px] text-gray-400">Recent workspace actions</p>
-            </div>
-          </div>
-          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-            {(analytics?.recentActivity || []).length === 0 ? (
-              <div className="text-xs text-gray-400 py-8 text-center bg-gray-50 rounded-xl">No recent activity logged.</div>
-            ) : (
-              (analytics?.recentActivity || []).map((act, idx) => (
-                <div key={idx} className="flex items-start space-x-3 p-2.5 rounded-xl bg-gray-50 border border-gray-100/60 text-xs">
-                  <div className="p-1.5 rounded-lg bg-indigo-100 text-indigo-600 shrink-0 mt-0.5"><CheckCircle2 className="h-3.5 w-3.5" /></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-700 truncate">{act.title || 'System Notification'}</p>
-                    <p className="text-[11px] text-gray-500 line-clamp-1">{act.message}</p>
-                    <span className="text-[9px] text-gray-400 block mt-1">{new Date(act.createdAt).toLocaleString()}</span>
-                  </div>
-                </div>
-              ))
             )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* ROW 7: Pending Action Tasks */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2">
-            <Clock className="h-4 w-4 text-orange-500" />
-            <div>
-              <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Operational Pending</h3>
-              <p className="text-[10px] text-gray-400">Immediate action items for staff</p>
+        {/* ROW 5: TRENDS & SOURCES */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#34D06D] to-[#60DF8F] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Monthly Admission Trends</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Enquiries vs confirmed admissions</p>
+              </div>
+              <div className="flex items-center space-x-3 text-[11px] font-bold bg-white/20 px-3 py-1.5 rounded-md">
+                <span className="flex items-center"><span className="h-2 w-2 rounded-full bg-white mr-1.5" /> Enquiries</span>
+                <span className="flex items-center"><span className="h-2 w-2 rounded-full bg-[#25C5B5] mr-1.5 shadow-sm" /> Admissions</span>
+              </div>
+            </div>
+
+            <div className="h-56 w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={monthlyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorInq" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7E63F6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#7E63F6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorAdm" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#34D06D" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#34D06D" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                  <Area type="monotone" dataKey="enquiries" stroke="#7E63F6" fill="url(#colorInq)" strokeWidth={2} activeDot={{ r: 4 }} animationDuration={1500} />
+                  <Area type="monotone" dataKey="admissions" stroke="#34D06D" fill="url(#colorAdm)" strokeWidth={2} activeDot={{ r: 4 }} animationDuration={1500} />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
-          <div className="space-y-2.5">
-            {[
-              { label: "Today's Follow-Up Calls", count: followUpPendingCount, link: '/enquiries?status=Hold', color: 'bg-orange-50 text-orange-700', icon: PhoneCall },
-              { label: "Pending Assessment Evaluations", count: totalAssigned - completedCount, link: '/assessments', color: 'bg-blue-50 text-blue-700', icon: FileQuestion },
-              { label: "New Admissions to Verify", count: newEnquiriesCount, link: '/enquiries?status=New%20Enquiry', color: 'bg-purple-50 text-purple-700', icon: Inbox },
-              { label: "QR Link Downloads", count: "Ready", link: '/qr-links', color: 'bg-teal-50 text-teal-700', icon: QrCode },
-            ].map((task) => {
-              const TaskIcon = task.icon;
-              return (
-                <div key={task.label} onClick={() => navigate(task.link)} className={`p-3 rounded-xl ${task.color} flex items-center justify-between cursor-pointer hover:shadow-sm transition-all`}>
-                  <div className="flex items-center space-x-2.5">
-                    <TaskIcon className="h-4 w-4 shrink-0" />
-                    <span className="font-bold text-xs">{task.label}</span>
-                  </div>
-                  <span className="px-2 py-0.5 bg-white rounded-md text-xs font-black shadow-sm">{task.count}</span>
+
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#F6A928] to-[#F8C15D] text-white flex items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Admission Sources</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Inbound channel distribution</p>
+              </div>
+            </div>
+
+            {sourceMetrics.length === 0 ? (
+              <div className="h-56 flex items-center justify-center text-xs font-medium text-gray-400">No source attributes.</div>
+            ) : (
+              <div className="flex flex-col h-full justify-center">
+                <div className="h-40 w-full flex items-center justify-center mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={sourceMetrics} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} innerRadius={40} paddingAngle={4} animationDuration={1500}>
+                        {sourceMetrics.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
+                <div className="space-y-2 pt-4 border-t border-[#E8ECF3] mt-2">
+                  {sourceMetrics.slice(0, 4).map((src, idx) => (
+                    <div key={src.name} className="flex justify-between items-center text-xs">
+                      <span className="flex items-center text-gray-600 font-medium truncate pr-2">
+                        <span className="h-2 w-2 rounded-full mr-2 shadow-sm shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                        <span className="truncate">{src.name}</span>
+                      </span>
+                      <span className="font-bold text-gray-900 shrink-0">{src.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ROW 5.5: TODAY'S FOLLOW-UPS */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-0 pb-2 mt-8">
+          <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#25C5B5] to-[#53D7C9] text-white flex justify-between items-center z-10">
+            <div>
+              <h6 className="text-sm font-bold tracking-wide">Today's Follow-ups Reminders</h6>
+              <p className="text-[10px] opacity-90 font-medium mt-0.5">Immediate follow-up schedules</p>
+            </div>
+            <span className="px-2.5 py-1 bg-white/20 rounded-md text-[11px] font-bold shadow-sm">
+              {todayFollowups.length} Reminders
+            </span>
+          </div>
+
+          {todayFollowups.length === 0 ? (
+            <div className="py-8 text-center px-6">
+              <CheckCircle2 className="h-8 w-8 mx-auto text-[#34D06D] mb-2 opacity-80" />
+              <p className="font-bold text-gray-800 text-sm">All Caught Up!</p>
+              <p className="text-xs text-gray-500 font-medium mt-1">No pending follow-ups scheduled for today.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto px-4 pb-2">
+              <table className="w-full text-left text-[13px] whitespace-nowrap">
+                <thead className="text-gray-400 font-semibold uppercase tracking-wider text-[10px] border-b border-[#E8ECF3]">
+                  <tr>
+                    <th className="px-3 py-3">Student Name</th>
+                    <th className="px-3 py-3">Active Stage</th>
+                    <th className="px-3 py-3">Follow-up Date</th>
+                    <th className="px-3 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E8ECF3] font-medium text-gray-700">
+                  {todayFollowups.map((fup) => (
+                    <tr key={fup._id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="px-3 py-2.5">
+                        <div className="flex items-center">
+                          <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[#7E63F6]/20 to-[#9781F8]/20 text-[#7E63F6] flex items-center justify-center text-xs font-bold mr-2.5">
+                            {fup.studentName.charAt(0)}
+                          </div>
+                          <span className="font-bold text-gray-900">{fup.studentName}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#7E63F6]/10 text-[#7E63F6] uppercase tracking-wide">
+                          {fup.stage}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5 text-gray-500 font-medium text-xs">
+                        {new Date(fup.followUpDate).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="px-3 py-2.5 text-right">
+                        <button onClick={() => navigate(`/dashboard/enquiries?expand=${fup.enquiryId}`)} className="font-semibold text-xs text-[#7E63F6] hover:text-[#6a50e0] transition-colors">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+
+        {/* ROW 6, 7, 8: WIDGETS */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          {/* Audit Trail */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-lg bg-[#EE5EAA]/10 text-[#EE5EAA]">
+                <Activity className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Live Audit & Activity</h3>
+                <p className="text-[10px] text-gray-500 font-medium">Recent workspace actions</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+              {(analytics?.recentActivity || []).length === 0 ? (
+                <div className="text-xs font-medium text-gray-400 py-6 text-center">No recent activity logged.</div>
+              ) : (
+                (analytics?.recentActivity || []).map((act, idx) => (
+                  <div key={idx} className="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="mt-1 flex-shrink-0">
+                      <div className="h-1.5 w-1.5 rounded-full bg-[#7E63F6] ring-2 ring-[#7E63F6]/20" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-xs text-gray-800 truncate">{act.title || 'System Notification'}</p>
+                      <p className="text-[11px] text-gray-500 font-medium mt-0.5 line-clamp-2">{act.message}</p>
+                      <span className="text-[9px] font-semibold text-gray-400 block mt-1">{new Date(act.createdAt).toLocaleString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Pending Action Tasks */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-lg bg-[#F6A928]/10 text-[#F6A928]">
+                <Clock className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Operational Pending</h3>
+                <p className="text-[10px] text-gray-500 font-medium">Immediate action items</p>
+              </div>
+            </div>
+            <div className="space-y-2.5">
+              {[
+                { label: "Follow-Up Calls", count: followUpPendingCount, link: '/enquiries?status=Hold', color: 'bg-[#F6A928]/10 text-[#F6A928]', icon: PhoneCall },
+                { label: "Assessment Evals", count: totalAssigned - completedCount, link: '/assessments', color: 'bg-[#5091F8]/10 text-[#5091F8]', icon: FileQuestion },
+                { label: "Admissions to Verify", count: newEnquiriesCount, link: '/enquiries?status=New%20Enquiry', color: 'bg-[#7E63F6]/10 text-[#7E63F6]', icon: Inbox },
+                { label: "QR Link Downloads", count: "Ready", link: '/qr-links', color: 'bg-[#34D06D]/10 text-[#34D06D]', icon: QrCode },
+              ].map((task) => {
+                const TaskIcon = task.icon;
+                return (
+                  <motion.div whileHover={{ scale: 1.02 }} key={task.label} onClick={() => navigate(task.link)} className="p-3 rounded-lg border border-[#E8ECF3] hover:border-[#7E63F6]/30 hover:shadow-sm cursor-pointer transition-all duration-200 flex items-center justify-between group bg-white">
+                    <div className="flex items-center space-x-2.5">
+                      <div className={`p-1.5 rounded-md ${task.color}`}>
+                        <TaskIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-bold text-xs text-gray-700 group-hover:text-gray-900">{task.label}</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-gray-100 group-hover:bg-[#7E63F6] group-hover:text-white rounded-md text-[10px] font-bold transition-colors">{task.count}</span>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Assessment Analytics */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-lg bg-[#5091F8]/10 text-[#5091F8]">
+                <Award className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Assessment Engine</h3>
+                <p className="text-[10px] text-gray-500 font-medium">Student evaluation status</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Assigned</span>
+                <span className="text-xl font-black text-[#5091F8]">{totalAssigned}</span>
+              </div>
+              <div className="p-3.5 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Completed</span>
+                <span className="text-xl font-black text-[#34D06D]">{completedCount}</span>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-2 border-t border-[#E8ECF3]">
+              <div className="flex justify-between items-center text-xs mb-2">
+                <span className="font-bold text-gray-600">Completion Rate</span>
+                <span className="font-black text-gray-900">{completionRate}%</span>
+              </div>
+              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden shadow-inner">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${completionRate}%` }}
+                  transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                  className="bg-gradient-to-r from-[#5091F8] to-[#34D06D] h-full rounded-full"
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ROW 9: SUBSCRIPTION BANNER */}
+        <motion.div variants={itemVariants} className="bg-gradient-to-r from-[#111827] via-[#1f2937] to-[#111827] rounded-xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden mt-4">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-48 h-48 rounded-full bg-[#7E63F6] opacity-20 blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-48 h-48 rounded-full bg-[#EE5EAA] opacity-20 blur-3xl pointer-events-none"></div>
+
+          <div className="space-y-1.5 z-10">
+            <div className="flex items-center space-x-2">
+              <Zap className="h-5 w-5 text-yellow-400" />
+              <h3 className="text-sm font-bold tracking-wide text-white">Subscription & Usage Meter</h3>
+            </div>
+            <p className="text-[11px] font-medium text-gray-400">
+              Current Tier: <strong className="text-white capitalize">{school?.subscription?.plan || 'Free Trial'}</strong> • Enterprise SLA • Unlimited Enquiries
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 z-10">
+            <div className="text-right">
+              <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider block mb-0.5">Status</span>
+              <span className="text-[11px] font-bold text-[#34D06D] flex items-center bg-[#34D06D]/10 px-2 py-0.5 rounded border border-[#34D06D]/20">
+                <ShieldCheck className="h-3 w-3 mr-1" /> Active
+              </span>
+            </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link to="/settings" className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs transition-all shadow-sm block">
+                Manage Sub
+              </Link>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* ROW 10: QUICK ACTIONS DOCK */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-5 space-y-4 hover:shadow-md transition-shadow duration-300">
+          <h3 className="text-sm font-bold text-gray-900">Quick Operational Dock</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+            {[
+              { label: 'Add Enquiry', icon: FilePlus, link: '/admission-form', color: 'text-[#7E63F6] bg-[#7E63F6]/10 hover:bg-[#7E63F6] hover:text-white' },
+              { label: 'Generate QR', icon: QrCode, link: '/qr-links', color: 'text-[#5091F8] bg-[#5091F8]/10 hover:bg-[#5091F8] hover:text-white' },
+              { label: 'Public Form', icon: SchoolIcon, link: `/public/admission/${school?._id}`, color: 'text-[#34D06D] bg-[#34D06D]/10 hover:bg-[#34D06D] hover:text-white', external: true },
+              { label: 'Assign Test', icon: BookOpen, link: '/assessments', color: 'text-[#F6A928] bg-[#F6A928]/10 hover:bg-[#F6A928] hover:text-white' },
+              { label: 'New Test', icon: FileQuestion, link: '/assessments/create', color: 'text-[#EE5EAA] bg-[#EE5EAA]/10 hover:bg-[#EE5EAA] hover:text-white' },
+              { label: 'Enquiry Banner', icon: Sparkles, link: '/thank-you-cms', color: 'text-[#25C5B5] bg-[#25C5B5]/10 hover:bg-[#25C5B5] hover:text-white' },
+              { label: 'Settings', icon: Filter, link: '/settings', color: 'text-gray-600 bg-gray-100 hover:bg-gray-800 hover:text-white' },
+            ].map((action) => {
+              const ActionIcon = action.icon;
+              return action.external ? (
+                <motion.a whileHover={{ y: -3 }} key={action.label} href={action.link} target="_blank" rel="noreferrer"
+                  className={`p-3 rounded-lg flex flex-col items-center justify-center text-center space-y-2 transition-all duration-200 group shadow-sm hover:shadow-md ${action.color}`}>
+                  <ActionIcon className="h-5 w-5" />
+                  <span className="text-[11px] font-bold truncate w-full">{action.label}</span>
+                </motion.a>
+              ) : (
+                <motion.div whileHover={{ y: -3 }} key={action.label}>
+                  <Link to={action.link}
+                    className={`p-3 rounded-lg flex flex-col items-center justify-center text-center space-y-2 transition-all duration-200 group shadow-sm hover:shadow-md h-full w-full ${action.color}`}>
+                    <ActionIcon className="h-5 w-5" />
+                    <span className="text-[11px] font-bold truncate w-full">{action.label}</span>
+                  </Link>
+                </motion.div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* ROW 8: Assessment Engine Analytics */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2">
-            <Award className="h-4 w-4 text-indigo-500" />
-            <div>
-              <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Assessment Engine</h3>
-              <p className="text-[10px] text-gray-400">Student evaluation status</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-indigo-50 rounded-xl">
-              <span className="text-[10px] text-indigo-600 uppercase font-extrabold block">Assigned</span>
-              <span className="text-xl font-black text-indigo-900">{totalAssigned}</span>
-            </div>
-            <div className="p-3 bg-teal-50 rounded-xl">
-              <span className="text-[10px] text-teal-600 uppercase font-extrabold block">Completed</span>
-              <span className="text-xl font-black text-teal-900">{completedCount}</span>
-            </div>
-          </div>
-          <div className="space-y-2 pt-2 border-t border-gray-50">
-            <div className="flex justify-between items-center text-xs">
-              <span className="font-semibold text-gray-500">Overall Completion</span>
-              <span className="font-bold text-gray-800">{completionRate}%</span>
-            </div>
-            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-indigo-500 h-full rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ROW 9: SUBSCRIPTION & RESOURCE USAGE (Colorful Gradient untouched but compact) */}
-      <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="space-y-2 z-10">
-          <div className="flex items-center space-x-2">
-            <Zap className="h-5 w-5 text-yellow-300" />
-            <h3 className="text-sm font-extrabold tracking-wide uppercase text-white">Subscription & Usage Meter</h3>
-          </div>
-          <p className="text-xs text-indigo-100">
-            Current Tier: <strong className="text-yellow-300 capitalize">{school?.subscription?.plan || 'Free Trial'}</strong> • Standard Enterprise SLA • Unlimited Enquiries & Locality Mapping
-          </p>
-        </div>
-        <div className="flex items-center gap-4 z-10">
-          <div className="text-right">
-            <span className="text-[10px] text-indigo-200 uppercase font-semibold block">Status</span>
-            <span className="text-xs font-bold text-teal-300 flex items-center"><ShieldCheck className="h-3.5 w-3.5 mr-1" /> Active</span>
-          </div>
-          <Link to="/settings" className="px-4 py-2 rounded-xl bg-white text-indigo-700 font-bold text-xs transition-all shadow-sm">
-            Manage Subscription
-          </Link>
-        </div>
-      </div>
-
-      {/* ROW 10: QUICK ACTIONS DOCK (RESTORED) */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-3">
-        <h3 className="text-xs font-extrabold text-gray-800 uppercase tracking-wider">Quick Operational Dock</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-          {[
-            { label: 'Add Enquiry', icon: FilePlus, link: '/admission-form', color: 'text-purple-600 bg-purple-50 hover:bg-purple-100' },
-            { label: 'Generate QR', icon: QrCode, link: '/qr-links', color: 'text-blue-600 bg-blue-50 hover:bg-blue-100' },
-            { label: 'Public Form', icon: SchoolIcon, link: `/public/admission/${school?._id}`, color: 'text-teal-600 bg-teal-50 hover:bg-teal-100', external: true },
-            { label: 'Assign Test', icon: BookOpen, link: '/assessments', color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' },
-            { label: 'New Test', icon: FileQuestion, link: '/assessments/create', color: 'text-orange-600 bg-orange-50 hover:bg-orange-100' },
-            { label: 'Enquiry Banner', icon: Sparkles, link: '/thank-you-cms', color: 'text-pink-600 bg-pink-50 hover:bg-pink-100' },
-            { label: 'Settings', icon: Filter, link: '/settings', color: 'text-gray-600 bg-gray-100 hover:bg-gray-200' },
-          ].map((action) => {
-            const ActionIcon = action.icon;
-            return action.external ? (
-              <a key={action.label} href={action.link} target="_blank" rel="noreferrer" className={`p-3 rounded-xl flex flex-col items-center justify-center text-center space-y-1.5 transition-all hover:shadow-sm ${action.color}`}>
-                <ActionIcon className="h-4 w-4" />
-                <span className="text-[11px] font-bold truncate w-full">{action.label}</span>
-              </a>
-            ) : (
-              <Link key={action.label} to={action.link} className={`p-3 rounded-xl flex flex-col items-center justify-center text-center space-y-1.5 transition-all hover:shadow-sm ${action.color}`}>
-                <ActionIcon className="h-4 w-4" />
-                <span className="text-[11px] font-bold truncate w-full">{action.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -29,7 +29,8 @@ import {
   HelpCircle,
   FileSpreadsheet,
   Settings,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -44,11 +45,31 @@ import {
   Pie,
   LineChart,
   Line,
-  Legend
+  Legend,
+  AreaChart,
+  Area
 } from 'recharts';
 import { motion } from 'framer-motion';
 
-const CHART_COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+// Soft, Premium Color Palette
+const CHART_COLORS = ['#7E63F6', '#EE5EAA', '#34D06D', '#F6A928', '#5091F8', '#25C5B5', '#9B86F8'];
+
+// Animation Variants for Premium Staggered Effect
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1, y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+  }
+};
 
 const Dashboard = () => {
   const { school } = useAuth();
@@ -393,460 +414,375 @@ const Dashboard = () => {
   const courseDistribution = analyticsData?.courseDistribution || [];
   const leadSourceDistribution = analyticsData?.leadSourceDistribution || [];
 
+  // Fake sparkline data for background visual
+  const sparkline1 = [{ v: 10 }, { v: 18 }, { v: 14 }, { v: 22 }, { v: 30 }, { v: 28 }, { v: 35 }];
+  const sparkline2 = [{ v: 5 }, { v: 9 }, { v: 12 }, { v: 18 }, { v: 15 }, { v: 24 }, { v: 29 }];
+
   return (
-    <div className="space-y-6 text-left max-w-[1600px] mx-auto pb-12">
-      
-      {/* ==================== HEADER SECTION ==================== */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">
+    <div className="min-h-screen bg-[#F6F8FC] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
+      <motion.div
+        className="max-w-[1400px] mx-auto space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+      >
+
+        {/* ==================== HEADER SECTION (COMPACT SAAS) ==================== */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl p-3 md:p-4 shadow-sm border border-[#E8ECF3] flex flex-col md:flex-row md:items-center justify-between gap-3 mt-4">
+          <div className="space-y-0.5">
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
               {school?.name || 'Global College'}
-            </h2>
+            </h1>
+            <p className="text-xs text-gray-500 font-medium">
+              Real-time College Admission CRM • Applications • Admissions
+            </p>
           </div>
-          <p className="text-slate-500 text-xs font-semibold mt-1">
-            Real-time College Admission CRM & Pipeline • Applications • Counselling • Departments • Admissions
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <button
-            onClick={() => navigate('/college/admission-form')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-purple-600/10 cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            Add Application
-          </button>
-          <button
-            onClick={() => navigate('/college/qr-links')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
-          >
-            <QrCode className="h-4 w-4 text-slate-550" />
-            QR Poster
-          </button>
-          {/* <button
-            onClick={() => navigate('/college/counselling')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
-          >
-            <Calendar className="h-4 w-4 text-slate-550" />
-            New Entrance Test
-          </button> */}
-        </div>
-      </div>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <Link to="/college/admission-form" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#7E63F6] to-[#9781F8] hover:shadow-md hover:shadow-[#7E63F6]/20 text-white transition-all duration-200">
+              <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Application
+            </Link>
+            <Link to="/college/qr-links" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-white text-gray-700 border border-[#E8ECF3] hover:bg-gray-50 hover:shadow-sm transition-all duration-200">
+              <QrCode className="h-3.5 w-3.5 mr-1.5 text-[#EE5EAA]" /> QR Poster
+            </Link>
+          </div>
+        </motion.div>
 
-      {/* ==================== ROW 1: 6 COMPACT KPI CARDS ==================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { title: "Today's Applications", val: computedMetrics.todayApps, desc: "Applications today", icon: Clock, color: "indigo" },
-          { title: "This Month Applications", val: computedMetrics.thisMonthApps, desc: "Applications this month", icon: ClipboardList, color: "purple" },
-          { title: "Today's Follow-ups", val: todayFollowups.length, desc: "Follow-ups scheduled today", icon: PhoneCall, color: "amber" },
-          { title: "Confirmed Admissions", val: computedMetrics.confirmedCount, desc: "Admissions finalized", icon: CheckCircle2, color: "emerald" },
-          { title: "Conversion %", val: computedMetrics.conversionPercent, desc: "Admissions to applications ratio", icon: TrendingUp, color: "fuchsia" },
-          { title: "Entrance Tests", val: computedMetrics.entranceTestCount, desc: "Entrance tests registered", icon: FileText, color: "cyan" }
-        ].map((kpi, idx) => {
-          const Icon = kpi.icon;
-          return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.04 }}
-              className="bg-white border border-slate-100 rounded-xl p-3.5 shadow-[0_4px_20px_rgb(0,0,0,0.01)] hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] font-black uppercase text-slate-400 leading-none truncate max-w-[85%]">{kpi.title}</span>
-                <span className={`h-6 w-6 rounded-lg bg-${kpi.color}-50 text-${kpi.color}-600 flex items-center justify-center shrink-0`}>
-                  <Icon className="h-3.5 w-3.5" />
-                </span>
-              </div>
-              <div className="mt-3">
-                <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none">{kpi.val}</h3>
-                <p className="text-[10px] text-slate-400 font-semibold mt-1.5 leading-tight">{kpi.desc}</p>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* ==================== ROW 2: ADMISSION FUNNEL ==================== */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <Layers className="h-4 w-4 text-purple-500 animate-bounce" />
-          Horizontal Admission Funnel & Pipeline
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {/* ==================== ROW 1: COMPACT FLOATING KPI CARDS ==================== */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-x-4 gap-y-6 pt-4">
           {[
-            { stage: 'Applications', count: computedMetrics.funnel.applications, color: 'bg-purple-600' },
-            // { stage: 'Doc Verification', count: computedMetrics.funnel.docVerification, color: 'bg-indigo-600' },
-            // { stage: 'Counselling Scheduled', count: computedMetrics.funnel.counselling, color: 'bg-pink-600' },
-            { stage: 'Department Assigned', count: computedMetrics.funnel.deptAssigned, color: 'bg-fuchsia-600' },
-            { stage: 'Fee Pending', count: computedMetrics.funnel.feePending, color: 'bg-amber-600' },
-            { stage: 'Admission Confirmed', count: computedMetrics.funnel.confirmed, color: 'bg-emerald-600' },
-            { stage: 'Not Interested', count: computedMetrics.funnel.notInterested, color: 'bg-rose-600' }
-          ].map((item, idx) => {
-            const percentage = computedMetrics.funnel.applications > 0
-              ? Math.round((item.count / computedMetrics.funnel.applications) * 100)
-              : 0;
-
+            { title: "Today's Apps", val: computedMetrics.todayApps, desc: "Created today", spark: sparkline1, icon: Clock, color: "from-[#7E63F6] to-[#9781F8]", line: "#7E63F6" },
+            { title: "Monthly Apps", val: computedMetrics.thisMonthApps, desc: "Created this month", spark: sparkline2, icon: ClipboardList, color: "from-[#5091F8] to-[#78AAF9]", line: "#5091F8" },
+            { title: "Today's Follow-ups", val: todayFollowups.length, desc: "Scheduled today", spark: sparkline1, icon: PhoneCall, color: "from-[#F6A928] to-[#F8C15D]", line: "#F6A928" },
+            { title: "Admissions", val: computedMetrics.confirmedCount, desc: "Finalized", spark: sparkline2, icon: CheckCircle2, color: "from-[#34D06D] to-[#60DF8F]", line: "#34D06D" },
+            { title: "Conversion %", val: computedMetrics.conversionPercent, desc: "Lead to admit ratio", spark: sparkline1, icon: TrendingUp, color: "from-[#EE5EAA] to-[#F488C2]", line: "#EE5EAA" },
+            { title: "Entrance Tests", val: computedMetrics.entranceTestCount, desc: "Registered tests", spark: sparkline2, icon: FileText, color: "from-[#25C5B5] to-[#53D7C9]", line: "#25C5B5" }
+          ].map((kpi, idx) => {
+            const Icon = kpi.icon;
             return (
-              <div key={idx} className="relative p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl space-y-2">
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-bold text-slate-500 tracking-tight leading-tight uppercase block max-w-[70%]">{item.stage}</span>
-                  <span className="text-[11px] font-black text-slate-800">{percentage}%</span>
-                </div>
-                <div className="mt-2.5">
-                  <span className="text-base font-extrabold text-slate-850 block">{item.count}</span>
-                  <span className="text-[9px] text-slate-400 font-semibold block mt-0.5">Applicants</span>
-                </div>
-                {/* Progress bar */}
-                <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
-                  <div
-                    className={`${item.color} h-full transition-all duration-500`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                {idx < 4 && (
-                  <div className="hidden lg:block absolute -right-3 top-[40%] z-10 text-slate-300">
-                    <ChevronRight className="h-5 w-5" />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ==================== ROW 3: CHARTS ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Applications by Course */}
-        <div className="lg:col-span-8 bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-          <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <BookOpen className="h-4.5 w-4.5 text-purple-500" />
-            Applications by Course
-          </h3>
-          <div className="h-72">
-            {courseDistribution.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 p-4">
-                <AlertCircle className="h-8 w-8 text-slate-300 mb-1.5" />
-                <span className="text-xs font-bold uppercase tracking-wider">No active courses configured</span>
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={courseDistribution}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f8fafc" />
-                  <XAxis dataKey="code" stroke="#94a3b8" fontSize={10} fontStyle="bold" />
-                  <YAxis stroke="#94a3b8" fontSize={10} fontStyle="bold" />
-                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 4px 20px rgb(0,0,0,0.05)' }} />
-                  <Bar dataKey="count" fill="#818cf8" radius={[6, 6, 0, 0]} barSize={36}>
-                    {courseDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-
-        {/* Lead Source Analytics */}
-        <div className="lg:col-span-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-          <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <TrendingUp className="h-4.5 w-4.5 text-purple-500" />
-            Application Source Analytics
-          </h3>
-          <div className="h-72 flex items-center justify-center relative">
-            {leadSourceDistribution.length === 0 ? (
-              <div className="text-slate-400 text-xs flex flex-col items-center justify-center p-4">
-                <AlertCircle className="h-8 w-8 text-slate-300 mb-1.5" />
-                <span className="text-xs font-bold uppercase tracking-wider">No lead source statistics</span>
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={leadSourceDistribution}
-                    dataKey="count"
-                    nameKey="source"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={3}
-                  >
-                    {leadSourceDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '12px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ==================== ROW 4: TRENDS & TOP COURSES ==================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Monthly Admission Trends */}
-        <div className="lg:col-span-8 bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-          <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <Activity className="h-4.5 w-4.5 text-purple-500" />
-            Monthly Admission Trends
-          </h3>
-          <div className="h-72">
-            {computedMetrics.monthlyTrends.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 p-4">
-                <AlertCircle className="h-8 w-8 text-slate-300 mb-1.5" />
-                <span className="text-xs font-bold uppercase tracking-wider">No trend timeline registered</span>
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={computedMetrics.monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f8fafc" />
-                  <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} />
-                  <YAxis stroke="#94a3b8" fontSize={10} />
-                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '12px' }} />
-                  <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 'bold' }} />
-                  <Line type="monotone" dataKey="Applications" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="Admissions" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="Rejected" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-
-        {/* Top Performing Courses Rank Cards */}
-        <div className="lg:col-span-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-          <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-            <Award className="h-4.5 w-4.5 text-purple-500" />
-            Top Performing Courses
-          </h3>
-          <div className="space-y-3.5 h-72 overflow-y-auto pr-1">
-            {computedMetrics.topCourses.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-400 p-4">
-                <Award className="h-8 w-8 text-slate-300 mb-1.5" />
-                <span className="text-xs font-bold uppercase tracking-wider">No course ranking stats</span>
-              </div>
-            ) : (
-              computedMetrics.topCourses.map((course, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-100 rounded-xl transition-all">
-                  <div className="flex items-center space-x-3">
-                    <span className={`h-6 w-6 rounded-lg text-xs font-black flex items-center justify-center ${
-                      idx === 0 ? 'bg-purple-100 text-purple-700' :
-                      idx === 1 ? 'bg-indigo-100 text-indigo-700' :
-                      'bg-slate-150 text-slate-600'
-                    }`}>
-                      {idx + 1}
-                    </span>
-                    <span className="text-xs font-bold text-slate-850 truncate max-w-[150px]">{course.name}</span>
-                  </div>
-                  <span className="text-xs font-black text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
-                    {course.count} applications
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ==================== ROW 5: TODAY'S COUNSELLING SCHEDULE (TEMPORARILY REMOVED) ==================== */}
-      {/* 
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <Calendar className="h-4.5 w-4.5 text-purple-500" />
-          Today's Counselling Schedule
-        </h3>
-        <div className="overflow-x-auto border border-slate-50 rounded-xl">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400">
-                <th className="py-3 px-4">Student</th>
-                <th className="py-3 px-4">Course</th>
-                <th className="py-3 px-4">Counsellor</th>
-                <th className="py-3 px-4">Time</th>
-                <th className="py-3 px-4 text-center">Status</th>
-                <th className="py-3 px-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {computedMetrics.todayCounsellingList.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
-                    No counselling sessions scheduled for today
-                  </td>
-                </tr>
-              ) : (
-                computedMetrics.todayCounsellingList.map((c, idx) => (
-                  <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50 text-xs transition-colors">
-                    <td className="py-3 px-4 font-bold text-slate-850">{c.studentName}</td>
-                    <td className="py-3 px-4 font-semibold text-slate-500">{c.course}</td>
-                    <td className="py-3 px-4 text-slate-600 font-semibold">{c.counselor}</td>
-                    <td className="py-3 px-4 font-black text-purple-600">{c.time}</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full font-black text-[9px] uppercase border tracking-wider ${
-                        c.status === 'Completed' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
-                        c.status === 'Cancelled' ? 'bg-rose-50 border-rose-200 text-rose-700' :
-                        'bg-purple-50 border-purple-200 text-purple-700'
-                      }`}>
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => navigate(`/college/counselling?expand=${c._id}`)}
-                        className="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 font-black rounded-lg transition-colors cursor-pointer text-[10px] uppercase border border-purple-200"
-                      >
-                        Launch
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      */}
-
-      {/* ==================== ROW 6: PENDING DOCUMENTS (TEMPORARILY REMOVED) ==================== */}
-      {/* 
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <FileCheck className="h-4.5 w-4.5 text-purple-500" />
-          Pending Documents verification
-        </h3>
-        <div className="overflow-x-auto border border-slate-50 rounded-xl">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400">
-                <th className="py-3 px-4">Student</th>
-                <th className="py-3 px-4">Missing Documents</th>
-                <th className="py-3 px-4 text-center">Days Pending</th>
-                <th className="py-3 px-4 text-right">View</th>
-              </tr>
-            </thead>
-            <tbody>
-              {computedMetrics.pendingDocsList.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-slate-400 text-xs">
-                    All document verifications are up-to-date
-                  </td>
-                </tr>
-              ) : (
-                computedMetrics.pendingDocsList.map((d, idx) => (
-                  <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50 text-xs transition-colors">
-                    <td className="py-3 px-4 font-bold text-slate-850">{d.studentName}</td>
-                    <td className="py-3 px-4 font-semibold text-rose-600 bg-rose-50/20 px-2 py-0.5 rounded border border-rose-100 max-w-sm truncate inline-block mt-2">
-                      {d.missingDocs}
-                    </td>
-                    <td className="py-3 px-4 text-center font-black text-slate-600">{d.daysPending} days</td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => navigate(`/college/documents?expand=${d._id}`)}
-                        className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-lg transition-colors cursor-pointer text-[10px] uppercase border border-slate-200"
-                      >
-                        Inspect
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      */}
-
-      {/* ==================== ROW 7: OPERATIONAL PANEL ==================== */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <Activity className="h-4.5 w-4.5 text-purple-500 animate-pulse" />
-          Operational CRM Status Panel
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { title: "Today's Calls", val: computedMetrics.opTodayCalls, color: "border-indigo-100 bg-indigo-50/20 text-indigo-700" },
-            // { title: "Pending Counselling", val: computedMetrics.opPendingCounselling, color: "border-purple-100 bg-purple-50/20 text-purple-700" },
-            { title: "Pending Fee Collection", val: computedMetrics.opPendingFee, color: "border-amber-100 bg-amber-50/20 text-amber-700" },
-            // { title: "Pending Verification", val: computedMetrics.opPendingVerification, color: "border-pink-100 bg-pink-50/20 text-pink-700" },
-            { title: "Entrance Tests Today", val: computedMetrics.opEntranceToday, color: "border-emerald-100 bg-emerald-50/20 text-emerald-700" }
-          ].map((op, idx) => (
-            <div key={idx} className={`p-4 border rounded-xl flex flex-col justify-between ${op.color} shadow-xs`}>
-              <span className="text-[10px] font-bold uppercase tracking-tight block">{op.title}</span>
-              <span className="text-3xl font-black block mt-3">{op.val}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ==================== ROW 8: RECENT ACTIVITIES ==================== */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <Activity className="h-4.5 w-4.5 text-purple-500" />
-          Recent Campus Activities Log
-        </h3>
-        <div className="space-y-4 max-h-72 overflow-y-auto pr-2 divide-y divide-slate-50">
-          {computedMetrics.sortedActivities.length === 0 ? (
-            <div className="py-6 text-center text-slate-400 text-xs">No recent actions recorded.</div>
-          ) : (
-            computedMetrics.sortedActivities.map((act, idx) => (
-              <div key={act.id} className="flex items-start gap-4.5 pt-3.5 first:pt-0">
-                <span className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
-                  act.type === 'Admission Confirmed' ? 'bg-emerald-50 border border-emerald-150 text-emerald-700' :
-                  act.type === 'Counselling Scheduled' ? 'bg-purple-50 border border-purple-150 text-purple-700' :
-                  act.type === 'Fee Received' ? 'bg-amber-50 border border-amber-150 text-amber-700' :
-                  act.type === 'Document Uploaded' ? 'bg-blue-50 border border-blue-150 text-blue-700' :
-                  'bg-slate-50 border text-slate-600'
-                }`}>
-                  {act.type === 'Admission Confirmed' ? '🎓' :
-                   act.type === 'Counselling Scheduled' ? '📅' :
-                   act.type === 'Fee Received' ? '💳' :
-                   act.type === 'Document Uploaded' ? '📄' : '📝'}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-slate-850">{act.type}</p>
-                    <span className="text-[10px] text-slate-400 font-semibold">{act.time.toLocaleTimeString()} ({act.time.toLocaleDateString()})</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-tight">{act.detail}</p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* ==================== BOTTOM: QUICK ACTION DOCK ==================== */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
-        <h3 className="text-xs font-black text-slate-850 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-          <Settings className="h-4.5 w-4.5 text-purple-500" />
-          Quick Action Dock
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-          {[
-            { label: "Add Application", path: "/college/admission-form", icon: Plus, color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
-            { label: "Generate QR", path: "/college/qr-links", icon: QrCode, color: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100" },
-            { label: "Admission Desk Link", path: "/college/qr-links", icon: FileSpreadsheet, color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
-            // { label: "Schedule Counselling", path: "/college/counselling", icon: Compass, color: "bg-pink-50 text-pink-700 hover:bg-pink-100" },
-            { label: "Entrance Test Config", path: "/college/academic-config", icon: Layers, color: "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100" },
-            // { label: "Verify Documents", path: "/college/documents", icon: FileCheck, color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
-            { label: "CRM Settings", path: "/college/settings", icon: Settings, color: "bg-slate-50 text-slate-700 hover:bg-slate-150" }
-          ].map((dock, idx) => {
-            const Icon = dock.icon;
-            return (
-              <button
+              <motion.div
                 key={idx}
-                onClick={() => navigate(dock.path)}
-                className={`p-3.5 rounded-xl border border-transparent font-bold flex flex-col items-center justify-center text-center gap-2 cursor-pointer shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-xs active:translate-y-0 duration-300 ${dock.color}`}
+                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)" }}
+                className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-3 relative flex flex-col group transition-all duration-300"
               >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="text-[10px] leading-tight block">{dock.label}</span>
-              </button>
+                <div className="flex justify-between items-start">
+                  <div className={`absolute -top-3 left-3 w-10 h-10 rounded-lg shadow-md flex items-center justify-center bg-gradient-to-br ${kpi.color}`}>
+                    <Icon className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="w-full text-right pl-14 pt-0.5">
+                    <p className="text-[11px] font-semibold text-gray-500 mb-0.5 truncate">{kpi.title}</p>
+                    <h4 className="text-xl font-bold text-gray-800 leading-tight">{kpi.val}</h4>
+                  </div>
+                </div>
+                <hr className="my-2.5 border-[#E8ECF3]" />
+                <div className="flex items-center justify-between z-10">
+                  <span className="text-[10px] font-medium text-gray-400 truncate">{kpi.desc}</span>
+                </div>
+                <div className="absolute bottom-0 left-0 h-8 w-full opacity-20 group-hover:opacity-40 transition-opacity rounded-b-xl overflow-hidden pointer-events-none">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={kpi.spark}>
+                      <Area type="monotone" dataKey="v" stroke={kpi.line} fill={kpi.line} strokeWidth={0} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </motion.div>
             );
           })}
-        </div>
-      </div>
+        </motion.div>
+
+        {/* ==================== ROW 2: ADMISSION FUNNEL PIPELINE ==================== */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative mt-6">
+          <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#7E63F6] to-[#9781F8] text-white flex justify-between items-center z-10">
+            <div>
+              <h6 className="text-sm font-bold tracking-wide">Horizontal Admission Funnel Pipeline</h6>
+              <p className="text-[10px] opacity-90 font-medium">Real-time stage distribution</p>
+            </div>
+            <Link to="/college/applications" className="text-white hover:text-gray-100 transition-colors bg-white/20 px-2.5 py-1 rounded-md text-xs font-semibold flex items-center">
+              View All <ArrowRight className="h-3 w-3 ml-1.5" />
+            </Link>
+          </div>
+
+          <div className="p-4 pt-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { stage: 'Applications', count: computedMetrics.funnel.applications, color: 'bg-[#7E63F6]' },
+                { stage: 'Department Assigned', count: computedMetrics.funnel.deptAssigned, color: 'bg-[#5091F8]' },
+                { stage: 'Fee Pending', count: computedMetrics.funnel.feePending, color: 'bg-[#F6A928]' },
+                { stage: 'Admission Confirmed', count: computedMetrics.funnel.confirmed, color: 'bg-[#34D06D]' },
+                { stage: 'Not Interested', count: computedMetrics.funnel.notInterested, color: 'bg-[#EE5EAA]' }
+              ].map((item, idx) => {
+                const percentage = computedMetrics.funnel.applications > 0
+                  ? Math.round((item.count / computedMetrics.funnel.applications) * 100)
+                  : 0;
+
+                return (
+                  <div key={idx} onClick={() => navigate('/college/applications')} className="space-y-2 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors relative">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-gray-500 text-xs truncate max-w-[75%]">{item.stage}</span>
+                      <span className="text-[10px] font-bold text-gray-400">{percentage}%</span>
+                    </div>
+                    <h4 className="font-bold text-xl text-gray-800">{item.count}</h4>
+                    <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.max(percentage, 2)}%` }}
+                        transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+                        className={`h-full rounded-full ${item.color}`}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ==================== ROW 3: CHARTS ==================== */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+          {/* Applications by Course */}
+          <div className="lg:col-span-8 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#EE5EAA] to-[#F488C2] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Applications by Course</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Program distribution statistics</p>
+              </div>
+            </div>
+
+            {courseDistribution.length === 0 ? (
+              <div className="h-56 flex flex-col items-center justify-center text-xs font-medium text-gray-400">
+                <AlertCircle className="h-6 w-6 text-gray-300 mb-2" />
+                No active courses configured
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="h-60 w-full mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={courseDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
+                      <XAxis dataKey="code" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                      <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={30} animationDuration={1500}>
+                        {courseDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Lead Source Analytics */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#5091F8] to-[#78AAF9] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Application Source</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Inbound channels</p>
+              </div>
+            </div>
+
+            {leadSourceDistribution.length === 0 ? (
+              <div className="h-56 flex flex-col items-center justify-center text-xs font-medium text-gray-400">
+                <AlertCircle className="h-6 w-6 text-gray-300 mb-2" />
+                No lead source statistics
+              </div>
+            ) : (
+              <div className="flex flex-col h-full justify-center">
+                <div className="h-44 w-full flex items-center justify-center mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={leadSourceDistribution} dataKey="count" nameKey="source" cx="50%" cy="50%" outerRadius={70} innerRadius={45} paddingAngle={4} animationDuration={1500}>
+                        {leadSourceDistribution.map((entry, index) => <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="transparent" />)}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ==================== ROW 4: TRENDS & TOP COURSES ==================== */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+          {/* Monthly Admission Trends */}
+          <div className="lg:col-span-8 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#34D06D] to-[#60DF8F] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Monthly Admission Trends</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Historical pipeline data</p>
+              </div>
+            </div>
+
+            <div className="h-60 w-full mt-2">
+              {computedMetrics.monthlyTrends.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-xs font-medium text-gray-400">
+                  <AlertCircle className="h-6 w-6 text-gray-300 mb-2" />
+                  No trend timeline registered
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={computedMetrics.monthlyTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
+                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
+                    <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', paddingTop: '10px' }} />
+                    <Line type="monotone" dataKey="Applications" stroke="#7E63F6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} animationDuration={1500} />
+                    <Line type="monotone" dataKey="Admissions" stroke="#34D06D" strokeWidth={3} dot={{ r: 4 }} animationDuration={1500} />
+                    <Line type="monotone" dataKey="Rejected" stroke="#EE5EAA" strokeWidth={3} dot={{ r: 4 }} animationDuration={1500} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          {/* Top Performing Courses */}
+          <div className="lg:col-span-4 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#F6A928] to-[#F8C15D] text-white flex justify-between items-center z-10">
+              <div>
+                <h6 className="text-sm font-bold tracking-wide">Top Performing Courses</h6>
+                <p className="text-[10px] opacity-90 font-medium mt-0.5">Highest application volume</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 mt-2 h-56 overflow-y-auto pr-2 custom-scrollbar">
+              {computedMetrics.topCourses.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-xs font-medium text-gray-400">
+                  <Award className="h-6 w-6 text-gray-300 mb-2" />
+                  No course ranking stats
+                </div>
+              ) : (
+                computedMetrics.topCourses.map((course, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50/80 hover:bg-gray-100 rounded-lg transition-colors border border-[#E8ECF3]">
+                    <div className="flex items-center space-x-3">
+                      <span className={`h-6 w-6 rounded-md text-xs font-bold flex items-center justify-center ${idx === 0 ? 'bg-[#7E63F6]/10 text-[#7E63F6]' :
+                          idx === 1 ? 'bg-[#5091F8]/10 text-[#5091F8]' :
+                            idx === 2 ? 'bg-[#F6A928]/10 text-[#F6A928]' :
+                              'bg-gray-200 text-gray-600'
+                        }`}>
+                        {idx + 1}
+                      </span>
+                      <span className="text-xs font-bold text-gray-800 truncate max-w-[120px]">{course.name}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#7E63F6] bg-[#7E63F6]/10 px-2 py-1 rounded">
+                      {course.count} apps
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ==================== ROW 5 & 6 (COMMENTED OUT IN ORIGINAL) ==================== */}
+        {/*
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            ... Today's Counselling Schedule ...
+          </div>
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            ... Pending Documents verification ...
+          </div>
+        */}
+
+        {/* ==================== ROW 7 & 8: OPERATIONAL & ACTIVITY ==================== */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+
+          {/* Operational Panel */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300 lg:col-span-2">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-lg bg-[#5091F8]/10 text-[#5091F8]">
+                <Settings className="h-4 w-4 animate-spin-slow" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Operational Status</h3>
+                <p className="text-[10px] text-gray-500 font-medium">Immediate action items</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              {[
+                { title: "Today's Calls", val: computedMetrics.opTodayCalls, color: "text-[#5091F8] border-[#5091F8]/20 bg-[#5091F8]/5" },
+                { title: "Pending Fee", val: computedMetrics.opPendingFee, color: "text-[#F6A928] border-[#F6A928]/20 bg-[#F6A928]/5" },
+                { title: "Tests Today", val: computedMetrics.opEntranceToday, color: "text-[#34D06D] border-[#34D06D]/20 bg-[#34D06D]/5" }
+              ].map((op, idx) => (
+                <div key={idx} className={`p-4 border rounded-xl flex flex-col justify-between transition-colors hover:shadow-sm ${op.color}`}>
+                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-80 block">{op.title}</span>
+                  <span className="text-3xl font-black block mt-2">{op.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activities Feed */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-lg bg-[#EE5EAA]/10 text-[#EE5EAA]">
+                <Activity className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Recent Campus Log</h3>
+                <p className="text-[10px] text-gray-500 font-medium">Real-time activities</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+              {computedMetrics.sortedActivities.length === 0 ? (
+                <div className="text-xs font-medium text-gray-400 py-6 text-center">No recent actions recorded.</div>
+              ) : (
+                computedMetrics.sortedActivities.map((act, idx) => (
+                  <div key={act.id} className="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="mt-0.5 flex-shrink-0">
+                      <span className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold ${act.type === 'Admission Confirmed' ? 'bg-[#34D06D]/10 text-[#34D06D]' :
+                          act.type === 'Counselling Scheduled' ? 'bg-[#7E63F6]/10 text-[#7E63F6]' :
+                            act.type === 'Fee Received' ? 'bg-[#F6A928]/10 text-[#F6A928]' :
+                              act.type === 'Document Uploaded' ? 'bg-[#5091F8]/10 text-[#5091F8]' :
+                                'bg-gray-100 text-gray-600'
+                        }`}>
+                        {act.type === 'Admission Confirmed' ? '🎓' :
+                          act.type === 'Counselling Scheduled' ? '📅' :
+                            act.type === 'Fee Received' ? '💳' :
+                              act.type === 'Document Uploaded' ? '📄' : '📝'}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-xs text-gray-800 truncate">{act.type}</p>
+                      <p className="text-[10px] text-gray-500 font-medium mt-0.5 line-clamp-2">{act.detail}</p>
+                      <span className="text-[9px] font-semibold text-gray-400 block mt-1">{act.time.toLocaleTimeString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ==================== BOTTOM: QUICK ACTION DOCK ==================== */}
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-5 space-y-4 hover:shadow-md transition-shadow duration-300 mt-6">
+          <h3 className="text-sm font-bold text-gray-900">Quick Action Dock</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+            {[
+              { label: "Add Application", path: "/college/admission-form", icon: Plus, color: "text-[#7E63F6] bg-[#7E63F6]/10 hover:bg-[#7E63F6] hover:text-white" },
+              { label: "Generate QR", path: "/college/qr-links", icon: QrCode, color: "text-[#5091F8] bg-[#5091F8]/10 hover:bg-[#5091F8] hover:text-white" },
+              { label: "Admission Link", path: "/college/qr-links", icon: FileSpreadsheet, color: "text-[#34D06D] bg-[#34D06D]/10 hover:bg-[#34D06D] hover:text-white" },
+              { label: "Entrance Config", path: "/college/academic-config", icon: Layers, color: "text-[#EE5EAA] bg-[#EE5EAA]/10 hover:bg-[#EE5EAA] hover:text-white" },
+              { label: "CRM Settings", path: "/college/settings", icon: Settings, color: "text-gray-600 bg-gray-100 hover:bg-gray-800 hover:text-white" }
+            ].map((dock, idx) => {
+              const Icon = dock.icon;
+              return (
+                <motion.div whileHover={{ y: -3 }} key={idx}>
+                  <Link to={dock.path} className={`p-3 rounded-lg flex flex-col items-center justify-center text-center space-y-2 transition-all duration-200 group shadow-sm hover:shadow-md h-full w-full ${dock.color}`}>
+                    <Icon className="h-5 w-5" />
+                    <span className="text-[11px] font-bold truncate w-full">{dock.label}</span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+      </motion.div>
     </div>
   );
 };

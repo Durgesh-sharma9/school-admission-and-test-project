@@ -31,7 +31,6 @@ const DashboardLayout = () => {
     }
     window.location.href = '/super-admin/schools';
   };
-
   // Show loader while checking auth state
   if (loading) {
     return <Loader fullPage message="Verifying session..." />;
