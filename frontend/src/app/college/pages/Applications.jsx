@@ -481,14 +481,14 @@ const Applications = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#FFF4F8] px-3 md:px-5 lg:px-6 pb-6 pt-8 font-sans text-gray-800">
+    <div className="min-h-screen bg-[#FFF4F8] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
       <div className="max-w-[1400px] mx-auto space-y-5">
 
       {/* Page Header (No Card) */}
       <div className="mb-5">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Applications CRM Desk</h1>
-          <div className="flex items-center h-[36px] px-[16px] bg-[#FCE7F3] border border-[#F9A8D4] text-[#DB2777] font-semibold text-xs rounded-[12px] shrink-0">
+          <div className="flex items-center h-[36px] px-[16px] bg-[#EEF2F6] border border-[#E2E8F0] text-slate-700 font-bold text-xs rounded-[12px] shrink-0">
             {filteredApplications.length} Records
           </div>
         </div>
@@ -630,7 +630,7 @@ const Applications = () => {
       </AnimatePresence>
 
       {/* Main Table Card */}
-      <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 14px 35px rgba(233, 30, 99, 0.08)' }}>
+      <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)' }}>
         <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
         {loading ? (
           <div className="py-20 text-center">
@@ -653,9 +653,9 @@ const Applications = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-700">
-              <thead className="text-[13px] text-[#5A3345] font-bold uppercase tracking-[0.6px] border-b border-[#F2C8DA] sticky top-0 shadow-[0_3px_10px_rgba(233,30,99,0.08)]" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '56px' }}>
-                <tr style={{ height: '56px' }}>
-                  <th className="py-0 px-5 w-12 text-center border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">
+              <thead className="text-[11px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100 bg-white sticky top-0" style={{ height: '48px' }}>
+                <tr style={{ height: '48px' }}>
+                  <th className="py-0 px-5 w-12 text-center border-r border-slate-100 last:border-r-0 align-middle">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
@@ -665,12 +665,12 @@ const Applications = () => {
                       className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                     />
                   </th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">App ID</th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Student</th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Department</th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Course</th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Status</th>
-                  <th className="py-0 px-5 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Created Date</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">App ID</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">Student</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">Department</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">Course</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">Status</th>
+                  <th className="py-0 px-5 border-r border-slate-100 last:border-r-0 align-middle">Created Date</th>
                   <th className="py-0 px-5 text-center w-[180px] last:border-r-0 align-middle">Actions</th>
                 </tr>
               </thead>
@@ -680,13 +680,13 @@ const Applications = () => {
                   return (
                     <React.Fragment key={app._id}>
                       <tr 
-                        className={`transition-all duration-200 ease-out hover:bg-[#FFF7FA] ${
+                        className={`transition-all duration-200 ease-out hover:bg-slate-50/80 ${
                           expandedAppId === app._id 
-                            ? 'bg-[#FFF7FA] border-l-4 border-l-[#E91E63] shadow-xs' 
+                            ? 'bg-slate-50 border-l-4 border-l-[#E91E63] shadow-xs' 
                             : 'border-l-4 border-l-transparent'
                         }`}
                       >
-                        <td className="px-5 py-2.5 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-5 py-2.5 text-center border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={selectedIds.includes(app._id)}
@@ -694,24 +694,24 @@ const Applications = () => {
                             className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                           />
                         </td>
-                        <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-[rgba(233,30,99,0.04)] last:border-r-0">{app.applicationId}</td>
-                        <td className="px-5 py-2.5 text-gray-800 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-slate-100 last:border-r-0">{app.applicationId}</td>
+                        <td className="px-5 py-2.5 text-gray-800 border-r border-slate-100 last:border-r-0">
                           <div className="font-semibold text-gray-900 text-[13px] leading-tight">{app.studentName}</div>
                           <span className="block text-[10px] text-gray-400 font-semibold mt-0.5">
                             {app.email} | {app.parentMobile || app.mobile}
                           </span>
                         </td>
-                        <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5091F8]/10 text-[#5091F8]">
                             {app.departmentId?.name || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-5 py-2.5 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#7E63F6]/10 text-[#7E63F6]">
                             {app.courseId?.name || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-6 py-2 font-bold text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-6 py-2 font-bold text-center border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
                           
                           {/* Colorful Status Dropdown */}
                           <div className="relative inline-block w-[140px]">
@@ -738,7 +738,7 @@ const Applications = () => {
                           </div>
 
                         </td>
-                        <td className="px-5 py-2.5 text-xs text-gray-700 font-semibold whitespace-nowrap border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
+                        <td className="px-5 py-2.5 text-xs text-gray-700 font-semibold whitespace-nowrap border-r border-slate-100 last:border-r-0">
                           {new Date(app.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',

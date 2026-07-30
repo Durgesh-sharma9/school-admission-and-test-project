@@ -25,7 +25,7 @@ const CollapsibleFilters = ({
   };
 
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm space-y-3 ${className}`}>
+    <div className={`bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] space-y-3 ${className}`}>
       {/* Row 1: Search and Export */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative flex-1 w-full text-left">
@@ -108,7 +108,7 @@ export const SelectFilter = ({ label, value, onChange, options, placeholder, cla
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-2 text-slate-750 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white"
+        className="w-full bg-white rounded-lg border border-[#E9EAF0] px-3 py-2 text-slate-700 font-medium focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all shadow-[0_4px_14px_rgba(15,23,42,0.05)] cursor-pointer"
       >
         <option value="">{placeholder}</option>
         {options.map((opt) => (
@@ -129,7 +129,7 @@ export const DateFilter = ({ label, value, onChange, className = '' }) => {
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-50 rounded-lg border border-slate-100 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-700 font-medium focus:bg-white"
+        className="w-full bg-white rounded-lg border border-[#E9EAF0] px-3 py-1.5 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 text-slate-700 font-medium transition-all shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
       />
     </FilterField>
   );

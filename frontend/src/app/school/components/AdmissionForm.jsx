@@ -339,13 +339,10 @@ const AdmissionForm = ({
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-3xl mx-auto">
         {/* Section 1: Student Information */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-              <User className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#8B5CF6] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
               Student Information
             </h3>
@@ -416,10 +413,7 @@ const AdmissionForm = ({
 
         {/* Section 2: Parent / Guardian Information */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
-              <Users className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#22C55E] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
               Parent / Guardian Information
             </h3>
@@ -556,10 +550,7 @@ const AdmissionForm = ({
 
         {/* Section 3: Address Details */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
-              <MapPin className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#F59E0B] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
               Address Details
             </h3>
@@ -582,7 +573,7 @@ const AdmissionForm = ({
                   setShowStateDropdown(true);
                 }}
                 onFocus={() => setShowStateDropdown(true)}
-                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${errors.state ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-[#94A3B8] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all ${errors.state ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
                   }`}
               />
               <input
@@ -630,7 +621,7 @@ const AdmissionForm = ({
                   setShowLocalityDropdown(true);
                 }}
                 onFocus={() => setShowLocalityDropdown(true)}
-                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${errors.area ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-[#94A3B8] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all ${errors.area ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
                   }`}
               />
               <input
@@ -713,12 +704,9 @@ const AdmissionForm = ({
 
         {/* Section 4: Where did you hear about us? */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-purple-50 text-purple-605 rounded-lg">
-              <Users className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#3B82F6] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
-              Where did you hear about us? *
+              Where did you hear about us?
             </h3>
           </div>
 
@@ -739,7 +727,7 @@ const AdmissionForm = ({
                   setShowSourceDropdown(true);
                 }}
                 onFocus={() => setShowSourceDropdown(true)}
-                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${errors.source ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
+                className={`w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-[#94A3B8] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all ${errors.source ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
                   }`}
               />
               <input
@@ -792,10 +780,7 @@ const AdmissionForm = ({
 
         {/* Section 5: Parent Expectations */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
-              <FileText className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#E91E63] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
               Parent Expectations
             </h3>
@@ -815,10 +800,7 @@ const AdmissionForm = ({
 
         {/* Section 6: Admin Options or Additional Notes */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
-          <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
-            <div className="p-1.5 bg-slate-50 text-slate-600 rounded-lg">
-              <FileText className="h-4.5 w-4.5" />
-            </div>
+          <div className="border-l-4 border-[#14B8A6] pl-3 py-0.5 text-left">
             <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
               Additional Information
             </h3>

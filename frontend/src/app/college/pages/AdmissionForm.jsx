@@ -238,7 +238,7 @@ const AdmissionForm = () => {
   const filteredSpecs = specializations.filter(s => s.courseId?._id === formData.courseId || s.courseId === formData.courseId);
 
   return (
-    <div className="max-w-[1400px] mx-auto text-left pb-12">
+    <div className="max-w-3xl mx-auto text-left pb-12">
       {/* Page Header (No Card) */}
       <div className="mb-5 mt-2">
         <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Manual Admission Entry</h1>
@@ -248,9 +248,11 @@ const AdmissionForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* SECTION 1: Student Information */}
         <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4">
-          <h3 className="text-xs font-extrabold text-[#E91E63] uppercase tracking-wider pb-1 border-b">
-            1. Student Information
-          </h3>
+          <div className="border-l-4 border-[#8B5CF6] pl-3 py-0.5 mb-2.5">
+            <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+              Student Information
+            </h3>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Input
               label="Student Name *"
@@ -274,7 +276,7 @@ const AdmissionForm = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -304,7 +306,7 @@ const AdmissionForm = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
               >
                 <option value="General">General</option>
                 <option value="OBC">OBC</option>
@@ -322,7 +324,7 @@ const AdmissionForm = () => {
                 name="nationality"
                 value={formData.nationality}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
               >
                 <option value="Indian">Indian</option>
                 <option value="Nepalese">Nepalese</option>
@@ -337,9 +339,11 @@ const AdmissionForm = () => {
 
         {/* SECTION 2: Academic Program Seeking */}
         <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4">
-          <h3 className="text-xs font-extrabold text-[#E91E63] uppercase tracking-wider pb-1 border-b">
-            2. Academic Program Seeking
-          </h3>
+          <div className="border-l-4 border-[#3B82F6] pl-3 py-0.5 mb-2.5">
+            <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+              Academic Program Seeking
+            </h3>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Input
               label="10th Board *"
@@ -433,7 +437,7 @@ const AdmissionForm = () => {
                 name="departmentId"
                 value={formData.departmentId}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
                 required
               >
                 <option value="">-- Select Department --</option>
@@ -449,7 +453,7 @@ const AdmissionForm = () => {
                 name="courseId"
                 value={formData.courseId}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
                 required
                 disabled={!formData.departmentId}
               >
@@ -466,7 +470,7 @@ const AdmissionForm = () => {
                 name="specialization"
                 value={formData.specialization}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
                 disabled={!formData.courseId}
               >
                 <option value="">-- Select Specialization --</option>
@@ -482,7 +486,7 @@ const AdmissionForm = () => {
                 name="referralSource"
                 value={formData.referralSource}
                 onChange={handleChange}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#E91E63] transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
               >
                 <option value="Google Search">Google Search</option>
                 <option value="College Website">College Website</option>
@@ -501,11 +505,13 @@ const AdmissionForm = () => {
           </div>
         </div>
 
-        {/* SECTION 3: Parent / Guardian Information */}
+        {/* SECTION 3: Parent / Guardian Details */}
         <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4">
-          <h3 className="text-xs font-extrabold text-[#E91E63] uppercase tracking-wider pb-1 border-b">
-            3. Parent / Guardian Details
-          </h3>
+          <div className="border-l-4 border-[#22C55E] pl-3 py-0.5 mb-2.5">
+            <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+              Parent / Guardian Details
+            </h3>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Input
               label="Father's Name"
@@ -546,11 +552,13 @@ const AdmissionForm = () => {
           </div>
         </div>
 
-        {/* SECTION 4: Contact & Permanent Address */}
+        {/* SECTION 4: Address & Location Details */}
         <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4">
-          <h3 className="text-xs font-extrabold text-[#E91E63] uppercase tracking-wider pb-1 border-b">
-            4. Address & Location Details
-          </h3>
+          <div className="border-l-4 border-[#F59E0B] pl-3 py-0.5 mb-2.5">
+            <h3 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+              Address & Location Details
+            </h3>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Input
               label="State *"
@@ -592,9 +600,9 @@ const AdmissionForm = () => {
 
 
         {/* Section 7: Submit Button */}
-        <div className="flex items-center justify-between bg-pink-50/20 rounded-[18px] border border-[#F2C8DA] p-5">
-          <div className="hidden sm:flex items-center text-xs text-[#5A3345] gap-2 font-semibold">
-            <ShieldCheck className="h-5 w-5 text-[#E91E63] shrink-0" />
+        <div className="flex items-center justify-between bg-slate-50/50 rounded-[18px] border border-[#E8ECF3] p-5">
+          <div className="hidden sm:flex items-center text-xs text-slate-500 gap-2 font-semibold">
+            <ShieldCheck className="h-5 w-5 text-slate-400 shrink-0" />
             <span>Encrypted transmission. Direct entry into CRM.</span>
           </div>
           <Button

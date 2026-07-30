@@ -27,7 +27,7 @@ const AdmissionFormPage = () => {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto text-left">
+    <div className="max-w-3xl mx-auto text-left">
       {/* Back button header */}
       <div className="flex items-center space-x-4 mb-5 mt-2">
         <Link

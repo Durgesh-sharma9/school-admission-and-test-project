@@ -246,7 +246,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto text-left">
+    <div className="max-w-4xl mx-auto text-left">
       {/* Page Header (No Card) */}
       <div className="mb-5 mt-2">
         <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">System Settings</h1>
