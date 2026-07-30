@@ -307,27 +307,27 @@ const AssessmentBuilder = () => {
   }
 
   return (
-    <div className="space-y-6 relative pb-24 text-left">
+    <div className="max-w-[1400px] mx-auto text-left relative pb-24 space-y-6">
       {/* Back button header */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 mb-5 mt-2">
         <Link
           to="/assessments"
-          className="p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded-xl text-slate-500 hover:text-slate-800 transition-colors shadow-xs"
+          className="h-10 w-10 flex items-center justify-center bg-white border border-[#E8ECF3] hover:bg-slate-50 rounded-xl text-slate-500 hover:text-slate-800 transition-all duration-200 shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 cursor-pointer"
         >
           <ArrowLeft className="h-4.5 w-4.5" />
         </Link>
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">
             {isEditMode ? 'Edit Assessment Template' : 'Configure Assessment Template'}
-          </h2>
-          <p className="text-slate-500 text-sm mt-0.5">
+          </h1>
+          <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
             Set dynamic sections, MCQ, True/False, One-Word, or Descriptive questions.
           </p>
         </div>
       </div>
 
       {/* Main settings row */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-2">
           <Input
             label="Assessment Name"
@@ -370,26 +370,26 @@ const AssessmentBuilder = () => {
       {/* Builder Core Sections Area */}
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
             Assessment Questionnaire ({sections.length} Sections)
           </h3>
           <Button
             variant="outline"
             size="sm"
             onClick={addSection}
-            className="text-indigo-600 hover:bg-indigo-50 border-indigo-200"
+            className="text-[#E91E63] hover:bg-pink-50 border-[#F2C8DA] px-3 h-[32px] rounded-[10px]"
           >
-            <Plus className="h-4 w-4 mr-1.5" />
+            <Plus className="h-4 w-4 mr-1.5 shrink-0" />
             Add Section
           </Button>
         </div>
 
         {sections && sections.filter(Boolean).map((sec, sIdx) => (
-          <div key={sIdx} className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+          <div key={sIdx} className="bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             {/* Section Header bar */}
-            <div className="bg-slate-50/70 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <span className="h-7 w-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700">
+            <div className="bg-gradient-to-r from-[#FFF5F8] to-[#FFF7FA] border-b border-[#F2C8DA] px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3 text-left">
+                <span className="h-7 w-7 rounded-lg bg-pink-50 border border-pink-100 flex items-center justify-center text-xs font-bold text-[#E91E63]">
                   {sIdx + 1}
                 </span>
                 <span
@@ -408,9 +408,9 @@ const AssessmentBuilder = () => {
                   variant="secondary"
                   size="sm"
                   onClick={() => openAddQuestionEditor(sIdx)}
-                  className="text-indigo-600 hover:bg-indigo-50 py-1 border-none"
+                  className="text-[#E91E63] hover:bg-pink-50 py-1 px-3 border-0 bg-transparent shadow-none"
                 >
-                  <PlusCircle className="h-4 w-4 mr-1.5" />
+                  <PlusCircle className="h-4 w-4 mr-1.5 shrink-0" />
                   Add Question
                 </Button>
                 <button
@@ -439,7 +439,7 @@ const AssessmentBuilder = () => {
                       <span className="inline-flex items-center text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                         Q{qIdx + 1} • {q?.type}
                       </span>
-                      <span className="inline-flex items-center text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
+                      <span className="inline-flex items-center text-[10px] font-bold text-[#E91E63] bg-pink-50 border border-pink-100 px-2 py-0.5 rounded">
                         {q?.marks} Marks
                       </span>
                     </div>
@@ -669,7 +669,7 @@ const AssessmentBuilder = () => {
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
               Total Marks
             </span>
-            <span className="text-xl font-black text-indigo-400">{totalMarks} Marks</span>
+            <span className="text-xl font-black text-[#E91E63]">{totalMarks} Marks</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">

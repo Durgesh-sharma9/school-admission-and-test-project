@@ -482,42 +482,42 @@ const SettingsPage = () => {
   });
 
   return (
-    <div className="space-y-6 text-left max-w-5xl mx-auto relative pb-12">
-      {/* Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-4 gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">College Settings</h2>
-          <p className="text-slate-500 text-xs mt-0.5 font-semibold">Configure details, branding templates, documents repository, and administrator credentials.</p>
-        </div>
+    <div className="max-w-[1400px] mx-auto text-left pb-12">
+      {/* Page Header (No Card) */}
+      <div className="mb-5 mt-2">
+        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">College Settings</h1>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
+          Configure details, branding templates, documents repository, and administrator credentials.
+        </p>
+      </div>
 
-        {/* Tab switcher */}
-        <div className="flex bg-slate-100 p-1 rounded-xl gap-1 overflow-x-auto shrink-0 max-w-full">
-          {[
-            { key: 'profile', label: 'College Profile' },
-            { key: 'branding', label: 'Branding' },
-            { key: 'templates', label: 'Notifications & Templates' },
-            { key: 'security', label: 'Security' }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                activeTab === tab.key
-                  ? 'bg-white text-indigo-650 shadow-xs font-extrabold'
-                  : 'text-slate-500 hover:text-slate-850'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {/* Tabs list */}
+      <div className="flex border-b border-[#E8ECF3] overflow-x-auto mb-6">
+        {[
+          { key: 'profile', label: 'College Profile' },
+          { key: 'branding', label: 'Branding' },
+          { key: 'templates', label: 'Notifications & Templates' },
+          { key: 'security', label: 'Security' }
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
+              activeTab === tab.key
+                ? 'border-[#E91E63] text-[#E91E63]'
+                : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Tab 1: College Profile */}
       {activeTab === 'profile' && (
         <form onSubmit={handleProfileSubmit} className="space-y-6">
           {/* Card 1: Identity & Affiliation */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">College Profile Details</h3>
             
             <div className="flex flex-col sm:flex-row gap-6 items-start">
@@ -656,7 +656,7 @@ const SettingsPage = () => {
           </div>
 
           {/* Card 2: Documents Upload */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
             <div>
               <h3 className="text-sm font-bold text-slate-800">Admission Documents Repository</h3>
               <p className="text-slate-450 text-[10px] mt-0.5 font-semibold">Upload college catalogs, brochures, and media highlights.</p>
@@ -664,10 +664,10 @@ const SettingsPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Brochure PDF */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-[#E8ECF3] rounded-[18px] flex flex-col justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText className="h-4 w-4 text-indigo-500" /> Admission Brochure PDF
+                    <FileText className="h-4 w-4 text-[#E91E63]" /> Admission Brochure PDF
                   </h4>
                   <p className="text-[10px] text-slate-400 mt-1">Upload the latest course descriptions and intake details in PDF format.</p>
                 </div>
@@ -699,10 +699,10 @@ const SettingsPage = () => {
               </div>
 
               {/* Prospectus PDF */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-[#E8ECF3] rounded-[18px] flex flex-col justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText className="h-4 w-4 text-indigo-500" /> Prospectus PDF
+                    <FileText className="h-4 w-4 text-[#E91E63]" /> Prospectus PDF
                   </h4>
                   <p className="text-[10px] text-slate-400 mt-1">Upload the university curriculum, admissions prospectus booklet.</p>
                 </div>
@@ -734,9 +734,9 @@ const SettingsPage = () => {
               </div>
 
               {/* College Banner Image */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-[#E8ECF3] rounded-[18px] md:col-span-2">
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Image className="h-4 w-4 text-indigo-500" /> College Banner
+                  <Image className="h-4 w-4 text-[#E91E63]" /> College Banner
                 </h4>
                 <p className="text-[10px] text-slate-400">Branded header banner used in public registration flows.</p>
                 
@@ -765,11 +765,11 @@ const SettingsPage = () => {
               </div>
 
               {/* College Gallery Images */}
-              <div className="space-y-2 p-4 bg-slate-50/50 border border-slate-100 rounded-2xl md:col-span-2">
+              <div className="space-y-2 p-4 bg-slate-50/50 border border-[#E8ECF3] rounded-[18px] md:col-span-2">
                 <div className="flex justify-between items-center border-b pb-2">
                   <div>
                     <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <Image className="h-4 w-4 text-indigo-500" /> College Gallery Images
+                      <Image className="h-4 w-4 text-[#E91E63]" /> College Gallery Images
                     </h4>
                     <p className="text-[10px] text-slate-400 mt-0.5">Upload college campus view and facilities pictures.</p>
                   </div>
@@ -805,11 +805,11 @@ const SettingsPage = () => {
           </div>
 
           {/* Card 3: Academic Course Catalog (Configured inside profile for simplified tabs) */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
               <div>
                 <h3 className="text-sm font-bold text-slate-800">Academic Configurations</h3>
-                <p className="text-slate-450 text-[10px] mt-0.5">Offered Departments, Courses and Specializations selection checklist.</p>
+                <p className="text-slate-455 text-[10px] mt-0.5">Offered Departments, Courses and Specializations selection checklist.</p>
               </div>
               <button
                 type="button"
@@ -947,10 +947,10 @@ const SettingsPage = () => {
           </div>
 
           {/* Card 4: Requested Course Submissions History */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4">
             <div>
               <h3 className="text-sm font-bold text-slate-800">My Requests</h3>
-              <p className="text-slate-450 text-[10px] mt-0.5">Track approvals and comments for submitted course requests.</p>
+              <p className="text-[#64748B] text-[10px] mt-0.5">Track approvals and comments for submitted course requests.</p>
             </div>
 
             {fetchingRequests ? (
@@ -958,18 +958,18 @@ const SettingsPage = () => {
             ) : requestsList.length === 0 ? (
               <p className="text-xs text-slate-400 italic py-4 text-center">No requested master entries submitted.</p>
             ) : (
-              <div className="overflow-x-auto border border-slate-100 rounded-xl">
+              <div className="overflow-x-auto border border-[#E8ECF3] rounded-[12px] shadow-sm">
                 <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50 text-[10px] font-bold uppercase text-slate-400">
-                      <th className="py-3 px-4">Request Type</th>
-                      <th className="py-3 px-4">Requested Item</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Submitted Date</th>
-                      <th className="py-3 px-4">Remarks</th>
+                  <thead className="text-[11px] text-[#5A3345] font-bold uppercase tracking-[0.5px] border-b border-[#F2C8DA] sticky top-0" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '40px' }}>
+                    <tr style={{ height: '40px' }}>
+                      <th className="py-0 px-4 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Request Type</th>
+                      <th className="py-0 px-4 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Requested Item</th>
+                      <th className="py-0 px-4 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Status</th>
+                      <th className="py-0 px-4 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Submitted Date</th>
+                      <th className="py-0 px-4 text-left last:border-r-0 align-middle">Remarks</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50 text-slate-650">
+                  <tbody className="divide-y divide-[#E8ECF3] text-slate-705">
                     {requestsList.map(req => {
                       const itemDisplay = req.requestType === 'Department' ? req.departmentName :
                                           req.requestType === 'Course' ? `${req.courseName} (${req.courseCode || 'No Code'})` :
@@ -1013,7 +1013,7 @@ const SettingsPage = () => {
 
       {/* Tab 2: Branding Redirect Card */}
       {activeTab === 'branding' && (
-        <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left max-w-lg">
+        <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4 text-left max-w-lg">
           <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
             <span className="text-base">🎨</span>
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
@@ -1029,7 +1029,7 @@ const SettingsPage = () => {
             <button
               type="button"
               onClick={() => window.location.href = '/college/qr-links'}
-              className="px-4 py-2 bg-indigo-650 hover:bg-indigo-755 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+              className="px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center"
             >
               Open QR Builder
             </button>
@@ -1041,7 +1041,7 @@ const SettingsPage = () => {
       {activeTab === 'templates' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Template Creator */}
-          <form onSubmit={handleSaveTemplate} className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs space-y-5 lg:col-span-1">
+          <form onSubmit={handleSaveTemplate} className="bg-white border border-[#E8ECF3] rounded-[18px] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-5 lg:col-span-1">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Create Message Template</span>
 
             <Input
@@ -1057,7 +1057,7 @@ const SettingsPage = () => {
               <select
                 value={templateType}
                 onChange={e => setTemplateType(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 bg-slate-50"
+                className="w-full rounded-[10px] border border-[#E9EAF0] px-3.5 py-2.5 text-sm text-slate-905 bg-white placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:ring-4 focus:ring-[#8B5CF6]/15 focus:border-[#8B5CF6] transition-all cursor-pointer"
               >
                 <option value="whatsapp">WhatsApp Message</option>
                 <option value="email">Email Message</option>
@@ -1091,9 +1091,9 @@ const SettingsPage = () => {
                 <span className="font-bold text-slate-700">Dynamic Variable Placeholders:</span>
                 <p>Use variables to auto-populate CRM values:</p>
                 <ul className="list-disc pl-4 space-y-0.5">
-                  <li><code className="font-bold text-indigo-650">[Parent Name]</code> - Father's / Mother's name</li>
-                  <li><code className="font-bold text-indigo-650">[Student Name]</code> - Candidate student name</li>
-                  <li><code className="font-bold text-indigo-650">[Enquiry ID]</code> - Auto-generated CRM reference</li>
+                  <li><code className="font-bold text-[#E91E63]">[Parent Name]</code> - Father's / Mother's name</li>
+                  <li><code className="font-bold text-[#E91E63]">[Student Name]</code> - Candidate student name</li>
+                  <li><code className="font-bold text-[#E91E63]">[Enquiry ID]</code> - Auto-generated CRM reference</li>
                 </ul>
               </div>
             </div>
@@ -1104,7 +1104,7 @@ const SettingsPage = () => {
           </form>
 
           {/* Templates list index */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs lg:col-span-2 space-y-4">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 lg:col-span-2 space-y-4">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Saved Templates ({school?.communicationTemplates?.length || 0})
             </span>
@@ -1159,7 +1159,7 @@ const SettingsPage = () => {
 
       {/* Tab 4: Security */}
       {activeTab === 'security' && (
-        <form onSubmit={handleSavePassword} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6 max-w-xl">
+        <form onSubmit={handleSavePassword} className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6 max-w-xl">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block border-b pb-1">Change Password</span>
 
           <div className="space-y-4">

@@ -114,12 +114,12 @@ const AssessmentList = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1400px] mx-auto text-left relative pb-12 space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 mt-2">
         <div className="text-left">
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Assessment Templates</h2>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Assessment Templates</h1>
+          <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
             Configure questions, dynamic sections, and durations to generate reusable exam assignments.
           </p>
         </div>
@@ -127,25 +127,25 @@ const AssessmentList = () => {
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
-            className="text-xs py-2.5 px-4 bg-white text-slate-700 border-slate-200 font-semibold"
+            className="text-xs py-2.5 px-4 bg-white text-slate-705 border-[#E8ECF3] font-semibold"
             onClick={handleExportCSV}
           >
             Export CSV / Excel
           </Button>
           <Link
             to="/assessments/create"
-            className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-sm"
+            className="inline-flex items-center px-4 h-[40px] rounded-[12px] text-xs font-bold bg-[#E91E63] hover:bg-[#E91E63]/90 text-white transition-all shadow-xs"
           >
-            <FilePlus className="h-4.5 w-4.5 mr-2" />
+            <FilePlus className="h-4.5 w-4.5 mr-2 shrink-0" />
             Create Assessment
           </Link>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md text-left">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#94A3B8]">
             <Search className="h-4.5 w-4.5" />
           </span>
           <input
@@ -153,16 +153,16 @@ const AssessmentList = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by Assessment Name..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E9EAF0] text-xs font-semibold text-slate-700 placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 text-left">
           <div className="relative">
             <select
               value={classFilter}
               onChange={(e) => setClassFilter(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-8 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="appearance-none bg-white border border-[#E9EAF0] rounded-lg px-4 py-2.5 pr-8 text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
             >
               <option value="">All Classes</option>
               <option value="Nursery">Nursery</option>
@@ -192,8 +192,8 @@ const AssessmentList = () => {
           <Loader message="Loading assessment templates..." />
         </div>
       ) : assessments.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center space-y-4">
-          <div className="h-12 w-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_10px_28px_rgba(15,23,42,0.08)] p-12 text-center space-y-4">
+          <div className="h-12 w-12 rounded-full bg-pink-50 text-[#E91E63] flex items-center justify-center mx-auto">
             <BookOpen className="h-6 w-6" />
           </div>
           <div className="space-y-1">
@@ -204,7 +204,7 @@ const AssessmentList = () => {
           </div>
           <Link
             to="/assessments/create"
-            className="inline-flex items-center px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+            className="inline-flex items-center px-4 h-[36px] rounded-[10px] text-xs font-semibold bg-[#E91E63] hover:bg-[#E91E63]/90 text-white transition-colors"
           >
             <FilePlus className="h-4 w-4 mr-1.5" />
             Create First Template
@@ -219,18 +219,18 @@ const AssessmentList = () => {
                 key={item._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-white rounded-[18px] border border-[#E8ECF3] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
               >
                 <div className="space-y-4">
                   {/* Card Header */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                      <div className="h-10 w-10 rounded-xl bg-pink-50 text-[#E91E63] flex items-center justify-center shrink-0">
                         <GraduationCap className="h-5 w-5" />
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-800 text-base line-clamp-1">{item.name}</h3>
-                        <span className="text-xs text-indigo-600 font-semibold bg-indigo-50/60 px-2 py-0.5 rounded-md inline-block mt-0.5">
+                        <span className="text-xs text-[#E91E63] font-semibold bg-pink-50/60 px-2 py-0.5 rounded-md inline-block mt-0.5">
                           Class {item.class}
                         </span>
                       </div>
@@ -238,7 +238,7 @@ const AssessmentList = () => {
                   </div>
 
                   {/* Metadata Indicators */}
-                  <div className="grid grid-cols-3 gap-2 bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+                  <div className="grid grid-cols-3 gap-2 bg-slate-50/50 rounded-xl p-3 text-center border border-[#E8ECF3]">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-slate-400 block">Duration</span>
                       <span className="text-xs font-bold text-slate-700 flex items-center justify-center mt-0.5">

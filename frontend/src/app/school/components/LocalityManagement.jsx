@@ -207,16 +207,16 @@ const LocalityManagement = () => {
       </div>
 
       {/* Tabs list */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-[#E8ECF3] mb-6">
         <button
           onClick={() => {
             setActiveTab('approved');
             setPage(1);
           }}
-          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'approved'
-              ? 'border-indigo-600 text-indigo-600 bg-indigo-50/40'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
+              ? 'border-[#E91E63] text-[#E91E63]'
+              : 'border-transparent text-slate-400 hover:text-slate-650'
           }`}
         >
           <MapPin className="h-4 w-4" />
@@ -227,16 +227,16 @@ const LocalityManagement = () => {
             setActiveTab('pending');
             setPage(1);
           }}
-          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === 'pending'
-              ? 'border-indigo-600 text-indigo-600 bg-indigo-50/40'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
+              ? 'border-[#E91E63] text-[#E91E63]'
+              : 'border-transparent text-slate-400 hover:text-slate-650'
           }`}
         >
           <Clock className="h-4 w-4" />
           Pending Suggestions
           {pendingCount > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white shadow-xs">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#E91E63] text-white shadow-xs">
               {pendingCount}
             </span>
           )}
@@ -244,9 +244,9 @@ const LocalityManagement = () => {
       </div>
 
       {/* Filters Row */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
         <div className="relative flex-1 w-full text-left">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#94A3B8]">
             <Search className="h-4 w-4" />
           </span>
           <input
@@ -257,19 +257,19 @@ const LocalityManagement = () => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all font-medium"
+            className="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border border-[#E9EAF0] text-xs text-slate-800 placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 focus:bg-white transition-all font-medium"
           />
         </div>
 
         {activeTab === 'approved' && (
-          <div className="w-full md:w-48">
+          <div className="w-full md:w-48 text-left">
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-indigo-500"
+              className="w-full py-2.5 px-3 bg-white rounded-lg border border-[#E9EAF0] text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
             >
               <option value="">All Statuses</option>
               <option value="active">Active Only</option>
@@ -280,14 +280,15 @@ const LocalityManagement = () => {
       </div>
 
       {/* Table Content */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_14px_35px_rgba(233,30,99,0.08)] overflow-hidden">
+        <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
         {loading ? (
           <div className="py-12">
             <Loader message="Loading locality master list..." />
           </div>
         ) : localities.length === 0 ? (
           <div className="py-12 px-4 text-center space-y-3">
-            <div className="mx-auto h-12 w-12 text-slate-300 bg-slate-50 rounded-full flex items-center justify-center">
+            <div className="mx-auto h-12 w-12 text-[#E91E63] bg-pink-50 rounded-full flex items-center justify-center">
               <MapPin className="h-6 w-6" />
             </div>
             <p className="text-sm font-semibold text-slate-600">
@@ -302,45 +303,45 @@ const LocalityManagement = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50/50 border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+              <thead className="text-[13px] text-[#5A3345] font-bold uppercase tracking-[0.6px] border-b border-[#F2C8DA] sticky top-0 shadow-[0_3px_10px_rgba(233,30,99,0.08)]" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '56px' }}>
                 {activeTab === 'approved' ? (
-                  <tr>
-                    <th className="px-6 py-4">Locality Name</th>
-                    <th className="px-6 py-4 text-center">Used In Enquiries</th>
-                    <th className="px-6 py-4 text-center">Used In Admissions</th>
-                    <th className="px-6 py-4 text-center">Status</th>
-                    <th className="px-6 py-4">Created Date</th>
-                    <th className="px-6 py-4 text-center">Actions</th>
+                  <tr style={{ height: '56px' }}>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Locality Name</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle text-center">Used In Enquiries</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle text-center">Used In Admissions</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle text-center">Status</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Created Date</th>
+                    <th className="px-6 py-0 text-center last:border-r-0 align-middle">Actions</th>
                   </tr>
                 ) : (
-                  <tr>
-                    <th className="px-6 py-4">Locality Name</th>
-                    <th className="px-6 py-4">First Used By</th>
-                    <th className="px-6 py-4">Created Date</th>
-                    <th className="px-6 py-4 text-center">Times Used</th>
-                    <th className="px-6 py-4 text-center">Actions</th>
+                  <tr style={{ height: '56px' }}>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Locality Name</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">First Used By</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Created Date</th>
+                    <th className="px-6 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle text-center">Times Used</th>
+                    <th className="px-6 py-0 text-center last:border-r-0 align-middle">Actions</th>
                   </tr>
                 )}
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+              <tbody className="divide-y divide-[#E8ECF3] font-medium text-slate-705">
                 {activeTab === 'approved' ? (
                   localities.map((loc) => (
-                    <tr key={loc._id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-2">
-                        <MapPin className="h-3.5 w-3.5 text-indigo-500" />
+                    <tr key={loc._id} className="hover:bg-[#FFF7FA] transition-all duration-200 ease-out" style={{ height: '58px' }}>
+                      <td className="px-6 py-4 font-bold text-slate-900 border-r border-[rgba(233,30,99,0.04)] last:border-r-0 flex items-center gap-2">
+                        <MapPin className="h-3.5 w-3.5 text-[#E91E63]" />
                         {loc.name}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span className="font-extrabold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">
                           {loc.usedInEnquiries || 0}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
                           {loc.usedInAdmissions || 0}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span
                           className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                             loc.status === 'active'
@@ -351,7 +352,7 @@ const LocalityManagement = () => {
                           {loc.status === 'active' ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-400 text-[11px]">
+                      <td className="px-6 py-4 text-slate-455 text-[11px] border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {new Date(loc.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -385,26 +386,26 @@ const LocalityManagement = () => {
                   ))
                 ) : (
                   localities.map((loc) => (
-                    <tr key={loc._id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-2">
+                    <tr key={loc._id} className="hover:bg-[#FFF7FA] transition-all duration-200 ease-out" style={{ height: '58px' }}>
+                      <td className="px-6 py-4 font-bold text-slate-900 border-r border-[rgba(233,30,99,0.04)] last:border-r-0 flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5 text-amber-500" />
                         {loc.name}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             loc.createdBy === 'parent'
                               ? 'bg-purple-50 text-purple-700 border border-purple-100'
-                              : 'bg-indigo-50 text-indigo-700 border border-indigo-100'
+                              : 'bg-[#E91E63]/10 text-[#E91E63] border border-[#E91E63]/20'
                           }`}
                         >
                           {loc.createdBy === 'parent' ? 'Parent Suggestion' : 'Admin'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-400 text-[11px]">
+                      <td className="px-6 py-4 text-slate-455 text-[11px] border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {new Date(loc.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-slate-800">
+                      <td className="px-6 py-4 text-center font-bold text-slate-800 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {loc.timesUsed || 1}
                       </td>
                       <td className="px-6 py-4 text-center">

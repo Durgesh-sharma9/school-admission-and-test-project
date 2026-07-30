@@ -242,10 +242,11 @@ const ThankYouCmsPage = () => {
   const phoneHeight = 495;
 
   return (
-    <div className="space-y-4 text-left">
-      <div>
-        <h2 className="text-lg font-black text-slate-900 tracking-tight">Enquiry Banner Settings</h2>
-        <p className="text-slate-500 text-xs mt-0.5">
+    <div className="max-w-[1400px] mx-auto text-left pb-16 no-print bg-transparent">
+      {/* Page Header (No Card) */}
+      <div className="mb-5 mt-2">
+        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiry Banner Settings</h1>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5 font-semibold">
           Configure real-time brochures and updates parents receive instantly upon submitting registration applications.
         </p>
       </div>
@@ -255,17 +256,17 @@ const ThankYouCmsPage = () => {
         <div className="w-full lg:w-[65%] space-y-4">
           
           {/* Section 1: Social Links Configuration */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+          <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-3.5">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <LinkIcon className="h-4 w-4 text-indigo-500" />
+                <LinkIcon className="h-4 w-4 text-[#E91E63]" />
                 Follow Us Links ({socialLinks.length}/4)
               </h4>
               <button
                 type="button"
                 onClick={handleAddSocial}
                 disabled={socialLinks.length >= 4}
-                className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-1 text-[10px] font-extrabold bg-pink-50 border border-pink-100 text-[#E91E63] rounded-lg hover:bg-pink-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Plus className="h-3 w-3 mr-1" />
                 Add Link
@@ -282,7 +283,7 @@ const ThankYouCmsPage = () => {
                   <select
                     value={link.platform}
                     onChange={(e) => handleUpdateSocial(idx, 'platform', e.target.value)}
-                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="rounded-lg border border-[#E9EAF0] px-2 py-1.5 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer"
                   >
                     {['Instagram', 'Facebook', 'YouTube', 'WhatsApp', 'LinkedIn', 'X (Twitter)', 'Telegram', 'College Website', 'Other'].map(p => (
                       <option key={p} value={p}>{p}</option>
@@ -294,7 +295,7 @@ const ThankYouCmsPage = () => {
                     value={link.url}
                     onChange={(e) => handleUpdateSocial(idx, 'url', e.target.value)}
                     placeholder="https://yoursocial.com/url"
-                    className="flex-1 rounded-lg border border-slate-200 px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="flex-1 rounded-lg border border-[#E9EAF0] px-2.5 py-1.5 text-xs text-slate-800 placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all"
                   />
 
                   <button
@@ -316,9 +317,9 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 2: Brochure Upload */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+          <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-3.5">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
-              <FileText className="h-4 w-4 text-blue-500" />
+              <FileText className="h-4 w-4 text-[#E91E63]" />
               Admission Brochure File
             </h4>
 
@@ -374,9 +375,9 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 3: Banner Image Upload */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3.5">
+          <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-3.5">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
-              <ImageIcon className="h-4 w-4 text-emerald-500" />
+              <ImageIcon className="h-4 w-4 text-[#E91E63]" />
               Banner Image
             </h4>
 
@@ -429,12 +430,12 @@ const ThankYouCmsPage = () => {
           </div>
 
           {/* Section 4: Welcome / Thank You Message Info Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
+          <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
-              <Sparkles className="h-4 w-4 text-purple-500" />
+              <Sparkles className="h-4 w-4 text-[#E91E63]" />
               Welcome / Success Message Preview
             </h4>
-            <div className="bg-slate-50 border border-slate-150 rounded-xl p-3 text-slate-600 text-xs leading-normal text-left">
+            <div className="bg-slate-50 border border-[#E8ECF3] rounded-xl p-3 text-slate-600 text-xs leading-normal text-left">
               <span className="font-semibold text-slate-700 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Post-submission message description:</span>
               Thank you, <span className="font-bold text-slate-800">John Doe</span>. Your application for admission has been registered successfully. Our team will contact you shortly.
             </div>

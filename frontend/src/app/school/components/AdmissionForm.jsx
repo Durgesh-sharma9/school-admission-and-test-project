@@ -341,7 +341,7 @@ const AdmissionForm = ({
     <>
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-4xl mx-auto">
         {/* Section 1: Student Information */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
               <User className="h-4.5 w-4.5" />
@@ -415,7 +415,7 @@ const AdmissionForm = ({
         </div>
 
         {/* Section 2: Parent / Guardian Information */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
               <Users className="h-4.5 w-4.5" />
@@ -555,7 +555,7 @@ const AdmissionForm = ({
         </div>
 
         {/* Section 3: Address Details */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
               <MapPin className="h-4.5 w-4.5" />
@@ -712,7 +712,7 @@ const AdmissionForm = ({
         </div>
 
         {/* Section 4: Where did you hear about us? */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-purple-50 text-purple-605 rounded-lg">
               <Users className="h-4.5 w-4.5" />
@@ -791,7 +791,7 @@ const AdmissionForm = ({
         </div>
 
         {/* Section 5: Parent Expectations */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
               <FileText className="h-4.5 w-4.5" />
@@ -814,7 +814,7 @@ const AdmissionForm = ({
         </div>
 
         {/* Section 6: Admin Options or Additional Notes */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs space-y-6">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="flex items-center space-x-2 pb-4 border-b border-slate-55">
             <div className="p-1.5 bg-slate-50 text-slate-600 rounded-lg">
               <FileText className="h-4.5 w-4.5" />

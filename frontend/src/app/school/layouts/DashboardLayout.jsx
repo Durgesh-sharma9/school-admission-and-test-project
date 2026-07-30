@@ -67,7 +67,7 @@ const DashboardLayout = () => {
         .layout-content-area .min-h-screen,
         .layout-content-area .bg-slate-50,
         .layout-content-area .bg-gray-50 {
-          background-color: #F9EEF3 !important;
+          background-color: #FFF4F8 !important;
         }
       `}</style>
       {/* Sidebar navigation */}

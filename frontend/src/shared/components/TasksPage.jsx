@@ -862,59 +862,61 @@ const TasksPage = ({ module = 'school' }) => {
   };
 
   return (
-    <div className="space-y-5 text-left font-sans max-w-[1600px] mx-auto px-4 py-2">
+    <div className="max-w-[1400px] mx-auto text-left">
 
-      {/* 1. PAGE HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4 mt-2">
-        <div className="space-y-0.5">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-indigo-600" />
-            {selectedDate ? `Tasks for ${new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : "Today's CRM Work Queue"}
-            {selectedDate && (
-              <button
-                onClick={() => setSelectedDate(null)}
-                className="ml-2 text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full flex items-center gap-1 cursor-pointer border border-rose-100"
-                title="Clear Date"
-              >
-                Clear Date <X className="h-3 w-3" />
-              </button>
-            )}
-          </h2>
-          <p className="text-slate-500 text-xs font-semibold">
-            Everything requiring action today in one place.
-          </p>
-        </div>
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            onClick={() => setCalendarOpen(true)}
-            className="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-bold transition-all shadow-md shadow-indigo-650/10 gap-1.5 cursor-pointer"
-            title="Change Date"
-          >
-            <Calendar className="h-3.5 w-3.5" />
-            <span>{selectedDate ? new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Change Date'}</span>
-          </button>
-          <button
-            onClick={() => fetchData(true)}
-            disabled={refreshing}
-            className="inline-flex items-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-[11px] font-bold transition-all shadow-xs gap-1.5 disabled:opacity-50 cursor-pointer"
-            title="Refresh List"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-          <button
-            onClick={handleExportCSV}
-            className="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-bold transition-all shadow-md shadow-indigo-650/10 gap-1.5 cursor-pointer"
-            title="Export CSV"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Export</span>
-          </button>
+      {/* 1. PAGE HEADER (No Card) */}
+      <div className="mb-6 mt-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="space-y-0.5">
+            <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2] flex items-center gap-2">
+              <CheckSquare className="h-6 w-6 text-[#E91E63]" />
+              {selectedDate ? `Tasks for ${new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : "Today's CRM Work Queue"}
+              {selectedDate && (
+                <button
+                  onClick={() => setSelectedDate(null)}
+                  className="ml-2 text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full flex items-center gap-1 cursor-pointer border border-rose-100"
+                  title="Clear Date"
+                >
+                  Clear Date <X className="h-3 w-3" />
+                </button>
+              )}
+            </h1>
+            <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
+              Everything requiring action today in one place.
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => setCalendarOpen(true)}
+              className="inline-flex items-center px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-[11px] font-bold transition-all shadow-xs gap-1.5 cursor-pointer"
+              title="Change Date"
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              <span>{selectedDate ? new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Change Date'}</span>
+            </button>
+            <button
+              onClick={() => fetchData(true)}
+              disabled={refreshing}
+              className="inline-flex items-center px-4.5 h-[36px] bg-white hover:bg-slate-50 text-slate-700 border border-[#E8ECF3] rounded-[12px] text-[11px] font-bold transition-all shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 gap-1.5 disabled:opacity-50 cursor-pointer"
+              title="Refresh List"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="inline-flex items-center px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-[11px] font-bold transition-all shadow-xs gap-1.5 cursor-pointer"
+              title="Export CSV"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Export</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 3. FILTER CARD (Rounded-2xl, soft shadow, matching Enquiries filters) */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-3">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] space-y-3 mb-6">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div className="flex items-center gap-1.5 text-slate-800 font-extrabold text-[10px] uppercase tracking-wider">
             <Filter className="h-4 w-4 text-slate-500" />
@@ -945,9 +947,9 @@ const TasksPage = ({ module = 'school' }) => {
                 placeholder="Student, Parent, Phone..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 focus:bg-white text-slate-850"
+                className="w-full pl-8 pr-3 py-2 bg-white rounded-xl border border-[#E9EAF0] text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all text-slate-850"
               />
-              <Search className="absolute left-2.5 top-3 h-3.5 w-3.5 text-slate-400" />
+              <Search className="absolute left-2.5 top-3 h-3.5 w-3.5 text-[#94A3B8]" />
             </div>
           </div>
 
@@ -960,7 +962,7 @@ const TasksPage = ({ module = 'school' }) => {
                 setDateFilter(e.target.value);
                 setSelectedDate(null); // Clear calendar selection when choosing standard dropdown
               }}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-750 focus:bg-white cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-[#E9EAF0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 text-slate-750 cursor-pointer shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
             >
               <option value="today">Today + Overdue</option>
               <option value="today_only">Today Only</option>
@@ -977,7 +979,7 @@ const TasksPage = ({ module = 'school' }) => {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-755 focus:bg-white cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-[#E9EAF0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 text-slate-755 cursor-pointer shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
             >
               <option value="all">All Types</option>
               <option value="call">Calls</option>
@@ -998,7 +1000,7 @@ const TasksPage = ({ module = 'school' }) => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/15 text-slate-755 focus:bg-white cursor-pointer"
+              className="w-full px-3 py-2 bg-white border border-[#E9EAF0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 text-slate-755 cursor-pointer shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
             >
               <option value="all">All</option>
               <option value="pending">Pending</option>
@@ -1017,7 +1019,7 @@ const TasksPage = ({ module = 'school' }) => {
                 type="date"
                 value={customStartDate}
                 onChange={(e) => setCustomStartDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-[#E9EAF0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all text-slate-750"
               />
             </div>
             <div className="text-left space-y-1">
@@ -1026,7 +1028,7 @@ const TasksPage = ({ module = 'school' }) => {
                 type="date"
                 value={customEndDate}
                 onChange={(e) => setCustomEndDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-semibold focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-[#E9EAF0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all text-slate-750"
               />
             </div>
           </div>
@@ -1035,8 +1037,8 @@ const TasksPage = ({ module = 'school' }) => {
 
       {/* Bulk actions block */}
       {selectedIds.length > 0 && (
-        <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex justify-between items-center shadow-xs">
-          <div className="text-xs text-indigo-900 font-bold">
+        <div className="bg-pink-50/70 border border-pink-100 rounded-xl p-3 flex justify-between items-center shadow-xs">
+          <div className="text-xs text-[#E91E63] font-bold">
             ⚡ Selected {selectedIds.length} tasks for bulk actions
           </div>
           <div className="flex gap-2">
@@ -1060,12 +1062,12 @@ const TasksPage = ({ module = 'school' }) => {
 
       {/* 4. MAIN CRM LIST TABLE */}
       {loading ? (
-        <div className="py-12 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+        <div className="py-12 bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_10px_28px_rgba(15,23,42,0.08)]">
           <Loader message="Fetching CRM queue records..." />
         </div>
       ) : filteredTasks.length === 0 ? (
         /* Empty State (Centered nicely, illustration, balanced spacing) */
-        <div className="py-14 text-center bg-white rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto flex flex-col items-center justify-center space-y-4 my-8 p-6">
+        <div className="py-14 text-center bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_10px_28px_rgba(15,23,42,0.08)] max-w-md mx-auto flex flex-col items-center justify-center space-y-4 my-8 p-6">
           <div className="h-12 w-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-xl shadow-xs">
             🎉
           </div>
@@ -1082,36 +1084,37 @@ const TasksPage = ({ module = 'school' }) => {
               setActiveKpi('all');
               setSelectedDate(null);
             }}
-            className="px-4.5 py-2 bg-indigo-600 hover:bg-indigo-705 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
+            className="px-4.5 py-2 bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             View Upcoming Tasks
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[18px] border border-[#E8ECF3] shadow-[0_14px_35px_rgba(233,30,99,0.08)] overflow-hidden">
+          <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
           <div className="overflow-x-auto max-h-[600px] scrollbar-none">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="sticky top-0 bg-slate-50 border-b border-slate-200 text-slate-450 font-bold uppercase tracking-wider z-10 text-[10px]">
-                <tr>
-                  <th className="px-4 py-3 text-center w-10">
+              <thead className="text-[13px] text-[#5A3345] font-bold uppercase tracking-[0.6px] border-b border-[#F2C8DA] sticky top-0 shadow-[0_3px_10px_rgba(233,30,99,0.08)] z-10" style={{ background: 'linear-gradient(90deg, #FFF5F8 0%, #FCE8F1 45%, #FFF7FA 100%)', height: '56px' }}>
+                <tr style={{ height: '56px' }}>
+                  <th className="px-4 py-0 text-center w-10 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">
                     <input
                       type="checkbox"
-                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                      className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                       onChange={handleSelectAll}
                       checked={selectedIds.length > 0 && selectedIds.length === filteredTasks.length}
                     />
                   </th>
-                  <th className="px-4 py-3 min-w-[130px]">Task</th>
-                  <th className="px-4 py-3 min-w-[155px]">Student</th>
-                  <th className="px-4 py-3 min-w-[115px]">Parent</th>
-                  <th className="px-4 py-3">Phone</th>
-                  <th className="px-4 py-3">Reference</th>
-                  <th className="px-4 py-3 min-w-[105px]">Due Date</th>
-                  <th className="px-4 py-3 text-center">Status</th>
-                  <th className="px-4 py-3 text-right min-w-[165px]">Actions</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Task</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Student</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Parent</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Phone</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Reference</th>
+                  <th className="px-4 py-0 border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Due Date</th>
+                  <th className="px-4 py-0 text-center border-r border-[rgba(233,30,99,0.08)] last:border-r-0 align-middle">Status</th>
+                  <th className="px-4 py-0 text-right min-w-[165px] last:border-r-0 align-middle">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
+              <tbody className="divide-y divide-[#E8ECF3] font-semibold text-slate-700">
                 {filteredTasks.map((task) => {
                   const isCompleted = task.status === 'Completed';
                   const isOverdue = task.status === 'Overdue';
@@ -1121,25 +1124,25 @@ const TasksPage = ({ module = 'school' }) => {
                     <tr
                       key={task.id}
                       onClick={() => handleViewProfileClick(task)}
-                      className={`transition-colors cursor-pointer ${
+                      className={`transition-all duration-200 ease-out hover:bg-[#FFF7FA] ${
                         isCompleted
-                          ? 'opacity-50 bg-slate-50 hover:opacity-60 hover:bg-slate-100/60'
-                          : 'hover:bg-slate-50/70'
+                          ? 'opacity-50 bg-slate-50 hover:opacity-60 hover:bg-[#FFF7FA]'
+                          : ''
                       }`}
                       style={{ height: '58px' }}
                     >
                       {/* Checkbox */}
-                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-4 py-3 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
-                          className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                          className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
                           checked={selectedIds.includes(task.id)}
                           onChange={() => handleSelectRow(task.id)}
                         />
                       </td>
 
                       {/* Task Type */}
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <div className="flex flex-col">
                           <span className={`font-bold text-[11.5px] ${
                             isCompleted ? 'line-through text-slate-400' : 'text-slate-800'
@@ -1153,27 +1156,27 @@ const TasksPage = ({ module = 'school' }) => {
                       </td>
 
                       {/* Student Name (Slightly bolder) */}
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span className="font-black text-slate-900 block text-xs">{task.studentName}</span>
                       </td>
 
                       {/* Parent Name */}
-                      <td className="px-4 py-3 text-slate-550 text-[11px]">
+                      <td className="px-4 py-3 text-slate-550 text-[11px] border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {task.parentName}
                       </td>
 
                       {/* Phone */}
-                      <td className="px-4 py-3 text-slate-500 font-mono font-semibold text-[10.5px]">
+                      <td className="px-4 py-3 text-slate-500 font-mono font-semibold text-[10.5px] border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {task.phone}
                       </td>
 
                       {/* Reference ID */}
-                      <td className="px-4 py-3 text-slate-450 font-mono text-[10.5px]">
+                      <td className="px-4 py-3 text-slate-455 font-mono text-[10.5px] border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         {task.enquiryId}
                       </td>
 
                       {/* Due Date & Time */}
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <div className="flex flex-col text-slate-550 leading-tight">
                           <span className="font-semibold text-[11px]">{new Date(task.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
                           <span className="text-[9px] text-slate-400 font-mono">
@@ -1183,7 +1186,7 @@ const TasksPage = ({ module = 'school' }) => {
                       </td>
 
                       {/* Status Badges with custom colors (Centered) */}
-                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td className="px-4 py-3 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0" onClick={(e) => e.stopPropagation()}>
                         <span className={`inline-flex items-center justify-center px-2 py-0.5 border rounded text-[8.5px] font-extrabold uppercase tracking-wider min-w-[76px] ${timeframe.classes}`}>
                           {timeframe.text}
                         </span>

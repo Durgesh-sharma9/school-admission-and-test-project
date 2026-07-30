@@ -241,26 +241,27 @@ const SettingsPage = () => {
         });
       }
     } catch (err) {
-      toast.error(err.message || 'Delete failed');
+  toast.error(err.message || 'Delete failed');
     }
   };
 
   return (
-    <div className="space-y-6 max-w-4xl text-left">
-      <div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">System Settings</h2>
-        <p className="text-slate-500 text-sm mt-0.5">
+    <div className="max-w-[1400px] mx-auto text-left">
+      {/* Page Header (No Card) */}
+      <div className="mb-5 mt-2">
+        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">System Settings</h1>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
           Manage your school's public identity, evaluation criteria, communication templates, and credentials.
         </p>
       </div>
 
       {/* Tabs list */}
-      <div className="flex border-b border-slate-200 overflow-x-auto">
+      <div className="flex border-b border-[#E8ECF3] overflow-x-auto mb-6">
         <button
           onClick={() => setActiveTab('school')}
-          className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
             activeTab === 'school'
-              ? 'border-indigo-600 text-indigo-600 font-bold'
+              ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -268,9 +269,9 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('locality')}
-          className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
             activeTab === 'locality'
-              ? 'border-indigo-600 text-indigo-600 font-bold'
+              ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -278,9 +279,9 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
             activeTab === 'templates'
-              ? 'border-indigo-600 text-indigo-600 font-bold'
+              ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -288,9 +289,9 @@ const SettingsPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('password')}
-          className={`px-4 py-2.5 font-semibold text-xs tracking-wider uppercase border-b-2 transition-all ${
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
             activeTab === 'password'
-              ? 'border-indigo-600 text-indigo-600 font-bold'
+              ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -303,7 +304,7 @@ const SettingsPage = () => {
 
       {activeTab === 'school' && (
         <form onSubmit={handleSaveSchool} className="space-y-6">
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               {/* Logo upload display */}
               <div className="flex flex-col items-center space-y-2">
@@ -397,7 +398,7 @@ const SettingsPage = () => {
           </div>
 
           {/* QR Branding Redirect Card */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4 text-left">
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
               <span className="text-base">🎨</span>
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
@@ -413,7 +414,7 @@ const SettingsPage = () => {
               <button
                 type="button"
                 onClick={() => window.location.href = '/qr-code'}
-                className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+                className="px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center"
               >
                 Open QR Builder
               </button>
@@ -421,7 +422,7 @@ const SettingsPage = () => {
           </div>
 
           {/* Evaluation Settings Panel */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-4 text-left">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-4 text-left">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Assessment Evaluation Settings
             </h3>
@@ -431,7 +432,7 @@ const SettingsPage = () => {
                 type="checkbox"
                 checked={minorTypingValidation}
                 onChange={(e) => setMinorTypingValidation(e.target.checked)}
-                className="mt-0.5 h-4.5 w-4.5 text-indigo-600 focus:ring-indigo-500/20"
+                className="mt-0.5 h-4.5 w-4.5 text-[#E91E63] border-[#F2C8DA] focus:ring-[#E91E63]/20"
               />
               <div className="ml-3 space-y-0.5">
                 <span className="text-xs font-bold text-slate-800">
@@ -456,7 +457,7 @@ const SettingsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
           {/* Template Creator Form */}
-          <form onSubmit={handleSaveTemplate} className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs space-y-5 lg:col-span-1">
+          <form onSubmit={handleSaveTemplate} className="bg-white border border-[#E8ECF3] rounded-[18px] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-5 lg:col-span-1">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Create Message Template
             </span>
@@ -476,7 +477,7 @@ const SettingsPage = () => {
               <select
                 value={templateType}
                 onChange={(e) => setTemplateType(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-950 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full rounded-[10px] border border-[#E9EAF0] px-3.5 py-2.5 text-sm text-slate-905 bg-white placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:ring-4 focus:ring-[#E91E63]/15 focus:border-[#E91E63] transition-all"
               >
                 <option value="whatsapp">WhatsApp Message</option>
                 <option value="email">Email Message</option>
@@ -509,21 +510,21 @@ const SettingsPage = () => {
                 <span className="font-bold text-slate-700">Dynamic Variable Placeholders:</span>
                 <p>Use variables to auto-populate CRM values:</p>
                 <ul className="list-disc pl-4 space-y-0.5">
-                  <li><code className="font-bold text-indigo-650">[Parent Name]</code> - Parent's full name</li>
-                  <li><code className="font-bold text-indigo-650">[Student Name]</code> - Candidate student name</li>
-                  <li><code className="font-bold text-indigo-650">[Enquiry ID]</code> - Auto-generated CRM reference</li>
+                  <li><code className="font-bold text-[#E91E63]">[Parent Name]</code> - Parent's full name</li>
+                  <li><code className="font-bold text-[#E91E63]">[Student Name]</code> - Candidate student name</li>
+                  <li><code className="font-bold text-[#E91E63]">[Enquiry ID]</code> - Auto-generated CRM reference</li>
                 </ul>
               </div>
             </div>
 
-            <Button type="submit" isLoading={savingTemplate} className="w-full">
+            <Button type="submit" isLoading={savingTemplate} className="w-full bg-[#E91E63] hover:bg-[#E91E63]/90">
               <Plus className="h-4 w-4 mr-1.5" />
               Save Template
             </Button>
           </form>
 
           {/* Templates Index List */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs lg:col-span-2 space-y-4">
+          <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 lg:col-span-2 space-y-4">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
               Saved Templates ({school?.communicationTemplates?.length || 0})
             </span>
@@ -578,7 +579,7 @@ const SettingsPage = () => {
       )}
 
       {activeTab === 'password' && (
-        <form onSubmit={handleSavePassword} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-xs space-y-6 max-w-xl">
+        <form onSubmit={handleSavePassword} className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6 max-w-xl">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
             Change Password
           </span>

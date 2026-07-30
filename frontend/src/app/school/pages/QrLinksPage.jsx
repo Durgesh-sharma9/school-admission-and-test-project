@@ -1154,20 +1154,20 @@ const QrLinksPage = () => {
   };
 
   return (
-    <div className="space-y-6 text-left pb-16 no-print bg-[#F8FAFC]">
+    <div className="max-w-[1400px] mx-auto text-left pb-16 no-print bg-transparent">
 
       {/* Title Header with Template Selector */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-205 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 mt-2">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">
               Admission QR & Public Links
             </h1>
-            <span className="py-1 px-2.5 bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold rounded-lg shadow-2xs">
+            <span className="py-1 px-2.5 bg-pink-50 border border-pink-100 text-[#E91E63] text-xs font-semibold rounded-lg shadow-2xs">
               Studio
             </span>
           </div>
-          <p className="text-sm font-semibold text-slate-505 mt-1">
+          <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
             Professional Admission Poster Studio
           </p>
         </div>
@@ -1175,7 +1175,7 @@ const QrLinksPage = () => {
           <select
             value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="rounded-lg border border-slate-200 py-2 px-3 text-sm font-semibold bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 cursor-pointer hover:border-slate-350 transition-all duration-200 shadow-2xs"
+            className="rounded-[10px] border border-[#E9EAF0] py-2 px-3 text-xs font-semibold bg-white text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#8B5CF6]/15 focus:border-[#8B5CF6] cursor-pointer hover:border-[#D7DCE5] transition-all duration-200 shadow-2xs"
           >
             <option value="modern-premium">Classic</option>
             <option value="corporate-split">Modern Premium</option>
@@ -1186,7 +1186,7 @@ const QrLinksPage = () => {
           <button
             type="button"
             onClick={() => setIsFullScreen(true)}
-            className="h-[46px] px-5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm flex items-center gap-2"
+            className="h-[40px] px-4 bg-white hover:bg-slate-50 border border-[#E8ECF3] text-slate-700 text-xs font-semibold rounded-[12px] transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
           >
             <Maximize2 className="h-4 w-4 text-slate-500" />
             <span>Full Screen Preview</span>
@@ -1195,13 +1195,13 @@ const QrLinksPage = () => {
       </div>
 
       {/* Mobile/Tablet Tab Switcher */}
-      <div className="lg:hidden flex border border-slate-200 bg-slate-50 p-1 rounded-lg gap-1">
+      <div className="lg:hidden flex border border-[#E8ECF3] bg-slate-50 p-1 rounded-[12px] gap-1 mb-6">
         <button
           type="button"
           onClick={() => setActiveTab('links')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'links'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-white/50'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'links'
+              ? 'bg-[#E91E63] text-white shadow-sm'
+              : 'text-slate-650 hover:bg-white/50'
             }`}
         >
           Links
@@ -1209,9 +1209,9 @@ const QrLinksPage = () => {
         <button
           type="button"
           onClick={() => setActiveTab('branding')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'branding'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-white/50'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'branding'
+              ? 'bg-[#E91E63] text-white shadow-sm'
+              : 'text-slate-650 hover:bg-white/50'
             }`}
         >
           Branding
@@ -1219,9 +1219,9 @@ const QrLinksPage = () => {
         <button
           type="button"
           onClick={() => setActiveTab('preview')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-md transition-all duration-200 ${activeTab === 'preview'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-600 hover:bg-white/50'
+          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'preview'
+              ? 'bg-[#E91E63] text-white shadow-sm'
+              : 'text-slate-650 hover:bg-white/50'
             }`}
         >
           Preview

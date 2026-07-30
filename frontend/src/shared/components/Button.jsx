@@ -13,13 +13,14 @@ const Button = ({
   onClick,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg h-[40px] px-4 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-[12px] h-[40px] px-4 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#E91E63]/20 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#4338CA] hover:to-[#6D28D9] text-white shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 border border-transparent',
-    secondary: 'bg-white hover:bg-slate-50 text-[#111827] border border-slate-200 hover:border-slate-300 focus:ring-[#4F46E5]/20 shadow-sm hover:shadow-md',
-    danger: 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 focus:ring-red-500/20 shadow-sm',
-    outline: 'bg-transparent border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-[#111827] focus:ring-[#4F46E5]/20',
+    primary: 'bg-[#E91E63] hover:bg-[#E91E63]/90 text-white shadow-md shadow-pink-500/10 hover:shadow-lg hover:shadow-pink-500/20 border border-transparent',
+    secondary: 'bg-white hover:bg-slate-50 text-[#111827] border border-[#E8ECF3] hover:border-slate-350 focus:ring-[#E91E63]/20 shadow-xs hover:shadow-md',
+    danger: 'bg-[#EF4444] hover:bg-[#EF4444]/90 text-white border border-transparent focus:ring-red-500/20 shadow-xs',
+    success: 'bg-[#22C55E] hover:bg-[#22C55E]/90 text-white border border-transparent focus:ring-green-500/20 shadow-xs',
+    outline: 'bg-transparent border border-[#E8ECF3] hover:bg-slate-50 hover:border-[#D7DCE5] text-[#111827] focus:ring-[#E91E63]/20',
   };
 
   const combinedClasses = `${baseStyles} ${variants[variant]} ${className}`;

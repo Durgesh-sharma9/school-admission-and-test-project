@@ -171,26 +171,26 @@ const AcademicConfigPage = () => {
   });
 
   return (
-    <div className="space-y-6 text-left max-w-5xl mx-auto relative pb-12">
+    <div className="max-w-[1400px] mx-auto text-left relative pb-12">
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5 mt-2">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Academic Configuration</h2>
-          <p className="text-slate-500 text-xs mt-0.5">Catalogue profile of enabled departments, courses and specializations.</p>
+          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Academic Configuration</h1>
+          <p className="text-[#64748B] text-[15px] font-medium mt-1.5">Catalogue profile of enabled departments, courses and specializations.</p>
         </div>
         <button
           onClick={() => {
             resetRequestForm();
             setIsRequestModalOpen(true);
           }}
-          className="inline-flex items-center justify-center px-4 py-2 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs gap-1.5 self-start"
+          className="inline-flex items-center justify-center px-4.5 h-[40px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-xs font-bold transition-all shadow-xs gap-1.5 self-start cursor-pointer border-0"
         >
           <Plus className="h-4 w-4" /> Request New Program
         </button>
       </div>
 
       {/* Information SaaS Compliance Notice Banner */}
-      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-xs text-amber-800 flex items-start space-x-3 leading-normal">
+      <div className="bg-amber-50/50 border border-amber-200/60 rounded-[12px] p-4 text-xs text-amber-900 flex items-start space-x-3 leading-normal mb-6">
         <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
         <div>
           <strong>SaaS Compliance Policy:</strong> This catalogue is managed globally by the Super Admin. Your college can configure and enable programs in the settings profile or request new departments/courses below.
@@ -198,9 +198,9 @@ const AcademicConfigPage = () => {
       </div>
 
       {/* Search Input bar */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-xs">
-        <div className="relative max-w-md w-full">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] mb-6">
+        <div className="relative max-w-md w-full text-left">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#94A3B8]">
             <Search className="h-4.5 w-4.5" />
           </span>
           <input
@@ -208,7 +208,7 @@ const AcademicConfigPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search departments, courses, or specializations..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E9EAF0] text-xs font-semibold text-slate-700 placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all"
           />
         </div>
       </div>
@@ -238,7 +238,7 @@ const AcademicConfigPage = () => {
             return (
               <div 
                 key={dept._id} 
-                className="bg-white border border-slate-100 rounded-2xl shadow-2xs overflow-hidden transition-all duration-200"
+                className="bg-white border border-[#E8ECF3] rounded-[18px] shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden mb-4"
               >
                 {/* Department Header row */}
                 <div 
@@ -246,7 +246,7 @@ const AcademicConfigPage = () => {
                   className="p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/50 transition-colors select-none"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-indigo-50 text-indigo-650 rounded-xl flex items-center justify-center border border-indigo-100 shrink-0">
+                    <div className="h-10 w-10 bg-pink-50 text-[#E91E63] rounded-xl flex items-center justify-center border border-pink-100 shrink-0">
                       <Layers className="h-5 w-5" />
                     </div>
                     <div>
@@ -275,11 +275,11 @@ const AcademicConfigPage = () => {
                           return (
                             <div 
                               key={course._id}
-                              className="bg-white border border-slate-100 rounded-xl p-4 shadow-3xs flex flex-col justify-between"
+                              className="bg-white border border-[#E8ECF3] rounded-[12px] p-4 shadow-3xs flex flex-col justify-between"
                             >
                               <div className="space-y-1">
                                 <h4 className="font-extrabold text-slate-850 text-xs flex items-center gap-1.5">
-                                  <BookOpen className="h-3.5 w-3.5 text-indigo-550 shrink-0" />
+                                  <BookOpen className="h-3.5 w-3.5 text-[#E91E63] shrink-0" />
                                   <span>{course.name}</span>
                                 </h4>
                                 <p className="text-[9px] font-bold text-slate-400 uppercase">Code: {course.code}</p>
@@ -294,9 +294,9 @@ const AcademicConfigPage = () => {
                                     {nestedSpecs.map(spec => (
                                       <span 
                                         key={spec._id}
-                                        className="inline-flex items-center px-2.5 py-1 bg-slate-50 border border-slate-150 rounded-lg text-[10px] font-semibold text-slate-650"
+                                        className="inline-flex items-center px-2.5 py-1 bg-[#FFF7FA] border border-[#F2C8DA] rounded-lg text-[10px] font-semibold text-[#E91E63]"
                                       >
-                                        <GraduationCap className="h-3 w-3 mr-1 text-slate-400 shrink-0" />
+                                        <GraduationCap className="h-3 w-3 mr-1 text-[#E91E63] shrink-0" />
                                         {spec.name}
                                       </span>
                                     ))}

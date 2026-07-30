@@ -11,7 +11,7 @@ const Input = forwardRef(({
   required = false,
   ...props
 }, ref) => {
-  const inputBaseClasses = `w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all ${
+  const inputBaseClasses = `w-full rounded-[10px] border border-[#E9EAF0] px-3.5 py-2.5 text-sm text-slate-905 bg-white placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:ring-4 focus:ring-[#8B5CF6]/15 focus:border-[#8B5CF6] transition-all ${
     error ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
   } ${className}`;
 

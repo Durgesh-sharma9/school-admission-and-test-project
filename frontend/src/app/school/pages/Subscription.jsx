@@ -72,12 +72,12 @@ const Subscription = () => {
 
   const getPlanColor = (planType) => {
     const colors = {
-      basic: 'from-slate-500 to-slate-600',
-      standard: 'from-indigo-500 to-indigo-600',
-      premium: 'from-purple-500 to-purple-600',
-      enterprise: 'from-amber-500 to-amber-600',
+      basic: 'from-[#64748B] to-[#94A3B8]',
+      standard: 'from-[#8B5CF6] to-[#A78BFA]',
+      premium: 'from-[#E91E63] to-[#F43F7A]',
+      enterprise: 'from-[#F59E0B] to-[#FBBF24]',
     };
-    return colors[planType] || 'from-slate-500 to-slate-600';
+    return colors[planType] || 'from-[#64748B] to-[#94A3B8]';
   };
 
   const handleUpgrade = async (plan) => {
@@ -166,15 +166,15 @@ const Subscription = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="max-w-[1400px] mx-auto text-left relative pb-12">
       {/* Header */}
-      <div className="animate-slide-up">
-        <h1 className="text-2xl font-bold text-slate-800">Subscription</h1>
-        <p className="text-slate-500">Manage your subscription and plan</p>
+      <div className="mb-5 mt-2">
+        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Subscription</h1>
+        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">Manage your subscription and plan</p>
       </div>
 
       {/* Current Subscription Card */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white animate-slide-up hover:shadow-xl hover:shadow-indigo-500/20 transition-all duration-300">
+      <div className="bg-gradient-to-r from-[#E91E63] to-[#8B5CF6] rounded-[18px] p-6 text-white hover:shadow-xl hover:shadow-[#E91E63]/10 transition-all duration-300">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -237,7 +237,7 @@ const Subscription = () => {
       </div>
 
       {/* Usage Statistics */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 animate-slide-up hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200">
         <h3 className="text-lg font-semibold text-slate-800 mb-4">Usage Overview</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Students */}
@@ -357,12 +357,12 @@ const Subscription = () => {
       </div>
 
       {/* Billing Cycle Toggle */}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 my-6">
         <button
           onClick={() => setBillingCycle('monthly')}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+          className={`px-6 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer ${
             billingCycle === 'monthly'
-              ? 'bg-indigo-600 text-white'
+              ? 'bg-[#E91E63] text-white shadow-md'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
@@ -370,21 +370,21 @@ const Subscription = () => {
         </button>
         <button
           onClick={() => setBillingCycle('yearly')}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors relative ${
+          className={`px-6 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-colors relative cursor-pointer ${
             billingCycle === 'yearly'
-              ? 'bg-indigo-600 text-white'
+              ? 'bg-[#E91E63] text-white shadow-md'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
           Yearly
-          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase">
             Save 20%
           </span>
         </button>
       </div>
 
       {/* Plan Comparison */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {plans.filter(p => p.status === 'active').map((plan, index) => {
           const isCurrent = currentPlan?._id === plan._id;
           const isUpgrade = !isCurrent && plan.monthlyPrice > (currentPlan?.monthlyPrice || 0);
@@ -393,10 +393,10 @@ const Subscription = () => {
           return (
             <div
               key={plan._id}
-              className={`bg-white rounded-xl border-2 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              className={`bg-white rounded-[18px] border overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                 isCurrent
-                  ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg'
-                  : 'border-slate-200 hover:border-slate-300'
+                  ? 'border-[#E91E63] ring-2 ring-[#E91E63]/25 shadow-lg shadow-[#E91E63]/5'
+                  : 'border-[#E8ECF3] hover:border-slate-300'
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >

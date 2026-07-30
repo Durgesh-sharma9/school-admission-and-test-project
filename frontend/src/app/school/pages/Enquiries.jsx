@@ -579,7 +579,7 @@ const Enquiries = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9EEF3] px-3 md:px-5 lg:px-6 pb-6 pt-8 font-sans text-gray-800">
+    <div className="min-h-screen bg-[#FFF4F8] px-3 md:px-5 lg:px-6 pb-6 pt-8 font-sans text-gray-800">
       <div className="max-w-[1400px] mx-auto space-y-5">
 
       {/* Page Header (No Card) */}
