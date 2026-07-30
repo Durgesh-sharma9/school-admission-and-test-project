@@ -1057,8 +1057,8 @@ const QrLinksPage = () => {
           <div
             style={{ color: effectiveTextColor }}
             className={`w-full h-full flex flex-col justify-between py-2 relative z-10 p-12 rounded-3xl ${themeMode === 'bw'
-                ? 'bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200 border border-slate-200'
-                : 'bg-gradient-to-br from-indigo-700 via-indigo-900 to-cyan-755'
+              ? 'bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200 border border-slate-200'
+              : 'bg-gradient-to-br from-indigo-700 via-indigo-900 to-cyan-755'
               }`}
           >
             {/* Floating bubble shapes (hidden in B&W) */}
@@ -1199,8 +1199,8 @@ const QrLinksPage = () => {
           type="button"
           onClick={() => setActiveTab('links')}
           className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'links'
-              ? 'bg-[#E91E63] text-white shadow-sm'
-              : 'text-slate-655 hover:bg-white/50'
+            ? 'bg-[#E91E63] text-white shadow-sm'
+            : 'text-slate-655 hover:bg-white/50'
             }`}
         >
           Links
@@ -1209,8 +1209,8 @@ const QrLinksPage = () => {
           type="button"
           onClick={() => setActiveTab('branding')}
           className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'branding'
-              ? 'bg-[#E91E63] text-white shadow-sm'
-              : 'text-slate-655 hover:bg-white/50'
+            ? 'bg-[#E91E63] text-white shadow-sm'
+            : 'text-slate-655 hover:bg-white/50'
             }`}
         >
           Branding
@@ -1219,8 +1219,8 @@ const QrLinksPage = () => {
           type="button"
           onClick={() => setActiveTab('preview')}
           className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'preview'
-              ? 'bg-[#E91E63] text-white shadow-sm'
-              : 'text-slate-655 hover:bg-white/50'
+            ? 'bg-[#E91E63] text-white shadow-sm'
+            : 'text-slate-655 hover:bg-white/50'
             }`}
         >
           Preview

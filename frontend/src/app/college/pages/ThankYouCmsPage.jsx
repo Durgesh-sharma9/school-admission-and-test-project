@@ -134,7 +134,7 @@ const ThankYouCmsPage = () => {
       });
 
       const response = await res.json();
-      
+
       if (response.success) {
         if (type === 'brochure') {
           setAdmissionBrochure({
@@ -223,7 +223,7 @@ const ThankYouCmsPage = () => {
 
       if (response.success) {
         toast.success('Thank You page CMS updated successfully!');
-        
+
         // Sync context state
         const updatedSchool = {
           ...school,
@@ -254,7 +254,7 @@ const ThankYouCmsPage = () => {
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Left configurations panel - 65% width */}
         <div className="w-full lg:w-[65%] space-y-4">
-          
+
           {/* Section 1: Social Links Configuration */}
           <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-4 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-3.5">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
@@ -462,21 +462,21 @@ const ThankYouCmsPage = () => {
             </span>
           </div>
 
-          <div 
-            style={{ 
-              width: `${phoneWidth * scale}px`, 
+          <div
+            style={{
+              width: `${phoneWidth * scale}px`,
               height: `${phoneHeight * scale}px`,
-              transition: 'all 0.15s ease-out' 
-            }} 
+              transition: 'all 0.15s ease-out'
+            }}
             className="relative flex items-center justify-center overflow-hidden"
           >
-            <div 
-              style={{ 
-                width: `${phoneWidth}px`, 
-                height: `${phoneHeight}px`, 
-                transform: `scale(${scale})`, 
-                transformOrigin: 'center center' 
-              }} 
+            <div
+              style={{
+                width: `${phoneWidth}px`,
+                height: `${phoneHeight}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: 'center center'
+              }}
               className="border-[6px] border-slate-800 rounded-[2rem] shadow-xl bg-slate-50 overflow-hidden relative flex flex-col flex-shrink-0"
             >
               {/* Phone speaker notch */}

@@ -213,11 +213,10 @@ const LocalityManagement = () => {
             setActiveTab('approved');
             setPage(1);
           }}
-          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === 'approved'
+          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'approved'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-650'
-          }`}
+            }`}
         >
           <MapPin className="h-4 w-4" />
           Approved Localities
@@ -227,11 +226,10 @@ const LocalityManagement = () => {
             setActiveTab('pending');
             setPage(1);
           }}
-          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === 'pending'
+          className={`px-5 py-3 font-extrabold text-xs tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'pending'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-650'
-          }`}
+            }`}
         >
           <Clock className="h-4 w-4" />
           Pending Suggestions
@@ -343,11 +341,10 @@ const LocalityManagement = () => {
                       </td>
                       <td className="px-6 py-4 text-center border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span
-                          className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                            loc.status === 'active'
+                          className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold border ${loc.status === 'active'
                               ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
                               : 'bg-slate-100 border-slate-200 text-slate-500'
-                          }`}
+                            }`}
                         >
                           {loc.status === 'active' ? 'Active' : 'Inactive'}
                         </span>
@@ -366,9 +363,8 @@ const LocalityManagement = () => {
                           </button>
                           <button
                             onClick={() => handleToggleStatus(loc)}
-                            className={`p-1.5 hover:bg-slate-100 rounded-lg transition-colors ${
-                              loc.status === 'active' ? 'text-emerald-600 hover:text-amber-600' : 'text-slate-400 hover:text-emerald-600'
-                            }`}
+                            className={`p-1.5 hover:bg-slate-100 rounded-lg transition-colors ${loc.status === 'active' ? 'text-emerald-600 hover:text-amber-600' : 'text-slate-400 hover:text-emerald-600'
+                              }`}
                             title={loc.status === 'active' ? 'Deactivate Locality' : 'Activate Locality'}
                           >
                             {loc.status === 'active' ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
@@ -393,11 +389,10 @@ const LocalityManagement = () => {
                       </td>
                       <td className="px-6 py-4 border-r border-[rgba(233,30,99,0.04)] last:border-r-0">
                         <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                            loc.createdBy === 'parent'
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${loc.createdBy === 'parent'
                               ? 'bg-purple-50 text-purple-700 border border-purple-100'
                               : 'bg-[#E91E63]/10 text-[#E91E63] border border-[#E91E63]/20'
-                          }`}
+                            }`}
                         >
                           {loc.createdBy === 'parent' ? 'Parent Suggestion' : 'Admin'}
                         </span>

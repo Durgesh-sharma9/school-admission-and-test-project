@@ -6,33 +6,33 @@ import Loader from '../../../shared/components/Loader';
 import Modal from '../../../shared/components/Modal';
 import toast from 'react-hot-toast';
 import api from '../../school/services/schoolApi';
-import { 
-  Settings, 
-  Layers, 
-  BookOpen, 
-  GraduationCap, 
-  Sparkles, 
-  Send, 
-  Upload, 
-  Trash2, 
-  Mail, 
-  Plus, 
-  Check, 
-  MessageSquare, 
-  ShieldAlert, 
-  Image, 
-  FileText, 
-  Globe, 
-  MapPin, 
-  Building 
+import {
+  Settings,
+  Layers,
+  BookOpen,
+  GraduationCap,
+  Sparkles,
+  Send,
+  Upload,
+  Trash2,
+  Mail,
+  Plus,
+  Check,
+  MessageSquare,
+  ShieldAlert,
+  Image,
+  FileText,
+  Globe,
+  MapPin,
+  Building
 } from 'lucide-react';
 
 const SettingsPage = () => {
   const { school, updateSchoolState } = useAuth();
-  
+
   // Tabs: 'profile', 'branding', 'templates', 'security'
   const [activeTab, setActiveTab] = useState('profile');
-  
+
   const [loading, setLoading] = useState(false);
   const [fetchingMasters, setFetchingMasters] = useState(false);
 
@@ -108,7 +108,7 @@ const SettingsPage = () => {
   const [prospectusUrl, setProspectusUrl] = useState(school?.documents?.prospectusUrl || '');
   const [bannerUrl, setBannerUrl] = useState(school?.documents?.collegeBannerUrl || '');
   const [galleryImages, setGalleryImages] = useState(school?.documents?.galleryImages || []);
-  
+
   const [uploadingDoc, setUploadingDoc] = useState({ logo: false, brochure: false, prospectus: false, banner: false, gallery: false });
 
   // Security password states
@@ -433,7 +433,7 @@ const SettingsPage = () => {
         const newDepts = prev.filter(d => d !== id);
         const relatedCourses = allCourses.filter(c => c.departmentId?._id === id || c.departmentId === id).map(c => c._id);
         setSelectedCourses(cPrev => cPrev.filter(cId => !relatedCourses.includes(cId)));
-        
+
         setSelectedSpecs(sPrev => sPrev.filter(sId => {
           const specObj = allSpecs.find(s => s._id === sId);
           const courseObj = specObj ? allCourses.find(c => c._id === (specObj.courseId?._id || specObj.courseId)) : null;
@@ -502,11 +502,10 @@ const SettingsPage = () => {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
-              activeTab === tab.key
+            className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${activeTab === tab.key
                 ? 'border-[#E91E63] text-[#E91E63]'
                 : 'border-transparent text-slate-400 hover:text-slate-600'
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -519,7 +518,7 @@ const SettingsPage = () => {
           {/* Card 1: Identity & Affiliation */}
           <div className="bg-white border border-[#E8ECF3] rounded-[18px] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide border-b pb-1">College Profile Details</h3>
-            
+
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               {/* Logo Upload Box */}
               <div className="flex flex-col items-center space-y-2">
@@ -621,7 +620,7 @@ const SettingsPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Address fields */}
             <div className="border-t border-slate-100 pt-4 space-y-4">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Campuses & Address</span>
@@ -671,7 +670,7 @@ const SettingsPage = () => {
                   </h4>
                   <p className="text-[10px] text-slate-400 mt-1">Upload the latest course descriptions and intake details in PDF format.</p>
                 </div>
-                
+
                 <div className="flex items-center justify-between gap-4 mt-3">
                   <div className="truncate flex-1">
                     {brochureUrl ? (
@@ -739,7 +738,7 @@ const SettingsPage = () => {
                   <Image className="h-4 w-4 text-[#E91E63]" /> College Banner
                 </h4>
                 <p className="text-[10px] text-slate-400">Branded header banner used in public registration flows.</p>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 items-center mt-3 pt-2">
                   <div className="h-28 w-56 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                     {bannerUrl ? (
@@ -841,11 +840,10 @@ const SettingsPage = () => {
                         return (
                           <label
                             key={dept._id}
-                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                              isChecked
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${isChecked
                                 ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
                                 : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -877,11 +875,10 @@ const SettingsPage = () => {
                         return (
                           <label
                             key={course._id}
-                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                              isChecked
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${isChecked
                                 ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
                                 : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -913,11 +910,10 @@ const SettingsPage = () => {
                         return (
                           <label
                             key={spec._id}
-                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                              isChecked
+                            className={`flex items-center space-x-2.5 p-3 rounded-xl border transition-all cursor-pointer ${isChecked
                                 ? 'bg-indigo-50/50 border-indigo-200 text-indigo-950 font-bold'
                                 : 'bg-slate-50/50 border-slate-150 text-slate-650 hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -972,12 +968,12 @@ const SettingsPage = () => {
                   <tbody className="divide-y divide-[#E8ECF3] text-slate-705">
                     {requestsList.map(req => {
                       const itemDisplay = req.requestType === 'Department' ? req.departmentName :
-                                          req.requestType === 'Course' ? `${req.courseName} (${req.courseCode || 'No Code'})` :
-                                          `${req.specializationName} (${req.courseId?.name || 'N/A'})`;
-                      
+                        req.requestType === 'Course' ? `${req.courseName} (${req.courseCode || 'No Code'})` :
+                          `${req.specializationName} (${req.courseId?.name || 'N/A'})`;
+
                       const statusColor = req.status === 'Pending' ? 'bg-amber-50 text-amber-600 border border-amber-200' :
-                                          req.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
-                                          'bg-rose-50 text-rose-600 border border-rose-200';
+                        req.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' :
+                          'bg-rose-50 text-rose-600 border border-rose-200';
 
                       return (
                         <tr key={req._id} className="hover:bg-slate-50/40 transition-colors">
@@ -1085,7 +1081,7 @@ const SettingsPage = () => {
                 rows={6}
                 required
               />
-              
+
               {/* Placeholder guides */}
               <div className="mt-2 bg-slate-50 border border-slate-100 rounded-xl p-3 text-[10px] text-slate-500 space-y-1">
                 <span className="font-bold text-slate-700">Dynamic Variable Placeholders:</span>
@@ -1121,11 +1117,10 @@ const SettingsPage = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-extrabold text-slate-800 text-xs">{tpl.name}</h4>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold ${
-                            tpl.type === 'whatsapp' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                            tpl.type === 'email' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                            'bg-purple-50 text-purple-700 border border-purple-100'
-                          }`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold ${tpl.type === 'whatsapp' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                              tpl.type === 'email' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                                'bg-purple-50 text-purple-700 border border-purple-100'
+                            }`}>
                             {tpl.type === 'whatsapp' ? 'WhatsApp' : tpl.type === 'email' ? 'Email' : 'SMS'}
                           </span>
                         </div>

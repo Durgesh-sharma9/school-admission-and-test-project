@@ -20,7 +20,7 @@ import LocalityManagement from '../components/LocalityManagement';
 
 const SettingsPage = () => {
   const { school, updateSchoolState } = useAuth();
-  
+
   // Tab control: 'school', 'locality', 'password', 'templates'
   const [activeTab, setActiveTab] = useState('school');
 
@@ -54,11 +54,11 @@ const SettingsPage = () => {
     primaryColor: school?.qrBranding?.primaryColor || '#4f46e5',
     secondaryColor: school?.qrBranding?.secondaryColor || '#f59e0b',
   });
-  
+
   const [minorTypingValidation, setMinorTypingValidation] = useState(
     school?.settings?.minorTypingValidation || false
   );
-  
+
   const [savingSchool, setSavingSchool] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -241,7 +241,7 @@ const SettingsPage = () => {
         });
       }
     } catch (err) {
-  toast.error(err.message || 'Delete failed');
+      toast.error(err.message || 'Delete failed');
     }
   };
 
@@ -259,41 +259,37 @@ const SettingsPage = () => {
       <div className="flex border-b border-[#E8ECF3] overflow-x-auto mb-6">
         <button
           onClick={() => setActiveTab('school')}
-          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
-            activeTab === 'school'
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${activeTab === 'school'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           School Profile
         </button>
         <button
           onClick={() => setActiveTab('locality')}
-          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
-            activeTab === 'locality'
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${activeTab === 'locality'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           Locality Management
         </button>
         <button
           onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
-            activeTab === 'templates'
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${activeTab === 'templates'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           Notifications & Templates
         </button>
         <button
           onClick={() => setActiveTab('password')}
-          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${
-            activeTab === 'password'
+          className={`px-4 py-2.5 font-bold text-xs tracking-[0.6px] uppercase border-b-2 transition-all cursor-pointer ${activeTab === 'password'
               ? 'border-[#E91E63] text-[#E91E63]'
               : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
+            }`}
         >
           Security & Password
         </button>
@@ -426,7 +422,7 @@ const SettingsPage = () => {
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Assessment Evaluation Settings
             </h3>
-            
+
             <label className="flex items-start p-4 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors select-none">
               <input
                 type="checkbox"
@@ -455,7 +451,7 @@ const SettingsPage = () => {
 
       {activeTab === 'templates' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          
+
           {/* Template Creator Form */}
           <form onSubmit={handleSaveTemplate} className="bg-white border border-[#E8ECF3] rounded-[18px] p-5 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-5 lg:col-span-1">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
@@ -504,7 +500,7 @@ const SettingsPage = () => {
                 rows={6}
                 required
               />
-              
+
               {/* Placeholders Guide */}
               <div className="mt-2 bg-slate-50 border border-slate-100 rounded-xl p-3 text-[10px] text-slate-500 space-y-1">
                 <span className="font-bold text-slate-700">Dynamic Variable Placeholders:</span>
@@ -541,11 +537,10 @@ const SettingsPage = () => {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-extrabold text-slate-800 text-xs">{tpl.name}</h4>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold ${
-                            tpl.type === 'whatsapp'
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold ${tpl.type === 'whatsapp'
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                               : 'bg-blue-50 text-blue-700 border border-blue-105'
-                          }`}>
+                            }`}>
                             {tpl.type === 'whatsapp' ? 'WhatsApp' : 'Email'}
                           </span>
                         </div>

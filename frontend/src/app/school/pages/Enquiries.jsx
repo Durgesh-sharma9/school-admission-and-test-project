@@ -6,7 +6,6 @@ import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
-import SearchableClassFilter from '../../../shared/components/SearchableClassFilter';
 import DeleteConfirmationModal from '../../../shared/components/DeleteConfirmationModal';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -91,10 +90,10 @@ const Enquiries = () => {
       const response = await api.put(`/enquiries/${enquiryId}`, payload);
       if (response.success) {
         toast.success('Admission journey updated successfully!');
-        setEnquiries(prev => prev.map(enq => enq._id === enquiryId ? { 
-          ...enq, 
-          journey: response.data.journey, 
-          journeyStatus: response.data.journeyStatus, 
+        setEnquiries(prev => prev.map(enq => enq._id === enquiryId ? {
+          ...enq,
+          journey: response.data.journey,
+          journeyStatus: response.data.journeyStatus,
           status: response.data.status,
           closedBy: response.data.closedBy,
           closedAt: response.data.closedAt,
@@ -547,12 +546,12 @@ const Enquiries = () => {
                     <td className="px-6 py-4 text-slate-600">{enq.classSeeking}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${enq.status === 'Admission Confirmed'
-                          ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
-                          : enq.status === 'Hold'
-                            ? 'bg-amber-50 border-amber-100 text-amber-705'
-                            : enq.status === 'Not Interested'
-                              ? 'bg-rose-50 border-rose-100 text-rose-700'
-                              : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+                        ? 'bg-emerald-50 border-emerald-100 text-emerald-700'
+                        : enq.status === 'Hold'
+                          ? 'bg-amber-50 border-amber-100 text-amber-705'
+                          : enq.status === 'Not Interested'
+                            ? 'bg-rose-50 border-rose-100 text-rose-700'
+                            : 'bg-indigo-50 border-indigo-100 text-indigo-700'
                         }`}>
                         {enq.status}
                       </span>
@@ -583,697 +582,705 @@ const Enquiries = () => {
     <div className="min-h-screen bg-[#FFF4F8] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
       <div className="max-w-[1400px] mx-auto space-y-5">
 
-      {/* Page Header (No Card) */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiries Database</h1>
-          <div className="flex items-center h-[36px] px-[16px] bg-[#EEF2F6] border border-[#E2E8F0] text-slate-700 font-bold text-xs rounded-[12px] shrink-0">
-            {totalRecords} Total Records
+        {/* Page Header (No Card) */}
+        <div className="mb-5">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiries Database</h1>
+            <div className="flex items-center h-[36px] px-[16px] bg-[#EEF2F6] border border-[#E2E8F0] text-slate-700 font-bold text-xs rounded-[12px] shrink-0">
+              {totalRecords} Total Records
+            </div>
           </div>
+          <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
+            Filter, modify statuses, convert registration stages, and send parents templated messages.
+          </p>
         </div>
-        <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
-          Filter, modify statuses, convert registration stages, and send parents templated messages.
-        </p>
-      </div>
 
-      {/* Advanced Filters Block */}
-      <CollapsibleFilters
-        searchValue={search}
-        onSearchChange={setSearch}
-        onExport={handleExportCSV}
-        isExpanded={filtersExpanded}
-        onToggleExpand={() => setFiltersExpanded(!filtersExpanded)}
-        searchPlaceholder="Search by ID, candidate name, parent name, mobile..."
-      >
-        <FilterRow>
-          {/* Status Filter */}
-          <SelectFilter
-            label="Status"
-            value={statusFilter}
-            onChange={setStatusFilter}
-            options={[
-              { value: '', label: 'All Statuses' },
-              { value: 'New Enquiry', label: 'New Enquiry' },
-              { value: 'Hold', label: 'On Hold' },
-              { value: 'Not Interested', label: 'Not Interested' },
-              { value: 'Admission Confirmed', label: 'Admission Confirmed' },
-            ]}
-            placeholder="All Statuses"
-          />
+        {/* Advanced Filters Block */}
+        <CollapsibleFilters
+          searchValue={search}
+          onSearchChange={setSearch}
+          onExport={handleExportCSV}
+          isExpanded={filtersExpanded}
+          onToggleExpand={() => setFiltersExpanded(!filtersExpanded)}
+          searchPlaceholder="Search by ID, candidate name, parent name, mobile..."
+        >
+          <FilterRow>
+            {/* Status Filter */}
+            <SelectFilter
+              label="Status"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: '', label: 'All Statuses' },
+                { value: 'New Enquiry', label: 'New Enquiry' },
+                { value: 'Hold', label: 'On Hold' },
+                { value: 'Not Interested', label: 'Not Interested' },
+                { value: 'Admission Confirmed', label: 'Admission Confirmed' },
+              ]}
+              placeholder="All Statuses"
+            />
 
-          <SearchableClassFilter
-            label="Class Seeking"
-            value={classFilter}
-            onChange={setClassFilter}
-          />
+            {/* Class Filter */}
+            <SelectFilter
+              label="Class Seeking"
+              value={classFilter}
+              onChange={setClassFilter}
+              options={[
+                { value: '', label: 'All Classes' },
+                ...['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map(c => ({
+                  value: c,
+                  label: `Class ${c}`
+                }))
+              ]}
+              placeholder="All Classes"
+            />
 
-          {/* Timeline Filter */}
-          <TimelineFilter
-            value={timelineFilter}
-            onChange={setTimelineFilter}
-          />
-        </FilterRow>
+            {/* Timeline Filter */}
+            <TimelineFilter
+              value={timelineFilter}
+              onChange={setTimelineFilter}
+            />
+          </FilterRow>
 
-        <FilterRow>
-          {/* Start Date */}
-          <DateFilter
-            label="Start Date"
-            value={startDate}
-            onChange={setStartDate}
-          />
+          <FilterRow>
+            {/* Start Date */}
+            <DateFilter
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+            />
 
-          {/* End Date */}
-          <DateFilter
-            label="End Date"
-            value={endDate}
-            onChange={setEndDate}
-          />
+            {/* End Date */}
+            <DateFilter
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+            />
 
-          {/* Sort By */}
-          <SelectFilter
-            label="Sort By"
-            value={sortBy}
-            onChange={setSortBy}
-            options={[
-              { value: 'newest', label: 'Newest First' },
-              { value: 'oldest', label: 'Oldest First' },
-              { value: 'name_asc', label: 'Name (A-Z)' },
-              { value: 'name_desc', label: 'Name (Z-A)' },
-              { value: 'class', label: 'Class Seeking' },
-            ]}
-            placeholder="Sort By"
-          />
-        </FilterRow>
+            {/* Sort By */}
+            <SelectFilter
+              label="Sort By"
+              value={sortBy}
+              onChange={setSortBy}
+              options={[
+                { value: 'newest', label: 'Newest First' },
+                { value: 'oldest', label: 'Oldest First' },
+                { value: 'name_asc', label: 'Name (A-Z)' },
+                { value: 'name_desc', label: 'Name (Z-A)' },
+                { value: 'class', label: 'Class Seeking' },
+              ]}
+              placeholder="Sort By"
+            />
+          </FilterRow>
 
-        <FilterRow>
-          {/* Page Size */}
-          <SelectFilter
-            label="Page Size"
-            value={limit.toString()}
-            onChange={(val) => setLimit(parseInt(val, 10))}
-            options={[
-              { value: '5', label: '5 per page' },
-              { value: '10', label: '10 per page' },
-              { value: '20', label: '20 per page' },
-              { value: '50', label: '50 per page' },
-            ]}
-            placeholder="Page Size"
-          />
-        </FilterRow>
-      </CollapsibleFilters>
+          <FilterRow>
+            {/* Page Size */}
+            <SelectFilter
+              label="Page Size"
+              value={limit.toString()}
+              onChange={(val) => setLimit(parseInt(val, 10))}
+              options={[
+                { value: '5', label: '5 per page' },
+                { value: '10', label: '10 per page' },
+                { value: '20', label: '20 per page' },
+                { value: '50', label: '50 per page' },
+              ]}
+              placeholder="Page Size"
+            />
+          </FilterRow>
+        </CollapsibleFilters>
 
-      {/* Selected Action floating bar */}
-      <AnimatePresence>
-        {selectedIds.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            className="bg-gradient-to-r from-[#7E63F6] to-[#9781F8] text-white rounded-xl px-5 py-3 card-flat flex items-center justify-between flex-wrap gap-3"
-          >
-            <span className="text-xs font-semibold">
-              {selectedIds.length} enquiries selected
-            </span>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="primary"
-                size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 border-none shadow-xs text-white"
-                onClick={() => {
-                  setMessageType('whatsapp');
-                  setMessageModalOpen(true);
-                }}
-              >
-                <MessageSquare size={16} className="mr-1.5" />
-                WhatsApp Selected
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 border-none shadow-xs text-white"
-                onClick={() => {
-                  setMessageType('email');
-                  setMessageModalOpen(true);
-                }}
-              >
-                <Mail size={16} className="mr-1.5" />
-                Email Selected
-              </Button>
-              <button
-                onClick={() => setSelectedIds([])}
-                className="text-xs font-bold text-slate-300 hover:text-white"
-              >
-                Clear Selection
-              </button>
+        {/* Selected Action floating bar */}
+        <AnimatePresence>
+          {selectedIds.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              className="bg-gradient-to-r from-[#7E63F6] to-[#9781F8] text-white rounded-xl px-5 py-3 card-flat flex items-center justify-between flex-wrap gap-3"
+            >
+              <span className="text-xs font-semibold">
+                {selectedIds.length} enquiries selected
+              </span>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="bg-emerald-600 hover:bg-emerald-700 border-none shadow-xs text-white"
+                  onClick={() => {
+                    setMessageType('whatsapp');
+                    setMessageModalOpen(true);
+                  }}
+                >
+                  <MessageSquare size={16} className="mr-1.5" />
+                  WhatsApp Selected
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 border-none shadow-xs text-white"
+                  onClick={() => {
+                    setMessageType('email');
+                    setMessageModalOpen(true);
+                  }}
+                >
+                  <Mail size={16} className="mr-1.5" />
+                  Email Selected
+                </Button>
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="text-xs font-bold text-slate-300 hover:text-white"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Table Card */}
+        <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)' }}>
+          <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
+          {loading ? (
+            <Loader message="Loading enquiries..." />
+          ) : enquiries.length === 0 ? (
+            <div className="py-16 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[#7E63F6]/10 flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={28} className="text-[#7E63F6]" />
+              </div>
+              <p className="font-bold text-gray-800 text-sm">No enquiries found</p>
+              <p className="text-xs text-gray-400 font-medium mt-1">
+                Try adjusting your search criteria or register a new form submission.
+              </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Main Table Card */}
-      <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)' }}>
-        <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
-        {loading ? (
-          <Loader message="Loading enquiries..." />
-        ) : enquiries.length === 0 ? (
-          <div className="py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#7E63F6]/10 flex items-center justify-center mx-auto mb-4">
-              <AlertCircle size={28} className="text-[#7E63F6]" />
-            </div>
-            <p className="font-bold text-gray-800 text-sm">No enquiries found</p>
-            <p className="text-xs text-gray-400 font-medium mt-1">
-              Try adjusting your search criteria or register a new form submission.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-700">
-              <thead className="text-[11px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100 bg-white sticky top-0" style={{ height: '48px' }}>
-                <tr style={{ height: '48px' }}>
-                  <th className="px-5 py-0 w-12 text-center border-r border-slate-100 last:border-r-0 align-middle">
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAll}
-                      checked={
-                        enquiries.length > 0 && selectedIds.length === enquiries.length
-                      }
-                      className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
-                    />
-                  </th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Enquiry ID</th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Student Name</th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Parent Details</th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Class</th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Status</th>
-                  <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Date Submited</th>
-                  <th className="px-5 py-0 text-center w-[300px] last:border-r-0 align-middle">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E8ECF3]">
-                {enquiries.map((enq, index) => (
-                  <React.Fragment key={enq._id}>
-                    <tr
-                      className={`transition-all duration-200 ease-out hover:bg-slate-50/80 ${
-                        expandedEnquiryId === enq._id
-                          ? 'bg-slate-50 border-l-4 border-l-[#E91E63] shadow-xs'
-                          : 'border-l-4 border-l-transparent'
-                      }`}
-                    >
-                      <td className="px-5 py-2.5 text-center border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(enq._id)}
-                          onChange={() => handleSelectRow(enq._id)}
-                          className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
-                        />
-                      </td>
-                      <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-slate-100 last:border-r-0">{enq.enquiryId}</td>
-                      <td className="px-5 py-2.5 text-gray-800 border-r border-slate-100 last:border-r-0">
-                        <div className="font-semibold text-gray-900 text-[13px] leading-tight">{enq.studentName}</div>
-                        <span className="block text-[10px] text-gray-400 font-medium mt-0.5">
-                          {enq.gender}
-                        </span>
-                      </td>
-                      <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewingParentMobile(enq.mobile);
-                          }}
-                          className="font-semibold text-gray-700 block cursor-pointer hover:text-[#E91E63] hover:underline leading-tight text-xs"
-                          title="View Parent & Family History Profile"
-                        >
-                          {enq.parentName}
-                        </span>
-                        <span className="text-[10px] text-gray-400 font-medium block mt-0.5">
-                          📞 {enq.mobile}
-                        </span>
-                      </td>
-                      <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8B5CF6]/10 text-[#8B5CF6]">
-                          {enq.classSeeking}
-                        </span>
-                      </td>
-                      <td className="px-5 py-2.5 font-bold border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
-                        <div className="relative inline-block w-[120px]">
-                          <select
-                            value={enq.status}
-                            onChange={(e) => handleStatusChange(enq._id, e.target.value)}
-                            className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
-                              ${enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
-                                enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
-                                  enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
-                                    enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
-                                      'bg-gray-50 text-gray-700 border-gray-200'
-                              }
-                            `}
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-700">
+                <thead className="text-[11px] text-slate-500 font-bold uppercase tracking-wider border-b border-slate-100 bg-white sticky top-0" style={{ height: '48px' }}>
+                  <tr style={{ height: '48px' }}>
+                    <th className="px-5 py-0 w-12 text-center border-r border-slate-100 last:border-r-0 align-middle">
+                      <input
+                        type="checkbox"
+                        onChange={handleSelectAll}
+                        checked={
+                          enquiries.length > 0 && selectedIds.length === enquiries.length
+                        }
+                        className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
+                      />
+                    </th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Enquiry ID</th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Student Name</th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Parent Details</th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Class</th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Status</th>
+                    <th className="px-5 py-0 border-r border-slate-100 last:border-r-0 align-middle">Date Submited</th>
+                    <th className="px-5 py-0 text-center w-[300px] last:border-r-0 align-middle">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E8ECF3]">
+                  {enquiries.map((enq, index) => (
+                    <React.Fragment key={enq._id}>
+                      <tr
+                        className={`transition-all duration-200 ease-out hover:bg-slate-50/80 ${expandedEnquiryId === enq._id
+                            ? 'bg-slate-50 border-l-4 border-l-[#E91E63] shadow-xs'
+                            : 'border-l-4 border-l-transparent'
+                          }`}
+                      >
+                        <td className="px-5 py-2.5 text-center border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(enq._id)}
+                            onChange={() => handleSelectRow(enq._id)}
+                            className="rounded-md text-[#E91E63] border-[#F2C8DA] bg-white focus:ring-[#E91E63]/20 focus:border-[#E91E63] h-4.5 w-4.5 cursor-pointer"
+                          />
+                        </td>
+                        <td className="px-5 py-2.5 font-bold text-gray-900 whitespace-nowrap text-sm border-r border-slate-100 last:border-r-0">{enq.enquiryId}</td>
+                        <td className="px-5 py-2.5 text-gray-800 border-r border-slate-100 last:border-r-0">
+                          <div className="font-semibold text-gray-900 text-[13px] leading-tight">{enq.studentName}</div>
+                          <span className="block text-[10px] text-gray-400 font-medium mt-0.5">
+                            {enq.gender}
+                          </span>
+                        </td>
+                        <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingParentMobile(enq.mobile);
+                            }}
+                            className="font-semibold text-gray-700 block cursor-pointer hover:text-[#E91E63] hover:underline leading-tight text-xs"
+                            title="View Parent & Family History Profile"
                           >
-                            <option value="New Enquiry">NEW</option>
-                            <option value="Hold">HOLD</option>
-                            <option value="Not Interested">REJECTED</option>
-                            <option value="Admission Confirmed">CONFIRMED</option>
-                          </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-                            <ChevronDown size={14} className="opacity-50" />
+                            {enq.parentName}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-medium block mt-0.5">
+                            📞 {enq.mobile}
+                          </span>
+                        </td>
+                        <td className="px-5 py-2.5 border-r border-slate-100 last:border-r-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                            {enq.classSeeking}
+                          </span>
+                        </td>
+                        <td className="px-5 py-2.5 font-bold border-r border-slate-100 last:border-r-0" onClick={(e) => e.stopPropagation()}>
+                          <div className="relative inline-block w-[120px]">
+                            <select
+                              value={enq.status}
+                              onChange={(e) => handleStatusChange(enq._id, e.target.value)}
+                              className={`w-full text-[10px] font-bold uppercase rounded-lg pl-3 pr-7 py-1.5 cursor-pointer appearance-none transition-all outline-none border focus:ring-2 focus:ring-offset-1
+                              ${enq.status === 'New Enquiry' ? 'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500' :
+                                  enq.status === 'Hold' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
+                                    enq.status === 'Not Interested' ? 'bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-500' :
+                                      enq.status === 'Admission Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-500' :
+                                        'bg-gray-50 text-gray-700 border-gray-200'
+                                }
+                            `}
+                            >
+                              <option value="New Enquiry">NEW</option>
+                              <option value="Hold">HOLD</option>
+                              <option value="Not Interested">REJECTED</option>
+                              <option value="Admission Confirmed">CONFIRMED</option>
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                              <ChevronDown size={14} className="opacity-50" />
+                            </div>
                           </div>
-                        </div>
 
-                      </td>
-                      <td className="px-5 py-2.5 text-xs font-semibold text-gray-700 whitespace-nowrap border-r border-slate-100 last:border-r-0">
-                        {formatSubmissionDate(enq.saveDate, enq.saveTime)}
-                      </td>
-                      <td className="px-5 py-2.5" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-1.5">
-                          <button
-                            className={`h-10 w-10 p-0 flex items-center justify-center border rounded-xl shadow-[0_3px_10px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] ${expandedEnquiryId === enq._id
+                        </td>
+                        <td className="px-5 py-2.5 text-xs font-semibold text-gray-700 whitespace-nowrap border-r border-slate-100 last:border-r-0">
+                          {formatSubmissionDate(enq.saveDate, enq.saveTime)}
+                        </td>
+                        <td className="px-5 py-2.5" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              className={`h-10 w-10 p-0 flex items-center justify-center border rounded-xl shadow-[0_3px_10px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] ${expandedEnquiryId === enq._id
                                 ? 'bg-[#6366F1]/15 border-[#6366F1]/30 text-[#6366F1]'
                                 : 'bg-[#EEF2FF] border-[#E8ECF3] text-[#6366F1] hover:bg-[#6366F1] hover:text-white hover:border-[#6366F1]'
-                              }`}
-                            onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
-                            title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
-                          >
-                            <GitCommit size={16} strokeWidth={2} />
-                          </button>
+                                }`}
+                              onClick={() => setExpandedEnquiryId(expandedEnquiryId === enq._id ? null : enq._id)}
+                              title={expandedEnquiryId === enq._id ? "Hide Timeline" : "Timeline"}
+                            >
+                              <GitCommit size={16} strokeWidth={2} />
+                            </button>
 
-                          <button
-                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
-                            onClick={() => {
-                              setSelectedEnquiryForView(enq);
-                              setViewModalOpen(true);
-                            }}
-                            title="View Details"
-                          >
-                            <Eye size={16} strokeWidth={2} />
-                          </button>
+                            <button
+                              className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white hover:border-[#3B82F6] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
+                              onClick={() => {
+                                setSelectedEnquiryForView(enq);
+                                setViewModalOpen(true);
+                              }}
+                              title="View Details"
+                            >
+                              <Eye size={16} strokeWidth={2} />
+                            </button>
 
-                          <button
-                             className={`h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#ECFDF5] text-[#10B981] hover:bg-[#10B981] hover:text-white hover:border-[#10B981] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200 ${enq.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                             onClick={() => {
-                               if (enq.journeyStatus === 'CLOSED') {
-                                 toast.error('This journey has been closed. Contact blocked.');
-                                 return;
-                               }
-                               setSelectedEnquiryForContact(enq);
-                               setContactModalOpen(true);
-                             }}
-                             title={enq.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
-                           >
-                             <Phone size={16} strokeWidth={2} />
-                           </button>
+                            <button
+                              className={`h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#ECFDF5] text-[#10B981] hover:bg-[#10B981] hover:text-white hover:border-[#10B981] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200 ${enq.journeyStatus === 'CLOSED' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              onClick={() => {
+                                if (enq.journeyStatus === 'CLOSED') {
+                                  toast.error('This journey has been closed. Contact blocked.');
+                                  return;
+                                }
+                                setSelectedEnquiryForContact(enq);
+                                setContactModalOpen(true);
+                              }}
+                              title={enq.journeyStatus === 'CLOSED' ? "Journey Closed - Contact Blocked" : "Contact"}
+                            >
+                              <Phone size={16} strokeWidth={2} />
+                            </button>
 
-                          <button
-                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FFF7ED] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-white hover:border-[#F59E0B] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
-                            onClick={() => setSelectedEnquiryForAssessment(enq)}
-                            title="Documents / Assessment"
-                          >
-                            <FileQuestion size={16} strokeWidth={2} />
-                          </button>
+                            <button
+                              className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FFF7ED] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-white hover:border-[#F59E0B] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
+                              onClick={() => setSelectedEnquiryForAssessment(enq)}
+                              title="Documents / Assessment"
+                            >
+                              <FileQuestion size={16} strokeWidth={2} />
+                            </button>
 
-                          <button
-                            className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FEF2F2] text-[#EF4444] hover:bg-[#EF4444] hover:text-white hover:border-[#EF4444] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
-                            onClick={() => handleDeleteClick(enq)}
-                            title="Delete"
-                          >
-                            <Trash2 size={16} strokeWidth={2} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                            <button
+                              className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FEF2F2] text-[#EF4444] hover:bg-[#EF4444] hover:text-white hover:border-[#EF4444] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
+                              onClick={() => handleDeleteClick(enq)}
+                              title="Delete"
+                            >
+                              <Trash2 size={16} strokeWidth={2} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
 
-                    <AnimatePresence>
-                      {expandedEnquiryId === enq._id && (
-                        <tr className="bg-indigo-50/40">
-                          <td colSpan={8} className="px-4 py-4 border-b border-indigo-100">
+                      <AnimatePresence>
+                        {expandedEnquiryId === enq._id && (
+                          <tr className="bg-indigo-50/40">
+                            <td colSpan={8} className="px-4 py-4 border-b border-indigo-100">
 
-                            <div className="bg-white border border-indigo-100 rounded-xl shadow-sm overflow-hidden">
+                              <div className="bg-white border border-indigo-100 rounded-xl shadow-sm overflow-hidden">
 
-                              <div className="bg-gradient-to-r from-indigo-50 to-slate-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100">
-                                <div className="space-y-1 text-left">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <h3 className="text-sm font-bold text-slate-800 leading-none">{enq.studentName}</h3>
-                                    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
-                                      {enq.enquiryId}
-                                    </span>
-                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border tracking-wider ${enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
+                                <div className="bg-gradient-to-r from-indigo-50 to-slate-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100">
+                                  <div className="space-y-1 text-left">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <h3 className="text-sm font-bold text-slate-800 leading-none">{enq.studentName}</h3>
+                                      <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                                        {enq.enquiryId}
+                                      </span>
+                                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border tracking-wider ${enq.status === 'New Enquiry' ? 'bg-blue-50 border-blue-200 text-blue-700' :
                                         enq.status === 'Hold' ? 'bg-amber-50 border-amber-200 text-amber-700' :
                                           enq.status === 'Not Interested' ? 'bg-rose-50 border-rose-200 text-rose-700' :
                                             enq.status === 'Admission Confirmed' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' :
                                               'bg-slate-50 border-slate-200 text-slate-700'
-                                      }`}>
-                                      {enq.status === 'New Enquiry' ? 'NEW' : enq.status === 'Not Interested' ? 'REJECTED' : enq.status === 'Admission Confirmed' ? 'CONFIRMED' : enq.status.toUpperCase()}
-                                    </span>
+                                        }`}>
+                                        {enq.status === 'New Enquiry' ? 'NEW' : enq.status === 'Not Interested' ? 'REJECTED' : enq.status === 'Admission Confirmed' ? 'CONFIRMED' : enq.status.toUpperCase()}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-semibold">
+                                      <span>Class: <strong>{enq.classSeeking}</strong></span>
+                                      <span className="h-1 w-1 rounded-full bg-slate-300" />
+                                      <span>City: <strong>{enq.city}</strong></span>
+                                      <span className="h-1 w-1 rounded-full bg-slate-300" />
+                                      <span>Parent: <strong>{enq.parentName} ({enq.mobile})</strong></span>
+                                      <span className="h-1 w-1 rounded-full bg-slate-300" />
+                                      <span>Submitted: <strong>{enq.saveDate} {enq.saveTime}</strong></span>
+                                    </div>
                                   </div>
 
-                                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-semibold">
-                                    <span>Class: <strong>{enq.classSeeking}</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
-                                    <span>City: <strong>{enq.city}</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
-                                    <span>Parent: <strong>{enq.parentName} ({enq.mobile})</strong></span>
-                                    <span className="h-1 w-1 rounded-full bg-slate-300" />
-                                    <span>Submitted: <strong>{enq.saveDate} {enq.saveTime}</strong></span>
+                                  <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        setSelectedEnquiryForView(enq);
+                                        setViewModalOpen(true);
+                                      }}
+                                      className="border-slate-200 hover:bg-slate-100 text-slate-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
+                                    >
+                                      View Profile
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setSelectedEnquiryForAssessment(enq)}
+                                      className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
+                                    >
+                                      Assessments
+                                    </Button>
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 font-bold text-xs" onClick={(e) => e.stopPropagation()}>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setSelectedEnquiryForView(enq);
-                                      setViewModalOpen(true);
-                                    }}
-                                    className="border-slate-200 hover:bg-slate-100 text-slate-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
-                                  >
-                                    View Profile
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setSelectedEnquiryForAssessment(enq)}
-                                    className="border-indigo-200 hover:bg-indigo-50 text-indigo-700 h-7 px-2.5 text-[10px] font-bold rounded-lg transition-all"
-                                  >
-                                    Assessments
-                                  </Button>
+                                <div className="p-4">
+                                  <AdmissionJourneyTimeline
+                                    enquiry={enq}
+                                    stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+                                    onSaveJourney={(updatedJourney, journeyStatus, closedMetadata) => handleSaveJourney(enq._id, updatedJourney, journeyStatus, closedMetadata)}
+                                    counselorName={school?.name || 'Admin'}
+                                  />
                                 </div>
+
                               </div>
-
-                              <div className="p-4">
-                                <AdmissionJourneyTimeline
-                                  enquiry={enq}
-                                  stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-                                  onSaveJourney={(updatedJourney, journeyStatus, closedMetadata) => handleSaveJourney(enq._id, updatedJourney, journeyStatus, closedMetadata)}
-                                  counselorName={school?.name || 'Admin'}
-                                />
-                              </div>
-
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white border border-[#E8ECF3] px-5 py-3.5 rounded-xl card-flat">
-          <p className="text-xs font-medium text-gray-500">
-            Showing Page <span className="font-bold text-gray-800">{page}</span> of{' '}
-            <span className="font-bold text-gray-800">{totalPages}</span> ({totalRecords} records)
-          </p>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setPage(Math.max(1, page - 1))}
-              disabled={page === 1}
-              className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              onClick={() => setPage(Math.min(totalPages, page + 1))}
-              disabled={page === totalPages}
-              className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
+                            </td>
+                          </tr>
+                        )}
+                      </AnimatePresence>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Personalized Communication Modal */}
-      {messageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
-          >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                {messageType === 'whatsapp' ? (
-                  <MessageSquare size={18} className="text-emerald-600" />
-                ) : (
-                  <Mail size={18} className="text-blue-600" />
-                )}
-                Draft Personalized Message
-              </h3>
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between bg-white border border-[#E8ECF3] px-5 py-3.5 rounded-xl card-flat">
+            <p className="text-xs font-medium text-gray-500">
+              Showing Page <span className="font-bold text-gray-800">{page}</span> of{' '}
+              <span className="font-bold text-gray-800">{totalPages}</span> ({totalRecords} records)
+            </p>
+            <div className="flex items-center space-x-2">
               <button
-                onClick={() => setMessageModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                <X size={20} />
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="p-2 border border-[#E8ECF3] rounded-lg text-gray-500 hover:bg-[#7E63F6]/10 hover:text-[#7E63F6] hover:border-[#7E63F6]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight size={18} />
               </button>
             </div>
+          </div>
+        )}
 
-            <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Customize your template message below. Placeholders like{' '}
-                <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
-                  [Parent Name]
-                </code>
-                ,{' '}
-                <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
-                  [Student Name]
-                </code>
-                , and{' '}
-                <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
-                  [Enquiry ID]
-                </code>{' '}
-                will automatically populate with each contact's custom details.
-              </p>
+        {/* Personalized Communication Modal */}
+        {messageModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+            >
+              <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  {messageType === 'whatsapp' ? (
+                    <MessageSquare size={18} className="text-emerald-600" />
+                  ) : (
+                    <Mail size={18} className="text-blue-600" />
+                  )}
+                  Draft Personalized Message
+                </h3>
+                <button
+                  onClick={() => setMessageModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 font-bold"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
-              {/* Saved templates dropdown selection */}
-              {school?.communicationTemplates && school.communicationTemplates.filter(t => t.type === messageType).length > 0 && (
+              <div className="p-6 space-y-4">
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Customize your template message below. Placeholders like{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Parent Name]
+                  </code>
+                  ,{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Student Name]
+                  </code>
+                  , and{' '}
+                  <code className="bg-slate-100 text-indigo-600 px-1 py-0.5 rounded font-semibold">
+                    [Enquiry ID]
+                  </code>{' '}
+                  will automatically populate with each contact's custom details.
+                </p>
+
+                {/* Saved templates dropdown selection */}
+                {school?.communicationTemplates && school.communicationTemplates.filter(t => t.type === messageType).length > 0 && (
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <label className="block text-xs font-semibold text-slate-700 uppercase">
+                      Load Saved Template
+                    </label>
+                    <select
+                      onChange={(e) => {
+                        const selected = school?.communicationTemplates?.find(t => t._id === e.target.value);
+                        if (selected) {
+                          setMessageTemplate(selected.body);
+                        }
+                      }}
+                      className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    >
+                      <option value="">Select a saved template blueprint</option>
+                      {school?.communicationTemplates
+                        ?.filter(t => t.type === messageType)
+                        .map(t => (
+                          <option key={t._id} value={t._id}>{t.name}</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-1.5 text-left">
                   <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Load Saved Template
+                    Message Body
                   </label>
-                  <select
-                    onChange={(e) => {
-                      const selected = school?.communicationTemplates?.find(t => t._id === e.target.value);
-                      if (selected) {
-                        setMessageTemplate(selected.body);
-                      }
-                    }}
-                    className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  >
-                    <option value="">Select a saved template blueprint</option>
-                    {school?.communicationTemplates
-                      ?.filter(t => t.type === messageType)
-                      .map(t => (
-                        <option key={t._id} value={t._id}>{t.name}</option>
-                      ))
-                    }
-                  </select>
+                  <textarea
+                    value={messageTemplate}
+                    onChange={(e) => setMessageTemplate(e.target.value)}
+                    rows={5}
+                    className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  />
                 </div>
-              )}
 
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Message Body
-                </label>
-                <textarea
-                  value={messageTemplate}
-                  onChange={(e) => setMessageTemplate(e.target.value)}
-                  rows={5}
-                  className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                {/* Recipient list */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase text-left">
+                    Recipients ({selectedIds.length})
+                  </label>
+                  <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2 divide-y divide-slate-100 text-xs">
+                    {getSelectedEnquiriesDetails().map((enq) => (
+                      <div key={enq._id} className="py-2 flex items-center justify-between">
+                        <div className="text-left">
+                          <span className="font-semibold text-slate-800 block">
+                            {enq.parentName} ({enq.studentName})
+                          </span>
+                          <span className="text-[10px] text-slate-500">
+                            {messageType === 'whatsapp' ? enq.whatsapp || enq.mobile : enq.email || 'No email provided'}
+                          </span>
+                        </div>
+
+                        {messageType === 'whatsapp' ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => launchCommunication(enq)}
+                            className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-none px-2.5 py-1 text-[10px]"
+                          >
+                            Send WhatsApp
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => launchCommunication(enq)}
+                            className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none px-2.5 py-1 text-[10px]"
+                            isDisabled={!enq.email}
+                          >
+                            Send Email
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                {messageType === 'email' ? (
+                  <Button
+                    variant="primary"
+                    onClick={launchBulkEmail}
+                    className="bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                  >
+                    <Send size={16} className="mr-1.5" />
+                    BCC Mail All Recipients
+                  </Button>
+                ) : (
+                  <p className="text-[10px] text-slate-500 italic">
+                    Note: WhatsApp doesn't support bulk api links. Trigger each message separately.
+                  </p>
+                )}
+                <Button variant="outline" onClick={() => setMessageModalOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {selectedEnquiryForAssessment && (
+          <AssessmentPortalModal
+            enquiry={selectedEnquiryForAssessment}
+            onClose={() => setSelectedEnquiryForAssessment(null)}
+          />
+        )}
+
+        {/* Reusable Premium CRM Profile Modal */}
+        <CRMProfileModal
+          isOpen={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setSelectedEnquiryForView(null);
+          }}
+          data={selectedEnquiryForView}
+          type="school"
+          onEdit={() => {
+            setSelectedEnquiryForEdit(selectedEnquiryForView);
+            setEditStatus(selectedEnquiryForView.status);
+            setEditModalOpen(true);
+          }}
+          onConvert={async () => {
+            if (window.confirm("Are you sure you want to convert this enquiry to registered admission?")) {
+              await handleConvertAdmission(selectedEnquiryForView._id);
+              setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
+            }
+          }}
+          onSaveJourney={async (updatedJourney, journeyStatus, closedMetadata) => {
+            await handleSaveJourney(selectedEnquiryForView._id, updatedJourney, journeyStatus, closedMetadata);
+            setSelectedEnquiryForView(prev => ({
+              ...prev,
+              journey: updatedJourney,
+              journeyStatus: journeyStatus || prev.journeyStatus,
+              closedBy: closedMetadata ? closedMetadata.closedBy : (journeyStatus === 'ACTIVE' ? '' : prev.closedBy),
+              closedAt: closedMetadata ? closedMetadata.closedAt : (journeyStatus === 'ACTIVE' ? null : prev.closedAt),
+              closedStage: closedMetadata ? closedMetadata.closedStage : (journeyStatus === 'ACTIVE' ? '' : prev.closedStage),
+              status: ['Admission Confirmed', 'Rejected', 'Closed'].includes(updatedJourney[updatedJourney.length - 1].stage) ? updatedJourney[updatedJourney.length - 1].stage : prev.status
+            }));
+          }}
+          onAssessments={() => {
+            setSelectedEnquiryForAssessment(selectedEnquiryForView);
+          }}
+          schoolName={school?.name || 'Admin'}
+          stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
+        />
+
+        {/* Shared Reusable ContactModal */}
+        <ContactModal
+          isOpen={contactModalOpen}
+          onClose={() => {
+            setContactModalOpen(false);
+            setSelectedEnquiryForContact(null);
+          }}
+          data={selectedEnquiryForContact}
+          type="school"
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setEnquiryToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Enquiry"
+          itemType="enquiry"
+          itemInfo={enquiryToDelete ? {
+            'Enquiry ID': enquiryToDelete.enquiryId,
+            'Student Name': enquiryToDelete.studentName,
+            'Parent Name': enquiryToDelete.parentName,
+            'Class': enquiryToDelete.classSeeking,
+          } : {}}
+          isDeleting={isDeleting}
+        />
+
+        {/* Edit Enquiry Modal */}
+        {editModalOpen && selectedEnquiryForEdit && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-8"
+            >
+              <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <Edit size={20} className="text-indigo-600" />
+                  Edit Enquiry: {selectedEnquiryForEdit.studentName}
+                </h3>
+                <button
+                  onClick={() => {
+                    setEditModalOpen(false);
+                    setSelectedEnquiryForEdit(null);
+                  }}
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-6 max-h-[70vh] overflow-y-auto bg-slate-50/30">
+                <AdmissionForm
+                  initialData={selectedEnquiryForEdit}
+                  onSubmit={handleEditEnquiry}
+                  isLoading={saving}
+                  isPublic={false}
                 />
               </div>
 
-              {/* Recipient list */}
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700 uppercase text-left">
-                  Recipients ({selectedIds.length})
-                </label>
-                <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2 divide-y divide-slate-100 text-xs">
-                  {getSelectedEnquiriesDetails().map((enq) => (
-                    <div key={enq._id} className="py-2 flex items-center justify-between">
-                      <div className="text-left">
-                        <span className="font-semibold text-slate-800 block">
-                          {enq.parentName} ({enq.studentName})
-                        </span>
-                        <span className="text-[10px] text-slate-500">
-                          {messageType === 'whatsapp' ? enq.whatsapp || enq.mobile : enq.email || 'No email provided'}
-                        </span>
-                      </div>
-
-                      {messageType === 'whatsapp' ? (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => launchCommunication(enq)}
-                          className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-none px-2.5 py-1 text-[10px]"
-                        >
-                          Send WhatsApp
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => launchCommunication(enq)}
-                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none px-2.5 py-1 text-[10px]"
-                          isDisabled={!enq.email}
-                        >
-                          Send Email
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-              {messageType === 'email' ? (
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
                 <Button
-                  variant="primary"
-                  onClick={launchBulkEmail}
-                  className="bg-indigo-600 hover:bg-indigo-700 border-none text-white"
+                  variant="outline"
+                  onClick={() => {
+                    setEditModalOpen(false);
+                    setSelectedEnquiryForEdit(null);
+                  }}
                 >
-                  <Send size={16} className="mr-1.5" />
-                  BCC Mail All Recipients
+                  Cancel
                 </Button>
-              ) : (
-                <p className="text-[10px] text-slate-500 italic">
-                  Note: WhatsApp doesn't support bulk api links. Trigger each message separately.
-                </p>
-              )}
-              <Button variant="outline" onClick={() => setMessageModalOpen(false)}>
-                Close
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {selectedEnquiryForAssessment && (
-        <AssessmentPortalModal
-          enquiry={selectedEnquiryForAssessment}
-          onClose={() => setSelectedEnquiryForAssessment(null)}
-        />
-      )}
-
-      {/* Reusable Premium CRM Profile Modal */}
-      <CRMProfileModal
-        isOpen={viewModalOpen}
-        onClose={() => {
-          setViewModalOpen(false);
-          setSelectedEnquiryForView(null);
-        }}
-        data={selectedEnquiryForView}
-        type="school"
-        onEdit={() => {
-          setSelectedEnquiryForEdit(selectedEnquiryForView);
-          setEditStatus(selectedEnquiryForView.status);
-          setEditModalOpen(true);
-        }}
-        onConvert={async () => {
-          if (window.confirm("Are you sure you want to convert this enquiry to registered admission?")) {
-            await handleConvertAdmission(selectedEnquiryForView._id);
-            setSelectedEnquiryForView(prev => ({ ...prev, isConvertedToAdmission: true }));
-          }
-        }}
-        onSaveJourney={async (updatedJourney, journeyStatus, closedMetadata) => {
-          await handleSaveJourney(selectedEnquiryForView._id, updatedJourney, journeyStatus, closedMetadata);
-          setSelectedEnquiryForView(prev => ({
-            ...prev,
-            journey: updatedJourney,
-            journeyStatus: journeyStatus || prev.journeyStatus,
-            closedBy: closedMetadata ? closedMetadata.closedBy : (journeyStatus === 'ACTIVE' ? '' : prev.closedBy),
-            closedAt: closedMetadata ? closedMetadata.closedAt : (journeyStatus === 'ACTIVE' ? null : prev.closedAt),
-            closedStage: closedMetadata ? closedMetadata.closedStage : (journeyStatus === 'ACTIVE' ? '' : prev.closedStage),
-            status: ['Admission Confirmed', 'Rejected', 'Closed'].includes(updatedJourney[updatedJourney.length - 1].stage) ? updatedJourney[updatedJourney.length - 1].stage : prev.status
-          }));
-        }}
-        onAssessments={() => {
-          setSelectedEnquiryForAssessment(selectedEnquiryForView);
-        }}
-        schoolName={school?.name || 'Admin'}
-        stageOptions={['Call', 'WhatsApp', 'Email', 'Meeting', 'Campus Visit', 'Documents Requested', 'Documents Submitted', 'Registration Fee', 'Admission Confirmed', 'Rejected', 'Closed', 'Other']}
-      />
-
-      {/* Shared Reusable ContactModal */}
-      <ContactModal
-        isOpen={contactModalOpen}
-        onClose={() => {
-          setContactModalOpen(false);
-          setSelectedEnquiryForContact(null);
-        }}
-        data={selectedEnquiryForContact}
-        type="school"
-      />
-
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={deleteModalOpen}
-        onClose={() => {
-          setDeleteModalOpen(false);
-          setEnquiryToDelete(null);
-        }}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Enquiry"
-        itemType="enquiry"
-        itemInfo={enquiryToDelete ? {
-          'Enquiry ID': enquiryToDelete.enquiryId,
-          'Student Name': enquiryToDelete.studentName,
-          'Parent Name': enquiryToDelete.parentName,
-          'Class': enquiryToDelete.classSeeking,
-        } : {}}
-        isDeleting={isDeleting}
-      />
-
-      {/* Edit Enquiry Modal */}
-      {editModalOpen && selectedEnquiryForEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-4xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-8"
-          >
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <Edit size={20} className="text-indigo-600" />
-                Edit Enquiry: {selectedEnquiryForEdit.studentName}
-              </h3>
-              <button
-                onClick={() => {
-                  setEditModalOpen(false);
-                  setSelectedEnquiryForEdit(null);
-                }}
-                className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6 max-h-[70vh] overflow-y-auto bg-slate-50/30">
-              <AdmissionForm
-                initialData={selectedEnquiryForEdit}
-                onSubmit={handleEditEnquiry}
-                isLoading={saving}
-                isPublic={false}
-              />
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditModalOpen(false);
-                  setSelectedEnquiryForEdit(null);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

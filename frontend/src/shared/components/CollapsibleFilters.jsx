@@ -70,9 +70,8 @@ const CollapsibleFilters = ({
 
       {/* Row 2: Collapsible Filter Section */}
       <div
-        className={`overflow-hidden transition-all duration-225 ease-in-out ${
-          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`overflow-hidden transition-all duration-225 ease-in-out ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="pt-3">
           {children}

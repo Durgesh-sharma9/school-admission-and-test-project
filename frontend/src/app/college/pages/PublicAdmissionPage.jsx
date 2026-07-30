@@ -12,12 +12,12 @@ const PublicAdmissionPage = () => {
   const schoolId = params.schoolId || params.token || params.id;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [collegeInfo, setCollegeInfo] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [specializations, setSpecializations] = useState([]);
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,7 +73,7 @@ const PublicAdmissionPage = () => {
       try {
         setLoading(true);
         const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
-        
+
         const [infoRes, deptsRes, coursesRes, specsRes] = await Promise.all([
           axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`),
           axios.get(`${apiBaseUrl}/college/public/departments/${schoolId}`),
