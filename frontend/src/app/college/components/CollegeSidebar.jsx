@@ -61,32 +61,24 @@ const CollegeSidebar = ({ isOpen, toggleSidebar }) => {
         style={{ background: 'linear-gradient(180deg, #1B1E28 0%, #151720 100%)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-slate-800/60">
-          <div className="flex items-center space-x-3">
-            {school?.logo ? (
-              <img
-                src={school.logo}
-                alt="Logo"
-                className="h-9 w-9 rounded-lg object-cover bg-white p-0.5"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-9 w-9 bg-white/10 rounded-lg text-white border border-white/10">
-                <GraduationCap className="h-5 w-5" />
-              </div>
-            )}
-            <div className="flex flex-col truncate max-w-[150px] text-left">
-              <span className="font-bold text-sm tracking-wide text-white truncate">
-                {school?.name || 'College CRM'}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/60">
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="flex items-center justify-center h-11 w-11 bg-[#E91E63] rounded-lg text-white shadow-[0_4px_10px_rgba(233,30,99,0.3)] shrink-0">
+              <GraduationCap className="h-6 w-6" />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <span className="font-bold text-[18px] text-white leading-tight">
+                Admission CRM
               </span>
-              <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-                College Admin
+              <span className="text-[12px] text-slate-400 font-medium mt-0.5 leading-snug">
+                School & College Management Suite
               </span>
             </div>
           </div>
 
           <button
             onClick={toggleSidebar}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white lg:hidden cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white lg:hidden cursor-pointer shrink-0"
           >
             <X className="h-5 w-5" />
           </button>

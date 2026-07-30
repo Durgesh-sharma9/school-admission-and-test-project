@@ -178,9 +178,22 @@ const Dashboard = () => {
 
         {/* TOPBAR / HEADER - COMPACT */}
         <motion.div variants={itemVariants} className="bg-white rounded-xl p-3 md:p-4 shadow-sm border border-[#E8ECF3] flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="space-y-0.5">
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">{school?.name || 'Dashboard Overview'}</h1>
-            <p className="text-xs text-gray-500 font-medium">Pages / Dashboard</p>
+          <div className="flex items-center gap-[10px] md:gap-3 min-w-0">
+            {school?.logo ? (
+              <img
+                src={school.logo}
+                alt="Logo"
+                className="h-10 w-10 rounded-lg object-contain bg-white border border-[#ECECEC] shadow-xs p-0.5 shrink-0"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm border border-[#ECECEC] shadow-xs shrink-0">
+                {school?.name?.charAt(0) || 'S'}
+              </div>
+            )}
+            <div className="space-y-0.5 min-w-0 text-left">
+              <h1 className="text-xl font-bold text-gray-900 tracking-tight truncate">{school?.name || 'Dashboard Overview'}</h1>
+              <p className="text-xs text-gray-500 font-medium">Pages / Dashboard</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
