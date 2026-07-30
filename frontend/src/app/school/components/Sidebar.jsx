@@ -91,17 +91,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <X className="h-5 w-5" />
           </button>
         </div>
-
-        {/* Free Trial Banner */}
-        {school?.subscription?.plan === 'free-trial' && (
-          <div className="mx-4 mt-4 p-3 bg-white/5 rounded-lg border border-white/10 text-xs text-left">
-            <span className="font-semibold text-slate-350 block mb-0.5">Free Trial Mode</span>
-            <span className="text-slate-400">
-              Ends {new Date(school.subscription.trialEnd).toLocaleDateString()}
-            </span>
-          </div>
-        )}
-
         {/* Navigation Links */}
         <nav className="flex-1 px-4 py-4 space-y-0.5 overflow-y-auto">
           {menuItems.map((item) => {
@@ -131,7 +120,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </nav>
 
         {/* Footer info & Logout */}
-        <div className="p-4 border-t border-slate-800/60">
+        <div className="p-4 border-t border-slate-800/60 mt-auto shrink-0 space-y-3">
+          {school?.subscription?.plan === 'free-trial' && (
+            <div className="p-3 bg-white/5 rounded-lg border border-white/10 text-xs text-left">
+              <span className="font-semibold text-slate-350 block mb-0.5">Free Trial Mode</span>
+              <span className="text-slate-400">
+                Ends {new Date(school.subscription.trialEnd).toLocaleDateString()}
+              </span>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="w-full flex items-center px-4 py-2.5 text-xs font-semibold text-[#D1D5DB] rounded-[8px] hover:bg-white/6 hover:text-white transition-all cursor-pointer"

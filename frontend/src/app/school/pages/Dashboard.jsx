@@ -168,7 +168,7 @@ const Dashboard = () => {
   const sparkline2 = [{ v: 5 }, { v: 9 }, { v: 12 }, { v: 18 }, { v: 15 }, { v: 24 }, { v: 29 }];
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
+    <div className="min-h-screen bg-[#F9EEF3] px-3 md:px-5 lg:px-6 pb-6 pt-0 font-sans text-gray-800">
       <motion.div
         className="max-w-[1400px] mx-auto space-y-8"
         variants={containerVariants}

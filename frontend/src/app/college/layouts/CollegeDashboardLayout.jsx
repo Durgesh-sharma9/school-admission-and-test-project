@@ -42,7 +42,16 @@ const CollegeDashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex layout-content-area">
+      <style>{`
+        /* Target main layout and dashboard page backgrounds to have the CRM pink tint */
+        .layout-content-area,
+        .layout-content-area .min-h-screen,
+        .layout-content-area .bg-slate-50,
+        .layout-content-area .bg-gray-50 {
+          background-color: #F9EEF3 !important;
+        }
+      `}</style>
       {/* Sidebar navigation */}
       <CollegeSidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
