@@ -1,8 +1,9 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus } from 'lucide-react';
+import AutocompleteSelect, { CLASS_SEEKING_OPTIONS, PREVIOUS_CLASS_OPTIONS } from '../../../shared/components/AutocompleteSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router-dom';
 
@@ -76,6 +77,7 @@ const AdmissionForm = ({
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
     reset,
   } = useForm({
@@ -382,13 +384,21 @@ const AdmissionForm = ({
               {...register('dob', { required: 'Date of Birth is required' })}
             />
 
-            <Input
-              label="Class Seeking Admission"
+            <Controller
               name="classSeeking"
-              placeholder="e.g. Grade 5, Kindergarten"
-              required
-              error={errors.classSeeking}
-              {...register('classSeeking', { required: 'Admission class is required' })}
+              control={control}
+              rules={{ required: 'Admission class is required' }}
+              render={({ field }) => (
+                <AutocompleteSelect
+                  label="Class Seeking Admission"
+                  placeholder="Select admission class..."
+                  required
+                  error={errors.classSeeking}
+                  options={CLASS_SEEKING_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
 
             <Input
@@ -400,13 +410,21 @@ const AdmissionForm = ({
               {...register('previousSchool', { required: 'Previous school is required' })}
             />
 
-            <Input
-              label="Previous Class *"
+            <Controller
               name="previousClass"
-              placeholder="e.g. Grade 4"
-              required
-              error={errors.previousClass}
-              {...register('previousClass', { required: 'Previous class is required' })}
+              control={control}
+              rules={{ required: 'Previous class is required' }}
+              render={({ field }) => (
+                <AutocompleteSelect
+                  label="Previous Class *"
+                  placeholder="Select previous class..."
+                  required
+                  error={errors.previousClass}
+                  options={PREVIOUS_CLASS_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
         </div>
