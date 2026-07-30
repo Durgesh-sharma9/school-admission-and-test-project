@@ -6,6 +6,7 @@ import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
+import SearchableClassFilter from '../../../shared/components/SearchableClassFilter';
 import DeleteConfirmationModal from '../../../shared/components/DeleteConfirmationModal';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -620,19 +621,10 @@ const Enquiries = () => {
             placeholder="All Statuses"
           />
 
-          {/* Class Filter */}
-          <SelectFilter
+          <SearchableClassFilter
             label="Class Seeking"
             value={classFilter}
             onChange={setClassFilter}
-            options={[
-              { value: '', label: 'All Classes' },
-              ...['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map(c => ({
-                value: c,
-                label: `Class ${c}`
-              }))
-            ]}
-            placeholder="All Classes"
           />
 
           {/* Timeline Filter */}

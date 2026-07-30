@@ -17,6 +17,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import SearchableClassFilter from '../../../shared/components/SearchableClassFilter';
 
 import { useAuth } from '../contexts/AuthContext';
 import UpgradePage from '../../../shared/components/UpgradePage';
@@ -166,31 +167,11 @@ const AssessmentList = () => {
         </div>
 
         <div className="flex items-center gap-3 text-left">
-          <div className="relative">
-            <select
-              value={classFilter}
-              onChange={(e) => setClassFilter(e.target.value)}
-              className="appearance-none bg-white border border-[#E9EAF0] rounded-lg px-4 py-2.5 pr-8 text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#8B5CF6] focus:ring-4 focus:ring-[#8B5CF6]/15 transition-all cursor-pointer shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
-            >
-              <option value="">All Classes</option>
-              <option value="Nursery">Nursery</option>
-              <option value="LKG">LKG</option>
-              <option value="UKG">UKG</option>
-              <option value="1">Class 1</option>
-              <option value="2">Class 2</option>
-              <option value="3">Class 3</option>
-              <option value="4">Class 4</option>
-              <option value="5">Class 5</option>
-              <option value="6">Class 6</option>
-              <option value="7">Class 7</option>
-              <option value="8">Class 8</option>
-              <option value="9">Class 9</option>
-              <option value="10">Class 10</option>
-              <option value="11">Class 11</option>
-              <option value="12">Class 12</option>
-            </select>
-            <Filter className="h-4 w-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
+          <SearchableClassFilter
+            value={classFilter}
+            onChange={setClassFilter}
+            className="w-[180px]"
+          />
         </div>
       </div>
 
