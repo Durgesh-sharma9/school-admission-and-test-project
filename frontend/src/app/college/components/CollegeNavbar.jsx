@@ -77,7 +77,7 @@ const CollegeNavbar = ({ toggleSidebar, title }) => {
   const fetchPendingPendingTasksCount = fetchPendingTasksCount;
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-30 shadow-[0_3px_12px_rgba(236,72,153,0.08),0_1px_4px_rgba(15,23,42,0.04)] animate-[slide-down_0.3s_ease_both] transition-all duration-300">
       {/* Left section */}
       <div className="flex items-center space-x-3">
         <button

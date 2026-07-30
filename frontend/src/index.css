@@ -49,6 +49,37 @@ body {
   border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Premium Elevation System */
+.card-elevated {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.05),
+    0 12px 28px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 250ms ease, transform 250ms ease;
+}
+
+.card-elevated:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 8px rgba(15, 23, 42, 0.06),
+    0 8px 22px rgba(15, 23, 42, 0.10),
+    0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.card-flat {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.05);
+  transition: box-shadow 250ms ease, transform 250ms ease;
+}
+
+.card-flat:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.07),
+    0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
 /* Animation keyframes */
 @keyframes fade-in {
   from {

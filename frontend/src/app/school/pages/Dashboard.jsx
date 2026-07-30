@@ -177,7 +177,7 @@ const Dashboard = () => {
       >
 
         {/* TOPBAR / HEADER - COMPACT */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl p-3 md:p-4 shadow-sm border border-[#E8ECF3] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <motion.div variants={itemVariants} className="bg-white rounded-xl p-3 md:p-4 card-elevated border border-[#E8ECF3] flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex items-center gap-[10px] md:gap-3 min-w-0">
             {school?.logo ? (
               <img
@@ -224,7 +224,7 @@ const Dashboard = () => {
               <motion.div
                 key={card.title}
                 whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)" }}
-                className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-3 relative flex flex-col group transition-all duration-300"
+                className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-3 relative flex flex-col group"
               >
                 <div className="flex justify-between items-start">
                   {/* COMPACT FLOATING ICON */}
@@ -253,7 +253,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* ROW 2: CRM PIPELINE PROGRESS */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative mt-6">
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative mt-6">
           <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#7E63F6] to-[#9781F8] text-white flex justify-between items-center z-10">
             <div>
               <h6 className="text-sm font-bold tracking-wide">CRM Admission Funnel Pipeline</h6>
@@ -297,7 +297,7 @@ const Dashboard = () => {
         {/* ROW 3 & 4: CHARTS */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {/* Locality Chart */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#EE5EAA] to-[#F488C2] text-white flex justify-between items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Top Performing Locality</h6>
@@ -331,7 +331,7 @@ const Dashboard = () => {
           </div>
 
           {/* Class Demand Chart */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#5091F8] to-[#78AAF9] text-white flex justify-between items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Class-Wise Demand</h6>
@@ -362,7 +362,7 @@ const Dashboard = () => {
 
         {/* ROW 5: TRENDS & SOURCES */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <div className="lg:col-span-2 bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#34D06D] to-[#60DF8F] text-white flex justify-between items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Monthly Admission Trends</h6>
@@ -398,7 +398,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-5 pb-4 mt-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#F6A928] to-[#F8C15D] text-white flex items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Admission Sources</h6>
@@ -437,7 +437,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* ROW 5.5: TODAY'S FOLLOW-UPS */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm relative pt-12 px-0 pb-2 mt-8">
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-0 pb-2 mt-8">
           <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#25C5B5] to-[#53D7C9] text-white flex justify-between items-center z-10">
             <div>
               <h6 className="text-sm font-bold tracking-wide">Today's Follow-ups Reminders</h6>
@@ -500,7 +500,7 @@ const Dashboard = () => {
         {/* ROW 6, 7, 8: WIDGETS */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           {/* Audit Trail */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-4 space-y-4">
             <div className="flex items-center space-x-2.5">
               <div className="p-2 rounded-lg bg-[#EE5EAA]/10 text-[#EE5EAA]">
                 <Activity className="h-4 w-4" />
@@ -532,7 +532,7 @@ const Dashboard = () => {
           </div>
 
           {/* Pending Action Tasks */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-4 space-y-4">
             <div className="flex items-center space-x-2.5">
               <div className="p-2 rounded-lg bg-[#F6A928]/10 text-[#F6A928]">
                 <Clock className="h-4 w-4" />
@@ -566,7 +566,7 @@ const Dashboard = () => {
           </div>
 
           {/* Assessment Analytics */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-4 space-y-4 hover:shadow-md transition-shadow duration-300">
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-4 space-y-4">
             <div className="flex items-center space-x-2.5">
               <div className="p-2 rounded-lg bg-[#5091F8]/10 text-[#5091F8]">
                 <Award className="h-4 w-4" />
@@ -606,7 +606,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* ROW 9: SUBSCRIPTION BANNER */}
-        <motion.div variants={itemVariants} className="bg-gradient-to-r from-[#111827] via-[#1f2937] to-[#111827] rounded-xl p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden mt-4">
+        <motion.div variants={itemVariants} className="bg-gradient-to-r from-[#111827] via-[#1f2937] to-[#111827] rounded-xl p-5 card-flat flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden mt-4">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-48 h-48 rounded-full bg-[#7E63F6] opacity-20 blur-3xl pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-48 h-48 rounded-full bg-[#EE5EAA] opacity-20 blur-3xl pointer-events-none"></div>
 
@@ -636,7 +636,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* ROW 10: QUICK ACTIONS DOCK */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] shadow-sm p-5 space-y-4 hover:shadow-md transition-shadow duration-300">
+        <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-5 space-y-4">
           <h3 className="text-sm font-bold text-gray-900">Quick Operational Dock</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
             {[
