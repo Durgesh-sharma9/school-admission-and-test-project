@@ -3,58 +3,43 @@ import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import {
   Check, X, ShieldAlert, Award, Calendar, CreditCard, Sparkles,
-  Zap, Users, FileText, QrCode, Bell, BarChart3, ClipboardCheck,
-  GraduationCap, Trophy, TrendingUp, Star
+  Zap, Clock
 } from 'lucide-react';
-import Button from '../../../shared/components/Button';
 import schoolApi from '../services/schoolApi';
 
-// ─── Feature Icon Map ──────────────────────────────────────────────────────────
-const featureIcons = {
-  'Student CRM': { icon: Users, color: '#8B5CF6' },
-  'Admission Management': { icon: GraduationCap, color: '#E91E63' },
-  'Parent Portal': { icon: Users, color: '#3B82F6' },
-  'Reports': { icon: BarChart3, color: '#F59E0B' },
-  'QR Forms': { icon: QrCode, color: '#14B8A6' },
-  'Notifications': { icon: Bell, color: '#22C55E' },
-  'Assessments': { icon: ClipboardCheck, color: '#E91E63' },
-  'Test Analytics': { icon: TrendingUp, color: '#8B5CF6' },
-  'Ranking': { icon: Trophy, color: '#F59E0B' },
-  'Assessment Reports': { icon: FileText, color: '#3B82F6' },
-  'Future Assessment Features': { icon: Star, color: '#14B8A6' },
-};
-
-// ─── Static Plan Definitions ────────────────────────────────────────────────
+// ─── Exact Image Match Plan Definitions ──────────────────────────────────────
 const SCHOOL_PLAN_META = {
   'school-basic': {
-    badge: 'POPULAR',
-    badgeColor: 'bg-blue-50 text-blue-600 border-blue-100',
+    badge: null,
     price: '₹1,999',
-    period: '/ Year',
-    highlight: false,
+    period: '/ year',
+    subtitle: 'Ideal for growing institutes',
+    buttonClass: 'bg-[#1E293B] hover:bg-slate-800 text-white',
+    cardClass: 'border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]',
     featuresDisplay: [
-      { label: 'Student CRM', enabled: true },
-      { label: 'Admission Management', enabled: true },
-      { label: 'Parent Portal', enabled: true },
-      { label: 'Reports', enabled: true },
-      { label: 'QR Forms', enabled: true },
-      { label: 'Notifications', enabled: true },
-      { label: 'Assessments', enabled: false },
+      { label: 'Up to 200 Students', enabled: true },
+      { label: 'Parent Portal Access', enabled: true },
+      { label: 'Daily Test Management', enabled: true },
+      { label: 'Easy Plan Upgrade', enabled: true },
+      { label: 'Email support', enabled: true },
+      { label: 'Assessments & Analytics', enabled: false },
     ],
   },
   'school-premium': {
-    badge: 'BEST VALUE',
-    badgeColor: 'bg-pink-50 text-[#E91E63] border-pink-100',
+    badge: 'MOST POPULAR',
+    badgeClass: 'bg-[#8B5CF6] text-white',
     price: '₹2,999',
-    period: '/ Year',
-    highlight: true,
+    period: '/ year',
+    subtitle: 'Ideal for growing institutes',
+    buttonClass: 'bg-[#8B5CF6] hover:bg-purple-600 text-white',
+    cardClass: 'border-2 border-[#8B5CF6] shadow-[0_8px_30px_rgb(139,92,246,0.12)]',
     featuresDisplay: [
-      { label: 'Everything in Basic', enabled: true, isSub: false },
-      { label: 'Assessments', enabled: true },
-      { label: 'Test Analytics', enabled: true },
-      { label: 'Ranking', enabled: true },
-      { label: 'Assessment Reports', enabled: true },
-      { label: 'Future Assessment Features', enabled: true },
+      { label: 'Up to 500 Students', enabled: true },
+      { label: 'Ideal for Growing Schools', enabled: true },
+      { label: 'Priority Email Support', enabled: true },
+      { label: 'Flexible Upgrade Options', enabled: true },
+      { label: 'Parents portal & download result', enabled: true },
+      { label: 'Full Assessment Suite', enabled: true },
     ],
   },
 };
@@ -62,85 +47,37 @@ const SCHOOL_PLAN_META = {
 // ─── Purchase Confirmation Modal ─────────────────────────────────────────────
 const PurchaseModal = ({ plan, planMeta, onConfirm, onClose, isLoading }) => {
   if (!plan) return null;
-  const meta = planMeta[plan.planCode] || {};
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
-      <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-        style={{ animation: 'scale-in 0.2s ease-out' }}
-      >
-        {/* Modal Header */}
-        <div className="bg-gradient-to-r from-[#E91E63] to-[#F43F7A] p-5 text-white">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <Zap className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-sm">Confirm Purchase Request</h3>
-              <p className="text-[11px] opacity-80 mt-0.5">Your request will be sent for approval</p>
-            </div>
-          </div>
-        </div>
+  const meta = planMeta[plan.planCode] || SCHOOL_PLAN_META['school-basic'];
 
-        {/* Plan Summary */}
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden" style={{ animation: 'scale-in 0.2s ease-out' }}>
+        <div className="bg-[#8B5CF6] p-5 text-white">
+          <h3 className="font-bold text-lg">Confirm Purchase</h3>
+          <p className="text-xs opacity-90 mt-0.5">Your request will be sent for approval</p>
+        </div>
         <div className="p-5 space-y-4">
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan Selected</span>
               <span className="text-sm font-extrabold text-slate-800">{plan.planName}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Price</span>
-              <span className="text-sm font-extrabold text-[#E91E63]">{meta.price} {meta.period}</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pricing</span>
+              <span className="text-base font-black text-slate-800">{meta.price} <span className="text-xs text-slate-500 font-medium">{meta.period}</span></span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Billing</span>
-              <span className="text-xs font-bold text-slate-700">Annual Subscription</span>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Included Features</p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {(meta.featuresDisplay || []).filter(f => f.enabled).map((feat, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-700">
-                  <Check className="h-3 w-3 text-emerald-500 shrink-0" />
-                  {feat.label}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Status Note */}
-          <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-100 rounded-xl p-3">
-            <div className="h-6 w-6 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-              <span className="text-amber-700 text-xs">⏳</span>
-            </div>
-            <p className="text-[11px] font-semibold text-amber-700">
-              After submission, your request will show as <strong>Pending Approval</strong> until reviewed by our team.
-            </p>
           </div>
         </div>
-
-        {/* Actions */}
         <div className="px-5 pb-5 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors"
-          >
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors">
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 py-2.5 rounded-xl bg-[#E91E63] hover:bg-[#D81B60] text-white font-extrabold text-xs transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center justify-center gap-2"
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm text-white transition-all flex items-center justify-center disabled:opacity-60 bg-[#8B5CF6] hover:bg-purple-600`}
           >
-            {isLoading ? (
-              <><div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Submitting...</>
-            ) : (
-              'Request Purchase'
-            )}
+            {isLoading ? 'Processing...' : 'Request Plan'}
           </button>
         </div>
       </div>
@@ -148,119 +85,65 @@ const PurchaseModal = ({ plan, planMeta, onConfirm, onClose, isLoading }) => {
   );
 };
 
-// ─── Plan Card Component ──────────────────────────────────────────────────────
-const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, activeSince, expiryDate, onBuy }) => {
-  const meta = planMeta[plan.planCode] || {};
-  const isHighlighted = meta.highlight;
+// ─── Exact Plan Card Component ───────────────────────────────────────────────
+const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) => {
+  const meta = planMeta[plan.planCode] || SCHOOL_PLAN_META['school-basic'];
 
   return (
-    <div
-      className={`relative bg-white rounded-2xl flex flex-col overflow-hidden transition-all duration-250 ${
-        isHighlighted
-          ? 'border-2 border-[#E91E63] shadow-[0_8px_32px_rgba(233,30,99,0.15)] hover:-translate-y-2 hover:shadow-[0_16px_40px_rgba(233,30,99,0.2)]'
-          : 'border border-[#E8ECF3] shadow-[0_4px_20px_rgba(15,23,42,0.06)] hover:-translate-y-2 hover:shadow-[0_12px_32px_rgba(15,23,42,0.1)]'
-      }`}
-    >
-      {/* Highlight Glow */}
-      {isHighlighted && (
-        <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px rgba(233,30,99,0.1)' }} />
+    <div className={`relative bg-white rounded-2xl flex flex-col w-[320px] transition-transform duration-300 hover:-translate-y-1 ${meta.cardClass}`}>
+
+      {/* Top Overlapping Badge */}
+      {meta.badge && (
+        <div className="absolute -top-3.5 w-full flex justify-center">
+          <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm ${meta.badgeClass}`}>
+            {meta.badge}
+          </span>
+        </div>
       )}
 
-      {/* Card Body */}
-      <div className="p-6 flex-1 flex flex-col">
-
-        {/* Badge + Name */}
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${meta.badgeColor || 'bg-slate-50 text-slate-500 border-slate-100'}`}>
-              {meta.badge || plan.planCode}
-            </span>
-            <h3 className="text-lg font-extrabold text-slate-800 mt-2 leading-tight">{plan.planName}</h3>
+      <div className="p-8 pb-6 flex-1 flex flex-col">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h3 className="text-[22px] font-bold text-[#1E293B]">{plan.planName}</h3>
+          <div className="mt-4 flex items-baseline justify-center">
+            <span className="text-[40px] font-black text-[#0F172A] leading-none tracking-tight">{meta.price || `₹${plan.price}`}</span>
+            <span className="text-sm font-medium text-slate-500 ml-1">{meta.period}</span>
           </div>
-          {isHighlighted && (
-            <div className="h-9 w-9 rounded-xl bg-[#E91E63]/10 flex items-center justify-center">
-              <Star className="h-4.5 w-4.5 text-[#E91E63]" fill="currentColor" />
-            </div>
-          )}
+          <p className="text-xs text-slate-500 mt-3 pb-6 border-b border-slate-100">{meta.subtitle}</p>
         </div>
-
-        {/* Price */}
-        <div className="flex items-baseline gap-1 mb-5">
-          <span className={`text-3xl font-black ${isHighlighted ? 'text-[#E91E63]' : 'text-slate-800'}`}>
-            {meta.price || `₹${plan.price}`}
-          </span>
-          <span className="text-xs text-slate-400 font-semibold">{meta.period || '/ Year'}</span>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-[#E8ECF3] mb-4" />
 
         {/* Features */}
-        <div className="space-y-2.5 flex-1">
-          {(meta.featuresDisplay || plan.features.map(f => ({ label: f, enabled: true }))).map((feat, idx) => {
-            const iconMeta = featureIcons[feat.label];
-            const IconComp = iconMeta?.icon || Check;
-            return (
-              <div key={idx} className={`flex items-center gap-2.5 text-xs font-semibold ${feat.enabled ? 'text-slate-700' : 'text-slate-400'}`}>
-                {feat.enabled ? (
-                  <div className="h-5 w-5 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${iconMeta?.color || '#22C55E'}15` }}>
-                    <Check className="h-3 w-3" style={{ color: iconMeta?.color || '#22C55E' }} />
-                  </div>
-                ) : (
-                  <div className="h-5 w-5 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
-                    <X className="h-3 w-3 text-rose-400" />
-                  </div>
-                )}
-                <span>{feat.label}</span>
-              </div>
-            );
-          })}
+        <div className="space-y-4 flex-1">
+          {(meta.featuresDisplay || plan.features.map(f => ({ label: f, enabled: true }))).map((feat, idx) => (
+            <div key={idx} className="flex items-center gap-3">
+              {feat.enabled ? (
+                <Check className="h-4 w-4 text-[#10B981] shrink-0" strokeWidth={3} />
+              ) : (
+                <Check className="h-4 w-4 text-slate-200 shrink-0" strokeWidth={3} />
+              )}
+              <span className={`text-[13px] ${feat.enabled ? 'text-slate-600 font-medium' : 'text-slate-400'}`}>
+                {feat.label}
+              </span>
+            </div>
+          ))}
         </div>
 
-        {/* Current Plan Info */}
-        {isCurrent && (activeSince || expiryDate) && (
-          <div className="mt-4 bg-emerald-50 border border-emerald-100 rounded-xl p-3 space-y-1">
-            {activeSince && (
-              <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-700">
-                <Calendar className="h-3 w-3" />
-                Activated: {new Date(activeSince).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </div>
-            )}
-            {expiryDate && (
-              <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-700">
-                <Calendar className="h-3 w-3" />
-                Expires: {new Date(expiryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* CTA Button */}
-      <div className="px-6 pb-6">
-        {isCurrent ? (
-          <div className="w-full py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-extrabold text-xs text-center flex items-center justify-center gap-2">
-            <Check className="h-3.5 w-3.5" /> Current Plan
-          </div>
-        ) : (
-          <button
-            onClick={() => onBuy(plan)}
-            disabled={isPending || isLoading}
-            className={`w-full py-2.5 rounded-xl font-extrabold text-xs transition-all duration-200 flex items-center justify-center gap-2 ${
-              isHighlighted
-                ? 'bg-[#E91E63] hover:bg-[#D81B60] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
-                : 'bg-slate-800 hover:bg-slate-900 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5'
-            } disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none`}
-          >
-            {isLoading ? (
-              <><div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
-            ) : isPending ? (
-              '⏳ Pending Approval'
-            ) : (
-              'Buy Plan'
-            )}
-          </button>
-        )}
+        {/* Button */}
+        <div className="mt-8">
+          {isCurrent ? (
+            <div className="w-full py-3 rounded-xl border border-[#10B981] text-[#10B981] bg-white font-semibold text-sm flex items-center justify-center gap-2">
+              <Check className="h-4 w-4" strokeWidth={2.5} /> Current Plan
+            </div>
+          ) : (
+            <button
+              onClick={() => onBuy(plan)}
+              disabled={isPending || isLoading}
+              className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${meta.buttonClass} disabled:opacity-60`}
+            >
+              {isLoading ? 'Processing...' : isPending ? '⏳ Pending Approval' : 'View Details'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -269,13 +152,10 @@ const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, activeSince
 // ─── Main Component ────────────────────────────────────────────────────────────
 const Subscription = () => {
   const { school, updateSchoolState } = useAuth();
-
   const [plans, setPlans] = useState([]);
   const [currentSub, setCurrentSub] = useState(null);
-  const [activePlanDetails, setActivePlanDetails] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [lastProcessedRequest, setLastProcessedRequest] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [requestingCode, setRequestingCode] = useState(null);
   const [modalPlan, setModalPlan] = useState(null);
@@ -288,20 +168,13 @@ const Subscription = () => {
     setLoading(true);
     try {
       const plansRes = await schoolApi.get('/plans/public?organizationType=school');
-      if (plansRes.success || plansRes.plans) {
-        setPlans(plansRes.plans || []);
-      }
-
+      if (plansRes.success || plansRes.plans) setPlans(plansRes.plans || []);
       const subRes = await schoolApi.get('/subscription/current');
       if (subRes.success) {
         setCurrentSub(subRes.subscription);
-        setActivePlanDetails(subRes.plan);
         setPendingRequest(subRes.pendingRequest);
         setLastProcessedRequest(subRes.lastProcessedRequest);
-
-        if (updateSchoolState && school) {
-          updateSchoolState({ ...school, subscription: subRes.subscription });
-        }
+        if (updateSchoolState && school) updateSchoolState({ ...school, subscription: subRes.subscription });
       }
     } catch (error) {
       console.error('Failed to fetch subscription data:', error);
@@ -331,8 +204,7 @@ const Subscription = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="h-9 w-9 border-[3px] border-[#E91E63] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-semibold text-slate-500">Loading subscription portal...</span>
+        <div className="h-8 w-8 border-4 border-[#8B5CF6] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -342,138 +214,98 @@ const Subscription = () => {
   const isTrial = plan === 'free-trial';
   const trialEnd = currentSub?.trialEnd ? new Date(currentSub.trialEnd) : null;
   const expiryDate = currentSub?.expiryDate ? new Date(currentSub.expiryDate) : null;
-  const startDate = currentSub?.startDate ? new Date(currentSub.startDate) : null;
-
-  const isSubscriptionActive = isTrial
-    ? (trialEnd && trialEnd >= new Date())
-    : (status === 'active' && expiryDate && expiryDate >= new Date());
+  const isSubscriptionActive = isTrial ? (trialEnd && trialEnd >= new Date()) : (status === 'active' && expiryDate && expiryDate >= new Date());
 
   return (
-    <div className="min-h-screen pb-16">
-      {/* ── Hero Header ─────────────────────────────────────────────────── */}
-      <div className="text-center pt-8 pb-10 px-4">
-        <div className="inline-flex items-center gap-2 bg-pink-50 border border-pink-100 text-[#E91E63] text-[11px] font-extrabold uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-4">
-          <Zap className="h-3.5 w-3.5" />
-          School Subscription Plans
-        </div>
-        <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight leading-tight">
-          Choose Your Perfect Plan
-        </h1>
-        <p className="text-slate-500 text-sm font-medium mt-2.5 max-w-md mx-auto">
-          Select the best subscription for your institution and unlock premium CRM features.
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#F8FAFC] pb-10 flex flex-col justify-between">
 
-      {/* ── Rejection Alert ──────────────────────────────────────────────── */}
-      {lastProcessedRequest && lastProcessedRequest.status === 'rejected' && !pendingRequest && (
-        <div className="max-w-2xl mx-auto px-4 mb-6">
-          <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-start gap-3">
-            <div className="h-8 w-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-              <ShieldAlert className="h-4 w-4" />
+      <div>
+        {/* ── Exact Header ────────────────────────────────────────────────────── */}
+        <div className="text-center pt-8 pb-10 px-4">
+          <h1 className="text-3xl md:text-[32px] font-bold text-[#A855F7] tracking-tight">
+            Choose the Perfect Plan
+          </h1>
+          <p className="text-slate-500 text-[13px] mt-2 max-w-md mx-auto">
+            Scale your school's records management with yearly plans.
+          </p>
+        </div>
+
+        {/* ── Alerts ──────────────────────────────────────────────────────────── */}
+        <div className="max-w-3xl mx-auto px-4 mb-6 flex flex-col gap-3">
+          {lastProcessedRequest && lastProcessedRequest.status === 'rejected' && !pendingRequest && (
+            <div className="bg-rose-50 border border-rose-100 rounded-xl p-3 flex items-center gap-3">
+              <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0" />
+              <div>
+                <h4 className="text-xs font-bold text-rose-800">Request Rejected: "{lastProcessedRequest.planCode}"</h4>
+              </div>
             </div>
-            <div>
-              <h4 className="text-xs font-extrabold text-rose-800 uppercase tracking-wide">Request Rejected</h4>
-              <p className="text-xs text-rose-700 font-semibold mt-0.5">
-                Your request for "{lastProcessedRequest.planCode.replace(/-/g, ' ').toUpperCase()}" was rejected.
-              </p>
-              {lastProcessedRequest.remarks && (
-                <p className="text-xs text-rose-600 italic mt-1.5 font-medium bg-rose-100/50 px-3 py-2 rounded-lg border border-rose-100">
-                  Reason: "{lastProcessedRequest.remarks}"
-                </p>
-              )}
+          )}
+          {pendingRequest && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-amber-600" />
+                <p className="text-xs font-bold text-amber-800">Request for "{pendingRequest.planCode}" is under review.</p>
+              </div>
+              <span className="bg-amber-500 text-white font-bold text-[9px] uppercase px-2 py-0.5 rounded-md">Pending</span>
             </div>
+          )}
+        </div>
+
+        {/* ── Centered Plan Cards ────────────────────────────────────────────────── */}
+        <div className="max-w-4xl mx-auto px-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-8 lg:gap-12">
+            {plans.map((p) => {
+              const isCurrent = plan === p.planCode && isSubscriptionActive;
+              return (
+                <PlanCard
+                  key={p._id}
+                  plan={p}
+                  planMeta={SCHOOL_PLAN_META}
+                  isCurrent={isCurrent}
+                  isPending={!!pendingRequest}
+                  isLoading={requestingCode === p.planCode}
+                  onBuy={(selectedPlan) => setModalPlan(selectedPlan)}
+                />
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* ── Current Subscription Status ──────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4 mb-8">
-        <div className="bg-white border border-[#E8ECF3] rounded-2xl shadow-[0_4px_20px_rgba(15,23,42,0.06)] overflow-hidden">
-          {/* Status bar accent */}
-          <div className={`h-1 w-full ${isSubscriptionActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
-          <div className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Current Subscription</h3>
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
-                isSubscriptionActive
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                  : 'bg-rose-50 text-rose-700 border-rose-100'
+      {/* ── Full Detailed Bottom Section ────────────────────────────────────────── */}
+      <div className="max-w-4xl mx-auto px-4 w-full">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+          <div className={`absolute top-0 left-0 h-1 w-full ${isSubscriptionActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Current Subscription Details</h3>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${isSubscriptionActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
               }`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${isSubscriptionActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                {isSubscriptionActive ? 'Active' : 'Inactive'}
-              </span>
-            </div>
+              <span className={`h-1.5 w-1.5 rounded-full ${isSubscriptionActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+              {isSubscriptionActive ? 'Active' : 'Inactive'}
+            </span>
+          </div>
 
-            {!isSubscriptionActive ? (
-              <div className="flex flex-col items-center justify-center py-4 text-center space-y-2">
-                <div className="h-10 w-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
-                  <ShieldAlert className="h-5 w-5" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'Current Plan', value: plan.replace(/-/g, ' '), icon: Award, color: 'text-purple-600', bg: 'bg-purple-50' },
+              { label: 'Status', value: status === 'active' ? 'Active' : 'Suspended', icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: isTrial ? 'Trial Ends' : 'Expires On', value: isTrial ? (trialEnd?.toLocaleDateString('en-IN') || 'N/A') : (expiryDate?.toLocaleDateString('en-IN') || 'N/A'), icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Assessments', value: currentSub?.assessmentEnabled ? 'Enabled' : 'Disabled', icon: Sparkles, color: currentSub?.assessmentEnabled ? 'text-emerald-600' : 'text-slate-400', bg: currentSub?.assessmentEnabled ? 'bg-emerald-50' : 'bg-slate-100' },
+            ].map(({ label, value, icon: Icon, color, bg }) => (
+              <div key={label} className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center mb-3 ${bg}`}>
+                  <Icon className={`h-4 w-4 ${color}`} />
                 </div>
-                <p className="font-extrabold text-slate-700 text-xs">No Active Plan</p>
-                <p className="text-xs text-slate-400 font-medium max-w-xs">Your trial or subscription has expired. Choose a plan below to continue.</p>
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{label}</span>
+                <p className="font-extrabold text-slate-800 text-sm capitalize mt-0.5 truncate">{value}</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: 'Current Plan', value: plan.replace(/-/g, ' '), icon: Award, color: '#E91E63' },
-                  { label: 'Status', value: status === 'active' ? 'Active' : 'Suspended', icon: CreditCard, color: '#22C55E' },
-                  { label: isTrial ? 'Trial Ends' : 'Expires On', value: isTrial ? (trialEnd?.toLocaleDateString('en-IN') || 'N/A') : (expiryDate?.toLocaleDateString('en-IN') || 'N/A'), icon: Calendar, color: '#F59E0B' },
-                  { label: 'Assessments', value: currentSub?.assessmentEnabled ? 'Enabled' : 'Disabled', icon: Sparkles, color: currentSub?.assessmentEnabled ? '#22C55E' : '#94A3B8' },
-                ].map(({ label, value, icon: Icon, color }) => (
-                  <div key={label} className="bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-2">
-                    <div className="h-7 w-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
-                      <Icon className="h-3.5 w-3.5" style={{ color }} />
-                    </div>
-                    <div>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">{label}</span>
-                      <p className="font-extrabold text-slate-800 text-xs capitalize mt-0.5">{value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Pending Request Banner */}
-            {pendingRequest && (
-              <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-extrabold text-amber-800 uppercase tracking-wide">⏳ Upgrade Pending</p>
-                  <p className="text-[11px] text-amber-700 font-medium mt-0.5">
-                    Your request for "{pendingRequest.planCode.replace(/-/g, ' ').toUpperCase()}" is under review.
-                  </p>
-                </div>
-                <span className="bg-amber-100 border border-amber-200 text-amber-800 font-extrabold text-[10px] uppercase px-2.5 py-1 rounded-full shrink-0">
-                  Pending
-                </span>
-              </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ── Plan Cards ────────────────────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
-          {plans.map((p) => {
-            const isCurrent = plan === p.planCode && isSubscriptionActive;
-            return (
-              <PlanCard
-                key={p._id}
-                plan={p}
-                planMeta={SCHOOL_PLAN_META}
-                isCurrent={isCurrent}
-                isPending={!!pendingRequest}
-                isLoading={requestingCode === p.planCode}
-                activeSince={isCurrent ? startDate : null}
-                expiryDate={isCurrent ? expiryDate : null}
-                onBuy={(selectedPlan) => setModalPlan(selectedPlan)}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Purchase Confirmation Modal ────────────────────────────────────── */}
+      {/* ── Modals & Animations ─────────────────────────────────────────── */}
       {modalPlan && (
         <PurchaseModal
           plan={modalPlan}
