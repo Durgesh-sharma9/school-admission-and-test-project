@@ -125,13 +125,13 @@ const LandingPage = () => {
           <div className="flex items-center justify-between h-16">
             <motion.div
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-3.5"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
-                <GraduationCap className="w-4 h-4 text-white" />
+              <div className="w-11 h-11 bg-white rounded-lg flex items-center justify-center shadow-sm p-0 overflow-hidden">
+                <img src="/logo.png" alt="Campus Flow Logo" className="w-full h-full object-contain scale-[1.3]" />
               </div>
-              <span className="text-lg font-black bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent tracking-tight">
-                CampusCRM
+              <span className="text-lg font-black bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent tracking-tight uppercase">
+                CAMPUS FLOW
               </span>
             </motion.div>
 
@@ -646,9 +646,11 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 relative z-10">
 
           <div className="col-span-2 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md"><GraduationCap className="w-4 h-4 text-white" /></div>
-              <span className="text-sm font-black text-white tracking-tight">CampusCRM</span>
+            <div className="flex items-center space-x-3.5">
+              <div className="w-11 h-11 bg-white rounded-lg flex items-center justify-center shadow-sm p-0 overflow-hidden">
+                <img src="/logo.png" alt="Campus Flow Logo" className="w-full h-full object-contain scale-[1.3]" />
+              </div>
+              <span className="text-sm font-black text-white tracking-tight uppercase">CAMPUS FLOW</span>
             </div>
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed max-w-xs">
               SaaS education CRM platform coordinates applicant follow-ups, schedules entrance assessments, and records receipts efficiently.
@@ -681,7 +683,7 @@ const LandingPage = () => {
             <ul className="space-y-3 font-semibold text-slate-400">
               <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-blue-500" />
-                <a href="mailto:support@campuscrm.app" className="hover:text-white transition-colors">support@campuscrm.app</a>
+                <a href="mailto:support@campusflow.app" className="hover:text-white transition-colors">support@campusflow.app</a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-emerald-500" />
@@ -697,7 +699,7 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 font-bold text-[10px] relative z-10">
-          <p>© 2026 CampusCRM. All rights reserved.</p>
+          <p>© 2026 CAMPUS FLOW. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Systems Operational</span>
             <span>·</span><span>v2.5.0</span>
