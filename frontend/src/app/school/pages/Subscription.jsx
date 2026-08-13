@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 import {
   Check, X, ShieldAlert, Award, Calendar, CreditCard, Sparkles,
   Zap, Clock
@@ -164,6 +165,7 @@ const Subscription = () => {
   const [loading, setLoading] = useState(true);
   const [requestingCode, setRequestingCode] = useState(null);
   const [modalPlan, setModalPlan] = useState(null);
+  const [downgradeDialog, setDowngradeDialog] = useState(null); // { planCode, planName, expiryDate }
 
   useEffect(() => {
     fetchData();
@@ -202,6 +204,7 @@ const Subscription = () => {
   const handleBuyPlan = async (planCode) => {
     setRequestingCode(planCode);
     setModalPlan(null);
+    setDowngradeDialog(null);
     try {
       const response = await schoolApi.post('/subscription/create-razorpay-order', { planCode });
       if (!response.success || !response.orderId) {
@@ -229,9 +232,7 @@ const Subscription = () => {
           email: school?.email || '',
           contact: school?.phone || ''
         },
-        theme: {
-          color: '#8B5CF6'
-        },
+        theme: { color: '#8B5CF6' },
         handler: async function (paymentRes) {
           setLoading(true);
           try {
@@ -242,7 +243,28 @@ const Subscription = () => {
               planCode
             });
             if (verifyRes.success) {
-              toast.success('Plan activated successfully!');
+              // 🎉 Party popper confetti burst!
+              confetti({
+                particleCount: 180, spread: 100, origin: { y: 0.55 },
+                colors: ['#8B5CF6', '#A855F7', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899'],
+                ticks: 300, zIndex: 9999
+              });
+              setTimeout(() => {
+                confetti({ particleCount: 80, angle: 60, spread: 70, origin: { x: 0, y: 0.6 }, colors: ['#8B5CF6', '#10B981', '#F59E0B'], zIndex: 9999 });
+                confetti({ particleCount: 80, angle: 120, spread: 70, origin: { x: 1, y: 0.6 }, colors: ['#8B5CF6', '#10B981', '#EC4899'], zIndex: 9999 });
+              }, 250);
+
+              if (verifyRes.needsDowngradeChoice) {
+                // Payment done ✅ — now ask what to do with assessment
+                toast.success('🎉 Payment confirmed! One more step...');
+                setDowngradeDialog({
+                  planCode,
+                  planName: verifyRes.newPlanName || planName,
+                  expiryDate: verifyRes.currentPlanExpiry ? new Date(verifyRes.currentPlanExpiry) : null,
+                });
+              } else {
+                toast.success('🎉 Plan activated successfully! Welcome aboard!');
+              }
               fetchData();
             } else {
               toast.error(verifyRes.message || 'Payment verification failed');
@@ -255,9 +277,7 @@ const Subscription = () => {
           }
         },
         modal: {
-          ondismiss: () => {
-            toast.error('Payment cancelled');
-          }
+          ondismiss: () => { toast.error('Payment cancelled'); }
         }
       };
 
@@ -270,6 +290,21 @@ const Subscription = () => {
       setRequestingCode(null);
     }
   };
+
+  // Called when user picks their downgrade choice after payment
+  const handleDowngradeChoice = async (choice) => {
+    try {
+      const res = await schoolApi.post('/subscription/confirm-downgrade-choice', { choice });
+      if (res.success) {
+        toast.success(choice === 'now' ? '✅ Assessment removed. New plan is active!' : '✅ Assessment stays until your current plan expires.');
+        setDowngradeDialog(null);
+        fetchData();
+      }
+    } catch (err) {
+      toast.error('Failed to confirm choice. Please try again.');
+    }
+  };
+
 
   if (loading) {
     return (
@@ -375,7 +410,7 @@ const Subscription = () => {
         </div>
       </div>
 
-      {/* ── Modals & Animations ─────────────────────────────────────────── */}
+      {/* ── Purchase Modal ─────────────────────────────────────────── */}
       {modalPlan && (
         <PurchaseModal
           plan={modalPlan}
@@ -384,6 +419,68 @@ const Subscription = () => {
           onConfirm={() => handleBuyPlan(modalPlan.planCode)}
           onClose={() => setModalPlan(null)}
         />
+      )}
+
+      {/* ── Downgrade Assessment Choice Dialog (shown AFTER payment) ─── */}
+      {downgradeDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" style={{ animation: 'scale-in 0.2s ease-out' }}>
+            {/* Header */}
+            <div className="bg-amber-500 p-5 text-white">
+              <div className="flex items-center gap-3 mb-1">
+                <Sparkles className="h-5 w-5" />
+                <h3 className="font-bold text-base">Payment Successful! 🎉</h3>
+              </div>
+              <p className="text-xs opacity-90">You have an active assessment plan. When should we switch?</p>
+            </div>
+
+            <div className="p-5 space-y-3">
+              <p className="text-xs text-slate-500 font-medium">
+                Your assessment plan is active until{' '}
+                <strong className="text-slate-700">{downgradeDialog.expiryDate?.toLocaleDateString('en-IN')}</strong>.
+                You've purchased <strong>"{downgradeDialog.planName}"</strong> (no assessment) — choose when to switch:
+              </p>
+
+              {/* Option A: Keep assessment until current plan expires */}
+              <button
+                onClick={() => handleDowngradeChoice('after_expiry')}
+                className="w-full text-left p-4 border-2 border-emerald-200 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 rounded-xl transition-all"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-emerald-800 text-sm">Keep Assessment Until Plan Expires</p>
+                    <p className="text-xs text-emerald-600 mt-0.5">
+                      Assessment stays active until <strong>{downgradeDialog.expiryDate?.toLocaleDateString('en-IN')}</strong>.
+                      "{downgradeDialog.planName}" activates automatically after. <strong>+1 year</strong> validity added.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Option B: Remove assessment right now */}
+              <button
+                onClick={() => handleDowngradeChoice('now')}
+                className="w-full text-left p-4 border-2 border-rose-200 bg-rose-50 hover:border-rose-400 hover:bg-rose-100 rounded-xl transition-all"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 h-5 w-5 rounded-full bg-rose-500 flex items-center justify-center shrink-0">
+                    <X className="h-3 w-3 text-white" strokeWidth={3} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-rose-800 text-sm">Remove Assessment Right Now</p>
+                    <p className="text-xs text-rose-600 mt-0.5">
+                      Assessment stops now. "{downgradeDialog.planName}" activates today with fresh <strong>1-year validity</strong>.
+                      Remaining time on current plan is forfeited.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <style>{`

@@ -85,116 +85,116 @@ const Payments = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Today's Revenue */}
-        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-4 shadow-md flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                <IndianRupee className="w-6 h-6 text-emerald-400" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <IndianRupee className="w-5 h-5 text-emerald-400" />
               </div>
-              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-extrabold uppercase">Live today</span>
+              <span className="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-extrabold uppercase">Live today</span>
             </div>
-            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Today's Revenue</p>
-            <p className="text-3xl font-black text-white tracking-tight">{formatINR(stats.todayRevenue)}</p>
+            <p className="text-slate-400 text-[10px] mb-0.5 font-bold uppercase tracking-wider">Today's Revenue</p>
+            <p className="text-2xl font-black text-white tracking-tight">{formatINR(stats.todayRevenue)}</p>
           </div>
         </div>
 
         {/* Monthly Revenue */}
-        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-4 shadow-md flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
-                <CreditCard className="w-6 h-6 text-indigo-400" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                <CreditCard className="w-5 h-5 text-indigo-400" />
               </div>
-              <span className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded font-extrabold uppercase">30-day window</span>
+              <span className="text-[9px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 rounded font-extrabold uppercase">30-day window</span>
             </div>
-            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Monthly Revenue</p>
-            <p className="text-3xl font-black text-white tracking-tight">{formatINR(stats.monthlyRevenue)}</p>
+            <p className="text-slate-400 text-[10px] mb-0.5 font-bold uppercase tracking-wider">Monthly Revenue</p>
+            <p className="text-2xl font-black text-white tracking-tight">{formatINR(stats.monthlyRevenue)}</p>
           </div>
         </div>
 
         {/* Pending Payments */}
-        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-4 shadow-md flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
-                <Clock className="w-6 h-6 text-amber-400" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
+                <Clock className="w-5 h-5 text-amber-400" />
               </div>
-              <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded font-extrabold uppercase">Awaiting review</span>
+              <span className="text-[9px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded font-extrabold uppercase">Awaiting review</span>
             </div>
-            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Pending Payments</p>
-            <p className="text-3xl font-black text-white tracking-tight">{stats.pendingPayments} <span className="text-sm text-slate-500 font-normal">Txns</span></p>
+            <p className="text-slate-400 text-[10px] mb-0.5 font-bold uppercase tracking-wider">Pending Payments</p>
+            <p className="text-2xl font-black text-white tracking-tight">{stats.pendingPayments} <span className="text-xs text-slate-500 font-normal">Txns</span></p>
           </div>
         </div>
       </div>
 
       {/* Payment History Table */}
       <div className="bg-slate-800/40 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-        <div className="p-6 border-b border-slate-700/60 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white tracking-wide">Payment History</h2>
-          <span className="px-2 py-0.5 bg-slate-900 border border-slate-700 text-[10px] text-indigo-400 font-bold rounded-md uppercase tracking-wider">Historical Log</span>
+        <div className="p-4 border-b border-slate-700/60 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-white tracking-wide">Payment History</h2>
+          <span className="px-2 py-0.5 bg-slate-900 border border-slate-700 text-[9px] text-indigo-400 font-bold rounded-md uppercase tracking-wider">Historical Log</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-slate-300">
-            <thead className="bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
+            <thead className="bg-slate-900/60 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
               <tr>
-                <th className="px-6 py-4">Institution / Organization</th>
-                <th className="px-6 py-4">Subscription Plan</th>
-                <th className="px-6 py-4">Amount Paid</th>
-                <th className="px-6 py-4">Method</th>
-                <th className="px-6 py-4">Billing Cycle</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment Date</th>
-                <th className="px-6 py-4">Transaction ID</th>
+                <th className="px-4 py-2">Institution / Organization</th>
+                <th className="px-4 py-2">Subscription Plan</th>
+                <th className="px-4 py-2">Amount Paid</th>
+                <th className="px-4 py-2">Method</th>
+                <th className="px-4 py-2">Billing Cycle</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Payment Date</th>
+                <th className="px-4 py-2">Transaction ID</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/50">
               {payments.length > 0 ? (
                 payments.map((payment) => (
                   <tr key={payment._id} className="hover:bg-slate-700/30 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${payment.school?.institutionType === 'college' ? 'bg-emerald-600/10 text-emerald-400' : 'bg-blue-600/10 text-blue-400'}`}>
-                          <CreditCard className="w-4 h-4" />
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <div className="flex items-center space-x-2.5">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${payment.school?.institutionType === 'college' ? 'bg-emerald-600/10 text-emerald-400' : 'bg-blue-600/10 text-blue-400'}`}>
+                          <CreditCard className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                          <p className="font-bold text-white">{payment.school?.name || 'Unknown School'}</p>
-                          <span className={`px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded ${payment.school?.institutionType === 'college' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                          <p className="font-bold text-white text-xs leading-tight">{payment.school?.name || 'Unknown School'}</p>
+                          <span className={`px-1 py-0.2 text-[8px] font-extrabold uppercase rounded ${payment.school?.institutionType === 'college' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'}`}>
                             {payment.school?.institutionType || 'school'}
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 font-semibold">
+                    <td className="px-4 py-2 whitespace-nowrap text-slate-300 text-xs font-semibold">
                       {payment.plan?.planName || payment.plan?.name || 'Starter / Pro'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-black text-white">
+                    <td className="px-4 py-2 whitespace-nowrap font-black text-white text-xs">
                       {formatINR(payment.amount)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 capitalize text-xs font-semibold">
+                    <td className="px-4 py-2 whitespace-nowrap text-slate-400 capitalize text-[11px] font-semibold">
                       {payment.paymentMethod ? payment.paymentMethod.replace('_', ' ') : 'Card'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 capitalize text-xs font-semibold">
+                    <td className="px-4 py-2 whitespace-nowrap text-slate-400 capitalize text-[11px] font-semibold">
                       {payment.billingCycle || 'Yearly'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border flex items-center gap-1.5 w-fit ${getStatusColor(payment.status)}`}>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider border flex items-center gap-1 w-fit ${getStatusColor(payment.status)}`}>
                         {getStatusIcon(payment.status)}
                         {payment.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-medium">
+                    <td className="px-4 py-2 whitespace-nowrap text-[11px] text-slate-400 font-medium">
                       {payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date(payment.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-mono font-bold tracking-wide">
+                    <td className="px-4 py-2 whitespace-nowrap text-[11px] text-slate-400 font-mono font-bold tracking-wide">
                       {payment.transactionId || '-'}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center text-slate-400 font-semibold">
+                  <td colSpan="8" className="px-4 py-8 text-center text-slate-455 font-semibold text-xs">
                     No payment transactions recorded in the platform ledger.
                   </td>
                 </tr>

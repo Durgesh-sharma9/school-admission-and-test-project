@@ -191,19 +191,19 @@ const SchoolPlans = () => {
     <div className="max-w-5xl mx-auto pb-12">
 
       {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-2 bg-pink-50 border border-pink-100 text-[#E91E63] text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-2">
+          <div className="inline-flex items-center gap-1.5 bg-pink-500/10 border border-pink-500/20 text-pink-400 text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full mb-1.5">
             <Settings className="h-3 w-3" /> Plan Configuration
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">School CRM Plans</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">
+          <h1 className="text-xl font-bold text-white tracking-tight">School CRM Plans</h1>
+          <p className="text-slate-400 text-xs mt-0.5">
             Configure prices, features, and statuses for School subscriptions.
           </p>
         </div>
         <button
           onClick={fetchPlans}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xs hover:bg-slate-700 hover:text-white transition shadow-md"
         >
           <RefreshCw className="h-3.5 w-3.5" /> Refresh
         </button>

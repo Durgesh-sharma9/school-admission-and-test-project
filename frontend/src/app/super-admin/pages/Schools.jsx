@@ -194,52 +194,52 @@ const Schools = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
+              <thead className="bg-slate-900/60 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
                 <tr>
-                  <th className="px-6 py-4">School</th>
-                  <th className="px-6 py-4">Contact Email</th>
-                  <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">Plan</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Joined</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-4 py-2">School</th>
+                  <th className="px-4 py-2">Contact Email</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Plan</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Joined</th>
+                  <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/50">
                 {schools.length > 0 ? (
                   schools.map((school) => (
                     <tr key={school._id} className="hover:bg-slate-700/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <div className="flex items-center space-x-3">
                           {school.logo ? (
-                            <img src={school.logo} alt={school.name} className="w-9 h-9 rounded-lg object-contain bg-white p-1" />
+                            <img src={school.logo} alt={school.name} className="w-8 h-8 rounded-lg object-contain bg-white p-1" />
                           ) : (
-                            <div className="w-9 h-9 bg-indigo-600/20 rounded-lg flex items-center justify-center">
-                              <Building2 className="w-5 h-5 text-indigo-400" />
+                            <div className="w-8 h-8 bg-indigo-600/20 rounded-lg flex items-center justify-center">
+                              <Building2 className="w-4 h-4 text-indigo-400" />
                             </div>
                           )}
                           <div>
-                            <p className="font-bold text-white leading-tight">{school.name}</p>
-                            <p className="text-xs text-slate-400">{school.address || 'Address not set'}</p>
+                            <p className="font-bold text-white leading-tight text-xs">{school.name}</p>
+                            <p className="text-[10px] text-slate-400">{school.address || 'Address not set'}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-300">{school.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">{school.phone || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-900 text-indigo-400 border border-slate-700">
+                      <td className="px-4 py-2 whitespace-nowrap font-medium text-slate-300 text-xs">{school.email}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-slate-300 text-xs">{school.phone || 'N/A'}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-indigo-400 border border-slate-700">
                           {school.subscription?.plan || 'Free Trial'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${getStatusBadgeClass(school.subscription?.status)}`}>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadgeClass(school.subscription?.status)}`}>
                           {school.subscription?.status || 'active'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-medium">
+                      <td className="px-4 py-2 whitespace-nowrap text-[11px] text-slate-400 font-medium">
                         {new Date(school.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                      <td className="px-4 py-2 whitespace-nowrap text-right space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"

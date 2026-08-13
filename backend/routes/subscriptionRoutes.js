@@ -7,7 +7,8 @@ const {
   approveSubscriptionRequest,
   rejectSubscriptionRequest,
   createRazorpayOrder,
-  verifyRazorpayPayment
+  verifyRazorpayPayment,
+  confirmDowngradeChoice
 } = require('../controllers/subscriptionController');
 const { protect, protectSuperAdmin } = require('../middleware/auth');
 
@@ -16,6 +17,8 @@ router.get('/current', protect, getCurrentSubscription);
 router.post('/request', protect, changePlan);
 router.post('/create-razorpay-order', protect, createRazorpayOrder);
 router.post('/verify-razorpay-payment', protect, verifyRazorpayPayment);
+router.post('/confirm-downgrade-choice', protect, confirmDowngradeChoice);
+
 
 // --- Super Admin endpoints ---
 router.get('/requests', protectSuperAdmin, getSubscriptionRequests);

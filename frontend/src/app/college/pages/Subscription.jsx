@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../school/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 import {
   Check, X, ShieldAlert, Award, Calendar, CreditCard, Sparkles,
   Zap, Clock
@@ -241,7 +242,34 @@ const Subscription = () => {
               planCode
             });
             if (verifyRes.success) {
-              toast.success('Plan activated successfully!');
+              // 🎉 Party popper confetti burst!
+              confetti({
+                particleCount: 180,
+                spread: 100,
+                origin: { y: 0.55 },
+                colors: ['#8B5CF6', '#A855F7', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899'],
+                ticks: 300,
+                zIndex: 9999
+              });
+              setTimeout(() => {
+                confetti({
+                  particleCount: 80,
+                  angle: 60,
+                  spread: 70,
+                  origin: { x: 0, y: 0.6 },
+                  colors: ['#8B5CF6', '#10B981', '#F59E0B'],
+                  zIndex: 9999
+                });
+                confetti({
+                  particleCount: 80,
+                  angle: 120,
+                  spread: 70,
+                  origin: { x: 1, y: 0.6 },
+                  colors: ['#8B5CF6', '#10B981', '#EC4899'],
+                  zIndex: 9999
+                });
+              }, 250);
+              toast.success('🎉 Plan activated successfully! Welcome aboard!');
               fetchData();
             } else {
               toast.error(verifyRes.message || 'Payment verification failed');

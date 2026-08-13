@@ -14,6 +14,26 @@ exports.getCurrentSubscription = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Organization not found' });
     }
 
+    // ── Auto-activate pending plan if its scheduled date has arrived ──────────
+    const sub = school.subscription;
+    if (sub?.pendingPlan?.plan && sub.pendingPlan.activateAfterExpiry && sub.pendingPlan.scheduledActivateAt) {
+      const now = new Date();
+      const scheduledAt = new Date(sub.pendingPlan.scheduledActivateAt);
+      if (now >= scheduledAt) {
+        school.subscription = {
+          ...sub,
+          plan: sub.pendingPlan.plan,
+          status: 'active',
+          startDate: now,
+          expiryDate: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+          assessmentEnabled: !!sub.pendingPlan.assessmentEnabled,
+          pendingPlan: { plan: null, assessmentEnabled: false, activateAfterExpiry: false, scheduledActivateAt: null },
+        };
+        await school.save();
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     // Get current plan details
     let planDetails = null;
     const planCode = school.subscription?.plan || 'free-trial';
@@ -299,7 +319,8 @@ exports.createRazorpayOrder = async (req, res) => {
 // Razorpay Payment Verification
 exports.verifyRazorpayPayment = async (req, res) => {
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, planCode } = req.body;
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, planCode, downgradeChoice } = req.body;
+    // downgradeChoice: 'now' | 'after_expiry' — only relevant when downgrading from assessment plan
     const school = await School.findById(req.school._id);
 
     if (!school) {
@@ -323,19 +344,96 @@ exports.verifyRazorpayPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Payment verification failed. Signature mismatch.' });
     }
 
-    // Update School/College Subscription details
-    school.subscription = {
-      plan: planCode,
-      status: 'active',
-      startDate: new Date(),
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 365 days
-      assessmentEnabled: plan.assessmentEnabled,
-      trialStart: school.subscription?.trialStart || new Date(),
-      trialEnd: school.subscription?.trialEnd || new Date(),
-    };
+    const currentSub = school.subscription || {};
+    const currentHasAssessment = !!currentSub.assessmentEnabled;
+    const newHasAssessment = !!plan.assessmentEnabled;
+    const currentExpiry = currentSub.expiryDate ? new Date(currentSub.expiryDate) : null;
+    const now = new Date();
+    const remainingMs = currentExpiry && currentExpiry > now ? (currentExpiry - now) : 0;
+
+    // ── CASE 1: UPGRADE (new plan has assessment, old doesn't) ────────────────
+    // Apply new plan immediately. If old plan had remaining time, queue it as basic extension after new plan
+    if (newHasAssessment && !currentHasAssessment && remainingMs > 0) {
+      const newExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      school.subscription = {
+        ...currentSub,
+        plan: planCode,
+        status: 'active',
+        startDate: now,
+        expiryDate: newExpiry,
+        assessmentEnabled: true,
+        // Queue old plan (basic) to continue after new plan ends
+        pendingPlan: {
+          plan: currentSub.plan || 'school-basic',
+          assessmentEnabled: false,
+          activateAfterExpiry: true,
+          scheduledActivateAt: newExpiry,
+        },
+      };
+
+    // ── CASE 2: DOWNGRADE (current plan has assessment, new doesn't) ─────────
+    } else if (currentHasAssessment && !newHasAssessment && remainingMs > 0) {
+      // Payment accepted. Queue new plan after expiry by default.
+      // Frontend will show choice dialog AFTER payment success.
+      const futureNewExpiry = new Date(currentExpiry.getTime() + 365 * 24 * 60 * 60 * 1000);
+      school.subscription = {
+        ...currentSub,
+        // Current assessment plan stays running
+        pendingPlan: {
+          plan: planCode,
+          assessmentEnabled: false,
+          activateAfterExpiry: true,
+          scheduledActivateAt: currentExpiry,
+        },
+      };
+
+      await school.save();
+
+      await Payment.create({
+        school: school._id,
+        plan: plan._id,
+        amount: plan.price || 0,
+        currency: 'INR',
+        status: 'completed',
+        paymentMethod: 'upi',
+        transactionId: razorpay_payment_id,
+        billingCycle: plan.billingCycle || 'yearly',
+        paidAt: now,
+        nextBillingDate: futureNewExpiry
+      });
+
+      await createNotification(
+        school._id,
+        'Payment Successful — Plan Queued',
+        `Payment for "${plan.planName}" received. Your current assessment plan continues until ${currentExpiry.toLocaleDateString()}. "${plan.planName}" will activate automatically after that.`,
+        'subscription_approved'
+      );
+
+      // Return special flag — frontend will show post-payment choice dialog
+      return res.json({
+        success: true,
+        needsDowngradeChoice: true,
+        currentPlanExpiry: currentExpiry,
+        newPlanName: plan.planName,
+        message: 'Payment confirmed!'
+      });
+
+    // ── CASE 3: NORMAL (same type, or no assessment either side) ─────────────
+    } else {
+      school.subscription = {
+        ...currentSub,
+        plan: planCode,
+        status: 'active',
+        startDate: now,
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        assessmentEnabled: newHasAssessment,
+        pendingPlan: { plan: null, assessmentEnabled: false, activateAfterExpiry: false, scheduledActivateAt: null },
+      };
+    }
+
     await school.save();
 
-    // Create completed payment record
+    // Create payment record
     await Payment.create({
       school: school._id,
       plan: plan._id,
@@ -345,15 +443,14 @@ exports.verifyRazorpayPayment = async (req, res) => {
       paymentMethod: 'upi',
       transactionId: razorpay_payment_id,
       billingCycle: plan.billingCycle || 'yearly',
-      paidAt: new Date(),
+      paidAt: now,
       nextBillingDate: school.subscription.expiryDate
     });
 
-    // Notify Client Admin
     await createNotification(
       school._id,
       'Subscription Activated',
-      `Congratulations! Your subscription request for "${plan.planName}" has been successfully paid and activated. Your plan is active until ${new Date(school.subscription.expiryDate).toLocaleDateString()}.`,
+      `Congratulations! Your subscription for "${plan.planName}" has been activated. ${newHasAssessment ? 'Assessments are now enabled.' : ''} Your plan is active until ${new Date(school.subscription.expiryDate).toLocaleDateString()}.`,
       'subscription_approved'
     );
 
@@ -366,3 +463,73 @@ exports.verifyRazorpayPayment = async (req, res) => {
     res.status(500).json({ success: false, message: error.message || 'Payment verification failed' });
   }
 };
+
+// @desc  Confirm downgrade assessment choice AFTER payment
+// @route POST /api/v1/subscription/confirm-downgrade-choice
+// @access School/College Admin
+exports.confirmDowngradeChoice = async (req, res) => {
+  try {
+    const { choice } = req.body; // 'now' | 'after_expiry'
+    const school = await School.findById(req.school._id);
+    if (!school) return res.status(404).json({ success: false, message: 'Organization not found' });
+
+    const sub = school.subscription;
+    const pendingPlanCode = sub?.pendingPlan?.plan;
+    if (!pendingPlanCode) {
+      return res.status(400).json({ success: false, message: 'No pending downgrade plan found' });
+    }
+
+    if (choice === 'now') {
+      // Switch immediately: remove assessment, activate new plan now
+      school.subscription = {
+        ...sub,
+        plan: pendingPlanCode,
+        status: 'active',
+        startDate: new Date(),
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        assessmentEnabled: false,
+        pendingPlan: { plan: null, assessmentEnabled: false, activateAfterExpiry: false, scheduledActivateAt: null },
+      };
+      await school.save();
+      return res.json({ success: true, message: 'Assessment removed. New plan is now active.' });
+    } else {
+      // Keep current plan: pendingPlan already set correctly (after_expiry)
+      // Nothing to change — just confirm
+      return res.json({ success: true, message: 'Got it! Assessment will remain active until your current plan expires.' });
+    }
+  } catch (error) {
+    console.error('Confirm downgrade choice error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+// Auto-activate pending plan if current plan has expired
+exports.activatePendingPlanIfDue = async (schoolId) => {
+  try {
+    const school = await School.findById(schoolId);
+    if (!school) return;
+    const sub = school.subscription;
+    if (!sub?.pendingPlan?.plan || !sub.pendingPlan.activateAfterExpiry) return;
+
+    const now = new Date();
+    const scheduledAt = sub.pendingPlan.scheduledActivateAt ? new Date(sub.pendingPlan.scheduledActivateAt) : null;
+
+    if (scheduledAt && now >= scheduledAt) {
+      // Activate the queued plan
+      school.subscription = {
+        ...sub,
+        plan: sub.pendingPlan.plan,
+        status: 'active',
+        startDate: now,
+        expiryDate: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+        assessmentEnabled: !!sub.pendingPlan.assessmentEnabled,
+        pendingPlan: { plan: null, assessmentEnabled: false, activateAfterExpiry: false, scheduledActivateAt: null },
+      };
+      await school.save();
+    }
+  } catch (err) {
+    console.error('Pending plan activation check failed:', err);
+  }
+};
+

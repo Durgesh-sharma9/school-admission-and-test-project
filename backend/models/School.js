@@ -168,6 +168,13 @@ const schoolSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    // Queued plan to activate after current plan expires (for upgrade/downgrade)
+    pendingPlan: {
+      plan: { type: String, default: null },
+      assessmentEnabled: { type: Boolean, default: false },
+      activateAfterExpiry: { type: Boolean, default: false }, // if true, activate after current expiryDate
+      scheduledActivateAt: { type: Date, default: null },     // the date after which this plan should activate
+    },
   },
 
   // QR settings

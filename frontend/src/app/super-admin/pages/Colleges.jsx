@@ -194,52 +194,52 @@ const Colleges = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
+              <thead className="bg-slate-900/60 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
                 <tr>
-                  <th className="px-6 py-4">College</th>
-                  <th className="px-6 py-4">Contact Email</th>
-                  <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">Plan</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Joined</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-4 py-2">College</th>
+                  <th className="px-4 py-2">Contact Email</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Plan</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Joined</th>
+                  <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/50">
                 {colleges.length > 0 ? (
                   colleges.map((college) => (
                     <tr key={college._id} className="hover:bg-slate-700/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <div className="flex items-center space-x-3">
                           {college.logo ? (
-                            <img src={college.logo} alt={college.name} className="w-9 h-9 rounded-lg object-contain bg-white p-1" />
+                            <img src={college.logo} alt={college.name} className="w-8 h-8 rounded-lg object-contain bg-white p-1" />
                           ) : (
-                            <div className="w-9 h-9 bg-emerald-600/20 rounded-lg flex items-center justify-center">
-                              <GraduationCap className="w-5 h-5 text-emerald-400" />
+                            <div className="w-8 h-8 bg-emerald-600/20 rounded-lg flex items-center justify-center">
+                              <GraduationCap className="w-4 h-4 text-emerald-400" />
                             </div>
                           )}
                           <div>
-                            <p className="font-bold text-white leading-tight">{college.name}</p>
-                            <p className="text-xs text-slate-400">{college.address || 'Address not set'}</p>
+                            <p className="font-bold text-white leading-tight text-xs">{college.name}</p>
+                            <p className="text-[10px] text-slate-400">{college.address || 'Address not set'}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-300">{college.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-300">{college.phone || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-900 text-indigo-400 border border-slate-700">
+                      <td className="px-4 py-2 whitespace-nowrap font-medium text-slate-300 text-xs">{college.email}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-slate-300 text-xs">{college.phone || 'N/A'}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-indigo-400 border border-slate-700">
                           {college.subscription?.plan || 'Free Trial'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${getStatusBadgeClass(college.subscription?.status)}`}>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadgeClass(college.subscription?.status)}`}>
                           {college.subscription?.status || 'active'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-medium">
+                      <td className="px-4 py-2 whitespace-nowrap text-[11px] text-slate-400 font-medium">
                         {new Date(college.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                      <td className="px-4 py-2 whitespace-nowrap text-right space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"
