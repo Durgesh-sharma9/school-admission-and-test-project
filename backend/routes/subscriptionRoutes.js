@@ -5,13 +5,17 @@ const {
   changePlan,
   getSubscriptionRequests,
   approveSubscriptionRequest,
-  rejectSubscriptionRequest
+  rejectSubscriptionRequest,
+  createRazorpayOrder,
+  verifyRazorpayPayment
 } = require('../controllers/subscriptionController');
 const { protect, protectSuperAdmin } = require('../middleware/auth');
 
 // --- School / College Admin endpoints ---
 router.get('/current', protect, getCurrentSubscription);
 router.post('/request', protect, changePlan);
+router.post('/create-razorpay-order', protect, createRazorpayOrder);
+router.post('/verify-razorpay-payment', protect, verifyRazorpayPayment);
 
 // --- Super Admin endpoints ---
 router.get('/requests', protectSuperAdmin, getSubscriptionRequests);

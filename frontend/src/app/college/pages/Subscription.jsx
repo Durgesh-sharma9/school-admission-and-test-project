@@ -63,7 +63,10 @@ const PurchaseModal = ({ plan, planMeta, onConfirm, onClose, isLoading }) => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pricing</span>
-              <span className="text-base font-black text-slate-800">{meta.price} <span className="text-xs text-slate-500 font-medium">{meta.period}</span></span>
+              <span className="text-base font-black text-slate-800">
+                {plan.price !== undefined ? `₹${new Intl.NumberFormat('en-IN').format(plan.price)}` : meta.price}{' '}
+                <span className="text-xs text-slate-500 font-medium">{meta.period}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -105,7 +108,9 @@ const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) =>
         <div className="text-center mb-6">
           <h3 className="text-[22px] font-bold text-[#1E293B]">{plan.planName}</h3>
           <div className="mt-4 flex items-baseline justify-center">
-            <span className="text-[40px] font-black text-[#0F172A] leading-none tracking-tight">{meta.price || `₹${plan.price}`}</span>
+            <span className="text-[40px] font-black text-[#0F172A] leading-none tracking-tight">
+              {plan.price !== undefined ? `₹${new Intl.NumberFormat('en-IN').format(plan.price)}` : meta.price}
+            </span>
             <span className="text-sm font-medium text-slate-500 ml-1">{meta.period}</span>
           </div>
           <p className="text-xs text-slate-500 mt-3 pb-6 border-b border-slate-100">{meta.subtitle}</p>
@@ -183,18 +188,83 @@ const Subscription = () => {
     }
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleBuyPlan = async (planCode) => {
     setRequestingCode(planCode);
     setModalPlan(null);
     try {
-      const response = await schoolApi.post('/subscription/request', { planCode });
-      if (response.success) {
-        toast.success(response.message || 'Subscription request submitted successfully!');
-        fetchData();
+      const response = await schoolApi.post('/subscription/create-razorpay-order', { planCode });
+      if (!response.success || !response.orderId) {
+        throw new Error(response.message || 'Failed to create payment order');
       }
+
+      const { orderId, amount, keyId, planName } = response;
+
+      const loaded = await loadRazorpayScript();
+      if (!loaded) {
+        toast.error('Razorpay SDK failed to load. Are you connected to the internet?');
+        setRequestingCode(null);
+        return;
+      }
+
+      const options = {
+        key: keyId,
+        amount: amount,
+        currency: 'INR',
+        name: 'College Admission CRM',
+        description: `Upgrade to ${planName}`,
+        order_id: orderId,
+        prefill: {
+          name: school?.name || '',
+          email: school?.email || '',
+          contact: school?.phone || ''
+        },
+        theme: {
+          color: '#8B5CF6'
+        },
+        handler: async function (paymentRes) {
+          setLoading(true);
+          try {
+            const verifyRes = await schoolApi.post('/subscription/verify-razorpay-payment', {
+              razorpay_payment_id: paymentRes.razorpay_payment_id,
+              razorpay_order_id: paymentRes.razorpay_order_id,
+              razorpay_signature: paymentRes.razorpay_signature,
+              planCode
+            });
+            if (verifyRes.success) {
+              toast.success('Plan activated successfully!');
+              fetchData();
+            } else {
+              toast.error(verifyRes.message || 'Payment verification failed');
+            }
+          } catch (err) {
+            console.error('Razorpay verification error:', err);
+            toast.error(err.message || 'Failed to verify payment');
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            toast.error('Payment cancelled');
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
       console.error('Purchase request failed:', error);
-      toast.error(error.message || 'Failed to submit request');
+      toast.error(error.message || 'Failed to initiate checkout');
     } finally {
       setRequestingCode(null);
     }

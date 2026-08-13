@@ -13,6 +13,7 @@ const {
   activateSchool,
   suspendSchool,
   deleteSchool,
+  getAllPayments,
 } = require('../controllers/schoolManagementController');
 const {
   getMasterDepartments,
@@ -47,6 +48,7 @@ router.get('/analytics', protect, getDashboardAnalytics);
 
 // School management routes
 router.get('/schools', protect, getAllSchools);
+router.get('/payments', protect, getAllPayments);
 router.get('/schools/:id', protect, getSchool);
 router.post('/impersonate/:id', protect, impersonateSchool);
 router.put('/schools/:id/activate', protect, activateSchool);
@@ -98,5 +100,11 @@ router.delete('/plans/:id', protect, deletePlan);
 router.get('/subscription/requests', protect, getSubscriptionRequests);
 router.post('/subscription/requests/:id/approve', protect, approveSubscriptionRequest);
 router.post('/subscription/requests/:id/reject', protect, rejectSubscriptionRequest);
+
+const { getSystemSettings, updateSystemSettings } = require('../controllers/settingsController');
+
+// System Settings routes
+router.get('/settings', protect, getSystemSettings);
+router.put('/settings', protect, updateSystemSettings);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const School = require('../models/School');
 const { uploadFile, deleteFile } = require('../services/uploadService');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const SystemSetting = require('../models/SystemSetting');
 
 // @desc    Update School Details Settings
 // @route   PUT /api/v1/settings
@@ -359,6 +360,72 @@ const deleteTemplate = async (req, res) => {
   }
 };
 
+// @desc    Get system settings
+// @route   GET /api/v1/super-admin/settings
+// @access  Private (Super Admin)
+const getSystemSettings = async (req, res) => {
+  try {
+    let settings = await SystemSetting.findOne({ key: 'platform_settings' });
+    if (!settings) {
+      settings = await SystemSetting.create({ key: 'platform_settings' });
+    }
+    res.status(200).json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve settings'
+    });
+  }
+};
+
+// @desc    Update system settings
+// @route   PUT /api/v1/super-admin/settings
+// @access  Private (Super Admin)
+const updateSystemSettings = async (req, res) => {
+  try {
+    const {
+      applicationName,
+      applicationLogo,
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPassword,
+      smtpFrom,
+      maintenanceMode
+    } = req.body;
+
+    let settings = await SystemSetting.findOne({ key: 'platform_settings' });
+    if (!settings) {
+      settings = new SystemSetting({ key: 'platform_settings' });
+    }
+
+    if (applicationName !== undefined) settings.applicationName = applicationName;
+    if (applicationLogo !== undefined) settings.applicationLogo = applicationLogo;
+    if (smtpHost !== undefined) settings.smtpHost = smtpHost;
+    if (smtpPort !== undefined) settings.smtpPort = smtpPort;
+    if (smtpUser !== undefined) settings.smtpUser = smtpUser;
+    if (smtpPassword !== undefined) settings.smtpPassword = smtpPassword;
+    if (smtpFrom !== undefined) settings.smtpFrom = smtpFrom;
+    if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
+
+    await settings.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Settings updated successfully',
+      data: settings
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to update settings'
+    });
+  }
+};
+
 module.exports = {
   updateSettings,
   updateThankYouCms,
@@ -367,4 +434,6 @@ module.exports = {
   updateSpellingSetting,
   addTemplate,
   deleteTemplate,
+  getSystemSettings,
+  updateSystemSettings,
 };

@@ -128,7 +128,7 @@ async function seed() {
     console.log('Connected to MongoDB for Enquiries seeding.');
 
     // Find the Demo School
-    const school = await School.findOne({ email: 'jdintschool@gmail.com' });
+    const school = await School.findOne({ email: 'nvn@gmail.com' });
     if (!school) {
       console.error('Demo School not found. Please run seedSchoolAdmin.js first.');
       process.exit(1);

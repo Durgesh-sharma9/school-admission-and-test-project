@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { IndianRupee, CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import superAdminApi from '../services/superAdminApi';
+
+const formatINR = (val) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+};
 
 const Payments = () => {
   const [stats, setStats] = useState({
@@ -17,69 +26,11 @@ const Payments = () => {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      // Mock data for now - will be replaced with actual API call
-      setStats({
-        todayRevenue: 1250,
-        monthlyRevenue: 15400,
-        pendingPayments: 8,
-      });
-      setPayments([
-        {
-          _id: '1',
-          school: { name: 'Springfield High', logo: '' },
-          plan: { name: 'Professional' },
-          amount: 79,
-          status: 'completed',
-          paymentMethod: 'card',
-          billingCycle: 'monthly',
-          paidAt: '2026-07-20',
-          transactionId: 'TXN001234',
-        },
-        {
-          _id: '2',
-          school: { name: 'Lincoln Academy', logo: '' },
-          plan: { name: 'Enterprise' },
-          amount: 199,
-          status: 'completed',
-          paymentMethod: 'upi',
-          billingCycle: 'yearly',
-          paidAt: '2026-07-19',
-          transactionId: 'TXN001235',
-        },
-        {
-          _id: '3',
-          school: { name: 'Washington Prep', logo: '' },
-          plan: { name: 'Starter' },
-          amount: 29,
-          status: 'pending',
-          paymentMethod: 'bank_transfer',
-          billingCycle: 'monthly',
-          paidAt: null,
-          transactionId: null,
-        },
-        {
-          _id: '4',
-          school: { name: 'Roosevelt High', logo: '' },
-          plan: { name: 'Professional' },
-          amount: 79,
-          status: 'completed',
-          paymentMethod: 'card',
-          billingCycle: 'monthly',
-          paidAt: '2026-07-18',
-          transactionId: 'TXN001236',
-        },
-        {
-          _id: '5',
-          school: { name: 'Jefferson Academy', logo: '' },
-          plan: { name: 'Enterprise' },
-          amount: 199,
-          status: 'failed',
-          paymentMethod: 'card',
-          billingCycle: 'yearly',
-          paidAt: null,
-          transactionId: 'TXN001237',
-        },
-      ]);
+      const response = await superAdminApi.get('/payments');
+      if (response.data.success) {
+        setStats(response.data.stats);
+        setPayments(response.data.data);
+      }
     } catch (error) {
       console.error('Failed to fetch payments:', error);
     } finally {
@@ -89,123 +40,165 @@ const Payments = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'completed': return 'bg-green-500/10 text-green-400';
-      case 'pending': return 'bg-yellow-500/10 text-yellow-400';
-      case 'failed': return 'bg-red-500/10 text-red-400';
-      case 'refunded': return 'bg-slate-500/10 text-slate-400';
-      default: return 'bg-slate-500/10 text-slate-400';
+      case 'completed': return 'bg-green-500/10 text-green-400 border-green-500/20';
+      case 'pending': return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+      case 'failed': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      case 'refunded': return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4" />;
-      case 'pending': return <Clock className="w-4 h-4" />;
-      case 'failed': return <XCircle className="w-4 h-4" />;
+      case 'completed': return <CheckCircle className="w-3.5 h-3.5" />;
+      case 'pending': return <Clock className="w-3.5 h-3.5" />;
+      case 'failed': return <XCircle className="w-3.5 h-3.5" />;
       default: return null;
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center h-64 bg-slate-900 rounded-2xl">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+          <p className="text-slate-400 text-sm font-medium">Retrieving transaction ledger...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 text-left bg-slate-900 text-slate-100">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Payments</h1>
-        <p className="text-slate-400">Track all payments and revenue</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Payments Ledger</h1>
+          <p className="text-slate-400 text-xs mt-0.5">Track real subscription receipts and revenue splits</p>
+        </div>
+        <button 
+          onClick={fetchPayments}
+          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold tracking-wide border border-slate-700 transition"
+        >
+          Refresh Ledger
+        </button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-400" />
+        {/* Today's Revenue */}
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <IndianRupee className="w-6 h-6 text-emerald-400" />
+              </div>
+              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-extrabold uppercase">Live today</span>
             </div>
-            <span className="text-green-400 text-sm font-medium">+12%</span>
+            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Today's Revenue</p>
+            <p className="text-3xl font-black text-white tracking-tight">{formatINR(stats.todayRevenue)}</p>
           </div>
-          <p className="text-slate-400 text-sm mb-1">Today's Revenue</p>
-          <p className="text-3xl font-bold text-white">${stats.todayRevenue.toLocaleString()}</p>
         </div>
 
-        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-purple-400" />
+        {/* Monthly Revenue */}
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                <CreditCard className="w-6 h-6 text-indigo-400" />
+              </div>
+              <span className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded font-extrabold uppercase">30-day window</span>
             </div>
-            <span className="text-green-400 text-sm font-medium">+8%</span>
+            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Monthly Revenue</p>
+            <p className="text-3xl font-black text-white tracking-tight">{formatINR(stats.monthlyRevenue)}</p>
           </div>
-          <p className="text-slate-400 text-sm mb-1">Monthly Revenue</p>
-          <p className="text-3xl font-bold text-white">${stats.monthlyRevenue.toLocaleString()}</p>
         </div>
 
-        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center">
-              <Clock className="w-6 h-6 text-yellow-400" />
+        {/* Pending Payments */}
+        <div className="bg-slate-800/40 rounded-2xl border border-slate-800 p-6 shadow-lg flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
+                <Clock className="w-6 h-6 text-amber-400" />
+              </div>
+              <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded font-extrabold uppercase">Awaiting review</span>
             </div>
-            <span className="text-yellow-400 text-sm font-medium">{stats.pendingPayments}</span>
+            <p className="text-slate-400 text-xs mb-1 font-bold uppercase tracking-wider">Pending Payments</p>
+            <p className="text-3xl font-black text-white tracking-tight">{stats.pendingPayments} <span className="text-sm text-slate-500 font-normal">Txns</span></p>
           </div>
-          <p className="text-slate-400 text-sm mb-1">Pending Payments</p>
-          <p className="text-3xl font-bold text-white">{stats.pendingPayments}</p>
         </div>
       </div>
 
-      {/* Payment History */}
-      <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-white">Payment History</h2>
+      {/* Payment History Table */}
+      <div className="bg-slate-800/40 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="p-6 border-b border-slate-700/60 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white tracking-wide">Payment History</h2>
+          <span className="px-2 py-0.5 bg-slate-900 border border-slate-700 text-[10px] text-indigo-400 font-bold rounded-md uppercase tracking-wider">Historical Log</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-700/50">
+          <table className="w-full text-left text-sm text-slate-300">
+            <thead className="bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-700/60">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">School</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Method</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Cycle</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Transaction ID</th>
+                <th className="px-6 py-4">Institution / Organization</th>
+                <th className="px-6 py-4">Subscription Plan</th>
+                <th className="px-6 py-4">Amount Paid</th>
+                <th className="px-6 py-4">Method</th>
+                <th className="px-6 py-4">Billing Cycle</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Payment Date</th>
+                <th className="px-6 py-4">Transaction ID</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
-              {payments.map((payment) => (
-                <tr key={payment._id} className="hover:bg-slate-700/30">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                        <CreditCard className="w-5 h-5 text-slate-400" />
+            <tbody className="divide-y divide-slate-700/50">
+              {payments.length > 0 ? (
+                payments.map((payment) => (
+                  <tr key={payment._id} className="hover:bg-slate-700/30 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${payment.school?.institutionType === 'college' ? 'bg-emerald-600/10 text-emerald-400' : 'bg-blue-600/10 text-blue-400'}`}>
+                          <CreditCard className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-white">{payment.school?.name || 'Unknown School'}</p>
+                          <span className={`px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded ${payment.school?.institutionType === 'college' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                            {payment.school?.institutionType || 'school'}
+                          </span>
+                        </div>
                       </div>
-                      <p className="font-medium text-white">{payment.school.name}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-300">{payment.plan.name}</td>
-                  <td className="px-6 py-4 font-semibold text-white">${payment.amount}</td>
-                  <td className="px-6 py-4 text-slate-300 capitalize">{payment.paymentMethod.replace('_', ' ')}</td>
-                  <td className="px-6 py-4 text-slate-300 capitalize">{payment.billingCycle}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(payment.status)}`}>
-                      {getStatusIcon(payment.status)}
-                      {payment.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-sm">
-                    {payment.paidAt ? new Date(payment.paidAt).toLocaleDateString() : '-'}
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-sm font-mono">
-                    {payment.transactionId || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 font-semibold">
+                      {payment.plan?.planName || payment.plan?.name || 'Starter / Pro'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap font-black text-white">
+                      {formatINR(payment.amount)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 capitalize text-xs font-semibold">
+                      {payment.paymentMethod ? payment.paymentMethod.replace('_', ' ') : 'Card'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-300 capitalize text-xs font-semibold">
+                      {payment.billingCycle || 'Yearly'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border flex items-center gap-1.5 w-fit ${getStatusColor(payment.status)}`}>
+                        {getStatusIcon(payment.status)}
+                        {payment.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-medium">
+                      {payment.paidAt ? new Date(payment.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date(payment.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-400 font-mono font-bold tracking-wide">
+                      {payment.transactionId || '-'}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-6 py-12 text-center text-slate-400 font-semibold">
+                    No payment transactions recorded in the platform ledger.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

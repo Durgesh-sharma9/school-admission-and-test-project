@@ -124,7 +124,8 @@ const Schools = () => {
         }
 
         toast.success(`Supervision Mode Active for "${impersonatedSchool.name}"`);
-        navigate('/dashboard');
+        const redirectPath = impersonatedSchool.institutionType === 'college' ? '/college/dashboard' : '/dashboard';
+        navigate(redirectPath);
       }
     } catch (error) {
       console.error('Failed to enter Support Mode:', error);

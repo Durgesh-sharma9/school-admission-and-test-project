@@ -60,11 +60,11 @@ const CollegePublicThankYou = lazy(() => import('./app/college/pages/PublicThank
 const SuperAdminLogin = lazy(() => import('./app/super-admin/pages/Login'));
 const SuperAdminDashboard = lazy(() => import('./app/super-admin/pages/Dashboard'));
 const SuperAdminSchools = lazy(() => import('./app/super-admin/pages/Schools'));
+const SuperAdminColleges = lazy(() => import('./app/super-admin/pages/Colleges'));
 const SuperAdminSchoolPlans = lazy(() => import('./app/super-admin/pages/SchoolPlans'));
 const SuperAdminCollegePlans = lazy(() => import('./app/super-admin/pages/CollegePlans'));
 const SuperAdminSubscriptionRequests = lazy(() => import('./app/super-admin/pages/SubscriptionRequests'));
 const SuperAdminPayments = lazy(() => import('./app/super-admin/pages/Payments'));
-const SuperAdminLandingCMS = lazy(() => import('./app/super-admin/pages/LandingCMS'));
 const SuperAdminAnnouncements = lazy(() => import('./app/super-admin/pages/Announcements'));
 const SuperAdminNotifications = lazy(() => import('./app/super-admin/pages/Notifications'));
 const SuperAdminSettings = lazy(() => import('./app/super-admin/pages/Settings'));
@@ -186,13 +186,12 @@ function App() {
                   <Route element={<SuperAdminLayout />}>
                     <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
                     <Route path="/super-admin/schools" element={<SuperAdminSchools />} />
+                    <Route path="/super-admin/colleges" element={<SuperAdminColleges />} />
                     <Route path="/super-admin/school-plans" element={<SuperAdminSchoolPlans />} />
                     <Route path="/super-admin/college-plans" element={<SuperAdminCollegePlans />} />
                     <Route path="/super-admin/subscription-requests" element={<SuperAdminSubscriptionRequests />} />
                     <Route path="/super-admin/payments" element={<SuperAdminPayments />} />
                     <Route path="/super-admin/announcements" element={<SuperAdminAnnouncements />} />
-                    <Route path="/super-admin/landing-cms" element={<SuperAdminLandingCMS />} />
-                    <Route path="/super-admin/cms" element={<SuperAdminLandingCMS />} />
                     <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
                     <Route path="/super-admin/settings" element={<SuperAdminSettings />} />
                     <Route path="/super-admin/profile" element={<SuperAdminProfile />} />

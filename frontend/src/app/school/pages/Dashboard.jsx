@@ -314,11 +314,19 @@ const Dashboard = () => {
               <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No locality data available.</div>
             ) : (
               <div className="space-y-4">
-                <div className="h-52 w-full mt-2">
+                <div className="h-60 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={localityMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <BarChart data={localityMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 45 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
-                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fontSize: 9, fill: '#6b7280', fontWeight: 500 }} 
+                        tickLine={false} 
+                        axisLine={false} 
+                        interval={0}
+                        angle={-35}
+                        textAnchor="end"
+                      />
                       <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
                       <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                       <Bar dataKey="totalEnquiries" fill="#7E63F6" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
@@ -345,18 +353,26 @@ const Dashboard = () => {
             {classDemandData.length === 0 ? (
               <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No class demand metrics.</div>
             ) : (
-              <div className="h-52 w-full mt-2">
+              <div className="h-60 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={classDemandData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={classDemandData} margin={{ top: 10, right: 10, left: -20, bottom: 45 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
-                    <XAxis dataKey="class" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <XAxis 
+                      dataKey="class" 
+                      tick={{ fontSize: 9, fill: '#6b7280', fontWeight: 500 }} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      interval={0}
+                      angle={-35}
+                      textAnchor="end"
+                    />
                     <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                     <Bar dataKey="enquiries" fill="#F6A928" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            )}
+            ) }
           </div>
         </motion.div>
 
