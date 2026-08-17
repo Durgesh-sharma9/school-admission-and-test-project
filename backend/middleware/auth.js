@@ -14,7 +14,7 @@ const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
 
       // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secret_crm_jwt_token_key_123!');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get school from the token
       req.school = await School.findById(decoded.id).select('-password');
@@ -47,7 +47,7 @@ const protectSuperAdmin = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
 
       // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super_secret_crm_jwt_token_key_123!');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get super admin from the token
       req.superAdmin = await SuperAdmin.findById(decoded.id).select('-password');

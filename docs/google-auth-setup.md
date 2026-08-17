@@ -66,7 +66,7 @@ VITE_API_URL=http://localhost:5001/api/v1
 
 ```env
 GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
-JWT_SECRET=super_secret_crm_jwt_token_key_123!
+JWT_SECRET=your_jwt_secret_here
 ```
 
 ---

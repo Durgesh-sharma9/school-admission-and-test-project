@@ -290,8 +290,8 @@ exports.createRazorpayOrder = async (req, res) => {
 
     const Razorpay = require('razorpay');
     const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_TNFrLSunBdtmcv',
-      key_secret: process.env.RAZORPAY_KEY_SECRET || 'rYqvnc8Q8GqIpXT6ZSNKp7Ly'
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET
     });
 
     const amountInPaise = Math.round((plan.price || 0) * 100);
@@ -306,7 +306,7 @@ exports.createRazorpayOrder = async (req, res) => {
       success: true,
       orderId: order.id,
       amount: order.amount,
-      keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_TNFrLSunBdtmcv',
+      keyId: process.env.RAZORPAY_KEY_ID,
       planName: plan.planName,
       planPrice: plan.price
     });
@@ -333,7 +333,7 @@ exports.verifyRazorpayPayment = async (req, res) => {
     }
 
     const crypto = require('crypto');
-    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'rYqvnc8Q8GqIpXT6ZSNKp7Ly';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
     
     const generated_signature = crypto
       .createHmac('sha256', keySecret)

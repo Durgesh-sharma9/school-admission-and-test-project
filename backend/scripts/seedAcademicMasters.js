@@ -7,7 +7,7 @@ const MasterSpecialization = require('../models/MasterSpecialization');
 const path = require('path');
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/school_admission_crm';
+const MONGO_URI = process.env.MONGODB_URI;
 
 const seedData = async () => {
   try {

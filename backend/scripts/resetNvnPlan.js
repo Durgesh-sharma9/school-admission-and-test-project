@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 const School = require('../models/School');
 const Payment = require('../models/Payment');
 const SubscriptionRequest = require('../models/SubscriptionRequest');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const resetNvnPlan = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/school-admission-crm');
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
     const school = await School.findOne({ email: 'nvn@gmail.com' });

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const School = require('../models/School');
 const Enquiry = require('../models/Enquiry');
 const Locality = require('../models/Locality');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const JAIPUR_LOCALITIES = [
   "Malviya Nagar",
@@ -124,7 +125,7 @@ function getRandomIndianMobile() {
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/school-admission-crm');
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB for Enquiries seeding.');
 
     // Find the Demo School

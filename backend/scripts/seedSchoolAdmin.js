@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const School = require('../models/School');
 const QRCode = require('qrcode');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const seedSchoolAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/school-admission-crm');
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
     let demoSchool = await School.findOne({ email: 'nvn@gmail.com' });

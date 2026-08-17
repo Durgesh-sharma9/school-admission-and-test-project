@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_crm_jwt_token_key_123!';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Protect routes - verify Super Admin token
 const protect = async (req, res, next) => {

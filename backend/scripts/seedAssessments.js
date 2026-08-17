@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const School = require('../models/School');
 const Assessment = require('../models/Assessment');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const ASSESSMENTS = [
   {
@@ -272,7 +273,7 @@ const ASSESSMENTS = [
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/school-admission-crm');
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB for Assessments seeding.');
 
     // Find the Demo School

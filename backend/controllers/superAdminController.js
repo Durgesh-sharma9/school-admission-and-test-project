@@ -1,7 +1,7 @@
 const SuperAdmin = require('../models/SuperAdmin');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_crm_jwt_token_key_123!';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Generate JWT Token
 const generateToken = (id) => {

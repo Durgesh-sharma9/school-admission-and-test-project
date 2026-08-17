@@ -247,8 +247,8 @@ Successfully upgraded the authentication system to a production-ready authentica
 ```
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/school-admission-crm
-JWT_SECRET=super_secret_crm_jwt_token_key_123!
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbname>
+JWT_SECRET=your_jwt_secret_here
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
