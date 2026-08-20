@@ -8,29 +8,35 @@ const generateEnquiryId = async () => {
   const currentYear = new Date().getFullYear();
   const yearString = currentYear.toString();
 
-  // Find the latest enquiry for the current year
-  const latestEnquiry = await Enquiry.findOne({
-    enquiryId: new RegExp(`^ENQ-${yearString}-`)
-  })
-  .sort({ createdAt: -1 })
-  .exec();
+  // Find all existing enquiry IDs for current year to calculate maximum sequence
+  const enquiries = await Enquiry.find(
+    { enquiryId: new RegExp(`^ENQ-${yearString}-`) },
+    { enquiryId: 1 }
+  ).lean();
 
-  let nextSequenceNum = 1;
-
-  if (latestEnquiry) {
-    // Extract the sequence number from the latest enquiryId (e.g. ENQ-2026-0012 -> 0012)
-    const idParts = latestEnquiry.enquiryId.split('-');
-    if (idParts.length === 3) {
-      const lastSequence = parseInt(idParts[2], 10);
-      if (!isNaN(lastSequence)) {
-        nextSequenceNum = lastSequence + 1;
+  let maxSequence = 0;
+  for (const enq of enquiries) {
+    if (enq.enquiryId) {
+      const parts = enq.enquiryId.split('-');
+      if (parts.length === 3) {
+        const num = parseInt(parts[2], 10);
+        if (!isNaN(num) && num > maxSequence) {
+          maxSequence = num;
+        }
       }
     }
   }
 
-  // Format the sequence number to 4 digits (e.g. 0001, 0012, 0123)
-  const paddedSequence = String(nextSequenceNum).padStart(4, '0');
-  return `ENQ-${yearString}-${paddedSequence}`;
+  let nextSeq = maxSequence + 1;
+  let candidateId = `ENQ-${yearString}-${String(nextSeq).padStart(4, '0')}`;
+
+  // Ensure 100% collision-free ID generation
+  while (await Enquiry.exists({ enquiryId: candidateId })) {
+    nextSeq += 1;
+    candidateId = `ENQ-${yearString}-${String(nextSeq).padStart(4, '0')}`;
+  }
+
+  return candidateId;
 };
 
 module.exports = generateEnquiryId;

@@ -110,7 +110,7 @@ const enquirySchema = new mongoose.Schema({
   // Expectations & Source
   source: {
     type: String,
-    required: [true, 'Source (Where did you hear about us?) is required'],
+    default: 'Website / QR Portal',
     trim: true,
   },
   sourceOtherSpecify: {

@@ -270,6 +270,7 @@ const createEnquiryPublic = async (req, res) => {
       enquiryId: uniqueId,
       saveDate,
       saveTime,
+      source: enquiryData.source || 'Website / QR Portal',
       status: 'New Enquiry', // Public forms default to New Enquiry
     });
 

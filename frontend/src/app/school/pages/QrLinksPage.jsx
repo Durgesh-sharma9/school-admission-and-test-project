@@ -438,53 +438,43 @@ const QrLinksPage = () => {
     }, 1000);
   };
 
-  // Download flyer handler — renders poster at full native size off-screen for pixel-perfect export
+  // Download flyer handler — captures rendered poster canvas for PNG/PDF export
   const handleDownload = async (format) => {
+    let posterEl = document.getElementById('admission-poster-canvas');
+    if (!posterEl) {
+      // Fallback: switch to preview tab or check modal canvas
+      posterEl = document.getElementById('modal-poster-canvas');
+    }
+
+    if (!posterEl) {
+      toast.error('Poster preview element not found. Please switch to the Preview tab.');
+      return;
+    }
+
     if (format === 'png') setDownloadingPng(true);
     else if (format === 'pdf') setDownloadingPdf(true);
 
+    const prevTransform = posterEl.style.transform;
+    const prevTransformOrigin = posterEl.style.transformOrigin;
+
+    // Temporarily reset scale transform for crisp rendering
+    posterEl.style.transform = 'none';
+    posterEl.style.transformOrigin = 'initial';
+
     try {
-      // Wait for web fonts to be fully loaded
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
       await new Promise(resolve => setTimeout(resolve, 80));
 
-      // 1. Create an off-screen container at the poster's full native pixel dimensions
-      //    (no CSS scaling applied — scale=1 so html2canvas captures the real design)
-      const container = document.createElement('div');
-      container.style.cssText = [
-        `position:fixed`,
-        `top:-${posterDims.height + 200}px`,
-        `left:-${posterDims.width + 200}px`,
-        `width:${posterDims.width}px`,
-        `height:${posterDims.height}px`,
-        `overflow:hidden`,
-        `z-index:-9999`,
-        `pointer-events:none`,
-        `visibility:hidden`,
-      ].join(';');
-      document.body.appendChild(container);
-
-      // 2. Render the React poster tree into the off-screen node at scale=1 (no transform)
-      const { createRoot } = await import('react-dom/client');
-      const offscreenRoot = createRoot(container);
-      offscreenRoot.render(renderPosterCanvas(1, 'pdf-export-canvas'));
-
-      // 3. Allow React to flush the render and all images to settle
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // 4. Capture at 4× density for print-quality resolution
-      const canvas = await html2canvas(container, {
-        scale: 4,
+      const canvas = await html2canvas(posterEl, {
+        scale: 3.0,
         useCORS: true,
         allowTaint: false,
         backgroundColor: effectiveBg,
-        width: posterDims.width,
-        height: posterDims.height,
         logging: false,
         onclone: (clonedDoc) => {
-          // Remove oklch/oklab color values not supported by html2canvas
+          // Remove unsupported oklch/oklab values from cloned styles
           const styleTags = clonedDoc.querySelectorAll('style');
           styleTags.forEach(tag => {
             let cssText = tag.textContent;
@@ -507,31 +497,37 @@ const QrLinksPage = () => {
         }
       });
 
-      // 5. Export to the requested format
       const imgData = canvas.toDataURL('image/png');
+      const fileNameClean = (name || 'School').replace(/[^a-zA-Z0-9_-]/g, '_');
 
       if (format === 'pdf') {
-        // Full-bleed A4 — the poster's own internal p-16 padding serves as the print margin
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-        pdf.save(`${name.replace(/\s+/g, '_')}_admission_poster.pdf`);
-        toast.success('PDF document exported successfully!');
+        const isLandscape = posterDims.width > posterDims.height;
+        const pdf = new jsPDF({
+          orientation: isLandscape ? 'landscape' : 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`${fileNameClean}_admission_poster.pdf`);
+        toast.success('PDF document downloaded successfully!');
       } else {
         const link = document.createElement('a');
         link.href = imgData;
-        link.download = `${name.replace(/\s+/g, '_')}_admission_poster.png`;
+        link.download = `${fileNameClean}_admission_poster.png`;
+        document.body.appendChild(link);
         link.click();
-        toast.success('PNG image exported successfully!');
+        document.body.removeChild(link);
+        toast.success('PNG image downloaded successfully!');
       }
-
-      // 6. Clean up the off-screen container
-      offscreenRoot.unmount();
-      document.body.removeChild(container);
-
     } catch (err) {
       console.error('Export error details:', err);
       toast.error(`Failed to export flyer: ${err.message || err}`);
     } finally {
+      posterEl.style.transform = prevTransform;
+      posterEl.style.transformOrigin = prevTransformOrigin;
       setDownloadingPng(false);
       setDownloadingPdf(false);
     }
@@ -1319,28 +1315,56 @@ const QrLinksPage = () => {
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-3">
-                <Button
+                <button
                   type="button"
                   onClick={() => handleDownload('png')}
-                  isLoading={downloadingPng}
-                  className="w-full h-[46px] justify-center text-sm font-semibold bg-indigo-600 hover:bg-indigo-770 text-white flex items-center gap-2 rounded-xl shadow-sm transition-colors"
+                  disabled={downloadingPng || downloadingPdf}
+                  className="w-full h-[46px] justify-center text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <Download className="h-4 w-4" /> Download PNG Flyer
-                </Button>
-                <Button
+                  {downloadingPng ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Exporting PNG...</span>
+                    </span>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4" />
+                      <span>Download PNG Flyer</span>
+                    </>
+                  )}
+                </button>
+                <button
                   type="button"
                   onClick={() => handleDownload('pdf')}
-                  isLoading={downloadingPdf}
-                  className="w-full h-[46px] justify-center text-sm font-semibold bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-2 rounded-xl shadow-sm transition-colors"
+                  disabled={downloadingPng || downloadingPdf}
+                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <FileText className="h-4 w-4 text-slate-500" /> Download PDF Document
-                </Button>
+                  {downloadingPdf ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Exporting PDF...</span>
+                    </span>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4 text-slate-500" />
+                      <span>Download PDF Document</span>
+                    </>
+                  )}
+                </button>
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
+                  disabled={downloadingPng || downloadingPdf}
+                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <Printer className="h-4 w-4 text-slate-500" /> Print High-Res Poster
+                  <Printer className="h-4 w-4 text-slate-500" />
+                  <span>Print High-Res Poster</span>
                 </button>
               </div>
             </div>

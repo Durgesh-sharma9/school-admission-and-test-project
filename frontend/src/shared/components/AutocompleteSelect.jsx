@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, X, Check } from 'lucide-react';
+import { ChevronDown, X, Check, Plus } from 'lucide-react';
 
 export const CLASS_SEEKING_OPTIONS = [
+  "Playgroup",
+  "Pre-Nursery",
   "Nursery",
   "LKG",
   "UKG",
@@ -20,10 +22,16 @@ export const CLASS_SEEKING_OPTIONS = [
   "Class 11 (Arts)",
   "Class 12 (Science)",
   "Class 12 (Commerce)",
-  "Class 12 (Arts)"
+  "Class 12 (Arts)",
+  "Diploma",
+  "Graduation / UG",
+  "Post Graduation / PG",
+  "Other"
 ];
 
 export const PREVIOUS_CLASS_OPTIONS = [
+  "Playgroup",
+  "Pre-Nursery",
   "Nursery",
   "LKG",
   "UKG",
@@ -39,7 +47,13 @@ export const PREVIOUS_CLASS_OPTIONS = [
   "Class 10",
   "Class 11 (Science)",
   "Class 11 (Commerce)",
-  "Class 11 (Arts)"
+  "Class 11 (Arts)",
+  "Class 12 (Science)",
+  "Class 12 (Commerce)",
+  "Class 12 (Arts)",
+  "Diploma",
+  "Graduation / UG",
+  "Other"
 ];
 
 const AutocompleteSelect = ({
@@ -48,7 +62,7 @@ const AutocompleteSelect = ({
   value = '',
   onChange,
   options = [],
-  placeholder = 'Select option...',
+  placeholder = 'Select option or type custom class...',
   required = false,
   error,
 }) => {
@@ -72,32 +86,47 @@ const AutocompleteSelect = ({
     setActiveIndex(-1);
   }, [inputValue]);
 
+  // Click outside handler to close dropdown cleanly without race conditions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        if (isOpen) {
+          finalizeValue();
+          setIsOpen(false);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, inputValue, options]);
+
+  const finalizeValue = () => {
+    const rawInput = (inputValue || '').trim();
+    if (!rawInput) {
+      onChange('');
+      setInputValue('');
+    } else {
+      const exactMatch = options.find(opt => opt.toLowerCase() === rawInput.toLowerCase());
+      if (exactMatch) {
+        onChange(exactMatch);
+        setInputValue(exactMatch);
+      } else {
+        onChange(rawInput);
+        setInputValue(rawInput);
+      }
+    }
+  };
+
   const handleSelectOption = (option) => {
     onChange(option);
     setInputValue(option);
     setIsOpen(false);
-    inputRef.current?.blur();
-  };
-
-  const handleBlur = () => {
-    // Determine if the current input value matches any option case-insensitively
-    const trimmedInput = (inputValue || '').trim().toLowerCase();
-    const exactMatch = options.find(opt => opt.toLowerCase() === trimmedInput);
-
-    if (exactMatch) {
-      // Correct input casing to match the option value exactly
-      onChange(exactMatch);
-      setInputValue(exactMatch);
-    } else {
-      // Revert to the last valid value selected (if any) or clear it
-      onChange(value || '');
-      setInputValue(value || '');
-    }
-    setIsOpen(false);
   };
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+    const val = e.target.value;
+    setInputValue(val);
+    onChange(val); // Update parent form state immediately as user types
     if (!isOpen) {
       setIsOpen(true);
     }
@@ -117,33 +146,25 @@ const AutocompleteSelect = ({
         setActiveIndex(prev => (prev - 1 + filteredOptions.length) % filteredOptions.length);
       }
     } else if (e.key === 'Enter') {
-      // Do not submit the form when hitting Enter to select
       e.preventDefault();
       if (isOpen && activeIndex >= 0 && activeIndex < filteredOptions.length) {
         handleSelectOption(filteredOptions[activeIndex]);
+      } else if (inputValue.trim()) {
+        handleSelectOption(inputValue.trim());
       } else {
-        // Blur the input to trigger validation and exact match checks
-        inputRef.current?.blur();
+        setIsOpen(false);
       }
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setIsOpen(false);
       setInputValue(value || '');
-      inputRef.current?.blur();
     } else if (e.key === 'Tab') {
       if (isOpen) {
-        // If there's an active index highlight, select it
         if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
           handleSelectOption(filteredOptions[activeIndex]);
         } else {
-          // If no index is highlighted but we have an exact match typed, complete it
-          const trimmedInput = (inputValue || '').trim().toLowerCase();
-          const match = filteredOptions.find(opt => opt.toLowerCase() === trimmedInput);
-          if (match) {
-            handleSelectOption(match);
-          } else {
-            handleBlur();
-          }
+          finalizeValue();
+          setIsOpen(false);
         }
       }
     }
@@ -151,10 +172,13 @@ const AutocompleteSelect = ({
 
   const clearSelection = (e) => {
     e.stopPropagation();
+    e.preventDefault();
     onChange('');
     setInputValue('');
     setIsOpen(false);
   };
+
+  const showAddCustomOption = inputValue.trim() && !filteredOptions.some(opt => opt.toLowerCase() === inputValue.trim().toLowerCase());
 
   return (
     <div ref={containerRef} className="w-full flex flex-col gap-1.5 text-left relative">
@@ -172,10 +196,9 @@ const AutocompleteSelect = ({
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
-          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className={`w-full rounded-[10px] border border-[#E9EAF0] pl-3.5 pr-12 py-2.5 text-sm text-slate-905 bg-white placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:ring-4 focus:ring-[#8B5CF6]/15 focus:border-[#8B5CF6] transition-all ${
+          className={`w-full rounded-[10px] border border-[#E9EAF0] pl-3.5 pr-12 py-2.5 text-sm text-slate-900 bg-white placeholder-[#94A3B8] shadow-[0_4px_14px_rgba(15,23,42,0.05)] hover:border-[#D7DCE5] focus:outline-none focus:ring-4 focus:ring-[#8B5CF6]/15 focus:border-[#8B5CF6] transition-all ${
             error ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : ''
           }`}
           autoComplete="off"
@@ -185,6 +208,7 @@ const AutocompleteSelect = ({
           {inputValue && (
             <button
               type="button"
+              onMouseDown={clearSelection}
               onClick={clearSelection}
               className="text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded cursor-pointer"
             >
@@ -193,12 +217,9 @@ const AutocompleteSelect = ({
           )}
           <button
             type="button"
-            onClick={() => {
-              if (isOpen) {
-                inputRef.current?.blur();
-              } else {
-                inputRef.current?.focus();
-              }
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsOpen(prev => !prev);
             }}
             className="text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded cursor-pointer"
           >
@@ -209,33 +230,59 @@ const AutocompleteSelect = ({
         {isOpen && (
           <div
             className="absolute z-[9999] left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#E9EAF0] rounded-[10px] shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
-            // Use onMouseDown with e.preventDefault() so that clicking an option doesn't fire blur on the input prematurely
-            onMouseDown={(e) => e.preventDefault()}
           >
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt, idx) => {
-                const isSelected = opt === value;
-                const isHighlighted = idx === activeIndex;
-                return (
-                  <div
-                    key={opt}
-                    onClick={() => handleSelectOption(opt)}
-                    className={`flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer select-none transition-colors ${
-                      isHighlighted
-                        ? 'bg-slate-100 text-slate-900 font-medium'
-                        : isSelected
-                        ? 'bg-purple-50 text-purple-750 font-bold'
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span>{opt}</span>
-                    {isSelected && <Check className="h-4 w-4 text-purple-650 shrink-0" />}
-                  </div>
-                );
-              })
-            ) : (
+            {filteredOptions.length > 0 && filteredOptions.map((opt, idx) => {
+              const isSelected = opt === value;
+              const isHighlighted = idx === activeIndex;
+              return (
+                <div
+                  key={opt}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelectOption(opt);
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelectOption(opt);
+                  }}
+                  className={`flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer select-none transition-colors ${
+                    isHighlighted
+                      ? 'bg-slate-100 text-slate-900 font-medium'
+                      : isSelected
+                      ? 'bg-purple-50 text-purple-700 font-bold'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>{opt}</span>
+                  {isSelected && <Check className="h-4 w-4 text-purple-600 shrink-0" />}
+                </div>
+              );
+            })}
+
+            {showAddCustomOption && (
+              <div
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelectOption(inputValue.trim());
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelectOption(inputValue.trim());
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-indigo-600 font-semibold hover:bg-indigo-50 cursor-pointer border-t border-slate-100"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add "{inputValue.trim()}"</span>
+              </div>
+            )}
+
+            {filteredOptions.length === 0 && !inputValue.trim() && (
               <div className="px-4 py-3 text-sm text-slate-400 italic">
-                No matching options found
+                Type custom class name...
               </div>
             )}
           </div>

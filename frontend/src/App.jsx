@@ -80,7 +80,7 @@ function App() {
       <GoogleOAuthProvider clientId={googleClientId}>
         <AuthProvider>
           <SuperAdminAuthProvider>
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Suspense fallback={<Loader fullPage message="Loading workspace components..." />}>
                 <Routes>
                   {/* Landing Page */}
