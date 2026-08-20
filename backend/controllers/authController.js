@@ -332,6 +332,23 @@ const getMe = async (req, res) => {
     if (!school) {
       return res.status(404).json({ success: false, message: 'School profile not found' });
     }
+
+    const rawFrontendUrl = process.env.FRONTEND_URL || 'https://campuscrm.webncode.in';
+    const primaryUrl = rawFrontendUrl.split(',')[0].trim().replace(/\/$/, '');
+
+    // If admissionFormLink is missing or points to localhost while configured for hosted domain, auto-update
+    if (!school.admissionFormLink || (school.admissionFormLink.includes('localhost') && !primaryUrl.includes('localhost'))) {
+      try {
+        const { generateSchoolQrCode } = require('../services/qrService');
+        const { qrCodeUrl, admissionFormLink } = await generateSchoolQrCode(school._id);
+        school.qrCodeUrl = qrCodeUrl;
+        school.admissionFormLink = admissionFormLink;
+        await school.save();
+      } catch (err) {
+        console.error('Auto QR update error in getMe:', err);
+      }
+    }
+
     return res.json({
       success: true,
       school,

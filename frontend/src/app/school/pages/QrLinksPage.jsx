@@ -239,7 +239,15 @@ const QrLinksPage = () => {
 
   const posterRef = useRef(null);
 
-  const publicLink = school?.admissionFormLink || `http://localhost:5173/public/school/admission/${school?.id || school?._id}`;
+  const getPublicLink = () => {
+    if (school?.admissionFormLink && !school.admissionFormLink.includes('localhost')) {
+      return school.admissionFormLink;
+    }
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://campuscrm.webncode.in';
+    const targetId = school?.id || school?._id || '';
+    return `${origin}/public/school/admission/${targetId}`;
+  };
+  const publicLink = getPublicLink();
   const receptionLink = `${publicLink}?role=reception`;
 
   // Preload base64 images to prevent canvas taint issues
@@ -430,12 +438,24 @@ const QrLinksPage = () => {
     }
   };
 
-  const handleGenerateNew = () => {
+  const handleGenerateNew = async () => {
     setGeneratingLink(true);
-    setTimeout(() => {
+    try {
+      const res = await api.post('/settings/regenerate-qr');
+      if (res.data?.success) {
+        if (updateSchoolState && res.data.school) {
+          updateSchoolState(res.data.school);
+        }
+        toast.success('New QR code and admission link generated successfully!');
+      } else {
+        toast.error(res.data?.message || 'Failed to generate link');
+      }
+    } catch (err) {
+      console.error('Error generating link:', err);
+      toast.error('Failed to generate new link and QR code');
+    } finally {
       setGeneratingLink(false);
-      toast.success('New secure link token generated!');
-    }, 1000);
+    }
   };
 
   // Download flyer handler — captures rendered poster canvas for PNG/PDF export

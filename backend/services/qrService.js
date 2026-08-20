@@ -7,12 +7,13 @@ const School = require('../models/School');
  * @returns {Promise<{ qrCodeUrl: string, admissionFormLink: string }>}
  */
 const generateSchoolQrCode = async (schoolId) => {
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const rawFrontendUrl = process.env.FRONTEND_URL || 'https://campuscrm.webncode.in';
+  const primaryUrl = rawFrontendUrl.split(',')[0].trim().replace(/\/$/, '');
   
   try {
     const institution = await School.findById(schoolId);
     const type = institution?.institutionType === 'college' ? 'college' : 'school';
-    const admissionFormLink = `${frontendUrl}/public/${type}/admission/${schoolId}`;
+    const admissionFormLink = `${primaryUrl}/public/${type}/admission/${schoolId}`;
 
     // Generate base64 data URI of the QR Code
     const qrCodeUrl = await QRCode.toDataURL(admissionFormLink, {

@@ -426,6 +426,51 @@ const updateSystemSettings = async (req, res) => {
   }
 };
 
+// @desc    Regenerate QR Code and Admission Form Link for current school
+// @route   POST /api/v1/settings/regenerate-qr
+// @access  Private (School Admin)
+const regenerateQrCode = async (req, res) => {
+  try {
+    const school = await School.findById(req.school.id);
+    if (!school) {
+      return res.status(404).json({ success: false, message: 'School not found' });
+    }
+
+    const { generateSchoolQrCode } = require('../services/qrService');
+    const { qrCodeUrl, admissionFormLink } = await generateSchoolQrCode(school._id);
+
+    school.qrCodeUrl = qrCodeUrl;
+    school.admissionFormLink = admissionFormLink;
+    await school.save();
+
+    return res.json({
+      success: true,
+      message: 'QR Code and links regenerated successfully',
+      qrCodeUrl,
+      admissionFormLink,
+      school: {
+        id: school._id,
+        name: school.name,
+        email: school.email,
+        phone: school.phone,
+        address: school.address,
+        role: school.role,
+        qrCodeUrl: school.qrCodeUrl,
+        admissionFormLink: school.admissionFormLink,
+        subscription: school.subscription,
+        logo: school.logo,
+        thankYouCms: school.thankYouCms,
+        settings: school.settings,
+        communicationTemplates: school.communicationTemplates,
+        institutionType: school.institutionType || 'school'
+      }
+    });
+  } catch (error) {
+    console.error('Regenerate QR error:', error);
+    return res.status(500).json({ success: false, message: 'Server error regenerating QR code' });
+  }
+};
+
 module.exports = {
   updateSettings,
   updateThankYouCms,
@@ -436,4 +481,5 @@ module.exports = {
   deleteTemplate,
   getSystemSettings,
   updateSystemSettings,
+  regenerateQrCode,
 };
