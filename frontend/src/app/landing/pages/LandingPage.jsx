@@ -184,11 +184,11 @@ const LandingPage = () => {
   ];
 
   const screenshotTabs = [
-    { id: 'dashboard', name: 'Dashboard', title: 'Complete overview of admissions', desc: 'Review conversion metrics, active enquiries, pending calls, and sources. All widgets update in real-time.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80' },
-    { id: 'enquiry', name: 'Pipeline', title: 'Track stages from contact to enrollment', desc: 'Manage pipeline stages via beautiful columns. Move applications, add notes, and reschedule followups.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80' },
-    { id: 'timeline', name: 'Timeline', title: 'Chronological timeline of applicant journey', desc: 'Track every conversation log, documents verified list, assessment scores, and reminder schedules.', image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80' },
-    { id: 'assessment', name: 'Assessments', title: 'Configure entrance tests digitally', desc: 'Design course-specific MCQ or assignments. Auto-evaluate submissions and generate PDF scorecards.', image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80' },
-    { id: 'reports', name: 'Analytics', title: 'Visualize admission performance data', desc: 'Identify which marketing sources drive conversions. Review response speeds and payment receipts.', image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80' }
+    { id: 'dashboard', name: 'Dashboard', title: 'Complete overview of admissions', desc: 'Review conversion metrics, active enquiries, pending calls, and sources. All widgets update in real-time.', image: '/images/tour/dashboard.png' },
+    { id: 'enquiry', name: 'Pipeline', title: 'Track stages from contact to enrollment', desc: 'Manage pipeline stages via beautiful columns. Move applications, add notes, and reschedule followups.', image: '/images/tour/pipeline.png' },
+    { id: 'timeline', name: 'Timeline', title: 'Chronological timeline of applicant journey', desc: 'Track every conversation log, documents verified list, assessment scores, and reminder schedules.', image: '/images/tour/timeline.png' },
+    { id: 'assessment', name: 'Assessments', title: 'Configure entrance tests digitally', desc: 'Design course-specific MCQ or assignments. Auto-evaluate submissions and generate PDF scorecards.', image: '/images/tour/assessment.png' },
+    { id: 'reports', name: 'Analytics', title: 'Visualize admission performance data', desc: 'Identify which marketing sources drive conversions. Review response speeds and payment receipts.', image: '/images/tour/analytics.png' }
   ];
 
   const faqList = [
@@ -577,8 +577,8 @@ const LandingPage = () => {
               initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.98 }} transition={{ duration: 0.3 }}
               className="bg-white rounded-3xl border border-slate-200 shadow-2xl p-4 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
             >
-              <div className="lg:col-span-8 overflow-hidden rounded-xl border border-slate-100 group shadow-inner">
-                <img src={activeTabContent.image} alt={activeTabContent.name} className="w-full aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200/60 bg-slate-50/50 p-2 group shadow-sm">
+                <img src={activeTabContent.image} alt={activeTabContent.name} className="w-full h-auto max-h-[480px] object-contain rounded-xl border border-slate-200/80 shadow-md group-hover:scale-[1.01] transition-transform duration-500" />
               </div>
               <div className="lg:col-span-4 space-y-4 px-2">
                 <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full border border-indigo-100">
@@ -586,11 +586,13 @@ const LandingPage = () => {
                 </span>
                 <h3 className="text-2xl font-black text-slate-900 leading-tight">{activeTabContent.title}</h3>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">{activeTabContent.desc}</p>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block mt-2">
-                  <Button className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1.5 shadow-md transition-all border border-slate-700">
-                    Try Dashboard Live <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Button>
-                </motion.div>
+                <Link to="/signup" className="inline-block mt-2">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1.5 shadow-md transition-all border border-slate-700 cursor-pointer">
+                      Try Dashboard Live <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Button>
+                  </motion.div>
+                </Link>
               </div>
             </motion.div>
           </AnimatePresence>
