@@ -248,7 +248,8 @@ exports.getPublicPlans = async (req, res) => {
       plans
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch public plans' });
+    console.error('Error in getPublicPlans:', error);
+    res.status(500).json({ success: false, message: error.message || 'Failed to fetch public plans' });
   }
 };
 

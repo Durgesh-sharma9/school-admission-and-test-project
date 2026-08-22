@@ -14,7 +14,9 @@ const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [institutionType, setInstitutionType] = useState('school');
+  const [institutionType, setInstitutionType] = useState(
+    location.state?.institutionType || location.state?.type || 'school'
+  );
 
   const googleData = location.state?.googleData;
 

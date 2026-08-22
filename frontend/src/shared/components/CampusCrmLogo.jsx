@@ -8,7 +8,7 @@ export const CampusCrmIcon = ({ className = "h-9 w-auto" }) => (
   />
 );
 
-const CampusCrmLogo = ({ variant = "full", className = "", size = "normal" }) => {
+const CampusCrmLogo = ({ variant = "full", lightText = false, className = "", size = "normal" }) => {
   const iconHeights = {
     sm: "h-7",
     normal: "h-8 sm:h-9",
@@ -31,21 +31,23 @@ const CampusCrmLogo = ({ variant = "full", className = "", size = "normal" }) =>
     );
   }
 
-  // Renders Photo 1 (Icon Image) & Photo 2 (Text Banner Image) side-by-side without any HTML text!
+  // Uses white text image (campus-crm-text-light.png) on dark backgrounds, dark text image (campus-crm-text.png) on light backgrounds
+  const textImageSrc = lightText ? "/campus-crm-text-light.png" : "/campus-crm-text.png";
+
   return (
-    <div className={`inline-flex items-center gap-2.5 sm:gap-3 bg-transparent p-0 ${className}`}>
-      {/* Photo 1: Circle Badge Icon Image */}
+    <div className={`inline-flex items-center gap-2 sm:gap-2.5 bg-transparent p-0 select-none ${className}`}>
+      {/* Photo 1: Circle Icon Badge */}
       <img 
         src="/logo.png" 
         alt="Campus CRM Icon" 
         className={`${iconHeights[size] || iconHeights.normal} w-auto object-contain shrink-0`} 
       />
 
-      {/* Photo 2: Exact Text Banner Image provided by user */}
+      {/* Photo 2: Text Banner Image */}
       <img 
-        src="/campus-crm-text-light.png" 
+        src={textImageSrc} 
         alt="Campus CRM Text" 
-        className={`${textHeights[size] || textHeights.normal} w-auto object-contain shrink-0`} 
+        className={`${textHeights[size] || textHeights.normal} w-auto object-contain shrink-0 translate-y-[2.5px] sm:translate-y-[3.5px]`} 
       />
     </div>
   );

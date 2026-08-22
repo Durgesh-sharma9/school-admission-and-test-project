@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Menu, X, GraduationCap, Check, ArrowRight, ChevronDown,
   Users, BarChart3, QrCode, ClipboardList, Bell, Sparkles, CheckCircle2,
   MessageSquare, Play, ArrowUpRight, Zap, RefreshCw,
-  FileText, Lock, Globe, Clock, Layers, Mail, Phone, MapPin
+  FileText, Lock, Globe, Clock, Layers, Mail, Phone, MapPin, Building2,
+  Linkedin, Facebook, Instagram, Twitter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../../shared/components/Button';
 import CampusCrmLogo from '../../../shared/components/CampusCrmLogo';
+import schoolApi from '../../school/services/schoolApi';
 
 // Enhanced Animation Variants
 const fadeUp = {
@@ -32,10 +34,97 @@ const floatAnimation = {
 };
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFAQ, setActiveFAQ] = useState(null);
   const [activeScreenshotTab, setActiveScreenshotTab] = useState('dashboard');
   const [stats, setStats] = useState({ admissions: 0, followUps: 0, satisfaction: 0, campuses: 0 });
+
+  const [pricingType, setPricingType] = useState('school');
+  const [plans, setPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+
+  const defaultPlansList = [
+    {
+      _id: 'default-school-basic',
+      organizationType: 'school',
+      planCode: 'school-basic',
+      planName: 'School Starter',
+      price: 1999,
+      billingCycle: 'yearly',
+      status: 'active',
+      features: [
+        'Up to 500 Enquiries/yr',
+        'Basic CRM Enquiry Desk',
+        'Standard QR Form & Poster',
+        'Enquiry Banner CMS'
+      ]
+    },
+    {
+      _id: 'default-school-premium',
+      organizationType: 'school',
+      planCode: 'school-premium',
+      planName: 'School Premium',
+      price: 2999,
+      billingCycle: 'yearly',
+      status: 'active',
+      features: [
+        'Unlimited Enquiries',
+        'Advanced CRM & Lead Automation',
+        'Online Entrance Assessments',
+        'Question Bank & Auto Results',
+        'Analytics & Reports'
+      ]
+    },
+    {
+      _id: 'default-college-basic',
+      organizationType: 'college',
+      planCode: 'college-starter',
+      planName: 'College Starter',
+      price: 2499,
+      billingCycle: 'yearly',
+      status: 'active',
+      features: [
+        'Up to 1,000 Enquiries/yr',
+        'College Application Desk',
+        'QR Poster & Form Links',
+        'Counselor & Lead Workflow'
+      ]
+    },
+    {
+      _id: 'default-college-premium',
+      organizationType: 'college',
+      planCode: 'college-premium',
+      planName: 'College Premium',
+      price: 3999,
+      billingCycle: 'yearly',
+      status: 'active',
+      features: [
+        'Unlimited Applications',
+        'Full Admission Pipeline CRM',
+        'Entrance Assessment Builder',
+        'Multi-department Workflow',
+        'Dedicated Analytics Suite'
+      ]
+    }
+  ];
+
+  useEffect(() => {
+    const fetchPublicPlans = async () => {
+      try {
+        setLoadingPlans(true);
+        const res = await schoolApi.get('/plans/public');
+        if (res?.success && Array.isArray(res?.plans) && res.plans.length > 0) {
+          setPlans(res.plans);
+        }
+      } catch (err) {
+        console.error('Error fetching public plans:', err);
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+    fetchPublicPlans();
+  }, []);
 
   useEffect(() => {
     const duration = 2000;
@@ -62,15 +151,11 @@ const LandingPage = () => {
     { title: 'CRM Enquiry Management', description: 'Capture, organize and track applicant/parent enquiries automatically.', icon: Users, color: 'from-blue-500 to-indigo-600' },
     { title: 'Lead Pipeline', description: 'Visualize admission stages clearly with drag-and-drop workflow lanes.', icon: Layers, color: 'from-emerald-400 to-teal-500' },
     { title: 'WhatsApp Integration', description: 'Send instant updates, brochures, and reminders directly on WhatsApp.', icon: MessageSquare, color: 'from-orange-400 to-orange-500' },
-    { title: 'Applicant Portal', description: 'Give applicants a secure portal to apply, submit docs, and book slots.', icon: Globe, color: 'from-fuchsia-500 to-purple-600' },
     { title: 'Online Assessments', description: 'Schedule, host and score entrance assessments online easily.', icon: ClipboardList, color: 'from-cyan-400 to-cyan-500' },
     { title: 'QR Admission Forms', description: 'Generate unique QR codes for banners to receive quick applications.', icon: QrCode, color: 'from-rose-400 to-rose-500' },
     { title: 'Follow-up Reminders', description: 'System triggers smart alerts and tasks dynamically for your team.', icon: Clock, color: 'from-amber-400 to-amber-500' },
     { title: 'Admission Timeline', description: 'Review the chronological interaction history of every lead.', icon: RefreshCw, color: 'from-violet-500 to-violet-600' },
-    { title: 'Analytics Dashboard', description: 'Track conversion rates and department speeds in real time.', icon: BarChart3, color: 'from-pink-500 to-rose-500' },
-    { title: 'Fee Tracking', description: 'Monitor application fee receipts and invoice approvals centrally.', icon: Zap, color: 'from-yellow-400 to-yellow-500' },
-    { title: 'Document Management', description: 'Verify identity documents and certificates with custom queues.', icon: FileText, color: 'from-sky-400 to-sky-500' },
-    { title: 'Role-Based Access', description: 'Secure student records. Grant tailored permissions to staff.', icon: Lock, color: 'from-indigo-500 to-purple-500' }
+    { title: 'Analytics Dashboard', description: 'Track conversion rates and department speeds in real time.', icon: BarChart3, color: 'from-pink-500 to-rose-500' }
   ];
 
   const workflowSteps = [
@@ -514,73 +599,135 @@ const LandingPage = () => {
 
       {/* 8. PRICING PLANS */}
       <section id="pricing" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC]">
-        <div className="max-w-6xl mx-auto space-y-10 text-center">
+        <div className="max-w-6xl mx-auto space-y-8 text-center">
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-xl mx-auto space-y-3">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Simple Pricing Options</h2>
-            <p className="text-sm text-slate-500 font-medium">Start with a 7-day free trial. Select the plan configured for your registration volume.</p>
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Flexible Subscription Plans</h2>
+            <p className="text-sm text-slate-500 font-medium">Select the plan configured by the Super Admin for your institution's registration volume.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 60 }} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-left flex flex-col h-[95%]">
-              <div>
-                <span className="text-xs font-black uppercase tracking-widest text-slate-400">Starter</span>
-                <h3 className="text-3xl font-black text-slate-900 mt-1">$29<span className="text-sm text-slate-400">/mo</span></h3>
-                <p className="text-xs text-slate-500 mt-2 h-8">Ideal for schools and small colleges.</p>
-              </div>
-              <ul className="space-y-3 pt-4 mt-4 border-t border-slate-100 flex-1">
-                {['Up to 100 Enquiries/mo', 'Basic CRM Enquiry Desk', 'Standard QR Form', '5 Online Assessments'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button className="w-full bg-slate-900 text-white text-xs font-bold py-3 rounded-lg mt-6 shadow-md border border-slate-800">Start Starter Trial</Button>
-              </motion.div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 70 }} className="bg-gradient-to-b from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-2xl text-left flex flex-col relative lg:scale-105 z-10 h-full text-white">
-              <motion.div animate={{ y: [-3, 3, -3] }} transition={{ duration: 2, repeat: Infinity }} className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg border border-orange-400">
-                Most Popular
-              </motion.div>
-              <div>
-                <span className="text-xs font-black uppercase tracking-widest text-blue-200">Professional</span>
-                <h3 className="text-4xl font-black text-white mt-1">$79<span className="text-sm text-blue-200">/mo</span></h3>
-                <p className="text-xs text-blue-100 mt-2 h-8">Perfect for active schools and higher-ed institutes.</p>
-              </div>
-              <ul className="space-y-3 pt-4 mt-4 border-t border-blue-500/30 flex-1">
-                {['Up to 500 Enquiries/mo', 'Advanced CRM & Followups', 'Custom Multi-stage Forms', 'Unlimited Assessments', 'WhatsApp Broadcasts'].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs font-bold text-white">
-                    <Check className="w-4 h-4 text-blue-300 shrink-0 mt-0.5" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-                <Button className="w-full bg-white text-indigo-700 text-xs font-black py-3 rounded-lg mt-6 shadow-[0_5px_15px_rgba(255,255,255,0.2)]">Get Professional Now</Button>
-              </motion.div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 60 }} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-left flex flex-col h-[95%]">
-              <div>
-                <span className="text-xs font-black uppercase tracking-widest text-slate-400">Enterprise</span>
-                <h3 className="text-3xl font-black text-slate-900 mt-1">$199<span className="text-sm text-slate-400">/mo</span></h3>
-                <p className="text-xs text-slate-500 mt-2 h-8">For multi-branch campuses and universities.</p>
-              </div>
-              <ul className="space-y-3 pt-4 mt-4 border-t border-slate-100 flex-1">
-                {['Unlimited Enquiries', 'Multiple Accounts Mapping', 'Custom ERP API Integration', 'Dedicated Account Mgr'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                    <Check className="w-4 h-4 text-slate-400 shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button variant="ghost" className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold py-3 rounded-lg mt-6">Contact Sales</Button>
-              </motion.div>
-            </motion.div>
-
+          {/* School / College Category Switcher */}
+          <div className="flex justify-center items-center gap-2 p-1.5 bg-slate-200/80 rounded-2xl max-w-xs mx-auto border border-slate-300 shadow-inner">
+            <button
+              onClick={() => setPricingType('school')}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
+                pricingType === 'school'
+                  ? 'bg-slate-900 text-white shadow-md scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 bg-transparent'
+              }`}
+            >
+              <GraduationCap className="w-4 h-4" />
+              <span>School Plans</span>
+            </button>
+            <button
+              onClick={() => setPricingType('college')}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
+                pricingType === 'college'
+                  ? 'bg-slate-900 text-white shadow-md scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 bg-transparent'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>College Plans</span>
+            </button>
           </div>
+
+          {/* Dynamic Plans Display */}
+          {loadingPlans ? (
+            <div className="py-12 flex justify-center items-center gap-3 text-slate-500 font-bold text-sm">
+              <RefreshCw className="w-5 h-5 animate-spin text-indigo-600" />
+              <span>Loading Subscription Plans...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch pt-4">
+              {(plans.length > 0 ? plans : defaultPlansList)
+                .filter(p => p.organizationType === pricingType && (p.status === 'active' || !p.status))
+                .map((plan, idx) => {
+                  const isPopular = idx === 1 || plan.planCode?.includes('pro') || plan.planCode?.includes('premium');
+                  return (
+                    <motion.div
+                      key={plan._id || plan.planCode}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: idx * 0.1 }}
+                      className={`p-6 sm:p-8 rounded-3xl text-left flex flex-col justify-between relative transition-all duration-300 ${
+                        isPopular
+                          ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white shadow-2xl border-2 border-indigo-500 scale-[1.03] z-10'
+                          : 'bg-white text-slate-900 border border-slate-200 shadow-md hover:shadow-xl'
+                      }`}
+                    >
+                      {isPopular && (
+                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg border border-amber-300">
+                          Recommended
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <div>
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${
+                            isPopular ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30' : 'bg-slate-100 text-slate-500'
+                          }`}>
+                            {plan.organizationType === 'school' ? 'School Plan' : 'College Plan'}
+                          </span>
+                          <h3 className={`text-2xl font-black mt-2 ${isPopular ? 'text-white' : 'text-slate-900'}`}>
+                            {plan.planName}
+                          </h3>
+                          <div className="mt-2 flex items-baseline gap-1">
+                            <span className="text-3xl sm:text-4xl font-black tracking-tight">
+                              ₹{plan.price}
+                            </span>
+                            <span className={`text-xs font-bold ${isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
+                              /{plan.billingCycle || 'year'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Features List */}
+                        <div className="border-t border-slate-200/20 pt-4 mt-4">
+                          <p className={`text-[10px] font-black uppercase tracking-wider mb-3 ${isPopular ? 'text-slate-400' : 'text-slate-400'}`}>Included Features:</p>
+                          <ul className="space-y-2.5 text-xs font-semibold">
+                            {plan.features && plan.features.length > 0 ? (
+                              plan.features.map((feat, i) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                  <span className={isPopular ? 'text-slate-200' : 'text-slate-700'}>{feat}</span>
+                                </li>
+                              ))
+                            ) : (
+                              <>
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle2 className={`w-4 h-4 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                  <span>Full Admissions & Lead CRM</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <CheckCircle2 className={`w-4 h-4 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                  <span>Online Entrance Assessments</span>
+                                </li>
+                              </>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Action Button -> Redirects to Signup */}
+                      <div className="pt-6 mt-6 border-t border-slate-200/20">
+                        <Button
+                          onClick={() => navigate('/signup', { state: { institutionType: pricingType, type: pricingType, planCode: plan.planCode } })}
+                          className={`w-full py-3 rounded-xl text-xs font-black shadow-md transition-transform active:scale-95 cursor-pointer ${
+                            isPopular
+                              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border border-indigo-400/30'
+                              : 'bg-slate-900 hover:bg-slate-800 text-white'
+                          }`}
+                        >
+                          Start Free Trial with {plan.planName}
+                        </Button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -637,64 +784,108 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      {/* 11. DARK FOOTER WITH CONTACT INFO (Kept exactly same format and data) */}
-      <footer id="contact" className="bg-[#0f172a] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 text-left text-xs relative z-20 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-900/20 rounded-full blur-[100px] pointer-events-none" />
+      {/* 11. DARK FOOTER WITH CONTACT & SOCIAL LINKS */}
+      <footer id="contact" className="bg-[#0b1329] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 text-left text-xs relative z-20 overflow-hidden border-t border-slate-800/80">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 relative z-10">
 
-          <div className="col-span-2 space-y-4">
+          {/* Brand & Social Column */}
+          <div className="col-span-1 sm:col-span-2 space-y-4">
             <CampusCrmLogo variant="full" lightText={true} size="normal" />
-            <p className="text-[11px] text-slate-400 font-medium leading-relaxed max-w-xs">
-              SaaS education CRM platform to connect applicants, manage admission leads, schedule entrance assessments, and grow enrollment efficiently.
+            <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-sm">
+              Campus CRM is a cloud-based School & College Admission Management Platform that helps institutions manage students, enquiries, entrance assessments, rankings, and parent communication efficiently.
             </p>
+            {/* Social Icons matching screenshot design */}
+            <div className="flex items-center gap-2 pt-2">
+              <a
+                href="https://x.com/webncodetech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                title="Twitter / X"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/webncodetechnologies"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                title="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="#"
+                onClick={(e) => e.preventDefault()}
+                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm opacity-80 cursor-not-allowed"
+                title="Facebook (Coming Soon)"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.instagram.com/webncodetechnologies"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                title="Instagram"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+            </div>
           </div>
 
+          {/* Features Column */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Features</h4>
-            <ul className="space-y-2 font-semibold text-slate-400">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">CRM Enquiry Management</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Admission Timeline</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Online Assessments</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Analytics Dashboard</a></li>
+            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Features</h4>
+            <ul className="space-y-2.5 font-medium text-slate-400">
+              <li><a href="#features" className="hover:text-white transition-colors">Student Management</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Teacher Management</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Daily Tests</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Results</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Parent Portal</a></li>
             </ul>
           </div>
 
+          {/* Support Column */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Support</h4>
-            <ul className="space-y-2 font-semibold text-slate-400">
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Documentation</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Contact Us</a></li>
-              <li><a href="/privacy" className="hover:text-blue-400 transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" className="hover:text-blue-400 transition-colors">Terms of Service</a></li>
+            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Support</h4>
+            <ul className="space-y-2.5 font-medium text-slate-400">
+              <li><a href="#faq" className="hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Documentation</a></li>
+              <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
+              <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
             </ul>
           </div>
 
+          {/* Contact Column (from user screenshot & request) */}
           <div className="space-y-3">
-            <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Contact</h4>
-            <ul className="space-y-3 font-semibold text-slate-400">
-              <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-blue-500" />
-                <a href="mailto:support@campuscrm.app" className="hover:text-white transition-colors">support@campuscrm.app</a>
-              </motion.li>
-              <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                <a href="tel:+919876543210" className="hover:text-white transition-colors">+91 98765 43210</a>
-              </motion.li>
-              <motion.li whileHover={{ x: 5 }} className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                <span className="hover:text-white transition-colors">Jaipur, Rajasthan<br />India</span>
-              </motion.li>
+            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Contact</h4>
+            <ul className="space-y-3 font-medium text-slate-400">
+              <li className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+                <a href="mailto:support@schoolresult.app" className="hover:text-white transition-colors">support@schoolresult.app</a>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                <a href="tel:+918947919195" className="hover:text-white transition-colors">+91 8947919195</a>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                <span className="hover:text-white transition-colors">Jaipur, Rajasthan</span>
+              </li>
             </ul>
           </div>
 
         </div>
 
-        <div className="max-w-7xl mx-auto border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 font-bold text-[10px] relative z-10">
+        {/* Bottom Bar */}
+        <div className="max-w-7xl mx-auto border-t border-slate-800/80 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 font-semibold text-xs relative z-10">
           <p>© 2026 Campus CRM. All rights reserved.</p>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Systems Operational</span>
-            <span>·</span><span>v2.5.0</span>
+          <div className="flex items-center gap-4">
+            <a href="/privacy" className="hover:text-slate-300 transition-colors">Privacy policy</a>
+            <a href="/terms" className="hover:text-slate-300 transition-colors">Terms of service</a>
           </div>
         </div>
       </footer>
