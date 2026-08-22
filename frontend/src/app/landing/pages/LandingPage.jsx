@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../../shared/components/Button';
+import CampusCrmLogo from '../../../shared/components/CampusCrmLogo';
 
 // Enhanced Animation Variants
 const fadeUp = {
@@ -125,14 +126,10 @@ const LandingPage = () => {
           <div className="flex items-center justify-between h-16">
             <motion.div
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-              className="flex items-center space-x-3.5"
             >
-              <div className="w-11 h-11 bg-white rounded-lg flex items-center justify-center shadow-sm p-0 overflow-hidden">
-                <img src="/logo.png" alt="Campus Flow Logo" className="w-full h-full object-contain scale-[1.3]" />
-              </div>
-              <span className="text-lg font-black bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent tracking-tight uppercase">
-                CAMPUS FLOW
-              </span>
+              <Link to="/">
+                <CampusCrmLogo variant="full" size="normal" />
+              </Link>
             </motion.div>
 
             <motion.div
@@ -200,17 +197,17 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
 
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="lg:col-span-6 text-left space-y-6">
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-purple-50 text-purple-700 border border-purple-200/50 shadow-sm">
-              <Sparkles className="w-3 h-3 text-purple-500" />
-              <span>AI-Powered Education CRM</span>
+            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white border border-slate-800 shadow-md">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Campus CRM • CONNECT. MANAGE. GROW.</span>
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-              Grow Admissions With One <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Complete CRM</span>
+              Grow Admissions With <span className="bg-gradient-to-r from-slate-900 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Campus CRM</span>
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-sm sm:text-base text-slate-600 max-w-lg font-medium leading-relaxed">
-              Manage student enquiries, admissions, follow-ups, QR forms, and applicant communication from one integrated dashboard. Built for Schools & Colleges.
+              Connect prospective students, manage enquiry funnels, and grow your institution's admissions from one integrated dashboard. Built for Schools & Colleges.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-3 pt-2">
@@ -254,7 +251,7 @@ const LandingPage = () => {
               <div className="p-3 bg-slate-50/50 rounded-b-xl h-[calc(100%-32px)] flex flex-col gap-3 shadow-inner">
                 <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
                   <div>
-                    <div className="font-black text-slate-900 text-xs">Campus Admissions</div>
+                    <div className="font-black text-slate-900 text-xs">Campus CRM Dashboard</div>
                     <div className="text-[10px] text-slate-500 font-bold">Today's CRM Work Queue</div>
                   </div>
                   <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md font-black text-[9px] border border-emerald-100">Live</span>
@@ -646,14 +643,9 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 relative z-10">
 
           <div className="col-span-2 space-y-4">
-            <div className="flex items-center space-x-3.5">
-              <div className="w-11 h-11 bg-white rounded-lg flex items-center justify-center shadow-sm p-0 overflow-hidden">
-                <img src="/logo.png" alt="Campus Flow Logo" className="w-full h-full object-contain scale-[1.3]" />
-              </div>
-              <span className="text-sm font-black text-white tracking-tight uppercase">CAMPUS FLOW</span>
-            </div>
+            <CampusCrmLogo variant="full" lightText={true} size="normal" />
             <p className="text-[11px] text-slate-400 font-medium leading-relaxed max-w-xs">
-              SaaS education CRM platform coordinates applicant follow-ups, schedules entrance assessments, and records receipts efficiently.
+              SaaS education CRM platform to connect applicants, manage admission leads, schedule entrance assessments, and grow enrollment efficiently.
             </p>
           </div>
 
@@ -683,7 +675,7 @@ const LandingPage = () => {
             <ul className="space-y-3 font-semibold text-slate-400">
               <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-blue-500" />
-                <a href="mailto:support@campusflow.app" className="hover:text-white transition-colors">support@campusflow.app</a>
+                <a href="mailto:support@campuscrm.app" className="hover:text-white transition-colors">support@campuscrm.app</a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-emerald-500" />
@@ -699,7 +691,7 @@ const LandingPage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto border-t border-slate-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 font-bold text-[10px] relative z-10">
-          <p>© 2026 CAMPUS FLOW. All rights reserved.</p>
+          <p>© 2026 Campus CRM. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Systems Operational</span>
             <span>·</span><span>v2.5.0</span>

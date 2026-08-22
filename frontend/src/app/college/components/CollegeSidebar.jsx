@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import CampusCrmLogo from '../../../shared/components/CampusCrmLogo';
 import { useAuth } from '../../school/contexts/AuthContext';
 import {
   LayoutDashboard,
@@ -62,19 +63,9 @@ const CollegeSidebar = ({ isOpen, toggleSidebar }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/60">
-          <div className="flex items-center space-x-3 min-w-0">
-            <div className="flex items-center justify-center h-12 w-12 bg-white rounded-xl shadow-md shrink-0 p-0.5 overflow-hidden">
-              <img src="/logo.png" alt="Campus Flow" className="h-full w-full object-contain scale-[1.25]" />
-            </div>
-            <div className="flex flex-col text-left min-w-0">
-              <span className="font-black text-[15px] text-[#E91E63] leading-tight uppercase tracking-wider whitespace-nowrap">
-                CAMPUS FLOW
-              </span>
-              <span className="text-[10px] text-slate-450 font-bold mt-0.5 leading-snug tracking-wide uppercase whitespace-nowrap">
-                College CRM
-              </span>
-            </div>
-          </div>
+          <Link to="/college/dashboard" className="flex items-center">
+            <CampusCrmLogo variant="horizontal" lightText={true} size="sm" />
+          </Link>
 
           <button
             onClick={toggleSidebar}
