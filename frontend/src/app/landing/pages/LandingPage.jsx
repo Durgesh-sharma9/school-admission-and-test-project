@@ -39,6 +39,14 @@ const LandingPage = () => {
   const [activeFAQ, setActiveFAQ] = useState(null);
   const [activeScreenshotTab, setActiveScreenshotTab] = useState('dashboard');
   const [stats, setStats] = useState({ admissions: 0, followUps: 0, satisfaction: 0, campuses: 0 });
+  const [heroImgIndex, setHeroImgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroImgIndex((prev) => (prev + 1) % 5);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
 
   const [pricingType, setPricingType] = useState('school');
   const [plans, setPlans] = useState([]);
@@ -272,14 +280,14 @@ const LandingPage = () => {
       </nav>
 
       {/* 2. COMPACT HERO SECTION WITH ANIMATED BLOBS */}
-      <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
+      <section className="relative pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/15 blur-[100px]" />
           <motion.div animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute top-[20%] right-[-5%] w-[30%] h-[50%] rounded-full bg-fuchsia-500/15 blur-[100px]" />
           <motion.div animate={{ scale: [1, 1.1, 1], x: [0, 50, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="absolute bottom-[-10%] left-[20%] w-[50%] h-[40%] rounded-full bg-cyan-400/15 blur-[100px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10 pt-2 lg:pt-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
 
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="lg:col-span-6 text-left space-y-6">
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white border border-slate-800 shadow-md">
@@ -327,42 +335,37 @@ const LandingPage = () => {
             initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 70, damping: 20, delay: 0.2 }}
             className="lg:col-span-6 relative flex justify-center items-center mt-6 lg:mt-0"
           >
-            <motion.div animate={floatAnimation} className="w-full max-w-[500px] aspect-[4/3] rounded-2xl sm:rounded-3xl bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_50px_rgba(79,70,229,0.15)] p-2.5 sm:p-3 relative z-10">
+            <motion.div animate={floatAnimation} className="w-full max-w-[560px] lg:max-w-[620px] aspect-[16/10.5] rounded-2xl sm:rounded-3xl bg-white/95 backdrop-blur-2xl border border-white shadow-[0_20px_50px_rgba(79,70,229,0.15)] p-2 sm:p-2.5 relative z-10">
               <div className="h-7 sm:h-8 flex items-center space-x-1.5 px-3 rounded-t-xl bg-slate-50 border-b border-slate-100">
                 <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               </div>
-              <div className="p-2 sm:p-3 bg-slate-50/50 rounded-b-xl h-[calc(100%-28px)] sm:h-[calc(100%-32px)] flex flex-col gap-2.5 sm:gap-3 shadow-inner">
-                <div className="flex justify-between items-center bg-white p-2.5 sm:p-3 rounded-xl shadow-sm border border-slate-100">
-                  <div>
-                    <div className="font-black text-slate-900 text-[11px] sm:text-xs">Campus CRM Dashboard</div>
-                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold">Today's CRM Work Queue</div>
-                  </div>
-                  <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md font-black text-[9px] border border-emerald-100">Live</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {['Admissions (50K+)', 'WhatsApp (98%)', 'Avg. Score (82)'].map((metric, i) => (
-                    <motion.div whileHover={{ scale: 1.05 }} key={i} className="bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-slate-100 cursor-default">
-                      <span className="text-[7px] sm:text-[8px] text-slate-400 font-black uppercase tracking-wider block truncate">{metric}</span>
-                      <span className="text-xs sm:text-sm font-black text-slate-800 block mt-0.5">
-                        {i === 0 ? '54,230' : i === 1 ? '98.6%' : '84.2'}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-1.5 flex-1 overflow-hidden">
-                  {[
-                    { n: 'Aarav Patel', t: 'Follow-up Call', c: 'bg-blue-50 text-blue-600', s: 'Pending' },
-                    { n: 'Samantha M.', t: 'WhatsApp Sent', c: 'bg-emerald-50 text-emerald-600', s: 'Done' }
-                  ].map((row, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors rounded">
-                      <div>
-                        <div className="text-xs font-black text-slate-900">{row.n}</div>
-                        <div className="text-[10px] text-slate-500 font-medium">{row.t}</div>
-                      </div>
-                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${row.c}`}>{row.s}</span>
-                    </div>
+              <div className="relative rounded-b-xl overflow-hidden h-[calc(100%-28px)] sm:h-[calc(100%-32px)] mt-1 bg-slate-50 border border-slate-100 shadow-inner flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={heroImgIndex}
+                    src={screenshotTabs[heroImgIndex]?.image}
+                    alt={screenshotTabs[heroImgIndex]?.name}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.02 }}
+                    transition={{ duration: 0.35 }}
+                    className="w-full h-full object-contain object-top rounded-b-xl p-0.5 bg-slate-50"
+                  />
+                </AnimatePresence>
+
+                {/* Auto-rotation Progress Dots */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20 z-20 shadow-md">
+                  {screenshotTabs.map((tab, idx) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setHeroImgIndex(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        heroImgIndex === idx ? 'w-4 bg-indigo-400' : 'w-1.5 bg-white/40 hover:bg-white/70'
+                      }`}
+                      title={tab.name}
+                    />
                   ))}
                 </div>
               </div>
@@ -612,22 +615,20 @@ const LandingPage = () => {
           <div className="flex justify-center items-center gap-2 p-1.5 bg-slate-200/80 rounded-2xl max-w-xs mx-auto border border-slate-300 shadow-inner">
             <button
               onClick={() => setPricingType('school')}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
-                pricingType === 'school'
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${pricingType === 'school'
                   ? 'bg-slate-900 text-white shadow-md scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 bg-transparent'
-              }`}
+                }`}
             >
               <GraduationCap className="w-4 h-4" />
               <span>School Plans</span>
             </button>
             <button
               onClick={() => setPricingType('college')}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
-                pricingType === 'college'
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${pricingType === 'college'
                   ? 'bg-slate-900 text-white shadow-md scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 bg-transparent'
-              }`}
+                }`}
             >
               <Building2 className="w-4 h-4" />
               <span>College Plans</span>
@@ -653,11 +654,10 @@ const LandingPage = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: idx * 0.1 }}
-                      className={`p-5 sm:p-6 rounded-2xl text-left flex flex-col justify-between relative transition-all duration-300 ${
-                        isPopular
+                      className={`p-5 sm:p-6 rounded-2xl text-left flex flex-col justify-between relative transition-all duration-300 ${isPopular
                           ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-500/80 scale-[1.01] z-10'
                           : 'bg-white text-slate-900 border border-slate-200 shadow-sm hover:shadow-md'
-                      }`}
+                        }`}
                     >
                       {isPopular && (
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md border border-amber-300">
@@ -667,9 +667,8 @@ const LandingPage = () => {
 
                       <div className="space-y-3">
                         <div>
-                          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                            isPopular ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30' : 'bg-slate-100 text-slate-500'
-                          }`}>
+                          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${isPopular ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30' : 'bg-slate-100 text-slate-500'
+                            }`}>
                             {plan.organizationType === 'school' ? 'School Plan' : 'College Plan'}
                           </span>
                           <h3 className={`text-xl font-black mt-1.5 ${isPopular ? 'text-white' : 'text-slate-900'}`}>
@@ -716,11 +715,10 @@ const LandingPage = () => {
                       <div className="pt-4 mt-4 border-t border-slate-200/20">
                         <Button
                           onClick={() => navigate('/signup', { state: { institutionType: pricingType, type: pricingType, planCode: plan.planCode } })}
-                          className={`w-full py-2.5 rounded-xl text-xs font-black shadow-sm transition-transform active:scale-95 cursor-pointer ${
-                            isPopular
+                          className={`w-full py-2.5 rounded-xl text-xs font-black shadow-sm transition-transform active:scale-95 cursor-pointer ${isPopular
                               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border border-indigo-400/30'
                               : 'bg-slate-900 hover:bg-slate-800 text-white'
-                          }`}
+                            }`}
                         >
                           Start Free Trial with {plan.planName}
                         </Button>
