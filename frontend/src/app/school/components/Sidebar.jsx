@@ -65,9 +65,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         style={{ background: 'linear-gradient(180deg, #1B1E28 0%, #151720 100%)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/60">
-          <Link to="/school/dashboard" className="flex items-center">
-            <CampusCrmLogo variant="horizontal" lightText={true} size="sm" />
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/60">
+          <Link to="/dashboard" className="flex items-center">
+            <CampusCrmLogo variant="horizontal" lightText={true} size="normal" />
           </Link>
 
           <button

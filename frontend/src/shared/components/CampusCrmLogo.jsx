@@ -10,13 +10,13 @@ export const CampusCrmIcon = ({ className = "h-9 w-auto" }) => (
 
 const CampusCrmLogo = ({ variant = "full", lightText = false, className = "", size = "normal" }) => {
   const iconHeights = {
-    sm: "h-7",
-    normal: "h-8 sm:h-9",
+    sm: "h-8",
+    normal: "h-9 sm:h-[38px]",
     lg: "h-12"
   };
 
   const textHeights = {
-    sm: "h-6",
+    sm: "h-7",
     normal: "h-7 sm:h-8",
     lg: "h-11"
   };

@@ -151,7 +151,7 @@ const Signup = () => {
   const bgImage = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=90';
 
   return (
-    <div className="relative h-screen w-full flex flex-col justify-between overflow-hidden font-sans bg-slate-50">
+    <div className="relative min-h-screen w-full flex flex-col justify-between font-sans bg-slate-50 overflow-y-auto py-4 sm:py-6 lg:py-0">
       {/* Background Image */}
       <div
         className="absolute inset-0 z-0"
@@ -167,36 +167,33 @@ const Signup = () => {
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          background: 'rgba(248, 250, 252, 0.65)',
-          backdropFilter: 'blur(4px)',
+          background: 'rgba(248, 250, 252, 0.7)',
+          backdropFilter: 'blur(6px)',
         }}
       />
 
-      <div className="relative z-10 flex flex-col-reverse lg:flex-row h-screen w-full max-w-7xl mx-auto">
+      <div className="relative z-10 flex flex-col-reverse lg:flex-row min-h-screen w-full max-w-7xl mx-auto items-center">
         {/* Left Side: Branding & Features */}
-        <div className="w-full lg:w-3/5 flex flex-col p-6 sm:p-8 lg:pr-12 text-slate-900 h-full">
+        <div className="w-full lg:w-3/5 flex flex-col p-5 sm:p-8 lg:pr-12 text-slate-900 justify-center">
 
           {/* Main content vertically centered */}
-          <div className="flex-1 flex flex-col justify-center">
+          <div className="flex flex-col justify-center">
 
-            {/* Reduced mb-6 to mb-5, and removed large margins from paragraph */}
-            <div className="mb-5">
-              <div className="flex items-center gap-2 mb-4 w-fit bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-blue-100/50 shadow-sm">
+            <div className="mb-4 sm:mb-5">
+              <div className="flex items-center gap-2 mb-3 w-fit bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-blue-100/80 shadow-sm">
                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-                <span className="text-blue-800 font-semibold text-xs">Next-Gen CRM Platform</span>
+                <span className="text-blue-800 font-bold text-xs">Next-Gen CRM Platform</span>
               </div>
 
-              {/* Increased heading sizes */}
-              <h1 className="text-5xl sm:text-[3.5rem] leading-[1.1] font-extrabold text-slate-900 tracking-tight mb-1">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-1">
                 Grow Your <br className="hidden lg:block" />
-                <span className="text-blue-600">{institutionType === 'school' ? 'School Admissions' : 'College Admissions'}</span>
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{institutionType === 'school' ? 'School Admissions' : 'College Admissions'}</span>
               </h1>
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-700 mt-2 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-700 mt-1 mb-3">
                 {institutionType === 'school' ? 'Manage School CRM' : 'Manage College CRM'}
               </h2>
 
-              {/* Removed mb-8 to bring boxes closer */}
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg font-medium">
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-lg font-medium">
                 Manage enquiries, admissions, assessments, communication, analytics and student records from one modern platform.
               </p>
             </div>
@@ -204,12 +201,12 @@ const Signup = () => {
             {/* Feature cards grid */}
             <div className="hidden sm:grid grid-cols-2 gap-3">
               {currentFeatures.map((feat, idx) => (
-                <div key={idx} className="bg-white/80 backdrop-blur-md border border-white/60 rounded-xl p-4 hover:bg-white transition-all duration-300 group shadow-sm flex items-start gap-3">
-                  <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${feat.iconBg}`}>
+                <div key={idx} className="bg-white/85 backdrop-blur-md border border-white/80 rounded-xl p-3.5 hover:bg-white transition-all duration-300 group shadow-sm flex items-start gap-3">
+                  <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center shadow-sm ${feat.iconBg}`}>
                     {feat.icon}
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-slate-900 mb-0.5">{feat.title}</h4>
+                    <h4 className="font-bold text-xs text-slate-900 mb-0.5">{feat.title}</h4>
                     <p className="text-[11px] text-slate-600 font-medium leading-relaxed">{feat.description}</p>
                   </div>
                 </div>
@@ -217,15 +214,15 @@ const Signup = () => {
             </div>
           </div>
 
-          {/* Footer branding fixed at the bottom */}
-          <div className="text-[10px] text-slate-400 font-semibold py-2">
+          {/* Footer branding fixed at bottom */}
+          <div className="text-[10px] text-slate-400 font-semibold pt-4">
             <p>© 2026 {institutionType === 'school' ? 'School' : 'College'} Admission CRM. All rights reserved.</p>
           </div>
         </div>
 
         {/* Right Side: Auth Card */}
-        <div className="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-6 lg:p-8 h-full">
-          <div className="w-full max-w-md bg-white rounded-[1.5rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col justify-between">
+        <div className="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-6 lg:p-8 my-auto">
+          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 flex flex-col justify-between">
             <div>
               {/* Card Header */}
               <div className="flex items-center gap-3 mb-5">

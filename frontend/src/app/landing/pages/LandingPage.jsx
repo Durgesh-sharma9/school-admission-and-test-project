@@ -272,14 +272,14 @@ const LandingPage = () => {
       </nav>
 
       {/* 2. COMPACT HERO SECTION WITH ANIMATED BLOBS */}
-      <section className="relative pt-24 pb-16 lg:pt-32 lg:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
+      <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/15 blur-[100px]" />
           <motion.div animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute top-[20%] right-[-5%] w-[30%] h-[50%] rounded-full bg-fuchsia-500/15 blur-[100px]" />
           <motion.div animate={{ scale: [1, 1.1, 1], x: [0, 50, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="absolute bottom-[-10%] left-[20%] w-[50%] h-[40%] rounded-full bg-cyan-400/15 blur-[100px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10 pt-2 lg:pt-4">
 
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="lg:col-span-6 text-left space-y-6">
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white border border-slate-800 shadow-md">
@@ -287,26 +287,26 @@ const LandingPage = () => {
               <span>Campus CRM • CONNECT. MANAGE. GROW.</span>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+            <motion.h1 variants={fadeUp} className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
               Grow Admissions With <span className="bg-gradient-to-r from-slate-900 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Campus CRM</span>
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="text-sm sm:text-base text-slate-600 max-w-lg font-medium leading-relaxed">
+            <motion.p variants={fadeUp} className="text-xs sm:text-base text-slate-600 max-w-lg font-medium leading-relaxed">
               Connect prospective students, manage enquiry funnels, and grow your institution's admissions from one integrated dashboard. Built for Schools & Colleges.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3 pt-2">
-              <Link to="/signup">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button className="relative group bg-slate-900 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg overflow-hidden border border-slate-800">
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 pt-2 w-full">
+              <Link to="/signup" className="w-full sm:w-auto">
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button className="w-full sm:w-auto relative group bg-slate-900 text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg overflow-hidden border border-slate-800 cursor-pointer">
                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <span className="relative z-10 flex items-center gap-1.5">Start Free Trial <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
                   </Button>
                 </motion.div>
               </Link>
-              <a href="#workflow">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button variant="ghost" className="text-xs font-bold px-6 py-3 rounded-xl border border-slate-200 bg-white/50 backdrop-blur-md hover:bg-slate-50 text-slate-800 shadow-sm flex items-center gap-1.5">
+              <a href="#workflow" className="w-full sm:w-auto">
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button variant="ghost" className="w-full sm:w-auto text-xs font-bold px-6 py-3 rounded-xl border border-slate-200 bg-white/50 backdrop-blur-md hover:bg-slate-50 text-slate-800 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
                     <Play className="w-3.5 h-3.5 fill-slate-800" /> Watch Workflow
                   </Button>
                 </motion.div>
@@ -316,7 +316,7 @@ const LandingPage = () => {
             <motion.div variants={fadeUp} className="flex flex-wrap gap-x-4 gap-y-2 pt-4 border-t border-slate-100">
               {['100% Cloud', 'For Schools & Colleges', 'Role-Based Access', 'QR Enabled'].map((b) => (
                 <div key={b} className="flex items-center gap-1.5 text-slate-500 font-bold text-xs">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" /> <span>{b}</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> <span>{b}</span>
                 </div>
               ))}
             </motion.div>
@@ -325,27 +325,27 @@ const LandingPage = () => {
           {/* FLOATING DASHBOARD MOCKUP */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 70, damping: 20, delay: 0.2 }}
-            className="lg:col-span-6 relative flex justify-center items-center mt-8 lg:mt-0"
+            className="lg:col-span-6 relative flex justify-center items-center mt-6 lg:mt-0"
           >
-            <motion.div animate={floatAnimation} className="w-full max-w-[500px] aspect-[4/3] rounded-3xl bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_50px_rgba(79,70,229,0.15)] p-3 relative z-10">
-              <div className="h-8 flex items-center space-x-1.5 px-3 rounded-t-xl bg-slate-50 border-b border-slate-100">
+            <motion.div animate={floatAnimation} className="w-full max-w-[500px] aspect-[4/3] rounded-2xl sm:rounded-3xl bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_50px_rgba(79,70,229,0.15)] p-2.5 sm:p-3 relative z-10">
+              <div className="h-7 sm:h-8 flex items-center space-x-1.5 px-3 rounded-t-xl bg-slate-50 border-b border-slate-100">
                 <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               </div>
-              <div className="p-3 bg-slate-50/50 rounded-b-xl h-[calc(100%-32px)] flex flex-col gap-3 shadow-inner">
-                <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+              <div className="p-2 sm:p-3 bg-slate-50/50 rounded-b-xl h-[calc(100%-28px)] sm:h-[calc(100%-32px)] flex flex-col gap-2.5 sm:gap-3 shadow-inner">
+                <div className="flex justify-between items-center bg-white p-2.5 sm:p-3 rounded-xl shadow-sm border border-slate-100">
                   <div>
-                    <div className="font-black text-slate-900 text-xs">Campus CRM Dashboard</div>
-                    <div className="text-[10px] text-slate-500 font-bold">Today's CRM Work Queue</div>
+                    <div className="font-black text-slate-900 text-[11px] sm:text-xs">Campus CRM Dashboard</div>
+                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold">Today's CRM Work Queue</div>
                   </div>
                   <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md font-black text-[9px] border border-emerald-100">Live</span>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {['Admissions (50K+)', 'WhatsApp (98%)', 'Avg. Score (82)'].map((metric, i) => (
-                    <motion.div whileHover={{ scale: 1.05 }} key={i} className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 cursor-default">
-                      <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider">{metric}</span>
-                      <span className="text-sm font-black text-slate-800 block mt-0.5">
+                    <motion.div whileHover={{ scale: 1.05 }} key={i} className="bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-slate-100 cursor-default">
+                      <span className="text-[7px] sm:text-[8px] text-slate-400 font-black uppercase tracking-wider block truncate">{metric}</span>
+                      <span className="text-xs sm:text-sm font-black text-slate-800 block mt-0.5">
                         {i === 0 ? '54,230' : i === 1 ? '98.6%' : '84.2'}
                       </span>
                     </motion.div>
@@ -371,7 +371,7 @@ const LandingPage = () => {
             {/* Hover Floating Widget */}
             <motion.div
               animate={{ y: [-15, 5, -15], rotate: [-2, 2, -2] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-4 -left-4 sm:-left-8 bg-white/95 backdrop-blur-xl p-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 z-20"
+              className="hidden sm:flex absolute top-4 -left-4 sm:-left-8 bg-white/95 backdrop-blur-xl p-3 rounded-2xl shadow-xl border border-slate-100 items-center gap-3 z-20"
             >
               <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600 rounded-xl flex items-center justify-center shadow-inner">
                 <BarChart3 className="w-5 h-5" />
@@ -384,7 +384,7 @@ const LandingPage = () => {
 
             <motion.div
               animate={{ y: [10, -10, 10] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -bottom-6 -right-2 sm:-right-6 bg-white/95 backdrop-blur-xl p-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 z-20"
+              className="hidden sm:flex absolute -bottom-6 -right-2 sm:-right-6 bg-white/95 backdrop-blur-xl p-3 rounded-2xl shadow-xl border border-slate-100 items-center gap-3 z-20"
             >
               <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-inner relative">
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-white animate-pulse" />
@@ -423,22 +423,22 @@ const LandingPage = () => {
       </section>
 
       {/* 4. PREMIUM FEATURES GRID (Animated Cards) */}
-      <section id="features" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC] relative">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} className="text-center max-w-2xl mx-auto space-y-3">
+      <section id="features" className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC] relative">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} className="text-center max-w-2xl mx-auto space-y-2 sm:space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-blue-700 border border-blue-100">
               <Zap className="w-3.5 h-3.5 text-blue-600" />
               <span>Comprehensive Toolkit</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-              12 Premium Features For Campuses
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              8 Premium Features For Campuses
             </h2>
-            <p className="text-sm text-slate-500 font-medium">Everything you need to automate inquiries, organize documents, and coordinate communications.</p>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium">Everything you need to automate inquiries, organize documents, and coordinate communications.</p>
           </motion.div>
 
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={staggerContainer}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
           >
             {featuresList.map((feat, i) => {
               const IconComp = feat.icon;
@@ -446,14 +446,14 @@ const LandingPage = () => {
                 <motion.div
                   variants={popIn} key={i}
                   whileHover={{ scale: 1.03, y: -5 }}
-                  className={`group p-5 bg-gradient-to-br ${feat.color} rounded-2xl border border-white/10 shadow-md flex flex-col justify-between text-white relative overflow-hidden cursor-default`}
+                  className={`group p-4 sm:p-5 bg-gradient-to-br ${feat.color} rounded-2xl border border-white/10 shadow-md flex flex-col justify-between text-white relative overflow-hidden cursor-default`}
                 >
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 blur-xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
                   <div className="relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 shadow-sm group-hover:rotate-6 transition-transform duration-300">
-                      <IconComp className="w-5 h-5 text-white" />
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:rotate-6 transition-transform duration-300">
+                      <IconComp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <h3 className="text-base font-black text-white mb-2">{feat.title}</h3>
+                    <h3 className="text-sm sm:text-base font-black text-white mb-1.5">{feat.title}</h3>
                     <p className="text-xs text-white/90 font-medium leading-relaxed">{feat.description}</p>
                   </div>
                 </motion.div>
@@ -464,27 +464,27 @@ const LandingPage = () => {
       </section>
 
       {/* 5. DYNAMIC MODULES */}
-      <section id="modules" className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-y border-slate-200/50">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-xl mx-auto space-y-3">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Built-in Dynamic Modules</h2>
-            <p className="text-sm text-slate-500 font-medium">Everything in one application context to eliminate multi-app context switches.</p>
+      <section id="modules" className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white border-y border-slate-200/50">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center max-w-xl mx-auto space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Built-in Dynamic Modules</h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium">Everything in one application context to eliminate multi-app context switches.</p>
           </motion.div>
 
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {modulesList.map((mod, i) => (
               <motion.div
                 variants={fadeUp} key={i} whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-                className="p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4 text-left transition-colors hover:bg-white"
+                className="p-4 sm:p-5 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3.5 sm:gap-4 text-left transition-colors hover:bg-white"
               >
-                <motion.div whileHover={{ rotate: 10, scale: 1.1 }} className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 ${mod.color} shadow-inner`}>
+                <motion.div whileHover={{ rotate: 10, scale: 1.1 }} className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl shrink-0 ${mod.color} shadow-inner`}>
                   {mod.img}
                 </motion.div>
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-black text-slate-900">{mod.title}</h3>
+                <div className="space-y-1">
+                  <h3 className="text-sm sm:text-base font-black text-slate-900">{mod.title}</h3>
                   <p className="text-xs text-slate-500 font-medium leading-relaxed">{mod.desc}</p>
                 </div>
               </motion.div>
@@ -494,15 +494,15 @@ const LandingPage = () => {
       </section>
 
       {/* 6. WORKFLOW & APPLICANT TIMELINE */}
-      <section id="workflow" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC] overflow-hidden relative">
+      <section id="workflow" className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC] overflow-hidden relative">
         <div className="absolute top-1/2 left-0 -translate-y-1/2 w-80 h-80 bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 items-center relative z-10">
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="space-y-6">
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">The Smooth Applicant Journey</motion.h2>
-            <motion.p variants={fadeUp} className="text-sm text-slate-500 font-medium max-w-md">A seamless, zero-friction path from offline campus scan to complete enrollment.</motion.p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="space-y-5 sm:space-y-6">
+            <motion.h2 variants={fadeUp} className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">The Smooth Applicant Journey</motion.h2>
+            <motion.p variants={fadeUp} className="text-xs sm:text-sm text-slate-500 font-medium max-w-md">A seamless, zero-friction path from offline campus scan to complete enrollment.</motion.p>
 
-            <div className="relative pl-6 border-l-2 border-indigo-100 space-y-8 pt-2">
+            <div className="relative pl-6 sm:pl-8 border-l-2 border-indigo-100 space-y-6 sm:space-y-8 pt-2">
               {workflowSteps.map((step, idx) => (
                 <motion.div key={idx} variants={popIn} className="relative group">
                   <motion.div whileHover={{ scale: 1.2 }} className="absolute -left-[41px] top-0 w-10 h-10 bg-white border-2 border-indigo-500 rounded-full flex items-center justify-center font-black text-indigo-600 shadow-sm group-hover:bg-indigo-50 transition-colors">
@@ -544,24 +544,24 @@ const LandingPage = () => {
       </section>
 
       {/* 7. INTERACTIVE SCREENSHOTS CAROUSEL */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-y border-slate-200/50 overflow-hidden relative">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-white border-y border-slate-200/50 overflow-hidden relative">
         <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
           <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 10, repeat: Infinity }} className="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-300/50 rounded-full blur-[100px]" />
           <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 12, repeat: Infinity }} className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-300/50 rounded-full blur-[100px]" />
         </div>
 
-        <div className="max-w-6xl mx-auto space-y-10 relative z-10 text-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-xl mx-auto space-y-3">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Explore the Platform</h2>
-            <p className="text-sm text-slate-500 font-medium">Take an interactive tour of the actual CRM layouts used by administrative personnel.</p>
+        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-10 relative z-10 text-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-xl mx-auto space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Explore the Platform</h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium">Take an interactive tour of the actual CRM layouts used by administrative personnel.</p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto bg-slate-50 p-1.5 rounded-xl border border-slate-200 shadow-sm backdrop-blur-md">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-3xl mx-auto bg-slate-50 p-1.5 rounded-xl border border-slate-200 shadow-sm backdrop-blur-md">
             {screenshotTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveScreenshotTab(tab.id)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex-1 min-w-[120px] ${activeScreenshotTab === tab.id
+                className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex-1 min-w-[85px] sm:min-w-[120px] ${activeScreenshotTab === tab.id
                   ? 'bg-indigo-600 text-white shadow-md scale-105'
                   : 'bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-200'
                   }`}
@@ -575,18 +575,18 @@ const LandingPage = () => {
             <motion.div
               key={activeScreenshotTab}
               initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.98 }} transition={{ duration: 0.3 }}
-              className="bg-white rounded-3xl border border-slate-200 shadow-2xl p-4 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
+              className="bg-white rounded-3xl border border-slate-200 shadow-2xl p-3 sm:p-4 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center text-left"
             >
-              <div className="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200/60 bg-slate-50/50 p-2 group shadow-sm">
+              <div className="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200/60 bg-slate-50/50 p-1.5 sm:p-2 group shadow-sm">
                 <img src={activeTabContent.image} alt={activeTabContent.name} className="w-full h-auto max-h-[480px] object-contain rounded-xl border border-slate-200/80 shadow-md group-hover:scale-[1.01] transition-transform duration-500" />
               </div>
-              <div className="lg:col-span-4 space-y-4 px-2">
+              <div className="lg:col-span-4 space-y-3 sm:space-y-4 px-2">
                 <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full border border-indigo-100">
                   {activeTabContent.name}
                 </span>
-                <h3 className="text-2xl font-black text-slate-900 leading-tight">{activeTabContent.title}</h3>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">{activeTabContent.title}</h3>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed">{activeTabContent.desc}</p>
-                <Link to="/signup" className="inline-block mt-2">
+                <Link to="/signup" className="inline-block mt-1 sm:mt-2">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1.5 shadow-md transition-all border border-slate-700 cursor-pointer">
                       Try Dashboard Live <ArrowUpRight className="w-3.5 h-3.5" />
@@ -600,11 +600,11 @@ const LandingPage = () => {
       </section>
 
       {/* 8. PRICING PLANS */}
-      <section id="pricing" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC]">
-        <div className="max-w-6xl mx-auto space-y-8 text-center">
+      <section id="pricing" className="py-10 sm:py-16 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC]">
+        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 text-center">
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-xl mx-auto space-y-3">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Flexible Subscription Plans</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-xl mx-auto space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">Flexible Subscription Plans</h2>
             <p className="text-sm text-slate-500 font-medium">Select the plan configured by the Super Admin for your institution's registration volume.</p>
           </motion.div>
 
@@ -641,7 +641,7 @@ const LandingPage = () => {
               <span>Loading Subscription Plans...</span>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-stretch pt-2 max-w-2xl mx-auto">
               {(plans.length > 0 ? plans : defaultPlansList)
                 .filter(p => p.organizationType === pricingType && (p.status === 'active' || !p.status))
                 .map((plan, idx) => {
@@ -653,57 +653,57 @@ const LandingPage = () => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: idx * 0.1 }}
-                      className={`p-6 sm:p-8 rounded-3xl text-left flex flex-col justify-between relative transition-all duration-300 ${
+                      className={`p-5 sm:p-6 rounded-2xl text-left flex flex-col justify-between relative transition-all duration-300 ${
                         isPopular
-                          ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white shadow-2xl border-2 border-indigo-500 scale-[1.03] z-10'
-                          : 'bg-white text-slate-900 border border-slate-200 shadow-md hover:shadow-xl'
+                          ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-500/80 scale-[1.01] z-10'
+                          : 'bg-white text-slate-900 border border-slate-200 shadow-sm hover:shadow-md'
                       }`}
                     >
                       {isPopular && (
-                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg border border-amber-300">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md border border-amber-300">
                           Recommended
                         </div>
                       )}
 
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <div>
-                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${
+                          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
                             isPopular ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30' : 'bg-slate-100 text-slate-500'
                           }`}>
                             {plan.organizationType === 'school' ? 'School Plan' : 'College Plan'}
                           </span>
-                          <h3 className={`text-2xl font-black mt-2 ${isPopular ? 'text-white' : 'text-slate-900'}`}>
+                          <h3 className={`text-xl font-black mt-1.5 ${isPopular ? 'text-white' : 'text-slate-900'}`}>
                             {plan.planName}
                           </h3>
-                          <div className="mt-2 flex items-baseline gap-1">
-                            <span className="text-3xl sm:text-4xl font-black tracking-tight">
+                          <div className="mt-1 flex items-baseline gap-1">
+                            <span className="text-2xl sm:text-3xl font-black tracking-tight">
                               ₹{plan.price}
                             </span>
-                            <span className={`text-xs font-bold ${isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
+                            <span className={`text-[11px] font-bold ${isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
                               /{plan.billingCycle || 'year'}
                             </span>
                           </div>
                         </div>
 
                         {/* Features List */}
-                        <div className="border-t border-slate-200/20 pt-4 mt-4">
-                          <p className={`text-[10px] font-black uppercase tracking-wider mb-3 ${isPopular ? 'text-slate-400' : 'text-slate-400'}`}>Included Features:</p>
-                          <ul className="space-y-2.5 text-xs font-semibold">
+                        <div className="border-t border-slate-200/20 pt-3 mt-3">
+                          <p className="text-[9px] font-black uppercase tracking-wider mb-2 text-slate-400">Included Features:</p>
+                          <ul className="space-y-1.5 text-[11px] font-semibold">
                             {plan.features && plan.features.length > 0 ? (
                               plan.features.map((feat, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                <li key={i} className="flex items-start gap-1.5">
+                                  <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                   <span className={isPopular ? 'text-slate-200' : 'text-slate-700'}>{feat}</span>
                                 </li>
                               ))
                             ) : (
                               <>
-                                <li className="flex items-center gap-2">
-                                  <CheckCircle2 className={`w-4 h-4 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                <li className="flex items-center gap-1.5">
+                                  <CheckCircle2 className={`w-3.5 h-3.5 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                   <span>Full Admissions & Lead CRM</span>
                                 </li>
-                                <li className="flex items-center gap-2">
-                                  <CheckCircle2 className={`w-4 h-4 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                <li className="flex items-center gap-1.5">
+                                  <CheckCircle2 className={`w-3.5 h-3.5 ${isPopular ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                   <span>Online Entrance Assessments</span>
                                 </li>
                               </>
@@ -713,10 +713,10 @@ const LandingPage = () => {
                       </div>
 
                       {/* Action Button -> Redirects to Signup */}
-                      <div className="pt-6 mt-6 border-t border-slate-200/20">
+                      <div className="pt-4 mt-4 border-t border-slate-200/20">
                         <Button
                           onClick={() => navigate('/signup', { state: { institutionType: pricingType, type: pricingType, planCode: plan.planCode } })}
-                          className={`w-full py-3 rounded-xl text-xs font-black shadow-md transition-transform active:scale-95 cursor-pointer ${
+                          className={`w-full py-2.5 rounded-xl text-xs font-black shadow-sm transition-transform active:scale-95 cursor-pointer ${
                             isPopular
                               ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border border-indigo-400/30'
                               : 'bg-slate-900 hover:bg-slate-800 text-white'
@@ -787,60 +787,60 @@ const LandingPage = () => {
       </section>
 
       {/* 11. DARK FOOTER WITH CONTACT & SOCIAL LINKS */}
-      <footer id="contact" className="bg-[#0b1329] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 text-left text-xs relative z-20 overflow-hidden border-t border-slate-800/80">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 relative z-10">
+      <footer id="contact" className="bg-[#0b1329] text-slate-400 py-8 sm:py-10 px-4 sm:px-6 lg:px-8 text-left text-xs relative z-20 overflow-hidden border-t border-slate-800/80">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
 
           {/* Brand & Social Column */}
-          <div className="col-span-1 sm:col-span-2 space-y-4">
+          <div className="col-span-1 sm:col-span-2 space-y-2.5">
             <CampusCrmLogo variant="full" lightText={true} size="normal" />
             <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-sm">
               Campus CRM is a cloud-based School & College Admission Management Platform that helps institutions manage students, enquiries, entrance assessments, rankings, and parent communication efficiently.
             </p>
             {/* Social Icons matching screenshot design */}
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 pt-1">
               <a
                 href="https://x.com/webncodetech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
                 title="Twitter / X"
               >
-                <Twitter className="w-4 h-4" />
+                <Twitter className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://www.linkedin.com/company/webncodetechnologies"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
                 title="LinkedIn"
               >
-                <Linkedin className="w-4 h-4" />
+                <Linkedin className="w-3.5 h-3.5" />
               </a>
               <a
                 href="#"
                 onClick={(e) => e.preventDefault()}
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm opacity-80 cursor-not-allowed"
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm opacity-80 cursor-not-allowed"
                 title="Facebook (Coming Soon)"
               >
-                <Facebook className="w-4 h-4" />
+                <Facebook className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://www.instagram.com/webncodetechnologies"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800/90 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all hover:scale-105 shadow-sm"
                 title="Instagram"
               >
-                <Instagram className="w-4 h-4" />
+                <Instagram className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
 
           {/* Features Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Features</h4>
-            <ul className="space-y-2.5 font-medium text-slate-400">
+          <div className="space-y-2">
+            <h4 className="text-[11px] font-extrabold text-white uppercase tracking-wider">Features</h4>
+            <ul className="space-y-1.5 font-medium text-slate-400 text-xs">
               <li><a href="#features" className="hover:text-white transition-colors">Student Management</a></li>
               <li><a href="#features" className="hover:text-white transition-colors">Teacher Management</a></li>
               <li><a href="#features" className="hover:text-white transition-colors">Daily Tests</a></li>
@@ -850,9 +850,9 @@ const LandingPage = () => {
           </div>
 
           {/* Support Column */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Support</h4>
-            <ul className="space-y-2.5 font-medium text-slate-400">
+          <div className="space-y-2">
+            <h4 className="text-[11px] font-extrabold text-white uppercase tracking-wider">Support</h4>
+            <ul className="space-y-1.5 font-medium text-slate-400 text-xs">
               <li><a href="#faq" className="hover:text-white transition-colors">Help Center</a></li>
               <li><a href="#features" className="hover:text-white transition-colors">Documentation</a></li>
               <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
@@ -862,19 +862,19 @@ const LandingPage = () => {
           </div>
 
           {/* Contact Column (from user screenshot & request) */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">Contact</h4>
-            <ul className="space-y-3 font-medium text-slate-400">
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-blue-400 shrink-0" />
+          <div className="space-y-2">
+            <h4 className="text-[11px] font-extrabold text-white uppercase tracking-wider">Contact</h4>
+            <ul className="space-y-2 font-medium text-slate-400 text-xs">
+              <li className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                 <a href="mailto:support@schoolresult.app" className="hover:text-white transition-colors">support@schoolresult.app</a>
               </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+              <li className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <a href="tel:+918947919195" className="hover:text-white transition-colors">+91 8947919195</a>
               </li>
-              <li className="flex items-center gap-2.5">
-                <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+              <li className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span className="hover:text-white transition-colors">Jaipur, Rajasthan</span>
               </li>
             </ul>
@@ -883,7 +883,7 @@ const LandingPage = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="max-w-7xl mx-auto border-t border-slate-800/80 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 font-semibold text-xs relative z-10">
+        <div className="max-w-7xl mx-auto border-t border-slate-800/80 mt-6 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-500 font-semibold text-[11px] relative z-10">
           <p>© 2026 Campus CRM. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="/privacy" className="hover:text-slate-300 transition-colors">Privacy policy</a>
