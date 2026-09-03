@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+export const DEFAULT_SESSION = '2026-2027';
+
 export const ACADEMIC_SESSIONS = [
   '2026-2027',
   '2027-2028',
@@ -19,7 +21,7 @@ export const DATE_PRESETS = [
   { id: 'custom', label: 'Custom Range' },
 ];
 
-export const calculateDateRange = (preset, session = '2026-2027', customStart = '', customEnd = '') => {
+export const calculateDateRange = (preset, session = DEFAULT_SESSION, customStart = '', customEnd = '') => {
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
 
@@ -60,7 +62,7 @@ const SessionContext = createContext();
 
 export const SessionProvider = ({ children }) => {
   const [activeSession, setActiveSession] = useState(() => {
-    return localStorage.getItem('selected_academic_session') || '2026-2027';
+    return localStorage.getItem('selected_academic_session') || DEFAULT_SESSION;
   });
 
   const changeSession = (newSession) => {
@@ -68,6 +70,14 @@ export const SessionProvider = ({ children }) => {
     localStorage.setItem('selected_academic_session', newSession);
     window.dispatchEvent(new CustomEvent('academic-session-changed', { detail: newSession }));
   };
+
+  const resetToDefaultSession = () => {
+    changeSession(DEFAULT_SESSION);
+  };
+
+  const isDefaultSession = activeSession === DEFAULT_SESSION;
+  const isFutureSession = activeSession > DEFAULT_SESSION;
+  const canCreateEnquiry = !isFutureSession;
 
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -83,7 +93,12 @@ export const SessionProvider = ({ children }) => {
     <SessionContext.Provider
       value={{
         activeSession,
+        defaultSession: DEFAULT_SESSION,
+        isDefaultSession,
+        isFutureSession,
+        canCreateEnquiry,
         changeSession,
+        resetToDefaultSession,
         availableSessions: ACADEMIC_SESSIONS,
         datePresets: DATE_PRESETS,
         calculateDateRange,
@@ -98,8 +113,13 @@ export const useSession = () => {
   const context = useContext(SessionContext);
   if (!context) {
     return {
-      activeSession: '2026-2027',
+      activeSession: DEFAULT_SESSION,
+      defaultSession: DEFAULT_SESSION,
+      isDefaultSession: true,
+      isFutureSession: false,
+      canCreateEnquiry: true,
       changeSession: () => {},
+      resetToDefaultSession: () => {},
       availableSessions: ACADEMIC_SESSIONS,
       datePresets: DATE_PRESETS,
       calculateDateRange,

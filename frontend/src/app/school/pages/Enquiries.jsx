@@ -282,7 +282,7 @@ const Enquiries = () => {
           return;
         }
 
-        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'State', 'Locality', 'City', 'Society', 'Previous School', 'Previous Class', 'Source', 'Source Details', 'Expectations', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
+        const headers = ['Enquiry ID', 'Student Name', 'Parent Name', 'Mobile', 'Email', 'Class Seeking', 'State', 'Locality', 'City', 'Society', 'Previous School', 'Previous Class', 'Transport Required', 'Source', 'Source Details', 'Expectations', 'Status', 'Registered Date', 'Registered Time', 'Converted to Admission'];
         const csvRows = [headers.join(',')];
 
         data.forEach(item => {
@@ -299,6 +299,7 @@ const Enquiries = () => {
             `"${item.society || ''}"`,
             `"${item.previousSchool || item.currentSchool || ''}"`,
             `"${item.previousClass || item.currentClass || ''}"`,
+            `"${item.transportRequired || 'No'}"`,
             `"${item.source || ''}"`,
             `"${item.sourceOtherSpecify || ''}"`,
             `"${(item.expectations || '').replace(/"/g, '""')}"`,

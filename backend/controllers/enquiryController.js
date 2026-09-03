@@ -279,7 +279,16 @@ const createEnquiryManual = async (req, res) => {
     const enquiryData = req.body;
 
     const school = await School.findById(schoolId);
-    const assignedSession = enquiryData.academicSession || enquiryData.session || school?.academicSession || '2026-2027';
+    const activeSchoolSession = school?.academicSession || '2026-2027';
+    const assignedSession = enquiryData.academicSession || enquiryData.session || activeSchoolSession;
+
+    // Block enquiry creation for future academic sessions
+    if (assignedSession > activeSchoolSession) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot create enquiries for future session (${assignedSession}). Admissions are currently open only for active session ${activeSchoolSession}.`
+      });
+    }
 
     const uniqueId = await generateEnquiryId();
     const { saveDate, saveTime } = getFormattedDateTime();

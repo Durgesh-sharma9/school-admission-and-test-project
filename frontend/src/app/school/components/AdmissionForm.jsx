@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
-import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus } from 'lucide-react';
+import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus, Lock, RotateCcw, AlertTriangle, Bus } from 'lucide-react';
 import AutocompleteSelect, { CLASS_SEEKING_OPTIONS, PREVIOUS_CLASS_OPTIONS } from '../../../shared/components/AutocompleteSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { useSession } from '../../../contexts/SessionContext';
@@ -59,10 +59,8 @@ const MARKETING_SOURCES = [
   "Newspaper",
   "Banner / Hoarding",
   "Pamphlet",
-  "Walk-in",
-  "Reception",
-  "Education Fair",
-  "WhatsApp",
+  "Education Fair / Event",
+  "Direct Walk-in",
   "Other"
 ];
 
@@ -101,6 +99,7 @@ const AdmissionForm = ({
       source: '',
       sourceOtherSpecify: '',
       expectations: '',
+      transportRequired: 'No',
       notes: '',
       status: 'New Enquiry',
     },
@@ -114,6 +113,9 @@ const AdmissionForm = ({
   const school = authContext?.school;
   const sessionContext = useSession ? useSession() : null;
   const activeSession = sessionContext?.activeSession || school?.academicSession || '2026-2027';
+  const defaultSession = sessionContext?.defaultSession || '2026-2027';
+  const isFutureSession = sessionContext?.isFutureSession || (activeSession > defaultSession);
+  const resetToDefaultSession = sessionContext?.resetToDefaultSession;
   const { schoolId: paramSchoolId } = useParams();
   const schoolId = paramSchoolId || school?._id || school?.id || '';
 
@@ -271,11 +273,8 @@ const AdmissionForm = ({
         formattedData.dob = new Date(formattedData.dob).toISOString().split('T')[0];
       }
       // Populate previous fields from current fields for old records
-      if (formattedData.currentSchool && !formattedData.previousSchool) {
-        formattedData.previousSchool = formattedData.currentSchool;
-      }
-      if (formattedData.currentClass && !formattedData.previousClass) {
-        formattedData.previousClass = formattedData.currentClass;
+      if (formattedData.transportRequired === undefined) {
+        formattedData.transportRequired = 'No';
       }
       reset(formattedData);
     } else {
@@ -298,6 +297,7 @@ const AdmissionForm = ({
         source: '',
         sourceOtherSpecify: '',
         expectations: '',
+        transportRequired: 'No',
         notes: '',
         status: 'New Enquiry',
       });
@@ -328,9 +328,16 @@ const AdmissionForm = ({
           }
         }
       }
+
+      // Future Academic Session Guard
+      if (isFutureSession) {
+        toast.error(`Admissions for future session (${activeSession}) are not yet open. Please switch back to ${defaultSession}.`);
+        return;
+      }
+
       const payload = {
         ...data,
-        academicSession: data.academicSession || activeSession || '2026-2027',
+        academicSession: data.academicSession || activeSession || defaultSession,
       };
       await onSubmit(payload, reset);
     } catch (error) {
@@ -349,6 +356,35 @@ const AdmissionForm = ({
   return (
     <>
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8 max-w-3xl mx-auto">
+        {/* Future Session Lock Warning Banner */}
+        {isFutureSession && (
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl p-4 shadow-sm text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-amber-500 text-white rounded-xl shrink-0 mt-0.5 shadow-sm">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-950">
+                  Future Session: {activeSession} (Registration Locked)
+                </h4>
+                <p className="text-xs text-amber-800 mt-0.5">
+                  Admissions for future academic session <strong>{activeSession}</strong> have not opened yet. New entries are restricted to active session <strong>{defaultSession}</strong>.
+                </p>
+              </div>
+            </div>
+            {resetToDefaultSession && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resetToDefaultSession}
+                className="shrink-0 text-xs font-bold border-amber-400 text-amber-900 bg-white hover:bg-amber-100 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1" /> Switch to {defaultSession}
+              </Button>
+            )}
+          </div>
+        )}
+
         {/* Section 1: Student Information */}
         <div className="bg-white rounded-[18px] border border-[#E8ECF3] p-6 shadow-[0_10px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-200 space-y-6">
           <div className="border-l-4 border-[#8B5CF6] pl-3 py-0.5 text-left">
@@ -409,23 +445,20 @@ const AdmissionForm = ({
             />
 
             <Input
-              label="Previous School *"
+              label="Previous School (Optional)"
               name="previousSchool"
-              placeholder="e.g. Greenwood Nursery"
-              required
+              placeholder="e.g. Greenwood Nursery (Optional)"
               error={errors.previousSchool}
-              {...register('previousSchool', { required: 'Previous school is required' })}
+              {...register('previousSchool')}
             />
 
             <Controller
               name="previousClass"
               control={control}
-              rules={{ required: 'Previous class is required' }}
               render={({ field }) => (
                 <AutocompleteSelect
-                  label="Previous Class *"
-                  placeholder="Select previous class..."
-                  required
+                  label="Previous Class (Optional)"
+                  placeholder="Select previous class (Optional)..."
                   error={errors.previousClass}
                   options={PREVIOUS_CLASS_OPTIONS}
                   value={field.value}
@@ -831,31 +864,54 @@ const AdmissionForm = ({
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
-            {!isPublic && (
-              <div className="max-w-xs">
-                <Input
-                  label="Enquiry Status"
-                  name="status"
-                  type="select"
-                  required
-                  error={errors.status}
-                  options={[
-                    { value: 'New Enquiry', label: 'New Enquiry' },
-                    { value: 'Hold', label: 'Hold' },
-                    { value: 'Not Interested', label: 'Not Interested' },
-                    { value: 'Admission Confirmed', label: 'Admission Confirmed' },
-                  ]}
-                  {...register('status', { required: 'Status is required' })}
-                />
+          <div className="space-y-6">
+            {/* Transportation Requirement */}
+            <div className="text-left space-y-2">
+              <label className="block text-xs font-semibold text-slate-700">
+                Transportation Requirement
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  watch('transportRequired') === 'Yes'
+                    ? 'bg-blue-50/80 border-blue-500 shadow-xs ring-1 ring-blue-500/20'
+                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                }`}>
+                  <input
+                    type="radio"
+                    value="Yes"
+                    {...register('transportRequired')}
+                    className="text-blue-600 focus:ring-blue-500 h-4 w-4"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-slate-800 block">🚌 Yes, School Bus / Van Required</span>
+                    <span className="text-slate-400 font-medium text-[11px]">Requires school pickup & drop facility</span>
+                  </div>
+                </label>
+
+                <label className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  watch('transportRequired') === 'No'
+                    ? 'bg-blue-50/80 border-blue-500 shadow-xs ring-1 ring-blue-500/20'
+                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                }`}>
+                  <input
+                    type="radio"
+                    value="No"
+                    {...register('transportRequired')}
+                    className="text-blue-600 focus:ring-blue-500 h-4 w-4"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-slate-800 block">🚶 No, Self Transport</span>
+                    <span className="text-slate-400 font-medium text-[11px]">Parents will manage pickup & drop</span>
+                  </div>
+                </label>
               </div>
-            )}
+            </div>
 
             <Input
               label="Notes / Special Instructions (Optional)"
               name="notes"
               type="textarea"
-              placeholder="e.g. Requires transport facilities, requested fee installment schedule"
+              placeholder="e.g. Requires special pickup stop, fee installment schedule, etc."
               error={errors.notes}
               {...register('notes')}
             />
@@ -865,10 +921,11 @@ const AdmissionForm = ({
         <div className="flex justify-end pt-4">
           <Button
             type="submit"
-            className="px-8 py-3"
+            className={`px-8 py-3 ${isFutureSession ? 'opacity-60 cursor-not-allowed bg-slate-400' : ''}`}
             isLoading={isLoading}
+            disabled={isFutureSession}
           >
-            {isPublic ? 'Submit Admission Enquiry' : 'Save CRM Enquiry'}
+            {isFutureSession ? `🔒 Registration Locked (${activeSession})` : (isPublic ? 'Submit Admission Enquiry' : 'Save CRM Enquiry')}
           </Button>
         </div>
       </form>

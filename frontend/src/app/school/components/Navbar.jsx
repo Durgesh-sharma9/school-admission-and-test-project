@@ -42,7 +42,7 @@ const getPopupTitle = (announcement) => {
 
 const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
   const { school, logout } = useAuth();
-  const { activeSession, changeSession, availableSessions } = useSession();
+  const { activeSession, defaultSession, isDefaultSession, changeSession, availableSessions } = useSession();
   const navigate = useNavigate();
 
   const [sessionDropdownOpen, setSessionDropdownOpen] = useState(false);
@@ -247,25 +247,42 @@ const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
             <button
               type="button"
               onClick={() => setSessionDropdownOpen(!sessionDropdownOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200/80 transition-all cursor-pointer shadow-xs"
-              title="Switch Academic Session"
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs ${
+                isDefaultSession
+                  ? 'bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200/80'
+                  : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 ring-1 ring-amber-400/40 animate-pulse'
+              }`}
+              title={isDefaultSession ? "Current Academic Session" : `Viewing Session ${activeSession} (Not Default)`}
             >
-              <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-              <span className="hidden xs:inline text-[11px] text-blue-600 font-semibold">Session:</span>
+              {isDefaultSession ? (
+                <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              )}
+              <span className="hidden xs:inline text-[11px] text-slate-500 font-semibold">Session:</span>
               <span className="font-extrabold">{activeSession}</span>
-              <ChevronDown className={`w-3 h-3 text-blue-500 transition-transform ${sessionDropdownOpen ? 'rotate-180' : ''}`} />
+              {!isDefaultSession && (
+                <span className="hidden sm:inline text-[9px] font-bold bg-amber-200 text-amber-900 px-1 py-0.2 rounded">
+                  Archive/Future
+                </span>
+              )}
+              <ChevronDown className="w-3 h-3 text-slate-400 transition-transform" />
             </button>
 
             {sessionDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-left animate-fadeIn">
-                <div className="px-3.5 py-1.5 border-b border-slate-100 mb-1">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-left animate-fadeIn">
+                <div className="px-3.5 py-1.5 border-b border-slate-100 mb-1 flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     Switch Academic Session
+                  </span>
+                  <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                    Current: {defaultSession}
                   </span>
                 </div>
                 <div className="space-y-0.5 px-1.5">
                   {availableSessions.map((sess) => {
                     const isSelected = activeSession === sess;
+                    const isDef = sess === defaultSession;
                     return (
                       <button
                         key={sess}
@@ -281,7 +298,14 @@ const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
                             : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        <span>{sess}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span>{sess}</span>
+                          {isDef && (
+                            <span className={`text-[9px] font-normal px-1 rounded ${isSelected ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-500'}`}>
+                              Current
+                            </span>
+                          )}
+                        </div>
                         {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                       </button>
                     );

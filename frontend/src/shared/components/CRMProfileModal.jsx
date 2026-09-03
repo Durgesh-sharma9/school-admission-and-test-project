@@ -306,18 +306,54 @@ const CRMProfileModal = ({
                         {data.saveDate ? `${data.saveDate} ${data.saveTime || ''}` : data.createdAt ? new Date(data.createdAt).toLocaleDateString() : '—'}
                       </span>
                     </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Academic Session</span>
+                      <span className="font-extrabold text-blue-700 text-sm mt-0.5 block">
+                        {data.academicSession || '2026-2027'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Transport Required</span>
+                      <span className={`font-bold text-xs mt-1 inline-flex items-center gap-1 px-2.5 py-1 rounded-md ${
+                        data.transportRequired === 'Yes'
+                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          : 'bg-slate-50 text-slate-600 border border-slate-200'
+                      }`}>
+                        {data.transportRequired === 'Yes' ? '🚌 Yes (School Bus / Van)' : '🚶 No (Self Transport)'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Previous School & Class</span>
+                      <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                        {data.previousSchool ? `${data.previousSchool} (${data.previousClass || 'N/A'})` : 'First Time Admission'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Source of Enquiry</span>
+                      <span className="font-bold text-slate-700 text-sm mt-0.5 block">
+                        {data.source || '—'} {data.sourceOtherSpecify ? `(${data.sourceOtherSpecify})` : ''}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Society / Township</span>
+                      <span className="font-bold text-slate-700 text-sm mt-0.5 block">{data.society || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Full Address</span>
+                      <span className="font-bold text-slate-700 text-sm mt-0.5 block">{data.fullAddress || '—'}</span>
+                    </div>
+                    {data.notes && (
+                      <div className="col-span-1 sm:col-span-2 md:col-span-3 bg-amber-50/70 p-3 rounded-xl border border-amber-200/80">
+                        <span className="text-amber-800 font-bold block uppercase tracking-wider text-[9px]">Notes / Special Instructions</span>
+                        <span className="text-amber-950 font-semibold text-xs mt-0.5 block">{data.notes}</span>
+                      </div>
+                    )}
                     {type === 'college' && (
                       <>
                         <div>
                           <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Hostel Required</span>
                           <span className="font-bold text-slate-705 text-xs block mt-1">
                             {data.hostelRequired ? 'Yes' : 'No'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 font-bold block uppercase tracking-wider text-[9px]">Transport Option</span>
-                          <span className="font-bold text-slate-705 text-xs block mt-1">
-                            {data.transportRequired ? 'Yes' : 'No'}
                           </span>
                         </div>
                       </>

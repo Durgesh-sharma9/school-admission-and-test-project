@@ -44,13 +44,13 @@ const enquirySchema = new mongoose.Schema({
   },
   previousSchool: {
     type: String,
-    required: [true, 'Previous school is required'],
     trim: true,
+    default: '',
   },
   previousClass: {
     type: String,
-    required: [true, 'Previous class is required'],
     trim: true,
+    default: '',
   },
 
   // Parent Information
@@ -124,7 +124,13 @@ const enquirySchema = new mongoose.Schema({
     default: '',
   },
 
-  // Additional Info
+  // Additional Info & Transport
+  transportRequired: {
+    type: String,
+    enum: ['Yes', 'No', ''],
+    default: 'No',
+    trim: true,
+  },
   notes: {
     type: String,
     trim: true,
