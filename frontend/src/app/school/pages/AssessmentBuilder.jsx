@@ -23,6 +23,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { useAuth } from '../contexts/AuthContext';
 import UpgradePage from '../../../shared/components/UpgradePage';
+import AutocompleteSelect from '../../../shared/components/AutocompleteSelect';
+
+const SCHOOL_CLASS_OPTIONS = [
+  "Playgroup",
+  "Pre-Nursery",
+  "Nursery",
+  "LKG",
+  "UKG",
+  "Class 1",
+  "Class 2",
+  "Class 3",
+  "Class 4",
+  "Class 5",
+  "Class 6",
+  "Class 7",
+  "Class 8",
+  "Class 9",
+  "Class 10",
+  "Class 11 (Science)",
+  "Class 11 (Commerce)",
+  "Class 11 (Arts)",
+  "Class 12 (Science)",
+  "Class 12 (Commerce)",
+  "Class 12 (Arts)",
+  "All Classes",
+  "Other"
+];
 
 const AssessmentBuilder = () => {
   const { school } = useAuth();
@@ -346,12 +373,14 @@ const AssessmentBuilder = () => {
           />
         </div>
         <div>
-          <Input
+          <AutocompleteSelect
             label="Class targeted"
+            name="className"
             value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            placeholder="e.g. Grade 5"
+            onChange={(val) => setClassName(val)}
+            placeholder="Search class or type custom..."
             required
+            options={SCHOOL_CLASS_OPTIONS}
           />
         </div>
         <div>

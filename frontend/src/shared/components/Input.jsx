@@ -32,11 +32,15 @@ const Input = forwardRef(({
           {...props}
         >
           {placeholder && <option value="">{placeholder}</option>}
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
+          {options.map((opt, index) => {
+            const val = typeof opt === 'object' && opt !== null ? opt.value : opt;
+            const lbl = typeof opt === 'object' && opt !== null ? opt.label : opt;
+            return (
+              <option key={`${val}-${index}`} value={val}>
+                {lbl}
+              </option>
+            );
+          })}
         </select>
       ) : type === 'textarea' ? (
         <textarea

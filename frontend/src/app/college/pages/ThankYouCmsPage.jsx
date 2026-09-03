@@ -245,7 +245,7 @@ const ThankYouCmsPage = () => {
     <div className="max-w-[1400px] mx-auto text-left pb-16 no-print bg-transparent">
       {/* Page Header (No Card) */}
       <div className="mb-5 mt-2">
-        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiry Banner Settings</h1>
+        <h1 className="text-[24px] font-bold text-[#1F2937] tracking-tight leading-[1.2]">Enquiry Response Banner Settings</h1>
         <p className="text-[#64748B] text-[15px] font-medium mt-1.5 font-semibold">
           Configure real-time brochures and updates parents receive instantly upon submitting registration applications.
         </p>
@@ -448,7 +448,7 @@ const ThankYouCmsPage = () => {
               onClick={handleSaveCms}
               isLoading={saving}
             >
-              Save Enquiry Banner changes
+              Save Enquiry Response Banner Changes
             </Button>
           </div>
         </div>

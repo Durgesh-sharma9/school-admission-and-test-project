@@ -460,26 +460,15 @@ const QrLinksPage = () => {
 
   // Download flyer handler — captures rendered poster canvas for PNG/PDF export
   const handleDownload = async (format) => {
-    let posterEl = document.getElementById('admission-poster-canvas');
-    if (!posterEl) {
-      // Fallback: switch to preview tab or check modal canvas
-      posterEl = document.getElementById('modal-poster-canvas');
-    }
+    let posterEl = document.getElementById('export-poster-canvas-hidden') || document.getElementById('admission-poster-canvas') || document.getElementById('modal-poster-canvas');
 
     if (!posterEl) {
-      toast.error('Poster preview element not found. Please switch to the Preview tab.');
+      toast.error('Poster preview element not found. Please try again.');
       return;
     }
 
     if (format === 'png') setDownloadingPng(true);
     else if (format === 'pdf') setDownloadingPdf(true);
-
-    const prevTransform = posterEl.style.transform;
-    const prevTransformOrigin = posterEl.style.transformOrigin;
-
-    // Temporarily reset scale transform for crisp rendering
-    posterEl.style.transform = 'none';
-    posterEl.style.transformOrigin = 'initial';
 
     try {
       if (document.fonts && document.fonts.ready) {
@@ -488,7 +477,7 @@ const QrLinksPage = () => {
       await new Promise(resolve => setTimeout(resolve, 80));
 
       const canvas = await html2canvas(posterEl, {
-        scale: 3.0,
+        scale: 2.0,
         useCORS: true,
         allowTaint: false,
         backgroundColor: effectiveBg,
@@ -546,30 +535,22 @@ const QrLinksPage = () => {
       console.error('Export error details:', err);
       toast.error(`Failed to export flyer: ${err.message || err}`);
     } finally {
-      posterEl.style.transform = prevTransform;
-      posterEl.style.transformOrigin = prevTransformOrigin;
       setDownloadingPng(false);
       setDownloadingPdf(false);
     }
   };
 
   const handlePrint = async () => {
-    const posterEl = document.getElementById('admission-poster-canvas');
+    let posterEl = document.getElementById('export-poster-canvas-hidden') || document.getElementById('admission-poster-canvas');
     if (!posterEl) return;
 
     toast.loading('Preparing poster for print...', { id: 'print-toast' });
-
-    const prevTransform = posterEl.style.transform;
-    const prevTransformOrigin = posterEl.style.transformOrigin;
-
-    posterEl.style.transform = 'none';
-    posterEl.style.transformOrigin = 'initial';
 
     try {
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 80));
 
       const canvas = await html2canvas(posterEl, {
         scale: 2.0,
@@ -578,35 +559,22 @@ const QrLinksPage = () => {
         backgroundColor: effectiveBg,
         logging: false,
         onclone: (clonedDoc) => {
-          // 1. Clean oklch and oklab from style tags
           const styleTags = clonedDoc.querySelectorAll('style');
           styleTags.forEach(tag => {
             let cssText = tag.textContent;
             if (cssText && (cssText.includes('oklch') || cssText.includes('oklab'))) {
-              const colorRegex = /(oklch|oklab)\([^)]+\)/g;
-              cssText = cssText.replace(colorRegex, (match) => {
-                try {
-                  return oklchToRgb(match);
-                } catch (e) {
-                  return 'rgb(0,0,0)';
-                }
+              cssText = cssText.replace(/(oklch|oklab)\([^)]+\)/g, match => {
+                try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
               });
               tag.textContent = cssText;
             }
           });
-
-          // 2. Clean oklch and oklab from inline styles
           const allElements = clonedDoc.getElementsByTagName('*');
           for (const el of allElements) {
             const styleAttr = el.getAttribute('style');
             if (styleAttr && (styleAttr.includes('oklch') || styleAttr.includes('oklab'))) {
-              const colorRegex = /(oklch|oklab)\([^)]+\)/g;
-              el.setAttribute('style', styleAttr.replace(colorRegex, (match) => {
-                try {
-                  return oklchToRgb(match);
-                } catch (e) {
-                  return 'rgb(0,0,0)';
-                }
+              el.setAttribute('style', styleAttr.replace(/(oklch|oklab)\([^)]+\)/g, match => {
+                try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
               }));
             }
           }
@@ -615,53 +583,43 @@ const QrLinksPage = () => {
 
       const imgData = canvas.toDataURL('image/png');
 
-      // Open print window
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <html>
-            <head>
-              <title>Print Admission Poster</title>
-              <style>
-                body {
-                  margin: 0;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  background: white;
-                  height: 100vh;
-                }
-                img {
-                  max-width: 100%;
-                  max-height: 100vh;
-                  object-fit: contain;
-                }
-                @page {
-                  size: auto;
-                  margin: 0mm;
-                }
-                @media print {
-                  body { margin: 0; }
-                  img { width: 100%; height: 100vh; object-fit: contain; }
-                }
-              </style>
-            </head>
-            <body>
-              <img src="${imgData}" onload="window.print(); window.close();" />
-            </body>
-          </html>
-        `);
-        printWindow.document.close();
-        toast.dismiss('print-toast');
-      } else {
-        toast.error('Pop-up blocked! Please allow pop-ups to print posters.', { id: 'print-toast' });
-      }
+      // Create an invisible iframe for reliable direct printing on all devices (bypasses popup blockers)
+      const existingIframe = document.getElementById('poster-print-iframe');
+      if (existingIframe) existingIframe.remove();
+
+      const printIframe = document.createElement('iframe');
+      printIframe.id = 'poster-print-iframe';
+      printIframe.style.position = 'fixed';
+      printIframe.style.right = '0';
+      printIframe.style.bottom = '0';
+      printIframe.style.width = '0';
+      printIframe.style.height = '0';
+      printIframe.style.border = '0';
+      document.body.appendChild(printIframe);
+
+      const doc = printIframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Print Admission Poster</title>
+            <style>
+              @page { size: auto; margin: 0; }
+              body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; background: white; }
+              img { width: 100%; height: auto; max-height: 100vh; object-fit: contain; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.focus(); window.print();" />
+          </body>
+        </html>
+      `);
+      doc.close();
+      toast.success('Print dialog ready!', { id: 'print-toast' });
     } catch (err) {
-      console.error(err);
+      console.error('Print error:', err);
       toast.error('Failed to prepare print document', { id: 'print-toast' });
-    } finally {
-      posterEl.style.transform = prevTransform;
-      posterEl.style.transformOrigin = prevTransformOrigin;
     }
   };
 
@@ -1184,7 +1142,7 @@ const QrLinksPage = () => {
             </span>
           </div>
           <p className="text-[#64748B] text-[15px] font-medium mt-1.5">
-            Professional Admission Poster Studio
+            Professional Admission QR & Poster Studio
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -1199,14 +1157,6 @@ const QrLinksPage = () => {
             <option value="color-burst">Color Gradient</option>
             <option value="creative-gradient">Minimal Elegant</option>
           </select>
-          <button
-            type="button"
-            onClick={() => setIsFullScreen(true)}
-            className="h-[40px] px-4 bg-white hover:bg-slate-50 border border-[#E8ECF3] text-slate-700 text-xs font-semibold rounded-[12px] transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
-          >
-            <Maximize2 className="h-4 w-4 text-slate-500" />
-            <span>Full Screen Preview</span>
-          </button>
         </div>
       </div>
 
@@ -1759,6 +1709,16 @@ const QrLinksPage = () => {
             {/* Canva Workspace backdrop: Clean white canvas */}
             <div className="bg-white rounded-xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-sm relative mt-3 border border-slate-200">
 
+              {/* Full Screen Preview Button */}
+              <button
+                type="button"
+                onClick={() => setIsFullScreen(true)}
+                title="Full Screen Preview"
+                className="absolute top-3 right-3 z-10 h-8 w-8 bg-white/90 hover:bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg shadow-xs flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+
               {/* Clutter-free scaling node boundary wrapper */}
               <div
                 style={{
@@ -1775,6 +1735,23 @@ const QrLinksPage = () => {
 
         </div>
       </form>
+
+      {/* Off-screen dedicated 1:1 canvas for 100% reliable export across all devices & mobile tabs */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          left: '-99999px',
+          top: '0',
+          width: `${posterDims.width}px`,
+          height: `${posterDims.height}px`,
+          overflow: 'hidden',
+          zIndex: -9999,
+          pointerEvents: 'none'
+        }}
+      >
+        {renderPosterCanvas(1.0, 'export-poster-canvas-hidden')}
+      </div>
 
       {/* Fullscreen Preview Modal Presentation View */}
       {isFullScreen && (

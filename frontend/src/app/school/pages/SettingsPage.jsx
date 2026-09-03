@@ -398,12 +398,12 @@ const SettingsPage = () => {
             <div className="flex items-center space-x-2 border-b border-slate-100 pb-3">
               <span className="text-base">🎨</span>
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Admission Poster Branding
+                Template Branding
               </h3>
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
-              Manage admission poster branding, colors, highlights, QR templates, downloads and live preview from QR Builder.
+              Manage admission poster & QR templates, branding colors, highlights, downloads and live preview.
             </p>
 
             <div>
@@ -412,7 +412,7 @@ const SettingsPage = () => {
                 onClick={() => window.location.href = '/qr-code'}
                 className="px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center"
               >
-                Open QR Builder
+                Open Template Branding
               </button>
             </div>
           </div>

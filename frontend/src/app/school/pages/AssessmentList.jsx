@@ -133,13 +133,6 @@ const AssessmentList = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="text-xs py-2.5 px-4 bg-white text-slate-705 border-[#E8ECF3] font-semibold"
-            onClick={handleExportCSV}
-          >
-            Export CSV / Excel
-          </Button>
           <Link
             to="/assessments/create"
             className="inline-flex items-center px-4 h-[40px] rounded-[12px] text-xs font-bold bg-[#E91E63] hover:bg-[#E91E63]/90 text-white transition-all shadow-xs"

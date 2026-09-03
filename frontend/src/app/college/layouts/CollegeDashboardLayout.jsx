@@ -34,8 +34,8 @@ const CollegeDashboardLayout = () => {
     if (path.startsWith('/college/academic-config')) return 'Academic Configuration';
     if (path.startsWith('/college/counselling')) return 'Counselling Pipeline';
     if (path.startsWith('/college/documents')) return 'Document Verification Desk';
-    if (path.startsWith('/college/qr-links')) return 'QR & Admission Desk Links';
-    if (path.startsWith('/college/thank-you-cms')) return 'Enquiry Banner Settings';
+    if (path.startsWith('/college/qr-links') || path.startsWith('/college/qr-code')) return 'QR & Admission Desk Links';
+    if (path.startsWith('/college/thank-you-cms') || path.startsWith('/college/thankyou-cms')) return 'Enquiry Response Banner Settings';
     if (path.startsWith('/college/subscription')) return 'Subscription & Plans';
     if (path.startsWith('/college/settings')) return 'College Profile & Settings';
     return 'College CRM Admin';
