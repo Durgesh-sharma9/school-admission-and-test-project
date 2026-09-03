@@ -61,11 +61,12 @@ const Dashboard = () => {
   const [localities, setLocalities] = useState([]);
   const [recentEnquiriesList, setRecentEnquiriesList] = useState([]);
   const [todayFollowups, setTodayFollowups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
       const { startDate, endDate } = calculateDateRange(selectedTimeframe, activeSession, customStartDate, customEndDate);
       const params = {
         academicSession: activeSession,
@@ -91,7 +92,8 @@ const Dashboard = () => {
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -176,7 +178,7 @@ const Dashboard = () => {
 
   const mostRequestedClass = useMemo(() => classDemandData.length > 0 ? classDemandData[0].class : 'N/A', [classDemandData]);
 
-  if (loading) return <Loader fullPage message="Aggregating enterprise CRM analytics..." />;
+  if (initialLoading) return <Loader fullPage message="Aggregating enterprise CRM analytics..." />;
 
   const sparkline1 = [{ v: 10 }, { v: 18 }, { v: 14 }, { v: 22 }, { v: 30 }, { v: 28 }, { v: 35 }];
   const sparkline2 = [{ v: 5 }, { v: 9 }, { v: 12 }, { v: 18 }, { v: 15 }, { v: 24 }, { v: 29 }];

@@ -136,6 +136,13 @@ const enquirySchema = new mongoose.Schema({
     trim: true,
     default: '',
   },
+  counselingNotes: [
+    {
+      text: { type: String, required: true },
+      author: { type: String, default: 'Counselor' },
+      createdAt: { type: Date, default: Date.now },
+    }
+  ],
 
   // Metadata
   status: {

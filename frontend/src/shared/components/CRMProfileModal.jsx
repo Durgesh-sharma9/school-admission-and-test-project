@@ -74,16 +74,41 @@ const CRMProfileModal = ({
 
   // Notes Normalization
   const getNotesList = () => {
-    if (Array.isArray(data.notes)) {
-      return data.notes.filter(note => !note.note?.includes('Status updated to:') && !note.note?.includes('Stage updated to:'));
+    const list = [];
+    if (Array.isArray(data.counselingNotes) && data.counselingNotes.length > 0) {
+      data.counselingNotes.forEach(n => {
+        list.push({
+          note: n.text || n.note,
+          date: n.createdAt || n.date || new Date(),
+          counselorName: n.author || n.counselorName || schoolName || 'Counselor',
+        });
+      });
     }
-    if (typeof data.notes === 'string' && data.notes.trim()) {
-      return [{ note: data.notes, date: data.updatedAt || data.createdAt || new Date(), counselorName: 'Admin' }];
+    if (Array.isArray(data.notes) && data.notes.length > 0) {
+      data.notes.forEach(n => {
+        if (!n.note?.includes('Status updated to:') && !n.note?.includes('Stage updated to:')) {
+          list.push({
+            note: n.note,
+            date: n.date || data.createdAt || new Date(),
+            counselorName: n.counselorName || 'Counselor',
+          });
+        }
+      });
+    } else if (typeof data.notes === 'string' && data.notes.trim()) {
+      list.push({
+        note: `Registration Note: ${data.notes}`,
+        date: data.updatedAt || data.createdAt || new Date(),
+        counselorName: 'Initial Submission',
+      });
     }
     if (data.expectations && typeof data.expectations === 'string' && data.expectations.trim()) {
-      return [{ note: `Expectations: ${data.expectations}`, date: data.createdAt, counselorName: 'System' }];
+      list.push({
+        note: `Parent Expectations: ${data.expectations}`,
+        date: data.createdAt || new Date(),
+        counselorName: 'Parent',
+      });
     }
-    return [];
+    return list;
   };
 
   // Dynamic / Custom Fields Filter
@@ -91,7 +116,7 @@ const CRMProfileModal = ({
     const knownKeys = [
       '_id', 'schoolId', 'studentName', 'gender', 'dob', 'classSeeking', 'currentSchool',
       'currentClass', 'previousSchool', 'previousClass', 'parentName', 'mobile', 'whatsapp',
-      'email', 'state', 'city', 'area', 'society', 'fullAddress', 'notes', 'source',
+      'email', 'state', 'city', 'area', 'society', 'fullAddress', 'notes', 'counselingNotes', 'source',
       'expectations', 'enquiryId', 'saveDate', 'saveTime', 'status', 'isConvertedToAdmission',
       'convertedAt', 'isDeleted', 'createdAt', 'updatedAt', '__v', 'documents',
       'applicationId', 'stage', 'departmentId', 'courseId', 'specialization', 'modeOfStudy',
@@ -117,7 +142,7 @@ const CRMProfileModal = ({
   const { completedCount, currentStep, nextFollowUp } = getTimelinePreview();
 
   const handleLocalAddNote = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!newNoteText.trim()) return;
     if (!onAddNote) {
       toast.error('Notes addition not supported for this entry');
@@ -125,7 +150,7 @@ const CRMProfileModal = ({
     }
     setSubmittingNote(true);
     try {
-      await onAddNote(newNoteText);
+      await onAddNote(newNoteText.trim());
       setNewNoteText('');
     } catch (err) {
       toast.error('Failed to add remark');
@@ -435,7 +460,10 @@ const CRMProfileModal = ({
             >
               <span className="flex items-center gap-2">
                 <StickyNote className="h-4.5 w-4.5 text-[#6D5DF6]" />
-                Counseling Notes & remarks
+                Counseling Notes & Remarks
+                <span className="ml-1 text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">
+                  {getNotesList().length}
+                </span>
               </span>
               {activeSection === 'notes' ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
             </button>
@@ -450,33 +478,68 @@ const CRMProfileModal = ({
                 >
                   <div className="p-5 space-y-4 text-left">
                     {/* Add note form */}
-                    {onAddNote && data.journeyStatus !== 'CLOSED' && (
-                      <form onSubmit={handleLocalAddNote} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newNoteText}
-                          onChange={(e) => setNewNoteText(e.target.value)}
-                          placeholder="Log call feedback, parent response remarks, or observations..."
-                          className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
-                          disabled={submittingNote}
-                        />
-                        <Button type="submit" disabled={submittingNote} className="py-2 px-4.5 text-xs font-bold shrink-0">
-                          {submittingNote ? 'Adding...' : 'Add Note'}
-                        </Button>
-                      </form>
+                    {data.journeyStatus !== 'CLOSED' && (
+                      <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200/80 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                            Add New Remark / Parent Conversation
+                          </label>
+                          <span className="text-[10px] text-slate-400 font-medium">Logged under: {schoolName}</span>
+                        </div>
+
+                        {/* Quick Tag Chips */}
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            '📞 Spoke with Parent',
+                            '🏫 Campus Visit Scheduled',
+                            '💰 Fee Installment Query',
+                            '🚌 Transport Route Query',
+                            '⭐ Ready for Admission'
+                          ].map((tag, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setNewNoteText(prev => prev ? `${prev} - ${tag}` : tag)}
+                              className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors cursor-pointer"
+                            >
+                              + {tag}
+                            </button>
+                          ))}
+                        </div>
+
+                        <form onSubmit={handleLocalAddNote} className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="text"
+                            value={newNoteText}
+                            onChange={(e) => setNewNoteText(e.target.value)}
+                            placeholder="Type parent response, follow-up remarks, or observations..."
+                            className="flex-1 px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
+                            disabled={submittingNote}
+                          />
+                          <Button type="submit" disabled={submittingNote || !newNoteText.trim()} className="py-2.5 px-5 text-xs font-bold shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs">
+                            {submittingNote ? 'Saving...' : '+ Add Remark'}
+                          </Button>
+                        </form>
+                      </div>
                     )}
 
-                    {/* Notes display */}
-                    <div className="space-y-3">
+                    {/* Notes display list */}
+                    <div className="space-y-2.5">
                       {getNotesList().length === 0 ? (
-                        <p className="text-slate-400 text-xs italic text-center py-4">No notes added yet.</p>
+                        <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                          <StickyNote className="h-6 w-6 text-slate-300 mx-auto mb-1.5" />
+                          <p className="text-slate-500 text-xs font-bold">No counseling remarks logged yet</p>
+                          <p className="text-slate-400 text-[11px] mt-0.5">Use the box above to log parent conversation notes or next action items.</p>
+                        </div>
                       ) : (
                         getNotesList().map((note, index) => (
-                          <div key={index} className="p-3.5 bg-slate-50/70 border border-slate-100 rounded-xl">
-                            <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">{note.note}</p>
-                            <div className="flex justify-between items-center mt-2.5 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                              <span>Counselor: {note.counselorName || 'System'}</span>
-                              <span>{new Date(note.date).toLocaleString()}</span>
+                          <div key={index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl shadow-xs space-y-1.5 hover:border-slate-300 transition-colors">
+                            <p className="text-xs text-slate-800 font-medium leading-relaxed whitespace-pre-wrap">{note.note}</p>
+                            <div className="flex justify-between items-center pt-1 border-t border-slate-100 text-[10px] text-slate-400 font-semibold">
+                              <span className="flex items-center gap-1 text-indigo-600 font-bold">
+                                ✍️ {note.counselorName || 'Counselor'}
+                              </span>
+                              <span>{new Date(note.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                           </div>
                         ))
@@ -488,32 +551,33 @@ const CRMProfileModal = ({
             </AnimatePresence>
           </div>
 
-          {/* Section 4: Documents */}
-          <div className="border border-slate-150 rounded-xl overflow-hidden shadow-xs bg-white">
-            <button
-              type="button"
-              onClick={() => toggleSection('documents')}
-              className="w-full flex items-center justify-between px-5 py-4 bg-slate-50/50 hover:bg-slate-50 text-slate-805 font-black text-xs uppercase tracking-wider transition-colors border-b border-slate-100"
-            >
-              <span className="flex items-center gap-2">
-                <FileText className="h-4.5 w-4.5 text-[#6D5DF6]" />
-                Uploaded Documents
-              </span>
-              {activeSection === 'documents' ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
-            </button>
-            <AnimatePresence>
-              {activeSection === 'documents' && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="p-5 text-left">
-                    {!data.documents || data.documents.length === 0 ? (
-                      <p className="text-slate-400 text-xs italic text-center py-4">No documents uploaded.</p>
-                    ) : (
+          {/* Section 4: Documents (Only render if documents exist) */}
+          {data.documents && data.documents.length > 0 && (
+            <div className="border border-slate-150 rounded-xl overflow-hidden shadow-xs bg-white">
+              <button
+                type="button"
+                onClick={() => toggleSection('documents')}
+                className="w-full flex items-center justify-between px-5 py-4 bg-slate-50/50 hover:bg-slate-50 text-slate-805 font-black text-xs uppercase tracking-wider transition-colors border-b border-slate-100"
+              >
+                <span className="flex items-center gap-2">
+                  <FileText className="h-4.5 w-4.5 text-[#6D5DF6]" />
+                  Uploaded Documents
+                  <span className="ml-1 text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">
+                    {data.documents.length}
+                  </span>
+                </span>
+                {activeSection === 'documents' ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
+              </button>
+              <AnimatePresence>
+                {activeSection === 'documents' && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-5 text-left">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {data.documents.map((doc) => (
                           <div key={doc._id} className="flex items-center justify-between p-3.5 bg-slate-50/70 rounded-xl border border-slate-100 text-xs">
@@ -556,12 +620,12 @@ const CRMProfileModal = ({
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Section 5: Custom / Dynamic Fields */}
           {getCustomFields().length > 0 && (

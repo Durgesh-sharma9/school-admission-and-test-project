@@ -686,6 +686,49 @@ const getTodayFollowups = async (req, res) => {
   }
 };
 
+// @desc    Add counseling note / remark to enquiry
+// @route   POST /api/v1/enquiries/:id/notes
+// @access  Private (School Admin)
+const addEnquiryNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text, author } = req.body;
+    const schoolId = req.school.id;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'Note text is required' });
+    }
+
+    const noteObj = {
+      text: text.trim(),
+      author: author || req.school.name || 'Counselor',
+      createdAt: new Date(),
+    };
+
+    const enquiry = await Enquiry.findOneAndUpdate(
+      { _id: id, schoolId: new mongoose.Types.ObjectId(schoolId) },
+      {
+        $push: { counselingNotes: noteObj },
+        $set: { notes: text.trim() },
+      },
+      { new: true }
+    );
+
+    if (!enquiry) {
+      return res.status(404).json({ success: false, message: 'Enquiry not found or unauthorized' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Counseling note saved successfully',
+      data: enquiry,
+    });
+  } catch (error) {
+    console.error('addEnquiryNote error:', error);
+    return res.status(500).json({ success: false, message: 'Server error saving counseling note' });
+  }
+};
+
 module.exports = {
   getEnquiries,
   getDashboardStats,
@@ -697,4 +740,5 @@ module.exports = {
   deleteEnquiry,
   parentRecognition,
   getTodayFollowups,
+  addEnquiryNote,
 };

@@ -11,6 +11,7 @@ const {
   deleteEnquiry,
   parentRecognition,
   getTodayFollowups,
+  addEnquiryNote,
 } = require('../controllers/enquiryController');
 const { protect } = require('../middleware/auth');
 
@@ -22,6 +23,7 @@ router.post('/', protect, createEnquiryManual);
 router.put('/:id', protect, updateEnquiry);
 router.patch('/:id/status', protect, updateEnquiryStatus);
 router.post('/:id/convert', protect, convertToAdmission);
+router.post('/:id/notes', protect, addEnquiryNote);
 router.delete('/:id', protect, deleteEnquiry);
 
 // Public Routes (used for QR code & Reception Link)

@@ -51,7 +51,8 @@ const Enquiries = () => {
   const expandId = searchParams.get('expand');
 
   const [enquiries, setEnquiries] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -205,7 +206,7 @@ const Enquiries = () => {
 
   const fetchEnquiries = async () => {
     try {
-      setLoading(true);
+      setIsFetching(true);
       const response = await api.get('/enquiries', {
         params: {
           page,
@@ -228,7 +229,8 @@ const Enquiries = () => {
     } catch (error) {
       toast.error(error.message || 'Failed to fetch enquiries');
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -767,9 +769,12 @@ const Enquiries = () => {
         </AnimatePresence>
 
         {/* Main Table Card */}
-        <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden" style={{ boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)' }}>
+        <div className="bg-white border border-[#E8ECF3] rounded-[18px] card-elevated overflow-hidden relative" style={{ boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)' }}>
           <div className="h-[4px] w-full bg-[#E91E63] rounded-t-[18px]" />
-          {loading ? (
+          {isFetching && (
+            <div className="h-0.5 w-full bg-gradient-to-r from-pink-500 via-indigo-500 to-blue-500 animate-pulse" />
+          )}
+          {initialLoading ? (
             <Loader message="Loading enquiries..." />
           ) : enquiries.length === 0 ? (
             <div className="py-16 text-center">
@@ -1223,6 +1228,19 @@ const Enquiries = () => {
               closedStage: closedMetadata ? closedMetadata.closedStage : (journeyStatus === 'ACTIVE' ? '' : prev.closedStage),
               status: ['Admission Confirmed', 'Rejected', 'Closed'].includes(updatedJourney[updatedJourney.length - 1].stage) ? updatedJourney[updatedJourney.length - 1].stage : prev.status
             }));
+          }}
+          onAddNote={async (noteText) => {
+            if (!selectedEnquiryForView?._id) return;
+            const res = await api.post(`/enquiries/${selectedEnquiryForView._id}/notes`, {
+              text: noteText,
+              author: school?.name || 'Counselor',
+            });
+            if (res.success) {
+              toast.success('Counseling note added successfully');
+              const updatedEnquiry = res.data;
+              setSelectedEnquiryForView(updatedEnquiry);
+              setEnquiries(prev => prev.map(e => e._id === updatedEnquiry._id ? updatedEnquiry : e));
+            }
           }}
           onAssessments={() => {
             setSelectedEnquiryForAssessment(selectedEnquiryForView);
