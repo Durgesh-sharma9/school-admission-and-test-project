@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './app/school/contexts/AuthContext';
 import { SuperAdminAuthProvider } from './app/super-admin/contexts/SuperAdminAuthContext';
+import { SessionProvider } from './contexts/SessionContext';
 import { Toaster } from 'react-hot-toast';
 import Loader from './shared/components/Loader';
 import ErrorBoundary from './shared/components/ErrorBoundary';
@@ -78,10 +79,11 @@ function App() {
   return (
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={googleClientId}>
-        <AuthProvider>
-          <SuperAdminAuthProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <Suspense fallback={<Loader fullPage message="Loading workspace components..." />}>
+        <SessionProvider>
+          <AuthProvider>
+            <SuperAdminAuthProvider>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <Suspense fallback={<Loader fullPage message="Loading workspace components..." />}>
                 <Routes>
                   {/* Landing Page */}
                   <Route path="/" element={<LandingPage />} />
@@ -209,9 +211,10 @@ function App() {
             </BrowserRouter>
           </SuperAdminAuthProvider>
         </AuthProvider>
-      </GoogleOAuthProvider>
-    </ErrorBoundary>
-  );
+      </SessionProvider>
+    </GoogleOAuthProvider>
+  </ErrorBoundary>
+);
 }
 
 export default App;

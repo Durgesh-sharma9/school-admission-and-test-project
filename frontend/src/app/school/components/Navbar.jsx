@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useSession } from '../../../contexts/SessionContext';
 import api from '../services/schoolApi';
 import {
   Menu,
@@ -17,7 +18,9 @@ import {
   CheckSquare,
   X,
   CheckCircle2,
-  ShieldAlert
+  ShieldAlert,
+  Calendar,
+  Check
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -39,8 +42,10 @@ const getPopupTitle = (announcement) => {
 
 const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
   const { school, logout } = useAuth();
+  const { activeSession, changeSession, availableSessions } = useSession();
   const navigate = useNavigate();
 
+  const [sessionDropdownOpen, setSessionDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
   const [announcementDrawerOpen, setAnnouncementDrawerOpen] = useState(false);
@@ -54,6 +59,7 @@ const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
   const [selectedAnnouncementDetail, setSelectedAnnouncementDetail] = useState(null);
   const [pendingTasksCount, setPendingTasksCount] = useState(0);
 
+  const sessionRef = useRef(null);
   const profileRef = useRef(null);
   const bellRef = useRef(null);
   const annRef = useRef(null);
@@ -144,6 +150,9 @@ const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
+      if (sessionRef.current && !sessionRef.current.contains(e.target)) {
+        setSessionDropdownOpen(false);
+      }
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileDropdownOpen(false);
       }
@@ -220,21 +229,70 @@ const Navbar = ({ toggleSidebar, title, module = 'school' }) => {
 
   return (
     <>
-     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white border-b border-gray-100 shadow-[0_3px_12px_rgba(236,72,153,0.08),0_1px_4px_rgba(15,23,42,0.04)] transition-all duration-300 animate-[slide-down_0.3s_ease_both]">
-        <div className="flex items-center space-x-4">
+     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-100 shadow-[0_3px_12px_rgba(236,72,153,0.08),0_1px_4px_rgba(15,23,42,0.04)] transition-all duration-300 animate-[slide-down_0.3s_ease_both]">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <button
             onClick={toggleSidebar}
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-pink-50 hover:text-[#F21D6B] transition-all duration-200 lg:hidden"
+            className="p-1.5 rounded-lg text-gray-500 hover:bg-pink-50 hover:text-[#F21D6B] transition-all duration-200 lg:hidden cursor-pointer"
           >
             <Menu className="h-5.5 w-5.5" />
           </button>
-          <h1 className="text-lg font-extrabold text-gray-800 tracking-tight">{title}</h1>
+          <h1 className="text-base sm:text-lg font-extrabold text-gray-800 tracking-tight">{title}</h1>
         </div>
 
         {/* Right Navbar elements */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Academic Session Switcher */}
+          <div className="relative" ref={sessionRef}>
+            <button
+              type="button"
+              onClick={() => setSessionDropdownOpen(!sessionDropdownOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200/80 transition-all cursor-pointer shadow-xs"
+              title="Switch Academic Session"
+            >
+              <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="hidden xs:inline text-[11px] text-blue-600 font-semibold">Session:</span>
+              <span className="font-extrabold">{activeSession}</span>
+              <ChevronDown className={`w-3 h-3 text-blue-500 transition-transform ${sessionDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {sessionDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 text-left animate-fadeIn">
+                <div className="px-3.5 py-1.5 border-b border-slate-100 mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Switch Academic Session
+                  </span>
+                </div>
+                <div className="space-y-0.5 px-1.5">
+                  {availableSessions.map((sess) => {
+                    const isSelected = activeSession === sess;
+                    return (
+                      <button
+                        key={sess}
+                        type="button"
+                        onClick={() => {
+                          changeSession(sess);
+                          setSessionDropdownOpen(false);
+                          toast.success(`Switched to Session ${sess}`);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-left ${
+                          isSelected
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>{sess}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           {school?.subscription?.plan === 'free-trial' && (
-            <div className="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-pink-500 to-[#F21D6B] text-white shadow-sm">
+            <div className="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-pink-500 to-[#F21D6B] text-white shadow-sm">
               Active Free Trial
             </div>
           )}

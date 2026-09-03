@@ -10,10 +10,38 @@ const Assessment = require('../models/Assessment');
 const getAnalyticsOverview = async (req, res) => {
   try {
     const schoolId = req.school.id;
+    const {
+      academicSession = '',
+      session = '',
+      startDate = '',
+      endDate = ''
+    } = req.query;
+
+    const selectedSession = academicSession || session;
+    const baseMatch = { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } };
+
+    if (selectedSession && selectedSession !== 'all' && selectedSession !== 'All Sessions') {
+      if (selectedSession === '2026-2027') {
+        baseMatch.$or = [
+          { academicSession: '2026-2027' },
+          { academicSession: { $exists: false } },
+          { academicSession: null },
+          { academicSession: '' }
+        ];
+      } else {
+        baseMatch.academicSession = selectedSession;
+      }
+    }
+
+    if (startDate || endDate) {
+      baseMatch.saveDate = {};
+      if (startDate) baseMatch.saveDate.$gte = startDate;
+      if (endDate) baseMatch.saveDate.$lte = endDate;
+    }
 
     // 1. Enquiries by Class seeking (ignoring soft-deleted)
     const classDistribution = await Enquiry.aggregate([
-      { $match: { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } } },
+      { $match: baseMatch },
       {
         $group: {
           _id: '$classSeeking',
@@ -25,7 +53,7 @@ const getAnalyticsOverview = async (req, res) => {
 
     // 2. Monthly registration counts (Inquiries by Month)
     const monthlyEnquiries = await Enquiry.aggregate([
-      { $match: { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } } },
+      { $match: baseMatch },
       {
         $group: {
           _id: { $substr: ['$saveDate', 0, 7] }, // YYYY-MM substring
@@ -37,14 +65,13 @@ const getAnalyticsOverview = async (req, res) => {
     ]);
 
     // 3. Monthly Admissions (Admissions by Month)
+    const admissionsMatch = {
+      ...baseMatch,
+      status: 'Admission Confirmed'
+    };
+
     const monthlyAdmissions = await Enquiry.aggregate([
-      {
-        $match: {
-          schoolId: new mongoose.Types.ObjectId(schoolId),
-          status: 'Admission Confirmed',
-          isDeleted: { $ne: true }
-        }
-      },
+      { $match: admissionsMatch },
       {
         $group: {
           _id: { $substr: ['$saveDate', 0, 7] }, // YYYY-MM substring
@@ -57,7 +84,7 @@ const getAnalyticsOverview = async (req, res) => {
 
     // 4. Counts breakdown for conversion rates
     const enquiriesCounts = await Enquiry.aggregate([
-      { $match: { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } } },
+      { $match: baseMatch },
       {
         $group: {
           _id: '$status',
@@ -73,10 +100,10 @@ const getAnalyticsOverview = async (req, res) => {
       : 0;
 
     // 5. Recent Enquiries (Last 5)
-    const recentEnquiries = await Enquiry.find({ schoolId, isDeleted: { $ne: true } })
+    const recentEnquiries = await Enquiry.find(baseMatch)
       .sort({ createdAt: -1 })
       .limit(5)
-      .select('enquiryId studentName parentName classSeeking status saveDate saveTime');
+      .select('enquiryId studentName parentName classSeeking status saveDate saveTime academicSession');
 
     // 6. Recent Assessment Completions (Last 5)
     const recentAssessments = await AssessmentAssignment.find({ schoolId, status: 'Completed' })

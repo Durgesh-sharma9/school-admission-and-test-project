@@ -3,6 +3,8 @@ import api from '../services/schoolApi';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { useSession } from '../../../contexts/SessionContext';
+import SessionFilterBar from '../../../shared/components/SessionFilterBar';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Users, Inbox, PauseCircle, CheckCircle, XCircle, FilePlus, QrCode, Sparkles,
@@ -46,7 +48,12 @@ const itemVariants = {
 
 const Dashboard = () => {
   const { school, isTrialActive } = useAuth();
+  const { activeSession, calculateDateRange } = useSession();
   const navigate = useNavigate();
+
+  const [selectedTimeframe, setSelectedTimeframe] = useState('all');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
 
   const [enquiryStats, setEnquiryStats] = useState(null);
   const [assessmentStats, setAssessmentStats] = useState(null);
@@ -59,12 +66,19 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      const { startDate, endDate } = calculateDateRange(selectedTimeframe, activeSession, customStartDate, customEndDate);
+      const params = {
+        academicSession: activeSession,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      };
+
       const [resEnq, resAsm, resAnl, resLoc, resEnqList, resFollowups] = await Promise.all([
-        api.get('/enquiries/stats').catch(() => ({ success: false })),
+        api.get('/enquiries/stats', { params }).catch(() => ({ success: false })),
         api.get('/assessments/assignments/stats').catch(() => ({ success: false })),
-        api.get('/analytics/overview').catch(() => ({ success: false })),
+        api.get('/analytics/overview', { params }).catch(() => ({ success: false })),
         api.get('/localities?type=approved&limit=50').catch(() => ({ success: false })),
-        api.get('/enquiries?limit=100').catch(() => ({ success: false })),
+        api.get('/enquiries', { params: { ...params, limit: 100 } }).catch(() => ({ success: false })),
         api.get('/enquiries/followups/today').catch(() => ({ success: false }))
       ]);
 
@@ -88,7 +102,7 @@ const Dashboard = () => {
     return () => {
       window.removeEventListener('crm-tasks-updated', fetchDashboardData);
     };
-  }, []);
+  }, [activeSession, selectedTimeframe, customStartDate, customEndDate]);
 
   const totalEnquiries = enquiryStats?.total || 0;
   const newEnquiriesCount = enquiryStats?.newEnquiry || 0;
@@ -209,11 +223,25 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* ACADEMIC SESSION & TIMEFRAME FILTER BAR */}
+        <motion.div variants={itemVariants}>
+          <SessionFilterBar
+            selectedTimeframe={selectedTimeframe}
+            onTimeframeChange={setSelectedTimeframe}
+            customStartDate={customStartDate}
+            customEndDate={customEndDate}
+            onCustomDateChange={(s, e) => {
+              setCustomStartDate(s);
+              setCustomEndDate(e);
+            }}
+          />
+        </motion.div>
+
         {/* ROW 1: COMPACT FLOATING KPI CARDS */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-x-4 gap-y-6 pt-4">
           {[
-            { title: "Today's Enquiries", value: todayEnquiries.length, desc: "Created today", spark: sparkline1, icon: Users, color: 'from-[#7E63F6] to-[#9781F8]', line: '#7E63F6' },
-            { title: "Monthly Enquiries", value: totalEnquiries, desc: "Created this month", spark: sparkline2, icon: Inbox, color: 'from-[#5091F8] to-[#78AAF9]', line: '#5091F8' },
+            { title: "Today's Enquiries", value: enquiryStats?.today ?? todayEnquiries.length, desc: "Created today", spark: sparkline1, icon: Users, color: 'from-[#7E63F6] to-[#9781F8]', line: '#7E63F6' },
+            { title: "Monthly Enquiries", value: enquiryStats?.thisMonth ?? totalEnquiries, desc: "Created this month", spark: sparkline2, icon: Inbox, color: 'from-[#5091F8] to-[#78AAF9]', line: '#5091F8' },
             { title: "Pending Follow-ups", value: followUpPendingCount, desc: "Follow-ups waiting", spark: sparkline1, icon: Clock, color: 'from-[#F6A928] to-[#F8C15D]', line: '#F6A928' },
             { title: "Admissions", value: confirmedAdmissions, desc: "Finalized", spark: sparkline2, icon: CheckCircle, color: 'from-[#34D06D] to-[#60DF8F]', line: '#34D06D' },
             { title: "Conversion", value: `${conversionRate}%`, desc: "Lead to admit ratio", spark: sparkline1, icon: TrendingUp, color: 'from-[#EE5EAA] to-[#F488C2]', line: '#EE5EAA' },

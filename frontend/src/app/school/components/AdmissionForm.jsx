@@ -5,6 +5,7 @@ import Button from '../../../shared/components/Button';
 import { User, Users, MapPin, FileText, ChevronLeft, ChevronRight, X, Eye, Plus } from 'lucide-react';
 import AutocompleteSelect, { CLASS_SEEKING_OPTIONS, PREVIOUS_CLASS_OPTIONS } from '../../../shared/components/AutocompleteSelect';
 import { useAuth } from '../contexts/AuthContext';
+import { useSession } from '../../../contexts/SessionContext';
 import { useParams } from 'react-router-dom';
 
 const INDIAN_STATES = [
@@ -111,6 +112,8 @@ const AdmissionForm = ({
 
   const authContext = useAuth ? useAuth() : null;
   const school = authContext?.school;
+  const sessionContext = useSession ? useSession() : null;
+  const activeSession = sessionContext?.activeSession || school?.academicSession || '2026-2027';
   const { schoolId: paramSchoolId } = useParams();
   const schoolId = paramSchoolId || school?._id || school?.id || '';
 
@@ -325,7 +328,11 @@ const AdmissionForm = ({
           }
         }
       }
-      await onSubmit(data, reset);
+      const payload = {
+        ...data,
+        academicSession: data.academicSession || activeSession || '2026-2027',
+      };
+      await onSubmit(payload, reset);
     } catch (error) {
       console.error(error);
     }

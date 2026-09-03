@@ -7,6 +7,7 @@ const { generateSchoolQrCode } = require('../services/qrService');
 const nodemailer = require('nodemailer');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
+const { validatePasswordPolicy } = require('../utils/passwordValidator');
 
 // @desc    Register a new school & admin
 // @route   POST /api/v1/auth/signup
@@ -28,6 +29,12 @@ const signup = async (req, res) => {
       if (!name || !email || !password || !phone || !address) {
         console.log('Missing Email signup fields:', { name: !!name, email: !!email, password: !!password, phone: !!phone, address: !!address });
         return res.status(400).json({ success: false, message: 'All fields are required' });
+      }
+
+      // Password policy validation
+      const passwordCheck = validatePasswordPolicy(password);
+      if (!passwordCheck.isValid) {
+        return res.status(400).json({ success: false, message: passwordCheck.message });
       }
     }
 
@@ -404,6 +411,12 @@ const resetPassword = async (req, res) => {
     // Validate request
     if (!email || !password) {
       return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    // Validate password policy
+    const passwordCheck = validatePasswordPolicy(password);
+    if (!passwordCheck.isValid) {
+      return res.status(400).json({ success: false, message: passwordCheck.message });
     }
 
     // Find school by email

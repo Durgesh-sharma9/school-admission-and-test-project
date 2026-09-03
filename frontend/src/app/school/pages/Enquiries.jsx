@@ -6,6 +6,8 @@ import Badge from '../components/Badge';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import CollapsibleFilters, { FilterRow, SelectFilter, DateFilter, TimelineFilter } from '../../../shared/components/CollapsibleFilters';
+import SessionFilterBar from '../../../shared/components/SessionFilterBar';
+import { useSession, ACADEMIC_SESSIONS, DATE_PRESETS } from '../../../contexts/SessionContext';
 import DeleteConfirmationModal from '../../../shared/components/DeleteConfirmationModal';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -44,6 +46,7 @@ import ContactModal from '../../../shared/components/ContactModal';
 
 const Enquiries = () => {
   const { school } = useAuth();
+  const { activeSession, changeSession, availableSessions, calculateDateRange } = useSession();
   const [searchParams, setSearchParams] = useSearchParams();
   const expandId = searchParams.get('expand');
 
@@ -56,12 +59,22 @@ const Enquiries = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [classFilter, setClassFilter] = useState('');
+  const [selectedTimeframe, setSelectedTimeframe] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [timelineFilter, setTimelineFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
+
+  const handleTimeframeChange = (presetId) => {
+    setSelectedTimeframe(presetId);
+    if (presetId !== 'custom') {
+      const { startDate: s, endDate: e } = calculateDateRange(presetId, activeSession);
+      setStartDate(s);
+      setEndDate(e);
+    }
+  };
 
   // Admission Journey Timeline States
   const [expandedEnquiryId, setExpandedEnquiryId] = useState(null);
@@ -202,6 +215,7 @@ const Enquiries = () => {
           classFilter,
           startDate,
           endDate,
+          academicSession: activeSession,
           sortBy,
           timeline: timelineFilter,
         },
@@ -256,6 +270,7 @@ const Enquiries = () => {
           classFilter,
           startDate,
           endDate,
+          academicSession: activeSession,
           sortBy
         }
       });
@@ -315,11 +330,11 @@ const Enquiries = () => {
 
   useEffect(() => {
     setPage(1); // Reset page on filter/search change
-  }, [search, statusFilter, classFilter, startDate, endDate, sortBy, limit, timelineFilter]);
+  }, [search, statusFilter, classFilter, startDate, endDate, activeSession, sortBy, limit, timelineFilter]);
 
   useEffect(() => {
     fetchEnquiries();
-  }, [page, search, statusFilter, classFilter, startDate, endDate, sortBy, limit, timelineFilter]);
+  }, [page, search, statusFilter, classFilter, startDate, endDate, activeSession, sortBy, limit, timelineFilter]);
 
   // Handle select all rows
   const handleSelectAll = (e) => {
@@ -594,6 +609,18 @@ const Enquiries = () => {
             Filter, modify statuses, convert registration stages, and send parents templated messages.
           </p>
         </div>
+
+        {/* Academic Session & Date Preset Filter Bar */}
+        <SessionFilterBar
+          selectedTimeframe={selectedTimeframe}
+          onTimeframeChange={handleTimeframeChange}
+          customStartDate={startDate}
+          customEndDate={endDate}
+          onCustomDateChange={(s, e) => {
+            setStartDate(s);
+            setEndDate(e);
+          }}
+        />
 
         {/* Advanced Filters Block */}
         <CollapsibleFilters

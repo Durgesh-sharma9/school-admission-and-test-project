@@ -28,10 +28,27 @@ const getEnquiries = async (req, res) => {
       classFilter = '', 
       startDate = '', 
       endDate = '', 
+      academicSession = '',
+      session = '',
       sortBy = 'newest' 
     } = req.query;
 
     const query = { schoolId, isDeleted: { $ne: true } };
+
+    // Apply academic session filter
+    const selectedSession = academicSession || session;
+    if (selectedSession && selectedSession !== 'all' && selectedSession !== 'All Sessions') {
+      if (selectedSession === '2026-2027') {
+        query.$or = [
+          { academicSession: '2026-2027' },
+          { academicSession: { $exists: false } },
+          { academicSession: null },
+          { academicSession: '' }
+        ];
+      } else {
+        query.academicSession = selectedSession;
+      }
+    }
 
     // Apply status filter if provided
     if (status) {
@@ -68,7 +85,16 @@ const getEnquiries = async (req, res) => {
       if (mongoose.Types.ObjectId.isValid(search)) {
         searchConditions.push({ _id: new mongoose.Types.ObjectId(search) });
       }
-      query.$or = searchConditions;
+
+      if (query.$or) {
+        query.$and = [
+          { $or: query.$or },
+          { $or: searchConditions }
+        ];
+        delete query.$or;
+      } else {
+        query.$or = searchConditions;
+      }
     }
 
     // Determine Sort options
@@ -123,9 +149,37 @@ const getEnquiries = async (req, res) => {
 const getDashboardStats = async (req, res) => {
   try {
     const schoolId = req.school.id;
+    const { 
+      academicSession = '', 
+      session = '', 
+      startDate = '', 
+      endDate = '' 
+    } = req.query;
+
+    const selectedSession = academicSession || session;
+    const matchQuery = { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } };
+
+    if (selectedSession && selectedSession !== 'all' && selectedSession !== 'All Sessions') {
+      if (selectedSession === '2026-2027') {
+        matchQuery.$or = [
+          { academicSession: '2026-2027' },
+          { academicSession: { $exists: false } },
+          { academicSession: null },
+          { academicSession: '' }
+        ];
+      } else {
+        matchQuery.academicSession = selectedSession;
+      }
+    }
+
+    if (startDate || endDate) {
+      matchQuery.saveDate = {};
+      if (startDate) matchQuery.saveDate.$gte = startDate;
+      if (endDate) matchQuery.saveDate.$lte = endDate;
+    }
 
     const stats = await Enquiry.aggregate([
-      { $match: { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } } },
+      { $match: matchQuery },
       {
         $group: {
           _id: '$status',
@@ -140,7 +194,9 @@ const getDashboardStats = async (req, res) => {
       newEnquiry: 0,
       hold: 0,
       notInterested: 0,
-      confirmed: 0
+      confirmed: 0,
+      today: 0,
+      thisMonth: 0
     };
 
     stats.forEach(stat => {
@@ -150,6 +206,33 @@ const getDashboardStats = async (req, res) => {
       else if (stat._id === 'Not Interested') formattedStats.notInterested = stat.count;
       else if (stat._id === 'Admission Confirmed') formattedStats.confirmed = stat.count;
     });
+
+    // Calculate today & month counts in session
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const monthStr = todayStr.substring(0, 7);
+
+    const sessionMatchOnly = { schoolId: new mongoose.Types.ObjectId(schoolId), isDeleted: { $ne: true } };
+    if (selectedSession && selectedSession !== 'all' && selectedSession !== 'All Sessions') {
+      if (selectedSession === '2026-2027') {
+        sessionMatchOnly.$or = [
+          { academicSession: '2026-2027' },
+          { academicSession: { $exists: false } },
+          { academicSession: null },
+          { academicSession: '' }
+        ];
+      } else {
+        sessionMatchOnly.academicSession = selectedSession;
+      }
+    }
+
+    const [todayCount, monthCount] = await Promise.all([
+      Enquiry.countDocuments({ ...sessionMatchOnly, saveDate: todayStr }),
+      Enquiry.countDocuments({ ...sessionMatchOnly, saveDate: { $regex: `^${monthStr}` } })
+    ]);
+
+    formattedStats.today = todayCount;
+    formattedStats.thisMonth = monthCount;
 
     return res.json({
       success: true,
@@ -195,6 +278,9 @@ const createEnquiryManual = async (req, res) => {
     const schoolId = req.school.id;
     const enquiryData = req.body;
 
+    const school = await School.findById(schoolId);
+    const assignedSession = enquiryData.academicSession || enquiryData.session || school?.academicSession || '2026-2027';
+
     const uniqueId = await generateEnquiryId();
     const { saveDate, saveTime } = getFormattedDateTime();
 
@@ -206,6 +292,7 @@ const createEnquiryManual = async (req, res) => {
     const enquiry = new Enquiry({
       ...enquiryData,
       schoolId,
+      academicSession: assignedSession,
       localityId: localityInfo ? localityInfo.localityId : null,
       enquiryId: uniqueId,
       saveDate,
@@ -222,7 +309,7 @@ const createEnquiryManual = async (req, res) => {
     await createNotification(
       schoolId,
       'New Enquiry Registered',
-      `Manual Walk-in enquiry created for ${enquiry.studentName} (ID: ${enquiry.enquiryId})`,
+      `Manual Walk-in enquiry created for ${enquiry.studentName} (ID: ${enquiry.enquiryId}) [${assignedSession}]`,
       'new_enquiry'
     );
 
@@ -255,6 +342,8 @@ const createEnquiryPublic = async (req, res) => {
       return res.status(404).json({ success: false, message: 'School not found' });
     }
 
+    const assignedSession = enquiryData.academicSession || enquiryData.session || school.academicSession || '2026-2027';
+
     const uniqueId = await generateEnquiryId();
     const { saveDate, saveTime } = getFormattedDateTime();
 
@@ -266,6 +355,7 @@ const createEnquiryPublic = async (req, res) => {
     const enquiry = new Enquiry({
       ...enquiryData,
       schoolId,
+      academicSession: assignedSession,
       localityId: localityInfo ? localityInfo.localityId : null,
       enquiryId: uniqueId,
       saveDate,
@@ -283,7 +373,7 @@ const createEnquiryPublic = async (req, res) => {
     await createNotification(
       schoolId,
       'New Enquiry Submitted',
-      `New portal enquiry submitted for student ${enquiry.studentName} (ID: ${enquiry.enquiryId})`,
+      `New portal enquiry submitted for student ${enquiry.studentName} (ID: ${enquiry.enquiryId}) [${assignedSession}]`,
       'new_enquiry'
     );
 

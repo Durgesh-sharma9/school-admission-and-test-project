@@ -3,6 +3,7 @@ const { uploadFile, deleteFile } = require('../services/uploadService');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const SystemSetting = require('../models/SystemSetting');
+const { validatePasswordPolicy } = require('../utils/passwordValidator');
 
 // @desc    Update School Details Settings
 // @route   PUT /api/v1/settings
@@ -249,8 +250,9 @@ const changePassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide current and new passwords' });
     }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+    const passwordCheck = validatePasswordPolicy(newPassword);
+    if (!passwordCheck.isValid) {
+      return res.status(400).json({ success: false, message: passwordCheck.message });
     }
 
     const school = await School.findById(req.school.id);

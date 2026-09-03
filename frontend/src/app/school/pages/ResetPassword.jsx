@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import schoolApi from '../services/schoolApi';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
+import PasswordInput, { isPasswordValid } from '../../../shared/components/PasswordInput';
 import toast from 'react-hot-toast';
 import { Lock, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -102,9 +103,8 @@ const ResetPassword = () => {
       return;
     }
 
-    // Password validation - at least 6 characters
-    if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (!isPasswordValid(newPassword)) {
+      toast.error('Password does not meet the security requirements');
       return;
     }
 
@@ -141,7 +141,7 @@ const ResetPassword = () => {
             </div>
             <h1 className="text-2xl font-bold text-slate-800">Reset Password</h1>
             <p className="text-sm text-slate-500">
-              {otpVerified ? 'Enter your new password' : 'Enter the OTP sent to your email'}
+              {otpVerified ? 'Enter your new strong password' : 'Enter the OTP sent to your email'}
             </p>
           </div>
 
@@ -177,38 +177,28 @@ const ResetPassword = () => {
             </form>
           ) : (
             /* Password Reset Form */
-            <form onSubmit={handleResetPassword} className="space-y-6">
-              <Input
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <PasswordInput
                 label="New Password"
-                type="password"
-                placeholder="••••••••"
+                placeholder="Enter new strong password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                showStrength={true}
                 required
               />
 
               <Input
                 label="Confirm New Password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Re-enter new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
 
-              <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-slate-700">Password Requirements:</p>
-                <ul className="text-xs text-slate-500 space-y-1">
-                  <li className="flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-2 text-green-500" />
-                    At least 6 characters
-                  </li>
-                </ul>
-              </div>
-
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full mt-2"
                 disabled={loading}
               >
                 {loading ? 'Resetting...' : 'Reset Password'}

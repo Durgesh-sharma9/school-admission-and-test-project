@@ -137,6 +137,12 @@ const enquirySchema = new mongoose.Schema({
     enum: ['New Enquiry', 'Hold', 'Not Interested', 'Admission Confirmed'],
     default: 'New Enquiry',
   },
+  academicSession: {
+    type: String,
+    default: '2026-2027',
+    trim: true,
+    index: true,
+  },
   
   // Date and Time saved as strings for reports/easy filtering
   saveDate: {

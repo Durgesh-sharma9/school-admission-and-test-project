@@ -6,6 +6,7 @@ import schoolApi from '../services/schoolApi';
 import toast from 'react-hot-toast';
 import { GraduationCap, Target, Activity, Star, Zap, CheckCircle2 } from 'lucide-react';
 import Input from '../../../shared/components/Input';
+import PasswordInput, { isPasswordValid } from '../../../shared/components/PasswordInput';
 import Button from '../../../shared/components/Button';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 
@@ -24,6 +25,7 @@ const Signup = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -32,8 +34,11 @@ const Signup = () => {
       phone: '',
       address: '',
       password: '',
-    }
+    },
+    mode: 'onChange'
   });
+
+  const passwordValue = watch('password');
 
   useEffect(() => {
     if (googleData?.email) {
@@ -276,28 +281,28 @@ const Signup = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                    Admin Email
-                  </label>
-                  <Input
-                    name="email"
-                    type="email"
-                    placeholder="admin@mail.com"
-                    required
-                    error={errors.email}
-                    className="!rounded-lg border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2 px-3 text-sm"
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                        message: 'Valid email required',
-                      },
-                    })}
-                  />
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      Admin Email
+                    </label>
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="admin@mail.com"
+                      required
+                      error={errors.email}
+                      className="!rounded-lg border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2 px-3 text-sm"
+                      {...register('email', {
+                        required: 'Email is required',
+                        pattern: {
+                          value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                          message: 'Valid email required',
+                        },
+                      })}
+                    />
+                  </div>
 
-                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-700 mb-1">Contact Number</label>
                     <Input
@@ -315,36 +320,40 @@ const Signup = () => {
                       })}
                     />
                   </div>
+                </div>
 
-                  <div>
-                    {!googleData?.googleVerified ? (
-                      <>
-                        <label className="block text-[11px] font-semibold text-slate-700 mb-1">Admin Password</label>
-                        <Input
-                          name="password"
-                          type="password"
-                          placeholder="••••••••"
-                          required
-                          error={errors.password}
-                          className="!rounded-lg border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2 px-3 text-sm"
-                          {...register('password', {
-                            required: 'Required',
-                            minLength: {
-                              value: 6,
-                              message: 'Min 6 chars',
-                            },
-                          })}
-                        />
-                      </>
-                    ) : (
-                      <div className="space-y-1 text-left">
-                        <label className="block text-[11px] font-semibold text-slate-700">Admin Password</label>
-                        <div className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 font-medium">
-                          Managed by Google
-                        </div>
+                <div>
+                  {!googleData?.googleVerified ? (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">Admin Password</label>
+                      <PasswordInput
+                        name="password"
+                        placeholder="Create a password (min 8 chars, letters & numbers)"
+                        required
+                        value={passwordValue}
+                        error={errors.password}
+                        showStrength={true}
+                        className="!rounded-lg border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2 px-3 text-sm"
+                        {...register('password', {
+                          required: !googleData?.googleVerified ? 'Password is required' : false,
+                          validate: (val) => {
+                            if (googleData?.googleVerified) return true;
+                            if (!val || val.length < 8) return 'Password must be at least 8 characters long';
+                            if (!/[a-zA-Z]/.test(val)) return 'Must include letters (a-z / A-Z)';
+                            if (!/[0-9]/.test(val)) return 'Must include at least 1 number (0-9)';
+                            return true;
+                          }
+                        })}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-left">
+                      <label className="block text-[11px] font-semibold text-slate-700">Admin Password</label>
+                      <div className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 font-medium">
+                        Managed by Google
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
