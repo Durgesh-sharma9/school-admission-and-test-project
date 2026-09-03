@@ -33,7 +33,8 @@ import {
   CalendarDays,
   RefreshCw,
   User,
-  CheckSquare
+  CheckSquare,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -885,27 +886,42 @@ const TasksPage = ({ module = 'school' }) => {
               Everything requiring action today in one place.
             </p>
           </div>
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {/* High-End Date Selector Button with Integrated "Change Date" Sub-Header */}
             <button
               onClick={() => setCalendarOpen(true)}
-              className="inline-flex items-center px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-[11px] font-bold transition-all shadow-xs gap-1.5 cursor-pointer"
-              title="Change Date"
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-pink-300 rounded-xl shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:shadow-md transition-all duration-200 group text-left cursor-pointer"
+              title="Click to select or change date"
             >
-              <Calendar className="h-3.5 w-3.5" />
-              <span>{selectedDate ? new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Change Date'}</span>
+              <div className="h-8 w-8 rounded-lg bg-pink-50 text-[#E91E63] flex items-center justify-center shrink-0 group-hover:bg-[#E91E63] group-hover:text-white transition-colors duration-200 shadow-xs">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-extrabold text-[#E91E63] uppercase tracking-wider leading-none mb-0.5">
+                  Change Date
+                </span>
+                <span className="text-xs font-bold text-slate-800 leading-none">
+                  {selectedDate
+                    ? new Date(selectedDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+                    : `Today (${new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })})`}
+                </span>
+              </div>
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-[#E91E63] ml-1 transition-transform group-hover:translate-y-0.5" />
             </button>
+
             <button
               onClick={() => fetchData(true)}
               disabled={refreshing}
-              className="inline-flex items-center px-4.5 h-[36px] bg-white hover:bg-slate-50 text-slate-700 border border-[#E8ECF3] rounded-[12px] text-[11px] font-bold transition-all shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center px-4 h-[42px] bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:-translate-y-0.5 gap-1.5 disabled:opacity-50 cursor-pointer"
               title="Refresh List"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 text-slate-500 ${refreshing ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
+
             <button
               onClick={handleExportCSV}
-              className="inline-flex items-center px-4.5 h-[36px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-[12px] text-[11px] font-bold transition-all shadow-xs gap-1.5 cursor-pointer"
+              className="inline-flex items-center px-4 h-[42px] bg-[#E91E63] hover:bg-[#E91E63]/90 text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:-translate-y-0.5 gap-1.5 cursor-pointer"
               title="Export CSV"
             >
               <Download className="h-3.5 w-3.5" />

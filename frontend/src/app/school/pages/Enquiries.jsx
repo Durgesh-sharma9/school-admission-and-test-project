@@ -23,7 +23,7 @@ import {
   UserCheck,
   MoreVertical,
   Check,
-  FileQuestion,
+  GraduationCap,
   Trash2,
   AlertCircle,
   Eye,
@@ -83,7 +83,6 @@ const Enquiries = () => {
   // Handle deep-linking query parameter: ?expand=ID
   useEffect(() => {
     if (expandId) {
-      setSearch(expandId);
       setExpandedEnquiryId(expandId);
     }
   }, [expandId]);
@@ -963,9 +962,9 @@ const Enquiries = () => {
                             <button
                               className="h-10 w-10 p-0 flex items-center justify-center border border-[#E8ECF3] rounded-xl bg-[#FFF7ED] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-white hover:border-[#F59E0B] shadow-[0_3px_10px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(15,23,42,0.08)] transition-all duration-200"
                               onClick={() => setSelectedEnquiryForAssessment(enq)}
-                              title="Documents / Assessment"
+                              title="Online Assessment / Entrance Test"
                             >
-                              <FileQuestion size={16} strokeWidth={2} />
+                              <GraduationCap size={17} strokeWidth={2} />
                             </button>
 
                             <button

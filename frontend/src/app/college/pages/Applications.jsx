@@ -86,7 +86,6 @@ const Applications = () => {
   // Handle deep-linking query parameter: ?expand=ID
   useEffect(() => {
     if (expandId) {
-      setSearchTerm(expandId);
       setExpandedAppId(expandId);
     }
   }, [expandId]);
