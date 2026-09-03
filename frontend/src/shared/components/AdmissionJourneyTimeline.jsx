@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Sparkles, X, Plus, Info, Calendar, User, GitCommit } from 'lucide-react';
 import Button from './Button';
@@ -307,7 +308,7 @@ const AdmissionJourneyTimeline = ({
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
         
         {/* Connected Horizontal Timeline Scroller */}
-        <div className="overflow-x-auto pb-2 p-3 border-b border-slate-200">
+        <div className="overflow-x-auto py-4 px-4 border-b border-slate-200">
           <div className="flex items-center w-max py-1 px-1">
           {displayNodes.map((stage, idx) => {
             const isAddNode = stage.isAddNode;
@@ -361,21 +362,8 @@ const AdmissionJourneyTimeline = ({
                       setModalNotes('');
                       setTimelineModalOpen(true);
                     }}
-                    onMouseEnter={(e) => {
-                      setHoveredStageIndex(idx);
-                      const circleEl = e.currentTarget.querySelector('div');
-                      const rect = circleEl ? circleEl.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
-                      setHoveredStageRect({
-                        top: rect.top,
-                        left: rect.left + (rect.width / 2),
-                        idx
-                      });
-                    }}
-                    onMouseLeave={() => {
-                      setHoveredStageIndex(null);
-                      setHoveredStageRect(null);
-                    }}
-                    className="flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-300 hover:scale-105"
+                    title="Click to add a new stage to this candidate's journey"
+                    className="flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-200 hover:scale-105"
                   >
                     <div className="w-8 h-8 rounded-full border-2 border-dashed border-indigo-500 bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold relative hover:bg-indigo-100 transition-all">
                       <Plus className="h-4 w-4" />
@@ -406,27 +394,17 @@ const AdmissionJourneyTimeline = ({
 
                 {/* Circle & Label Container */}
                 <div
+                  title={`${stage.stage} (${status}) - Click or hover to view details below`}
                   onClick={() => {
                     setSelectedStageIndex(idx);
                     if (isFinalStageNode) {
                       setShowFinalNodePopup(true);
                     }
                   }}
-                  onMouseEnter={(e) => {
-                    setHoveredStageIndex(idx);
-                    const circleEl = e.currentTarget.querySelector('div');
-                    const rect = circleEl ? circleEl.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
-                    setHoveredStageRect({
-                      top: rect.top,
-                      left: rect.left + (rect.width / 2),
-                      idx
-                    });
-                  }}
-                  onMouseLeave={() => {
-                    setHoveredStageIndex(null);
-                    setHoveredStageRect(null);
-                  }}
-                  className="flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-300 hover:scale-105"
+                  onMouseEnter={() => setSelectedStageIndex(idx)}
+                  className={`flex flex-col items-center shrink-0 cursor-pointer relative transition-all duration-200 p-1 rounded-xl ${
+                    isSelected ? 'bg-indigo-50/60 scale-105' : 'hover:bg-slate-50 hover:scale-105'
+                  }`}
                 >
                   {/* Circle Node */}
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 font-bold relative ${
@@ -463,7 +441,7 @@ const AdmissionJourneyTimeline = ({
                   </div>
 
                   {/* Label below circle */}
-                  <span className={`text-[11px] font-semibold mt-2 block whitespace-nowrap transition-colors duration-200 ${
+                  <span className={`text-[11px] font-semibold mt-1.5 block whitespace-nowrap transition-colors duration-200 ${
                     isSelected ? 'text-indigo-600 font-bold' : 'text-slate-700'
                   }`}>
                     {isFinalStageNode ? `${stage.stage} (Final)` : stage.stage}
@@ -485,48 +463,6 @@ const AdmissionJourneyTimeline = ({
           })}
         </div>
       </div>
-
-      {/* Non-Clipping Absolute Positioned Tooltip */}
-      {hoveredStageRect && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: `${hoveredStageRect.top + 40}px`,
-            left: `${hoveredStageRect.left}px`,
-            transform: 'translateX(-50%)',
-            zIndex: 9999
-          }}
-          className="bg-slate-900 text-white text-[10.5px] p-3 rounded-xl shadow-xl w-52 pointer-events-none transition-all duration-150 text-left border border-slate-700/60 leading-normal"
-        >
-          {(() => {
-            const stage = displayNodes[hoveredStageRect.idx];
-            if (!stage) return null;
-            if (stage.isAddNode) {
-              return (
-                <>
-                  <div className="font-extrabold text-[#6D5DF6]">Add Stage</div>
-                  <div className="text-slate-300 mt-0.5 font-medium">Continue Admission Journey</div>
-                </>
-              );
-            }
-            const status = getStageStatus(stage, hoveredStageRect.idx);
-            return (
-              <>
-                <div className="font-extrabold border-b border-slate-700 pb-1 mb-1.5 flex items-center justify-between">
-                  <span className="truncate">{stage.stage}</span>
-                  <span className="text-[8.5px] bg-[#6D5DF6] text-white px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">{status}</span>
-                </div>
-                <div className="space-y-1 text-slate-300 font-medium">
-                  <div>📅 Created: {new Date(stage.createdAt || stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                  {stage.completedAt && <div className="text-emerald-450">✔ Completed: {new Date(stage.completedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
-                  {stage.followUpDate && !stage.completedAt && <div>📞 Follow-up: {new Date(stage.followUpDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</div>}
-                  {stage.notes && <div className="italic truncate border-t border-slate-800/80 pt-1 mt-1 text-slate-455">"{stage.notes}"</div>}
-                </div>
-              </>
-            );
-          })()}
-        </div>
-      )}
 
       {/* Selected Stage Detail Panel - Inside Unified Container */}
       {(() => {
@@ -583,12 +519,12 @@ const AdmissionJourneyTimeline = ({
                     : status === 'Current'
                     ? 'bg-indigo-100 border-indigo-200 text-indigo-700'
                     : status === 'Overdue'
-                    ? 'bg-red-100 border-red-200 text-red-700 animate-pulse'
+                    ? 'bg-red-100 border-red-200 text-red-700 font-bold'
                     : 'bg-slate-100 border-slate-200 text-slate-500'
                 }`}>
                   {status === 'Current' ? 'ACTIVE' : status}
                 </span>
-                {getFollowUpStatusBadge(stage)}
+                {status !== 'Overdue' && getFollowUpStatusBadge(stage)}
               </div>
             </div>
 
@@ -685,15 +621,15 @@ const AdmissionJourneyTimeline = ({
       </div>
 
       {/* Add / Edit Timeline Stage Modal */}
-      {timelineModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+      {timelineModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden my-8"
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col my-auto max-h-[90vh]"
           >
-            <form onSubmit={handleSaveStage}>
-              <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
+            <form onSubmit={handleSaveStage} className="flex flex-col max-h-[90vh] overflow-hidden">
+              <div className="shrink-0 px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                   <Sparkles className="h-4.5 w-4.5 text-[#6D5DF6]" />
                   {editingStageIndex !== -1 ? 'Edit Journey Stage' : 'Add Journey Stage'}
@@ -701,17 +637,17 @@ const AdmissionJourneyTimeline = ({
                 <button
                   type="button"
                   onClick={() => setTimelineModalOpen(false)}
-                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+                  className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="p-6 space-y-4 text-left">
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 text-left">
                 {/* Selectable Stage Options Chips directly */}
                 <div className="space-y-2">
                   <label className="block text-[10px] font-black text-slate-600 uppercase">Select Timeline / Pipeline Stage *</label>
-                  <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50/50">
+                  <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50/50">
                     {stageOptions.filter(opt => opt !== 'Other').map(opt => {
                       const isSelected = modalStage === opt;
                       
@@ -768,14 +704,14 @@ const AdmissionJourneyTimeline = ({
                   <textarea
                     value={modalNotes}
                     onChange={(e) => setModalNotes(e.target.value)}
-                    rows={3}
+                    rows={2.5}
                     placeholder="Add notes about this interaction..."
                     className="w-full bg-[#F8FAFC] rounded-lg border border-[#E5E7EB] px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#6D5DF6]/30 focus:bg-white transition-all font-medium leading-relaxed"
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-4 bg-[#F8FAFC] border-t border-[#E5E7EB] flex justify-end gap-3 font-semibold text-xs">
+              <div className="shrink-0 px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5 font-semibold text-xs">
                 <Button
                   variant="outline"
                   type="button"
@@ -788,24 +724,26 @@ const AdmissionJourneyTimeline = ({
                   variant="primary"
                   type="submit"
                   isLoading={saving}
-                  className="bg-[#6D5DF6] hover:bg-[#5b4ee3] border-transparent text-white shadow-xs px-3.5 rounded-lg h-8 font-bold"
+                  className="bg-[#6D5DF6] hover:bg-[#5b4ee3] border-transparent text-white shadow-xs px-4 rounded-lg h-8 font-bold"
                 >
                   Save Stage
                 </Button>
               </div>
             </form>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
+
       {/* 2. Confirmation modal for final stages */}
       <AnimatePresence>
-        {showConfirmCloseModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        {showConfirmCloseModal && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden"
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-auto"
             >
               <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -888,19 +826,20 @@ const AdmissionJourneyTimeline = ({
                 </Button>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
 
       {/* Reopen Journey Confirmation Modal */}
       <AnimatePresence>
-        {showConfirmReopenModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        {showConfirmReopenModal && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden"
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-auto"
             >
               <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -937,19 +876,20 @@ const AdmissionJourneyTimeline = ({
                 </Button>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
 
       {/* Final Node Popup */}
       <AnimatePresence>
-        {showFinalNodePopup && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        {showFinalNodePopup && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white rounded-xl shadow-xl border border-[#E5E7EB] overflow-hidden text-left"
+              className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden text-left my-auto"
             >
               <div className="px-6 py-4 bg-[#F8FAFC] border-b border-[#E5E7EB] flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -1011,7 +951,8 @@ const AdmissionJourneyTimeline = ({
                 </Button>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </div>

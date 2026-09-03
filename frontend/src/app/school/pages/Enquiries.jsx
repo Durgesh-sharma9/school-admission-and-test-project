@@ -415,11 +415,26 @@ const Enquiries = () => {
     return enquiries.filter((enq) => selectedIds.includes(enq._id));
   };
 
+  const getCleanWhatsAppNumber = (phone) => {
+    if (!phone) return '';
+    let cleaned = String(phone).replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) return `91${cleaned}`;
+    if (cleaned.startsWith('0') && cleaned.length === 11) return `91${cleaned.slice(1)}`;
+    return cleaned;
+  };
+
   const getPersonalizedMessage = (template, enquiry) => {
+    if (!template || !enquiry) return '';
     return template
-      .replace(/\[Parent Name\]/g, enquiry.parentName)
-      .replace(/\[Student Name\]/g, enquiry.studentName)
-      .replace(/\[Enquiry ID\]/g, enquiry.enquiryId);
+      .replace(/\[Parent Name\]/gi, enquiry.parentName || 'Parent')
+      .replace(/\[Student Name\]/gi, enquiry.studentName || 'Student')
+      .replace(/\[Enquiry ID\]/gi, enquiry.enquiryId || enquiry._id || '')
+      .replace(/\[Class\]/gi, enquiry.classSeeking || '')
+      .replace(/\[School Name\]/gi, school?.name || 'our school')
+      .replace(/\{\{\s*parentName\s*\}\}/gi, enquiry.parentName || 'Parent')
+      .replace(/\{\{\s*studentName\s*\}\}/gi, enquiry.studentName || 'Student')
+      .replace(/\{\{\s*enquiryId\s*\}\}/gi, enquiry.enquiryId || enquiry._id || '')
+      .replace(/\{\{\s*class\s*\}\}/gi, enquiry.classSeeking || '');
   };
 
   const launchCommunication = (enq) => {
@@ -428,11 +443,18 @@ const Enquiries = () => {
 
     if (messageType === 'whatsapp') {
       const number = enq.whatsapp || enq.mobile;
-      // Remove symbols for WhatsApp API link
-      const cleanNumber = number.replace(/[^0-9]/g, '');
+      const cleanNumber = getCleanWhatsAppNumber(number);
+      if (!cleanNumber) {
+        toast.error('No valid phone number found for this parent');
+        return;
+      }
       window.open(`https://wa.me/${cleanNumber}?text=${encodedText}`, '_blank');
     } else {
-      const subject = encodeURIComponent('School Admission Follow-up');
+      if (!enq.email) {
+        toast.error('No email address found for this parent');
+        return;
+      }
+      const subject = encodeURIComponent(`Admission Enquiry Follow-up - ${enq.studentName || ''} (${enq.enquiryId || ''})`);
       window.open(`mailto:${enq.email}?subject=${subject}&body=${encodedText}`, '_blank');
     }
   };
@@ -444,18 +466,35 @@ const Enquiries = () => {
       return;
     }
 
-    // Draft bulk email with BCC
-    const bccList = selectedList.map((e) => e.email).join(',');
-    const subject = encodeURIComponent('Admission Follow-up');
-    const firstEnq = selectedList[0];
+    if (selectedList.length === 1) {
+      // Single recipient: Autofill exact parent email and personalized matter
+      const singleEnq = selectedList[0];
+      const subject = encodeURIComponent(`Admission Follow-up - ${singleEnq.studentName || ''} (${singleEnq.enquiryId || ''})`);
+      const text = getPersonalizedMessage(messageTemplate, singleEnq);
+      const encodedText = encodeURIComponent(text);
+      window.open(`mailto:${singleEnq.email}?subject=${subject}&body=${encodedText}`, '_blank');
+      toast.success(`Mail client opened for ${singleEnq.email}`);
+      setMessageModalOpen(false);
+      return;
+    }
+
+    // Multiple recipients: First in To, rest in BCC
+    const toEmail = selectedList[0].email;
+    const bccList = selectedList.slice(1).map((e) => e.email).join(',');
+    const subject = encodeURIComponent('School Admission Follow-up');
     const text = messageTemplate
-      .replace(/\[Parent Name\]/g, 'Parent')
-      .replace(/\[Student Name\]/g, 'your child')
-      .replace(/\[Enquiry ID\]/g, 'Registration ID');
+      .replace(/\[Parent Name\]/gi, 'Parent')
+      .replace(/\[Student Name\]/gi, 'Student')
+      .replace(/\[Enquiry ID\]/gi, 'Enquiry')
+      .replace(/\[School Name\]/gi, school?.name || 'our school');
     const encodedText = encodeURIComponent(text);
 
-    window.open(`mailto:?bcc=${bccList}&subject=${subject}&body=${encodedText}`, '_blank');
-    toast.success('Mail client opened with BCC list!');
+    const mailtoUrl = bccList
+      ? `mailto:${toEmail}?bcc=${bccList}&subject=${subject}&body=${encodedText}`
+      : `mailto:${toEmail}?subject=${subject}&body=${encodedText}`;
+
+    window.open(mailtoUrl, '_blank');
+    toast.success('Mail client opened with recipient list!');
     setMessageModalOpen(false);
   };
 

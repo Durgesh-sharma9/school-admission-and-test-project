@@ -21,13 +21,13 @@ const ContactModal = ({
 }) => {
   if (!isOpen || !data) return null;
 
-  // Format WhatsApp numbers
+  // Format WhatsApp numbers with India country code 91
   const formatWhatsApp = (phone) => {
     if (!phone) return '';
-    const cleaned = phone.replace(/[\s\-()]/g, '');
-    if (cleaned.startsWith('+')) return cleaned.replace('+', '');
-    if (cleaned.startsWith('91') && cleaned.length > 10) return cleaned;
-    return `91${cleaned}`;
+    let cleaned = String(phone).replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) return `91${cleaned}`;
+    if (cleaned.startsWith('0') && cleaned.length === 11) return `91${cleaned.slice(1)}`;
+    return cleaned;
   };
 
   const copyToClipboard = (text, label) => {
@@ -49,13 +49,22 @@ const ContactModal = ({
     return rawStatus.toUpperCase();
   };
 
-  // Get correct numbers based on CRM type
+  // Get correct numbers & emails based on CRM type
   const studentMobile = type === 'school' ? (data.studentMobile || '') : (data.mobile || '');
-  const parentMobile = type === 'school' ? (data.mobile || '') : (data.parentMobile || '');
-  const parentWhatsApp = type === 'school' ? (data.whatsapp || data.mobile || '') : (data.parentMobile || '');
+  const parentMobile = type === 'school' ? (data.mobile || data.parentMobile || '') : (data.parentMobile || data.mobile || '');
+  const parentWhatsApp = type === 'school' ? (data.whatsapp || data.mobile || '') : (data.parentWhatsApp || data.parentMobile || data.mobile || '');
   
-  const studentEmail = data.email || '';
-  const parentEmail = data.parentEmail || '';
+  const parentEmail = type === 'school' ? (data.email || data.parentEmail || '') : (data.parentEmail || data.email || '');
+  const studentEmail = type === 'school' ? (data.studentEmail || '') : (data.email || '');
+
+  // Prefilled message texts
+  const prefilledWhatsApp = encodeURIComponent(
+    `Hello ${data.parentName || 'Parent'}, regarding your admission enquiry for ${studentName} (ID: ${idBadge}, Class: ${classOrCourse}). How can we help you further?`
+  );
+  const prefilledSubject = encodeURIComponent(`Admission Enquiry Follow-up - ${studentName} (${idBadge})`);
+  const prefilledEmailBody = encodeURIComponent(
+    `Dear ${data.parentName || 'Parent'},\n\nThank you for your admission enquiry for ${studentName} (Enquiry ID: ${idBadge}, Class: ${classOrCourse}).\n\nWe would love to discuss the details and assist you with the admission process.\n\nWarm regards,\nAdmissions Team`
+  );
 
   // Determine which cards to show
   const showCallStudent = !!studentMobile;
@@ -207,7 +216,7 @@ const ContactModal = ({
             {showWhatsAppParent && (
               <div className="group flex flex-col justify-between p-4.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 hover:shadow-md transition-all duration-200 text-left">
                 <a
-                  href={`https://wa.me/${formatWhatsApp(parentWhatsApp)}`}
+                  href={`https://wa.me/${formatWhatsApp(parentWhatsApp)}?text=${prefilledWhatsApp}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-4 cursor-pointer"
@@ -221,7 +230,7 @@ const ContactModal = ({
                   </div>
                 </a>
                 <div className="flex items-center gap-3 mt-4 pt-3.5 border-t border-slate-100 font-bold text-[11px] text-slate-500">
-                  <button type="button" onClick={() => copyToClipboard(parentWhatsApp, 'Parent WhatsApp')} className="hover:text-emerald-600 transition-colors">📋 Copy Link</button>
+                  <button type="button" onClick={() => copyToClipboard(`https://wa.me/${formatWhatsApp(parentWhatsApp)}?text=${prefilledWhatsApp}`, 'WhatsApp link')} className="hover:text-emerald-600 transition-colors">📋 Copy Link</button>
                 </div>
               </div>
             )}
@@ -230,7 +239,7 @@ const ContactModal = ({
             {showEmailStudent && (
               <div className="group flex flex-col justify-between p-4.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 hover:shadow-md transition-all duration-200 text-left">
                 <a
-                  href={`mailto:${studentEmail}`}
+                  href={`mailto:${studentEmail}?subject=${prefilledSubject}&body=${prefilledEmailBody}`}
                   className="flex items-center gap-4 cursor-pointer"
                 >
                   <div className="h-12 w-12 rounded-xl bg-amber-100 group-hover:bg-amber-200 flex items-center justify-center shrink-0 transition-colors">
@@ -251,7 +260,7 @@ const ContactModal = ({
             {showEmailParent && (
               <div className="group flex flex-col justify-between p-4.5 rounded-2xl border border-slate-200 bg-white hover:bg-teal-50/40 hover:border-teal-300 hover:shadow-md transition-all duration-200 text-left">
                 <a
-                  href={`mailto:${parentEmail}`}
+                  href={`mailto:${parentEmail}?subject=${prefilledSubject}&body=${prefilledEmailBody}`}
                   className="flex items-center gap-4 cursor-pointer"
                 >
                   <div className="h-12 w-12 rounded-xl bg-teal-100 group-hover:bg-teal-200 flex items-center justify-center shrink-0 transition-colors">
