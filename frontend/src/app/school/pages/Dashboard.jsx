@@ -346,16 +346,39 @@ const Dashboard = () => {
               <div className="space-y-4">
                 <div className="h-60 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={localityMetrics} margin={{ top: 10, right: 10, left: -20, bottom: 45 }}>
+                    <BarChart
+                      data={localityMetrics}
+                      margin={{ top: 10, right: 10, left: -20, bottom: localityMetrics.length > 3 ? 35 : 20 }}
+                      barGap={4}
+                      barCategoryGap={localityMetrics.length === 1 ? '70%' : localityMetrics.length === 2 ? '50%' : '20%'}
+                    >
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fontSize: 9, fill: '#6b7280', fontWeight: 500 }} 
                         tickLine={false} 
                         axisLine={false} 
                         interval={0}
-                        angle={-35}
-                        textAnchor="end"
+                        tick={(props) => {
+                          const { x, y, payload } = props;
+                          const text = payload?.value || '';
+                          const shouldRotate = localityMetrics.length > 3 || text.length > 10;
+                          return (
+                            <g transform={`translate(${x},${y})`}>
+                              <text
+                                x={0}
+                                y={0}
+                                dy={shouldRotate ? 10 : 14}
+                                textAnchor={shouldRotate ? 'end' : 'middle'}
+                                fill="#6b7280"
+                                fontSize={10}
+                                fontWeight={500}
+                                transform={shouldRotate ? 'rotate(-30)' : undefined}
+                              >
+                                {text}
+                              </text>
+                            </g>
+                          );
+                        }}
                       />
                       <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
                       <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
@@ -385,16 +408,38 @@ const Dashboard = () => {
             ) : (
               <div className="h-60 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={classDemandData} margin={{ top: 10, right: 10, left: -20, bottom: 45 }}>
+                  <BarChart
+                    data={classDemandData}
+                    margin={{ top: 10, right: 10, left: -20, bottom: classDemandData.length > 3 ? 35 : 20 }}
+                    barCategoryGap={classDemandData.length === 1 ? '70%' : classDemandData.length === 2 ? '50%' : '20%'}
+                  >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
                     <XAxis 
                       dataKey="class" 
-                      tick={{ fontSize: 9, fill: '#6b7280', fontWeight: 500 }} 
                       tickLine={false} 
                       axisLine={false} 
                       interval={0}
-                      angle={-35}
-                      textAnchor="end"
+                      tick={(props) => {
+                        const { x, y, payload } = props;
+                        const text = payload?.value || '';
+                        const shouldRotate = classDemandData.length > 3 || text.length > 10;
+                        return (
+                          <g transform={`translate(${x},${y})`}>
+                            <text
+                              x={0}
+                              y={0}
+                              dy={shouldRotate ? 10 : 14}
+                              textAnchor={shouldRotate ? 'end' : 'middle'}
+                              fill="#6b7280"
+                              fontSize={10}
+                              fontWeight={500}
+                              transform={shouldRotate ? 'rotate(-30)' : undefined}
+                            >
+                              {text}
+                            </text>
+                          </g>
+                        );
+                      }}
                     />
                     <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
@@ -402,7 +447,7 @@ const Dashboard = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            ) }
+            )}
           </div>
         </motion.div>
 

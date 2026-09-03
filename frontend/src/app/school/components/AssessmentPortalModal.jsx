@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/schoolApi';
+import { useAuth } from '../contexts/AuthContext';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import toast from 'react-hot-toast';
@@ -34,6 +35,29 @@ const getAnswerDisplayValue = (q, val) => {
 const PIE_COLORS = ['#10b981', '#ef4444', '#f59e0b'];
 
 const AssessmentPortalModal = ({ enquiry, onClose }) => {
+  const auth = useAuth();
+  const school = auth?.school;
+
+  const currentSchoolName = 
+    school?.name || 
+    enquiry?.schoolId?.name || 
+    enquiry?.school?.name || 
+    localStorage.getItem('supportSchoolName') || 
+    localStorage.getItem('schoolName') || 
+    'J D International School';
+
+  const currentSchoolLogo = 
+    school?.logo || 
+    enquiry?.schoolId?.logo || 
+    enquiry?.school?.logo || 
+    localStorage.getItem('schoolLogo') || 
+    '';
+
+  useEffect(() => {
+    if (school?.name) localStorage.setItem('schoolName', school.name);
+    if (school?.logo) localStorage.setItem('schoolLogo', school.logo);
+  }, [school]);
+
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState([]);
   const [templates, setTemplates] = useState([]);
@@ -186,12 +210,12 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
 
   const statsResult = calculateResultStats();
   const getInitials = (n) => n ? n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase() : 'C';
-  const reportId = activeAssignmentDetails
-    ? `RPT-${activeAssignmentDetails.assignment._id?.slice(-8).toUpperCase()}`
-    : '';
+  const reportId = activeAssignmentDetails?.assignment
+    ? (activeAssignmentDetails.assignment.reportId || `RPT-${(activeAssignmentDetails.assignment._id || activeAssignmentDetails.assignment.id || '').toString().slice(-8).toUpperCase()}`)
+    : 'RPT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
   // PDF builder — Professional Enterprise A4 report layout designed for print
-  const buildScorecardHTML = () => {
+  const buildScorecardHTML = (customCampusLogo) => {
     if (!statsResult || !activeAssignmentDetails) return '';
     const { assessment, assignment } = activeAssignmentDetails;
     const s = statsResult;
@@ -202,9 +226,10 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
     const candId = enquiry.applicationId || enquiry.enquiryId || 'N/A';
     const courseName = enquiry.classSeeking || enquiry.courseId?.name || enquiry.class || 'N/A';
 
-    // Dynamic Logo fetching logic
-    const schoolLogoUrl = localStorage.getItem('schoolLogo') || enquiry?.schoolId?.logo || enquiry?.school?.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(enquiry?.schoolId?.name || 'School')}&background=f1f5f9&color=64748b&size=120`;
-    const schoolName = enquiry?.schoolId?.name || localStorage.getItem('schoolName') || 'OFFICIAL INSTITUTION';
+    // Dynamic School Details logic
+    const schoolName = currentSchoolName;
+    const schoolLogoUrl = currentSchoolLogo;
+    const campusLogoSrc = customCampusLogo || (window.location.origin + '/logo.png');
 
     // Precompile Detailed review card blocks
     const qCardsHTML = assessment.sections.map((sec, sI) =>
@@ -302,32 +327,35 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #ffffff;
       color: #0f172a;
       -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
-    /* Expanded A4 utilization */
     .pdf-page {
-      width: 210mm;
-      min-height: 297mm;
-      padding: 15mm 15mm 25mm 15mm; /* Increased bottom padding to protect footer */
+      width: 794px;
+      height: 1123px;
+      max-height: 1123px;
+      min-height: 1123px;
+      padding: 24px 30px 20px 30px;
       box-sizing: border-box;
       position: relative;
       background: #ffffff;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     @media print {
-      body { background: #fff; }
-      .pdf-page { margin: 0; page-break-after: always; box-shadow: none; }
+      body { background: #ffffff; }
+      .pdf-page { margin: 0; page-break-after: always; box-shadow: none; width: 100%; height: 100vh; }
     }
     .card-title {
       background: #f8fafc; 
       border-bottom: 1px solid #cbd5e1; 
-      padding: 10px 16px; 
-      font-size: 11px; 
+      padding: 7px 14px; 
+      font-size: 10.5px; 
       font-weight: 800; 
       color: #0f172a; 
       text-transform: uppercase; 
@@ -341,100 +369,115 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
   <div class="pdf-page" id="page-summary">
     
     <!-- PROFESSIONAL ERP HEADER -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 28px;">
-       <div style="display: flex; align-items: center; gap: 16px;">
-          <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-             <img src="${schoolLogoUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='https://ui-avatars.com/api/?name=LOGO&background=f1f5f9&color=94a3b8&size=120';" />
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 14px; flex-shrink: 0;">
+       <div style="display: flex; align-items: center; gap: 14px;">
+          ${schoolLogoUrl ? `
+          <div style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 3px; flex-shrink: 0;">
+             <img src="${schoolLogoUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;" crossorigin="anonymous" onerror="this.parentElement.style.display='none'" />
           </div>
+          ` : `
+          <div style="width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; box-shadow: 0 2px 6px rgba(79,70,229,0.25); flex-shrink: 0;">
+             ${schoolName.charAt(0)}
+          </div>
+          `}
           <div>
-             <h1 style="font-size: 24px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">${schoolName}</h1>
-             <div style="font-size: 12px; color: #475569; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Academic Session 2026-2027 • Assessment Report</div>
+             <h1 style="font-size: 21px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2;">${schoolName}</h1>
+             <div style="font-size: 11px; color: #475569; margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${school?.address || school?.city ? `${school.address || school.city} • ` : ''}Academic Session 2026-2027 • Assessment Report
+             </div>
           </div>
        </div>
-       <div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">REPORT ID</div>
-          <div style="font-size: 18px; font-weight: 900; color: #0f172a; margin-top: 4px;">${reportId}</div>
-          <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-top: 6px; text-transform: uppercase;">DATE: ${genDate}</div>
+       <div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 18px; flex-shrink: 0;">
+          <div style="font-size: 9.5px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">REPORT ID</div>
+          <div style="font-size: 17px; font-weight: 900; color: #0f172a; margin-top: 2px;">${reportId}</div>
+          <div style="font-size: 9.5px; font-weight: 700; color: #64748b; margin-top: 3px; text-transform: uppercase;">DATE: ${genDate}</div>
        </div>
     </div>
 
     <!-- STUDENT INFORMATION CARD -->
-    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 24px; overflow: hidden;">
+    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; overflow: hidden; flex-shrink: 0;">
        <div class="card-title">Candidate & Assessment Information</div>
-       <div style="padding: 20px 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: #ffffff;">
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Candidate Name</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${enquiry.studentName}</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Registration / ID</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${candId}</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Program / Class</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${courseName}</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Assessment Date</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${submittedDate}</div></div>
+       <div style="padding: 10px 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 16px; background: #ffffff;">
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Candidate Name</div><div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 2px;">${enquiry.studentName}</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Registration / ID</div><div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 2px;">${candId}</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Program / Class</div><div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 2px;">${courseName}</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Assessment Date</div><div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 2px;">${submittedDate}</div></div>
           
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Assessment Name</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${assessment.name}</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Evaluator</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${assignment.gradedBy || 'System Evaluated'}</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Max Duration</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${assessment.duration} Minutes</div></div>
-          <div><div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Time Taken</div><div style="font-size: 14px; font-weight: 800; color: #0f172a;">${Math.floor(s.timeTaken / 60)}m ${s.timeTaken % 60}s</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Assessment Name</div><div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${assessment.name}</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Evaluator</div><div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${assignment.gradedBy || 'System Evaluated'}</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Max Duration</div><div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${assessment.duration} Minutes</div></div>
+          <div><div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Time Taken</div><div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${Math.floor(s.timeTaken / 60)}m ${s.timeTaken % 60}s</div></div>
        </div>
     </div>
 
     <!-- PERFORMANCE METRICS (8 CARDS) -->
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #0f172a;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Total Questions</div>
-          <div style="font-size: 24px; font-weight: 900; color: #0f172a;">${s.totalQuestions}</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; flex-shrink: 0;">
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #0f172a;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Total Questions</div>
+          <div style="font-size: 20px; font-weight: 900; color: #0f172a; margin-top: 2px;">${s.totalQuestions}</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #3b82f6;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Attempted</div>
-          <div style="font-size: 24px; font-weight: 900; color: #1e3a8a;">${s.answeredCount}</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #3b82f6;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Attempted</div>
+          <div style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 2px;">${s.answeredCount}</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #10b981;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Correct Answers</div>
-          <div style="font-size: 24px; font-weight: 900; color: #064e3b;">${s.correctCount}</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #10b981;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Correct Answers</div>
+          <div style="font-size: 20px; font-weight: 900; color: #064e3b; margin-top: 2px;">${s.correctCount}</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #ef4444;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Wrong Answers</div>
-          <div style="font-size: 24px; font-weight: 900; color: #7f1d1d;">${s.wrongCount}</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #ef4444;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Wrong Answers</div>
+          <div style="font-size: 20px; font-weight: 900; color: #7f1d1d; margin-top: 2px;">${s.wrongCount}</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #f59e0b;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Skipped Questions</div>
-          <div style="font-size: 24px; font-weight: 900; color: #78350f;">${s.skippedCount}</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #f59e0b;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Skipped Questions</div>
+          <div style="font-size: 20px; font-weight: 900; color: #78350f; margin-top: 2px;">${s.skippedCount}</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #8b5cf6;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Marks Obtained</div>
-          <div style="font-size: 24px; font-weight: 900; color: #4c1d95;">${s.marksObtained} <span style="font-size: 14px; color:#64748b;">/ ${s.totalMarks}</span></div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #8b5cf6;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Marks Obtained</div>
+          <div style="font-size: 20px; font-weight: 900; color: #4c1d95; margin-top: 2px;">${s.marksObtained} <span style="font-size: 12px; color:#64748b; font-weight: 700;">/ ${s.totalMarks}</span></div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #ec4899;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Final Percentage</div>
-          <div style="font-size: 24px; font-weight: 900; color: #831843;">${s.percentage}%</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #ec4899;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Final Percentage</div>
+          <div style="font-size: 20px; font-weight: 900; color: #831843; margin-top: 2px;">${s.percentage}%</div>
        </div>
-       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 14px; background: #ffffff; border-left: 5px solid #14b8a6;">
-          <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Accuracy Rate</div>
-          <div style="font-size: 24px; font-weight: 900; color: #134e4a;">${s.accuracyPct}%</div>
+       <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #ffffff; border-left: 4.5px solid #14b8a6;">
+          <div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Accuracy Rate</div>
+          <div style="font-size: 20px; font-weight: 900; color: #134e4a; margin-top: 2px;">${s.accuracyPct}%</div>
        </div>
     </div>
 
     <!-- SECTION-WISE PERFORMANCE TABLE -->
-    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 24px; overflow: hidden; flex-shrink: 0;">
+    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; overflow: hidden; flex-shrink: 0;">
        <div class="card-title">Section-wise Breakdown</div>
-       <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;">
+       <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
           <thead>
-             <tr style="background: #f1f5f9; color: #475569; font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">
-                <th style="padding: 14px 16px; text-align: left; border-bottom: 2px solid #cbd5e1;">Section Name</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1;">Total Qs</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1; color: #047857;">Correct</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1; color: #be123c;">Wrong</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1; color: #b45309;">Skipped</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1;">Marks</th>
-                <th style="padding: 14px 16px; border-bottom: 2px solid #cbd5e1; color: #0f172a;">Score %</th>
+             <tr style="background: #f1f5f9; color: #475569; font-weight: 800; text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.3px;">
+                <th style="padding: 8px 12px; text-align: left; border-bottom: 1px solid #cbd5e1;">Section Name</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1;">Total Qs</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1; color: #047857;">Correct</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1; color: #be123c;">Wrong</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1; color: #b45309;">Skipped</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1;">Marks</th>
+                <th style="padding: 8px 12px; border-bottom: 1px solid #cbd5e1; color: #0f172a;">Score %</th>
              </tr>
           </thead>
           <tbody>
              ${s.sectionStats.map((sec, i) =>
       `<tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom: 1px solid #e2e8f0;">
-                  <td style="font-weight: 800; padding: 14px 16px; text-align: left; color: #0f172a;">${sec.name}</td>
-                  <td style="font-weight: 600; padding: 14px 16px;">${sec.totalQuestions}</td>
-                  <td style="font-weight: 800; color: #047857; padding: 14px 16px;">${sec.correct}</td>
-                  <td style="font-weight: 800; color: #be123c; padding: 14px 16px;">${sec.wrong}</td>
-                  <td style="font-weight: 800; color: #b45309; padding: 14px 16px;">${sec.skipped}</td>
-                  <td style="font-weight: 800; color: #0f172a; padding: 14px 16px;">${sec.marksObtained} <span style="font-weight:600; color:#64748b;">/ ${sec.totalMarks}</span></td>
-                  <td style="font-weight: 900; color: #0f172a; padding: 14px 16px; background: ${i % 2 === 0 ? '#f1f5f9' : '#e2e8f0'};">${sec.percentage}%</td>
+                  <td style="font-weight: 800; padding: 8px 12px; text-align: left; color: #0f172a;">${sec.name}</td>
+                  <td style="font-weight: 600; padding: 8px 12px;">${sec.totalQuestions}</td>
+                  <td style="font-weight: 800; color: #047857; padding: 8px 12px;">${sec.correct}</td>
+                  <td style="font-weight: 800; color: #be123c; padding: 8px 12px;">${sec.wrong}</td>
+                  <td style="font-weight: 800; color: #b45309; padding: 8px 12px;">${sec.skipped}</td>
+                  <td style="font-weight: 800; color: #0f172a; padding: 8px 12px;">${sec.marksObtained} <span style="font-weight:600; color:#64748b;">/ ${sec.totalMarks}</span></td>
+                  <td style="font-weight: 900; color: #0f172a; padding: 8px 12px; background: ${i % 2 === 0 ? '#f1f5f9' : '#e2e8f0'};">
+                     <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span>${sec.percentage}%</span>
+                        <div style="width: 48px; height: 5px; background: #cbd5e1; border-radius: 3px; overflow: hidden; display: inline-block;">
+                           <div style="width: ${sec.percentage}%; height: 100%; background: ${sec.percentage >= 70 ? '#10b981' : sec.percentage >= 40 ? '#3b82f6' : '#ef4444'}; border-radius: 3px;"></div>
+                        </div>
+                     </div>
+                  </td>
                 </tr>`
     ).join('')}
           </tbody>
@@ -442,25 +485,25 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
     </div>
 
     <!-- ANALYTICS & ACADEMIC INSIGHTS -->
-    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px; margin-bottom: auto; flex-shrink: 0;">
+    <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 14px; margin-bottom: 14px; flex-shrink: 0;">
        <!-- Score Distribution -->
        <div style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
           <div class="card-title">Score Distribution</div>
-          <div style="padding: 24px; display: flex; align-items: center; justify-content: center; gap: 32px; flex: 1; background: #ffffff;">
-             <svg width="140" height="140" viewBox="0 0 140 140" style="display: block; flex-shrink: 0;">
-               <circle cx="70" cy="70" r="55" fill="none" stroke="#e2e8f0" stroke-width="20" />
-               ${cPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#10b981" stroke-width="20" stroke-dasharray="${circ * cPct / 100} 345.58" stroke-dashoffset="0" transform="rotate(-90 70 70)" />` : ''}
-               ${wPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#ef4444" stroke-width="20" stroke-dasharray="${circ * wPct / 100} 345.58" stroke-dashoffset="-${circ * cPct / 100}" transform="rotate(-90 70 70)" />` : ''}
-               ${sPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#f59e0b" stroke-width="20" stroke-dasharray="${circ * sPct / 100} 345.58" stroke-dashoffset="-${circ * (cPct + wPct) / 100}" transform="rotate(-90 70 70)" />` : ''}
+          <div style="padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 18px; flex: 1; background: #ffffff;">
+             <svg width="112" height="112" viewBox="0 0 140 140" style="display: block; flex-shrink: 0;">
+               <circle cx="70" cy="70" r="55" fill="none" stroke="#e2e8f0" stroke-width="18" />
+               ${cPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#10b981" stroke-width="18" stroke-dasharray="${circ * cPct / 100} 345.58" stroke-dashoffset="0" transform="rotate(-90 70 70)" />` : ''}
+               ${wPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#ef4444" stroke-width="18" stroke-dasharray="${circ * wPct / 100} 345.58" stroke-dashoffset="-${circ * cPct / 100}" transform="rotate(-90 70 70)" />` : ''}
+               ${sPct > 0 ? `<circle cx="70" cy="70" r="55" fill="none" stroke="#f59e0b" stroke-width="18" stroke-dasharray="${circ * sPct / 100} 345.58" stroke-dashoffset="-${circ * (cPct + wPct) / 100}" transform="rotate(-90 70 70)" />` : ''}
                <g transform="translate(70, 75)" style="text-anchor: middle; font-family: Arial; font-weight: 900;">
-                 <text y="-5" style="font-size: 28px; fill: #0f172a;">${s.percentage}%</text>
-                 <text y="14" style="font-size: 10px; fill: #64748b; font-weight: 800; text-transform: uppercase;">SCORE</text>
+                 <text y="-5" style="font-size: 26px; fill: #0f172a;">${s.percentage}%</text>
+                 <text y="12" style="font-size: 9px; fill: #64748b; font-weight: 800; text-transform: uppercase;">SCORE</text>
                </g>
              </svg>
              <div style="flex: 1;">
-               <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 12px; font-weight: 800;"><span style="color: #475569;">CORRECT</span><span style="color: #047857;">${cPct}%</span></div>
-               <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 12px; font-weight: 800;"><span style="color: #475569;">WRONG</span><span style="color: #be123c;">${wPct}%</span></div>
-               <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800;"><span style="color: #475569;">SKIPPED</span><span style="color: #b45309;">${sPct}%</span></div>
+               <div style="display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 10.5px; font-weight: 800;"><span style="color: #475569;">CORRECT</span><span style="color: #047857;">${cPct}%</span></div>
+               <div style="display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 10.5px; font-weight: 800;"><span style="color: #475569;">WRONG</span><span style="color: #be123c;">${wPct}%</span></div>
+               <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 800;"><span style="color: #475569;">SKIPPED</span><span style="color: #b45309;">${sPct}%</span></div>
              </div>
           </div>
        </div>
@@ -468,36 +511,106 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
        <!-- Academic Insights -->
        <div style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
           <div class="card-title">Evaluation Insights</div>
-          <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; align-content: center; background: #ffffff;">
-             <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px 16px; border-radius: 6px;">
-                <div style="font-size: 10px; font-weight: 900; color: #166534; text-transform: uppercase; margin-bottom: 6px;">Strong Areas</div>
-                <div style="font-size: 13px; font-weight: 800; color: #14532d; line-height: 1.4;">${s.strongAreas.length ? s.strongAreas.join(', ') : 'Consistent performance'}</div>
+          <div style="padding: 10px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; align-content: center; background: #ffffff;">
+             <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 7px 9px; border-radius: 6px;">
+                <div style="font-size: 8.5px; font-weight: 900; color: #166534; text-transform: uppercase; margin-bottom: 2px;">Strong Areas</div>
+                <div style="font-size: 11px; font-weight: 800; color: #14532d; line-height: 1.3;">${s.strongAreas.length ? s.strongAreas.join(', ') : 'Consistent performance'}</div>
              </div>
-             <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 14px 16px; border-radius: 6px;">
-                <div style="font-size: 10px; font-weight: 900; color: #9f1239; text-transform: uppercase; margin-bottom: 6px;">Needs Improvement</div>
-                <div style="font-size: 13px; font-weight: 800; color: #881337; line-height: 1.4;">${s.weakAreas.length ? s.weakAreas.join(', ') : 'No critical weak areas'}</div>
+             <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 7px 9px; border-radius: 6px;">
+                <div style="font-size: 8.5px; font-weight: 900; color: #9f1239; text-transform: uppercase; margin-bottom: 2px;">Needs Improvement</div>
+                <div style="font-size: 11px; font-weight: 800; color: #881337; line-height: 1.3;">${s.weakAreas.length ? s.weakAreas.join(', ') : 'No critical weak areas'}</div>
              </div>
-             <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 14px 16px; border-radius: 6px;">
-                <div style="font-size: 10px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 6px;">Pace & Accuracy</div>
-                <div style="font-size: 13px; font-weight: 800; color: #1e3a8a; line-height: 1.4;">${s.speedLabel} / ${s.accuracyLabel}</div>
+             <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 7px 9px; border-radius: 6px;">
+                <div style="font-size: 8.5px; font-weight: 900; color: #1e40af; text-transform: uppercase; margin-bottom: 2px;">Pace & Accuracy</div>
+                <div style="font-size: 11px; font-weight: 800; color: #1e3a8a; line-height: 1.3;">${s.speedLabel} / ${s.accuracyLabel}</div>
              </div>
-             <div style="background: #faf5ff; border: 1px solid #e9d5ff; padding: 14px 16px; border-radius: 6px;">
-                <div style="font-size: 10px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 6px;">Primary Recommendation</div>
-                <div style="font-size: 13px; font-weight: 800; color: #581c87; line-height: 1.4;">${s.recommendations[0]}</div>
+             <div style="background: #faf5ff; border: 1px solid #e9d5ff; padding: 7px 9px; border-radius: 6px;">
+                <div style="font-size: 8.5px; font-weight: 900; color: #6b21a8; text-transform: uppercase; margin-bottom: 2px;">Primary Recommendation</div>
+                <div style="font-size: 11px; font-weight: 800; color: #581c87; line-height: 1.3;">${s.recommendations[0]}</div>
              </div>
           </div>
        </div>
     </div>
 
-    <!-- SIGNATURES (No Seal, Bottom Padding Added to clear footer) -->
-    <div style="margin-top: 40px; padding-top: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end;">
-       <div style="width: 240px; text-align: center;">
-          <div style="height: 50px; border-bottom: 1px solid #0f172a; margin-bottom: 10px;"></div>
-          <div style="font-size: 11px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Evaluator Signature</div>
+    <!-- INSTITUTIONAL GRADING SCALE -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; overflow: hidden; background: #ffffff; flex-shrink: 0;">
+       <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Institutional Performance Classification & Grade Benchmarks</span>
+          <span style="font-size: 8.5px; font-weight: 700; color: #64748b;">ACTIVE: ${s.percentage >= 75 ? 'DISTINCTION' : s.percentage >= 50 ? 'QUALIFIED' : 'NEEDS PRACTICE'}</span>
        </div>
-       <div style="width: 240px; text-align: center;">
-          <div style="height: 50px; border-bottom: 1px solid #0f172a; margin-bottom: 10px;"></div>
-          <div style="font-size: 11px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Principal / Director</div>
+       <div style="display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; font-size: 9.5px; padding: 8px 12px; gap: 8px; background: #ffffff;">
+          <div style="padding: 6px 4px; border-radius: 6px; border: 1.5px solid ${s.percentage >= 90 ? '#10b981' : '#e2e8f0'}; background: ${s.percentage >= 90 ? '#ecfdf5' : '#f8fafc'};">
+             <div style="font-weight: 900; color: ${s.percentage >= 90 ? '#065f46' : '#334155'}; font-size: 11px;">Grade A+</div>
+             <div style="font-size: 8.5px; color: #64748b; font-weight: 700;">90% – 100%</div>
+             <div style="font-size: 8px; font-weight: 800; color: #10b981; margin-top: 2px;">Outstanding</div>
+          </div>
+          <div style="padding: 6px 4px; border-radius: 6px; border: 1.5px solid ${s.percentage >= 75 && s.percentage < 90 ? '#3b82f6' : '#e2e8f0'}; background: ${s.percentage >= 75 && s.percentage < 90 ? '#eff6ff' : '#f8fafc'};">
+             <div style="font-weight: 900; color: ${s.percentage >= 75 && s.percentage < 90 ? '#1e40af' : '#334155'}; font-size: 11px;">Grade A</div>
+             <div style="font-size: 8.5px; color: #64748b; font-weight: 700;">75% – 89%</div>
+             <div style="font-size: 8px; font-weight: 800; color: #3b82f6; margin-top: 2px;">Distinction</div>
+          </div>
+          <div style="padding: 6px 4px; border-radius: 6px; border: 1.5px solid ${s.percentage >= 60 && s.percentage < 75 ? '#6366f1' : '#e2e8f0'}; background: ${s.percentage >= 60 && s.percentage < 75 ? '#eef2ff' : '#f8fafc'};">
+             <div style="font-weight: 900; color: ${s.percentage >= 60 && s.percentage < 75 ? '#3730a3' : '#334155'}; font-size: 11px;">Grade B</div>
+             <div style="font-size: 8.5px; color: #64748b; font-weight: 700;">60% – 74%</div>
+             <div style="font-size: 8px; font-weight: 800; color: #6366f1; margin-top: 2px;">First Class</div>
+          </div>
+          <div style="padding: 6px 4px; border-radius: 6px; border: 1.5px solid ${s.percentage >= 40 && s.percentage < 60 ? '#f59e0b' : '#e2e8f0'}; background: ${s.percentage >= 40 && s.percentage < 60 ? '#fffbeb' : '#f8fafc'};">
+             <div style="font-weight: 900; color: ${s.percentage >= 40 && s.percentage < 60 ? '#92400e' : '#334155'}; font-size: 11px;">Grade C</div>
+             <div style="font-size: 8.5px; color: #64748b; font-weight: 700;">40% – 59%</div>
+             <div style="font-size: 8px; font-weight: 800; color: #d97706; margin-top: 2px;">Qualified</div>
+          </div>
+          <div style="padding: 6px 4px; border-radius: 6px; border: 1.5px solid ${s.percentage < 40 ? '#ef4444' : '#e2e8f0'}; background: ${s.percentage < 40 ? '#fef2f2' : '#f8fafc'};">
+             <div style="font-weight: 900; color: ${s.percentage < 40 ? '#991b1b' : '#334155'}; font-size: 11px;">Grade D</div>
+             <div style="font-size: 8.5px; color: #64748b; font-weight: 700;">Below 40%</div>
+             <div style="font-size: 8px; font-weight: 800; color: #ef4444; margin-top: 2px;">Needs Practice</div>
+          </div>
+       </div>
+    </div>
+
+    <!-- EVALUATOR REMARKS & ACADEMIC OBSERVATIONS -->
+    <div style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px; overflow: hidden; background: #ffffff; flex-shrink: 0;">
+       <div class="card-title">Official Evaluator Remarks & Academic Observations</div>
+       <div style="padding: 10px 14px; font-size: 11px; line-height: 1.5; color: #1e293b; background: #ffffff;">
+          <p style="font-weight: 600; margin-bottom: 6px;">
+             ${s.percentage >= 75
+               ? `Candidate ${enquiry.studentName} has demonstrated exceptional academic proficiency across evaluated sections, scoring ${s.percentage}% (${s.marksObtained}/${s.totalMarks} marks) with ${s.accuracyPct}% accuracy. Performance qualifies in the top tier. Recommended for honors track.`
+               : s.percentage >= 50
+               ? `Candidate ${enquiry.studentName} has shown solid foundational understanding with ${s.percentage}% aggregate marks. Commendable consistency observed in ${s.strongAreas.join(', ') || 'attempted sections'}. Focused revision in ${s.weakAreas.join(', ') || 'weak modules'} will elevate overall precision.`
+               : `Candidate ${enquiry.studentName} secured ${s.percentage}% (${s.marksObtained}/${s.totalMarks} marks) with an overall accuracy of ${s.accuracyPct}%. While foundational effort is acknowledged, targeted remediation and conceptual strengthening are advised in ${s.weakAreas.join(', ') || 'underperforming modules'} before subsequent evaluation.`
+             }
+          </p>
+          <div style="display: flex; gap: 16px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0; font-size: 10px;">
+             <div><span style="color: #64748b; font-weight: 700;">Pace Assessment:</span> <strong style="color: #0f172a;">${s.speedLabel} (${Math.floor(s.timeTaken / 60)}m ${s.timeTaken % 60}s consumed)</strong></div>
+             <div><span style="color: #64748b; font-weight: 700;">Accuracy Standing:</span> <strong style="color: #0f172a;">${s.accuracyPct}% (${s.accuracyLabel})</strong></div>
+             <div><span style="color: #64748b; font-weight: 700;">Academic Status:</span> <strong style="color: ${s.percentage >= 40 ? '#15803d' : '#b91c1c'};">${s.percentage >= 40 ? 'Qualified' : 'Remedial Support Recommended'}</strong></div>
+          </div>
+       </div>
+    </div>
+
+    <!-- SIGNATURES (Anchored to bottom, right above footer) -->
+    <div style="margin-top: auto; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; flex-shrink: 0;">
+       <div style="width: 230px; text-align: center;">
+          <div style="height: 38px; border-bottom: 1.5px solid #0f172a; margin-bottom: 5px;"></div>
+          <div style="font-size: 10px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Evaluator Signature</div>
+       </div>
+       <div style="width: 230px; text-align: center;">
+          <div style="height: 38px; border-bottom: 1.5px solid #0f172a; margin-bottom: 5px;"></div>
+          <div style="font-size: 10px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Principal / Director</div>
+       </div>
+    </div>
+
+    <!-- PAGE 1 ERP FOOTER (Aligned at bottom right with Generated by Campus CRM) -->
+    <div style="padding-top: 10px; border-top: 1.5px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center; width: 100%; flex-shrink: 0;">
+       <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px;">
+          Official Assessment Report • ${schoolName}
+       </div>
+       <div style="font-size: 10px; font-weight: 800; color: #64748b;">
+          Page 1 of <span class="total-pages-val">2</span>
+       </div>
+       <div style="display: flex; align-items: center; gap: 7px;">
+          <span style="font-size: 10.5px; font-weight: 700; color: #64748b;">Generated by</span>
+          <img src="${campusLogoSrc}" style="height: 20px; width: 20px; object-fit: contain; vertical-align: middle;" alt="Campus CRM" crossorigin="anonymous" />
+          <span style="font-size: 12.5px; font-weight: 900; color: #0f172a; letter-spacing: -0.2px;">Campus CRM</span>
        </div>
     </div>
 
@@ -509,63 +622,87 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
   </div>
 
   <script>
-    window.addEventListener('load', function() {
-      const temp = document.getElementById('temp-questions');
-      const cards = Array.from(temp.children);
-      temp.parentNode.removeChild(temp);
+    (function runLayout() {
+      try {
+        const temp = document.getElementById('temp-questions');
+        if (!temp) return;
+        const cards = Array.from(temp.children);
+        if (temp.parentNode) temp.parentNode.removeChild(temp);
 
-      let currentPage = null;
-      let currentHeight = 0;
-      const pageHeightLimit = 1000; // Limit for standard A4 considering new padding
-      let pageNum = 2;
+        let currentPage = null;
+        let questionsContainer = null;
+        let currentHeight = 0;
+        const pageHeightLimit = 950;
+        let pageNum = 2;
 
-      const createNewPage = () => {
-        const page = document.createElement('div');
-        page.className = 'pdf-page';
-        page.id = 'page-' + pageNum;
+        const createNewPage = () => {
+          const page = document.createElement('div');
+          page.className = 'pdf-page';
+          page.id = 'page-' + pageNum;
 
-        const header = document.createElement('div');
-        header.style.cssText = 'display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px;';
-        header.innerHTML = '<div><h1 style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Detailed Evaluation</h1>' +
-          '<div style="font-size: 12px; color: #475569; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${enquiry.studentName} — ${assessment.name}</div></div>' +
-          '<div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 20px;">' +
-          '<div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">REPORT ID</div>' +
-          '<div style="font-size: 18px; font-weight: 900; color: #0f172a; margin-top: 4px;">${reportId}</div></div>';
-        page.appendChild(header);
+          const header = document.createElement('div');
+          header.style.cssText = 'display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 14px; flex-shrink: 0;';
+          header.innerHTML = '<div><h1 style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Detailed Evaluation</h1>' +
+            '<div style="font-size: 10.5px; color: #475569; margin-top: 2px; font-weight: 700; text-transform: uppercase;">' + ${JSON.stringify(schoolName)} + ' • ${enquiry.studentName} — ${assessment.name}</div></div>' +
+            '<div style="text-align: right; border-left: 2px solid #e2e8f0; padding-left: 14px;">' +
+            '<div style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">REPORT ID</div>' +
+            '<div style="font-size: 15px; font-weight: 900; color: #0f172a; margin-top: 1px;">' + ${JSON.stringify(reportId)} + '</div></div>';
+          page.appendChild(header);
 
-        document.body.appendChild(page);
-        pageNum++;
-        return page;
-      };
+          const qc = document.createElement('div');
+          qc.className = 'page-questions-container';
+          qc.style.cssText = 'flex: 1; overflow: hidden;';
+          page.appendChild(qc);
 
-      currentPage = createNewPage();
+          const pageFooter = document.createElement('div');
+          pageFooter.style.cssText = 'margin-top: auto; padding-top: 10px; border-top: 1.5px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; font-weight: 700; color: #64748b; flex-shrink: 0;';
+          pageFooter.innerHTML = '<span>Official Assessment Report • ' + ${JSON.stringify(schoolName)} + '</span>' +
+            '<span>Page ' + pageNum + ' of <span class="total-pages-val">' + pageNum + '</span></span>' +
+            '<div style="display: flex; align-items: center; gap: 7px;">' +
+              '<span style="font-size: 10.5px; font-weight: 700; color: #64748b;">Generated by</span>' +
+              '<img src="' + campusLogoSrc + '" style="height: 20px; width: 20px; object-fit: contain; vertical-align: middle;" alt="Campus CRM" crossorigin="anonymous" />' +
+              '<span style="font-size: 12.5px; font-weight: 900; color: #0f172a; letter-spacing: -0.2px;">Campus CRM</span>' +
+            '</div>';
+          page.appendChild(pageFooter);
 
-      cards.forEach((card) => {
-        currentPage.appendChild(card);
-        const cardHeight = card.offsetHeight;
+          document.body.appendChild(page);
+          pageNum++;
+          return { page, qc };
+        };
 
-        if (currentHeight + cardHeight > pageHeightLimit) {
-          currentPage.removeChild(card);
-          currentPage = createNewPage();
-          currentPage.appendChild(card);
-          currentHeight = cardHeight + 80;
-        } else {
-          currentHeight += cardHeight + 12; // margin-bottom
+        if (cards.length > 0) {
+          const first = createNewPage();
+          currentPage = first.page;
+          questionsContainer = first.qc;
+
+          cards.forEach((card) => {
+            questionsContainer.appendChild(card);
+            const cardHeight = card.offsetHeight;
+
+            if (currentHeight + cardHeight > pageHeightLimit) {
+              questionsContainer.removeChild(card);
+              const next = createNewPage();
+              currentPage = next.page;
+              questionsContainer = next.qc;
+              questionsContainer.appendChild(card);
+              currentHeight = cardHeight + 12;
+            } else {
+              currentHeight += cardHeight + 12;
+            }
+          });
         }
-      });
 
-      // Append Fixed Footers completely avoiding signature overlap
-      const allPages = document.querySelectorAll('.pdf-page');
-      allPages.forEach((page, idx) => {
-        const footer = document.createElement('div');
-        footer.style.cssText = 'position: absolute; bottom: 10mm; left: 15mm; right: 15mm; display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; border-top: 1px solid #e2e8f0; padding-top: 10px; letter-spacing: 0.5px;';
-        footer.innerHTML = '<span>Official Assessment Report • ${schoolName}</span>' +
-          '<span>Page ' + (idx + 1) + ' of ' + allPages.length + '</span>';
-        page.appendChild(footer);
-      });
-      
-      window.layoutComplete = true;
-    });
+        // Update total page counts across all pages
+        const allPages = document.querySelectorAll('.pdf-page');
+        document.querySelectorAll('.total-pages-val').forEach(el => {
+          el.textContent = allPages.length;
+        });
+      } catch (e) {
+        console.error('Layout error:', e);
+      } finally {
+        window.layoutComplete = true;
+      }
+    })();
   </script>
 </body>
 </html>`;
@@ -574,53 +711,78 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
   const handleDownloadPDF = async () => {
     if (!statsResult || !activeAssignmentDetails) return;
     setPdfGenerating(true);
-    const toastId = toast.loading('Generating enterprise report PDF…');
+    const toastId = toast.loading('Generating assessment report PDF…');
     let iframe = null;
     try {
-      const html = buildScorecardHTML();
+      let campusLogoDataUrl = window.location.origin + '/logo.png';
+      try {
+        const resp = await fetch(window.location.origin + '/logo.png');
+        if (resp.ok) {
+          const blob = await resp.blob();
+          campusLogoDataUrl = await new Promise((res) => {
+            const reader = new FileReader();
+            reader.onloadend = () => res(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (e) {
+        // fallback
+      }
+      const html = buildScorecardHTML(campusLogoDataUrl);
       iframe = document.createElement('iframe');
-      // Set width mapping the A4 ratio (210mm x 297mm) -> ~820px width matches
-      iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:820px;border:none;visibility:hidden;';
+      // Set width to exact standard A4 at 96 DPI: 794px x 1123px
+      iframe.style.cssText = 'position:fixed;top:0;left:-9999px;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;z-index:-9999;';
       document.body.appendChild(iframe);
 
-      await new Promise(resolve => {
-        iframe.onload = resolve;
-        iframe.contentDocument.open();
-        iframe.contentDocument.write(html);
-        iframe.contentDocument.close();
-      });
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
 
-      // Wait until pagination script is fully complete and height is calculated
+      // Wait until pagination script is fully complete and height is calculated (max 1.5s safety timeout)
       await new Promise((resolve) => {
+        let attempts = 0;
         const check = () => {
-          if (iframe.contentWindow.layoutComplete) {
+          attempts++;
+          if (iframe.contentWindow?.layoutComplete || attempts >= 20) {
             resolve();
           } else {
-            setTimeout(check, 100);
+            setTimeout(check, 60);
           }
         };
         check();
       });
 
+      // Brief pause to allow fonts and images to complete paint
+      await new Promise(r => setTimeout(r, 200));
+
       const pages = iframe.contentDocument.querySelectorAll('.pdf-page');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
 
       for (let i = 0; i < pages.length; i++) {
         const canvas = await html2canvas(pages[i], {
-          scale: 2, useCORS: true, logging: false,
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
           backgroundColor: '#ffffff',
-          width: 820, height: 1159, windowWidth: 820, // 820 * 1.414 ~ 1159
+          windowWidth: 794,
+          windowHeight: 1123,
         });
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgData = canvas.toDataURL('image/png');
         if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
       }
 
       pdf.save(enquiry.studentName.replace(/\s+/g, '_') + '_assessment_report.pdf');
-      toast.success('Report downloaded!', { id: toastId });
+      toast.success('Assessment report downloaded!', { id: toastId });
     } catch (err) {
       console.error(err);
-      toast.error('PDF failed — try the Print option.', { id: toastId });
+      toast.error('PDF generation failed — try the Print option.', { id: toastId });
     } finally {
       if (iframe?.parentNode) iframe.parentNode.removeChild(iframe);
       setPdfGenerating(false);
@@ -798,22 +960,39 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
                 const { assessment, assignment } = activeAssignmentDetails;
                 const s = statsResult;
                 const submittedDate = assignment.submittedAt ? new Date(assignment.submittedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Pending';
+                const reportId = assignment.reportId || 'RPT-' + (assignment._id ? assignment._id.toString().slice(-6).toUpperCase() : Math.random().toString(36).substring(2, 8).toUpperCase());
                 const circ = 2 * Math.PI * 56;
                 return (
                   <div className="space-y-6 text-left">
                     {/* Action bar */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
                       <button onClick={() => setViewState('list')} className="text-xs font-black text-indigo-600 flex items-center gap-1.5 cursor-pointer hover:underline"><ArrowLeft className="w-4 h-4" />Back to Assessments</button>
-                      <div className="flex flex-wrap gap-2">
-                        <Button onClick={handleDownloadPDF} disabled={pdfGenerating} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-md cursor-pointer">
-                          <Download className="w-4 h-4" />{pdfGenerating ? 'Generating...' : 'Download PDF'}
-                        </Button>
-                        <Button onClick={handlePrint} className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer">
-                          <Printer className="w-4 h-4 text-slate-400" />Print
-                        </Button>
-                        <Button onClick={() => toast('Share coming soon!')} className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer">
-                          <Share2 className="w-4 h-4 text-slate-400" />Share
-                        </Button>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={handleDownloadPDF}
+                          disabled={pdfGenerating}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          <Download className="w-4 h-4 text-white" />
+                          <span>{pdfGenerating ? 'Generating...' : 'Download PDF'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handlePrint}
+                          className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 hover:text-slate-900 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                        >
+                          <Printer className="w-4 h-4 text-slate-700" />
+                          <span className="text-slate-800 font-bold">Print</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toast('Share coming soon!')}
+                          className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 hover:text-slate-900 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                        >
+                          <Share2 className="w-4 h-4 text-slate-700" />
+                          <span className="text-slate-800 font-bold">Share</span>
+                        </button>
                       </div>
                     </div>
 
@@ -829,7 +1008,11 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
                             : <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white font-black text-xl flex items-center justify-center shadow-lg shrink-0">{getInitials(enquiry.studentName)}</div>
                           }
                           <div>
-                            <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">Assessment Report</p>
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="text-xs font-black text-slate-800 uppercase tracking-wide">{currentSchoolName}</span>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Assessment Report</span>
+                            </div>
                             <h2 className="text-lg font-black text-slate-900 leading-tight">{enquiry.studentName}</h2>
                             <div className="grid grid-cols-2 gap-x-5 gap-y-0.5 mt-2 text-[11px] text-slate-500 font-semibold">
                               <span><ShieldCheck className="w-3.5 h-3.5 text-slate-400 inline mr-1" />{enquiry.applicationId || enquiry.enquiryId || 'N/A'}</span>
@@ -1147,11 +1330,21 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
                           <p className="font-black text-slate-500 uppercase tracking-wider text-[8.5px]">Report Certification</p>
                           <p>Report ID: <strong className="text-slate-600">{reportId}</strong></p>
                           <p>Generated: {new Date().toLocaleString()}</p>
-                          <p className="italic">Powered by CRM Assessment DeskSuite</p>
+                          <p className="font-bold text-slate-600 mt-1">Official Assessment Report • {currentSchoolName}</p>
                         </div>
                         <div className="flex flex-col items-center">
                           <div className="w-48 h-px bg-slate-300 mb-2" />
                           <span className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Authorized Signature</span>
+                        </div>
+                      </div>
+
+                      {/* Right bottom Generated by Campus CRM badge */}
+                      <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                        <span className="text-[11px] font-bold text-slate-600">Official Assessment Report • {currentSchoolName}</span>
+                        <div className="inline-flex items-center gap-2">
+                          <span className="text-[11px] font-bold text-slate-500">Generated by</span>
+                          <img src="/logo.png" alt="Campus CRM" className="h-5 w-5 object-contain" />
+                          <span className="text-xs font-black text-slate-900 tracking-tight">Campus CRM</span>
                         </div>
                       </div>
                     </div>
