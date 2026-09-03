@@ -38,6 +38,19 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Authentic WhatsApp SVG Icon Component
+export const WhatsAppIcon = ({ className = "h-3.5 w-3.5" }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width="24" 
+    height="24" 
+    fill="currentColor" 
+    className={className}
+  >
+    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.41a8.17 8.17 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.07l-.29-.17-3.02.79.81-2.94-.19-.3A8.16 8.16 0 0 1 3.8 11.9c0-4.54 3.7-8.24 8.25-8.24m-3.52 3.12c-.19 0-.42.07-.64.31-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28s-1.42-.7-1.64-.78c-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.19-.71-.64-1.19-1.42-1.33-1.66-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.54-.42l-.46-.01z"/>
+  </svg>
+);
+
 // --- INLINE CUSTOM CALENDAR PICKER WITH TASK STATUS DOTS ---
 const CalendarPicker = ({
   rawTasks,
@@ -190,6 +203,7 @@ const TasksPage = ({ module = 'school' }) => {
   const [rescheduleTask, setRescheduleTask] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('10:00');
+  const [rescheduleNote, setRescheduleNote] = useState('');
 
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteTask, setNoteTask] = useState(null);
@@ -644,13 +658,14 @@ const TasksPage = ({ module = 'school' }) => {
     if (!rescheduleTask || !rescheduleDate) return;
     const toastId = toast.loading('Rescheduling task...');
     try {
-      const combinedDateStr = `${rescheduleDate}T${rescheduleTime}:00`;
+      const combinedDateStr = `${rescheduleDate}T${rescheduleTime || '10:00'}:00`;
       const newFollowUpDate = new Date(combinedDateStr);
       
-      await updateTaskDatabase(rescheduleTask, 'Current', null, newFollowUpDate, rescheduleTask.notes);
+      await updateTaskDatabase(rescheduleTask, 'Current', null, newFollowUpDate, rescheduleNote);
       toast.success('Task rescheduled successfully!', { id: toastId });
       setRescheduleOpen(false);
       setRescheduleTask(null);
+      setRescheduleNote('');
       fetchData();
     } catch (err) {
       toast.error('Failed to reschedule task: ' + err.message, { id: toastId });
@@ -725,8 +740,9 @@ const TasksPage = ({ module = 'school' }) => {
 
   const handleWhatsAppAction = (e, phone, studentName, parentName, enquiryId) => {
     e.stopPropagation();
-    const text = `Dear ${parentName}, thank you for your admission enquiry for ${studentName} (ID: ${enquiryId}). We would love to discuss the details. Regards.`;
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const text = `Dear ${parentName || 'Parent'}, thank you for your admission enquiry for ${studentName || 'Student'} (ID: ${enquiryId || ''}). We would love to discuss the details. Regards.`;
+    let cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10) cleanPhone = `91${cleanPhone}`;
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
     toast.success('WhatsApp chat opened!');
   };
@@ -1223,10 +1239,10 @@ const TasksPage = ({ module = 'school' }) => {
                           {/* WhatsApp Chat link */}
                           <button
                             onClick={(e) => handleWhatsAppAction(e, task.phone, task.studentName, task.parentName, task.enquiryId)}
-                            className="p-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg border border-emerald-100 transition-colors cursor-pointer"
+                            className="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg border border-emerald-200 transition-all cursor-pointer shadow-2xs"
                             title="Open WhatsApp Chat"
                           >
-                            <MessageSquare className="h-3.5 w-3.5" />
+                            <WhatsAppIcon className="h-3.5 w-3.5" />
                           </button>
 
                           {/* Email composer redirect */}
@@ -1277,53 +1293,20 @@ const TasksPage = ({ module = 'school' }) => {
                             </button>
                           )}
 
-                          {/* Action Options Dropdown (More) */}
-                          <div className="relative group/actions">
-                            <button className="p-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-205 text-slate-500 rounded-lg transition-colors cursor-pointer">
-                              <MoreVertical className="h-3.5 w-3.5" />
-                            </button>
-                            <div className="absolute right-0 top-7 w-32 bg-white border border-slate-200 rounded-xl shadow-md hidden group-hover/actions:block hover:block z-30 py-1 text-left">
-                              <button
-                                onClick={() => {
-                                  setRescheduleTask(task);
-                                  setRescheduleDate(task.followUpDate ? new Date(task.followUpDate).toISOString().split('T')[0] : '');
-                                  setRescheduleOpen(true);
-                                }}
-                                className="w-full px-2.5 py-1.5 text-[10.5px] text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                                Reschedule
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setNoteTask(task);
-                                  setNoteText(task.notes);
-                                  setNoteOpen(true);
-                                }}
-                                className="w-full px-2.5 py-1.5 text-[10.5px] text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <Plus className="h-3.5 w-3.5 text-slate-400" />
-                                Add Notes
-                              </button>
-                              {isCompleted ? (
-                                <button
-                                  onClick={() => handleUndoComplete(task)}
-                                  className="w-full px-2.5 py-1.5 text-[10.5px] text-amber-700 hover:bg-amber-50 flex items-center gap-1.5 cursor-pointer"
-                                >
-                                  <RefreshCw className="h-3.5 w-3.5 text-amber-500" />
-                                  Mark Pending
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleQuickSkip(task)}
-                                  className="w-full px-2.5 py-1.5 text-[10.5px] text-rose-650 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer"
-                                >
-                                  <X className="h-3.5 w-3.5 text-rose-500" />
-                                  Skip/Cancel
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                          {/* Direct Reschedule Button */}
+                          <button
+                            onClick={() => {
+                              setRescheduleTask(task);
+                              setRescheduleDate(task.followUpDate ? new Date(task.followUpDate).toISOString().split('T')[0] : '');
+                              setRescheduleTime(task.followUpDate ? new Date(task.followUpDate).toTimeString().substring(0, 5) : '10:00');
+                              setRescheduleNote(task.notes || '');
+                              setRescheduleOpen(true);
+                            }}
+                            className="p-1.5 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white rounded-lg border border-purple-200 transition-all cursor-pointer shadow-2xs"
+                            title="Reschedule Task"
+                          >
+                            <Calendar className="h-3.5 w-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -1415,23 +1398,37 @@ const TasksPage = ({ module = 'school' }) => {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-450 uppercase">New Date</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Date</label>
                     <input
                       type="date"
                       value={rescheduleDate}
                       onChange={(e) => setRescheduleDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-205 rounded-xl text-xs focus:outline-none"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-455 uppercase">New Time</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Time</label>
                     <input
                       type="time"
                       value={rescheduleTime}
                       onChange={(e) => setRescheduleTime(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-205 rounded-xl text-xs focus:outline-none"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     />
                   </div>
+                </div>
+
+                {/* Reschedule Note / Remarks */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <span>Reschedule Note / Remarks</span>
+                  </label>
+                  <textarea
+                    value={rescheduleNote}
+                    onChange={(e) => setRescheduleNote(e.target.value)}
+                    placeholder="Enter reason or details for rescheduling (e.g. Parent requested callback tomorrow)..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none font-normal text-slate-800"
+                  />
                 </div>
               </div>
 

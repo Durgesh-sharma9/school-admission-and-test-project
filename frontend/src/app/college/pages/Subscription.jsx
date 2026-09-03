@@ -80,7 +80,7 @@ const PurchaseModal = ({ plan, planMeta, onConfirm, onClose, isLoading }) => {
             disabled={isLoading}
             className={`flex-1 py-2.5 rounded-xl font-bold text-sm text-white transition-all flex items-center justify-center disabled:opacity-60 bg-[#8B5CF6] hover:bg-purple-600`}
           >
-            {isLoading ? 'Processing...' : 'Request Plan'}
+            {isLoading ? 'Processing...' : 'Purchase Plan'}
           </button>
         </div>
       </div>
@@ -145,7 +145,7 @@ const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) =>
               disabled={isPending || isLoading}
               className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${meta.buttonClass} disabled:opacity-60`}
             >
-              {isLoading ? 'Processing...' : isPending ? '⏳ Pending Approval' : 'View Details'}
+              {isLoading ? 'Processing...' : isPending ? '⏳ Pending Approval' : 'Buy Plan'}
             </button>
           )}
         </div>

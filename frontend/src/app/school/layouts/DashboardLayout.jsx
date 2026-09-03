@@ -51,7 +51,7 @@ const DashboardLayout = () => {
     const path = location.pathname;
     if (path.startsWith('/dashboard')) return 'Dashboard';
     if (path.startsWith('/enquiries')) return 'Enquiry Management';
-    if (path.startsWith('/admission-form')) return 'Manual Admission Entry';
+    if (path.startsWith('/admission-form')) return 'Manual Enquiry Entry';
     if (path.startsWith('/qr-code')) return 'Admission QR & Public Links';
     if (path.startsWith('/thankyou-cms')) return 'Enquiry Banner Configuration';
     if (path.startsWith('/subscription')) return 'Subscription & Billing';
