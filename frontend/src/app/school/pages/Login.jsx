@@ -4,10 +4,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSuperAdminAuth } from '../../super-admin/contexts/SuperAdminAuthContext';
 import toast from 'react-hot-toast';
-import { GraduationCap, Target, Activity, Star, Zap, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Target, Activity, Star, Zap, CheckCircle2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Input from '../../../shared/components/Input';
 import Button from '../../../shared/components/Button';
 import GoogleLoginButton from '../components/GoogleLoginButton';
+import CampusCrmLogo, { CampusCrmIcon } from '../../../shared/components/CampusCrmLogo';
 
 const Login = () => {
   const { login, school } = useAuth();
@@ -15,6 +16,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Check for auto-login state from OTP verification
   const { email: autoEmail, autoLogin } = location.state || {};
@@ -32,7 +34,7 @@ const Login = () => {
 
   // Update browser window title
   useEffect(() => {
-    document.title = 'Admission Management CRM - Sign In';
+    document.title = 'Campus CRM - Sign In';
   }, []);
 
   // Redirect if already logged in
@@ -104,7 +106,7 @@ const Login = () => {
   const bgImage = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=90';
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col justify-between font-sans bg-slate-50 overflow-y-auto py-4 sm:py-6 lg:py-0">
+    <div className="relative min-h-screen w-full flex flex-col justify-between font-sans bg-slate-50 overflow-y-auto">
       {/* Background Image */}
       <div
         className="absolute inset-0 z-0"
@@ -125,17 +127,27 @@ const Login = () => {
         }}
       />
 
-      <div className="relative z-10 flex flex-col-reverse lg:flex-row min-h-screen w-full max-w-7xl mx-auto items-center">
-        {/* Left Side: Branding & Features */}
-        <div className="w-full lg:w-3/5 flex flex-col p-5 sm:p-8 lg:pr-12 text-slate-900 justify-center">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-8 z-30">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-700 bg-white/90 hover:bg-white hover:text-blue-600 rounded-xl border border-slate-200/90 shadow-sm backdrop-blur-md transition-all duration-200 group hover:shadow-md cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:text-blue-600 group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
+      <div className="relative z-10 flex flex-col-reverse lg:flex-row min-h-screen w-full max-w-7xl mx-auto items-center justify-center">
+        {/* Left Side: Branding & Features (Hidden on mobile for clean focused login, shown on desktop) */}
+        <div className="hidden lg:flex w-full lg:w-3/5 flex-col p-5 sm:p-8 lg:pr-12 text-slate-900 justify-center">
 
           {/* Main content vertically centered */}
           <div className="flex flex-col justify-center">
 
             <div className="mb-4 sm:mb-5">
-              <div className="flex items-center gap-2 mb-3 w-fit bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-blue-100/80 shadow-sm">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-                <span className="text-blue-800 font-bold text-xs">Admission Management CRM</span>
+              <div className="mb-5">
+                <CampusCrmLogo variant="full" size="normal" />
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-1">
@@ -152,7 +164,7 @@ const Login = () => {
             </div>
 
             {/* Feature cards grid */}
-            <div className="hidden sm:grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {features.map((feat, idx) => (
                 <div key={idx} className="bg-white/85 backdrop-blur-md border border-white/80 rounded-xl p-3.5 hover:bg-white transition-all duration-300 group shadow-sm flex items-start gap-3">
                   <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center shadow-sm ${feat.iconBg}`}>
@@ -168,24 +180,21 @@ const Login = () => {
           </div>
 
           {/* Footer branding fixed at bottom */}
-          <div className="text-[10px] text-slate-400 font-semibold pt-4">
-            <p>© 2026 Admission Management CRM. All rights reserved.</p>
+          <div className="pt-4 text-left">
+            <p className="text-xs text-slate-400 font-medium">
+              © {new Date().getFullYear()} Campus CRM. All rights reserved.
+            </p>
           </div>
         </div>
 
         {/* Right Side: Auth Card */}
-        <div className="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-6 lg:p-8 my-auto">
-          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 flex flex-col justify-between">
+        <div className="w-full lg:w-2/5 flex items-center justify-center px-4 py-16 sm:py-20 lg:py-8 my-auto">
+          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-5 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100 flex flex-col justify-between">
             <div>
               {/* Card Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex items-center justify-center h-12 w-12 bg-blue-600 rounded-xl text-white shadow-md">
-                  <GraduationCap className="h-6 w-6" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900">Administrator Portal</h2>
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">Admission Management CRM</p>
-                </div>
+              <div className="mb-6 space-y-1.5">
+                <CampusCrmLogo variant="full" size="normal" />
+                <p className="text-xs font-bold text-slate-500">Administrator Portal</p>
               </div>
 
               <div className="mb-6">
@@ -226,15 +235,34 @@ const Login = () => {
                   <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                     Password
                   </label>
-                  <Input
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    error={errors.password}
-                    className="!rounded-xl border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2.5 px-3 text-sm"
-                    {...register('password', { required: 'Password is required' })}
-                  />
+                  <div className="relative">
+                    <input
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      required
+                      className={`w-full rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium placeholder:text-slate-400 py-2.5 pl-3 pr-10 text-sm transition-all outline-none ${
+                        errors.password ? 'border-red-500' : ''
+                      }`}
+                      {...register('password', { required: 'Password is required' })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 transition-colors cursor-pointer"
+                      tabIndex={-1}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>
+                  )}
                   <div className="flex justify-end mt-1.5">
                     <Link
                       to="/forgot-password"

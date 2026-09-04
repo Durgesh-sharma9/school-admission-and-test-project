@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../../shared/components/Button';
 import CampusCrmLogo from '../../../shared/components/CampusCrmLogo';
 import schoolApi from '../../school/services/schoolApi';
+import toast from 'react-hot-toast';
 
 // Enhanced Animation Variants
 const fadeUp = {
@@ -145,8 +146,8 @@ const LandingPage = () => {
       setStats({
         admissions: Math.min(Math.floor((50000 / steps) * step), 50000),
         followUps: Math.min(Math.floor((98 / steps) * step), 98),
-        satisfaction: Math.min(Math.floor((95 / steps) * step), 95),
-        campuses: Math.min(Math.floor((350 / steps) * step), 350)
+        satisfaction: Math.min(Math.floor((98 / steps) * step), 98),
+        campuses: Math.min(Math.floor((100 / steps) * step), 100)
       });
 
       if (step >= steps) clearInterval(timer);
@@ -312,13 +313,21 @@ const LandingPage = () => {
                   </Button>
                 </motion.div>
               </Link>
-              <a href="#workflow" className="w-full sm:w-auto">
+              <div className="w-full sm:w-auto">
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Button variant="ghost" className="w-full sm:w-auto text-xs font-bold px-6 py-3 rounded-xl border border-slate-200 bg-white/50 backdrop-blur-md hover:bg-slate-50 text-slate-800 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-                    <Play className="w-3.5 h-3.5 fill-slate-800" /> Watch Workflow
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast('Demo video coming soon!', { icon: '🎬' });
+                    }}
+                    className="w-full sm:w-auto text-xs font-bold px-6 py-3 rounded-xl border border-slate-200 bg-white/50 backdrop-blur-md hover:bg-slate-50 text-slate-800 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-slate-800" /> Watch Demo
                   </Button>
                 </motion.div>
-              </a>
+              </div>
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-x-4 gap-y-2 pt-4 border-t border-slate-100">
@@ -416,9 +425,9 @@ const LandingPage = () => {
               { val: `${stats.satisfaction}%`, label: 'Customer Satisfaction', color: 'from-orange-400 to-amber-500' },
               { val: `${stats.campuses}+`, label: 'Campuses Live', color: 'from-fuchsia-500 to-purple-600' }
             ].map((stat, i) => (
-              <motion.div variants={popIn} key={i} className={`p-4 rounded-2xl shadow-lg bg-gradient-to-br ${stat.color} text-white transform-gpu`}>
-                <span className="text-3xl sm:text-4xl font-black tracking-tight block mb-1">{stat.val}</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-90">{stat.label}</span>
+              <motion.div variants={popIn} key={i} className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg bg-gradient-to-br ${stat.color} text-white transform-gpu`}>
+                <span className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight block mb-0.5 sm:mb-1">{stat.val}</span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider opacity-90 leading-tight block">{stat.label}</span>
               </motion.div>
             ))}
           </motion.div>
@@ -505,15 +514,23 @@ const LandingPage = () => {
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">The Smooth Applicant Journey</motion.h2>
             <motion.p variants={fadeUp} className="text-xs sm:text-sm text-slate-500 font-medium max-w-md">A seamless, zero-friction path from offline campus scan to complete enrollment.</motion.p>
 
-            <div className="relative pl-6 sm:pl-8 border-l-2 border-indigo-100 space-y-6 sm:space-y-8 pt-2">
+            <div className="relative space-y-6 sm:space-y-8 pt-2">
               {workflowSteps.map((step, idx) => (
-                <motion.div key={idx} variants={popIn} className="relative group">
-                  <motion.div whileHover={{ scale: 1.2 }} className="absolute -left-[41px] top-0 w-10 h-10 bg-white border-2 border-indigo-500 rounded-full flex items-center justify-center font-black text-indigo-600 shadow-sm group-hover:bg-indigo-50 transition-colors">
+                <motion.div key={idx} variants={popIn} className="relative pl-11 sm:pl-14 group">
+                  {/* Connecting Line */}
+                  {idx < workflowSteps.length - 1 && (
+                    <div className="absolute left-4 sm:left-5 top-9 -bottom-7 sm:-bottom-9 w-0.5 bg-indigo-200" />
+                  )}
+                  {/* Step Circle */}
+                  <motion.div
+                    whileHover={{ scale: 1.15 }}
+                    className="absolute left-0 top-0 w-8 h-8 sm:w-10 sm:h-10 bg-white border-2 border-indigo-500 rounded-full flex items-center justify-center font-black text-xs sm:text-sm text-indigo-600 shadow-sm group-hover:bg-indigo-50 transition-colors z-10"
+                  >
                     {step.step}
                   </motion.div>
-                  <div className="ml-5 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black text-slate-900">{step.title}</h3>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <h3 className="text-sm sm:text-base font-black text-slate-900">{step.title}</h3>
                       <span className="text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{step.badge}</span>
                     </div>
                     <p className="text-xs text-slate-500 font-medium max-w-sm">{step.desc}</p>

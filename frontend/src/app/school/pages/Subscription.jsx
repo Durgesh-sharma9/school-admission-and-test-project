@@ -119,15 +119,18 @@ const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) =>
         </div>
 
         {/* Features */}
-        <div className="space-y-4 flex-1">
-          {(meta.featuresDisplay || plan.features.map(f => ({ label: f, enabled: true }))).map((feat, idx) => (
-            <div key={idx} className="flex items-center gap-3">
+        <div className="space-y-3.5 flex-1">
+          {((Array.isArray(plan?.features) && plan.features.length > 0)
+            ? plan.features.map(f => (typeof f === 'string' ? { label: f, enabled: true } : f))
+            : (meta.featuresDisplay || [])
+          ).map((feat, idx) => (
+            <div key={idx} className="flex items-start gap-2.5 text-left">
               {feat.enabled ? (
-                <Check className="h-4 w-4 text-[#10B981] shrink-0" strokeWidth={3} />
+                <Check className="h-4 w-4 text-[#10B981] shrink-0 mt-0.5" strokeWidth={2.5} />
               ) : (
-                <Check className="h-4 w-4 text-slate-200 shrink-0" strokeWidth={3} />
+                <X className="h-4 w-4 text-slate-300 shrink-0 mt-0.5" strokeWidth={2.5} />
               )}
-              <span className={`text-[13px] ${feat.enabled ? 'text-slate-600 font-medium' : 'text-slate-400'}`}>
+              <span className={`text-[13px] ${feat.enabled ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
                 {feat.label}
               </span>
             </div>

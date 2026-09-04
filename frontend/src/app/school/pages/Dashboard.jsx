@@ -324,10 +324,10 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* ROW 3 & 4: CHARTS */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          {/* Locality Chart */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
+        {/* 4 CORE ANALYTICS CHARTS (2 ROWS x 2 COLUMNS) */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          {/* 1. Locality Chart */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4 flex flex-col justify-between">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#EE5EAA] to-[#F488C2] text-white flex justify-between items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Top Performing Locality</h6>
@@ -341,10 +341,10 @@ const Dashboard = () => {
             </div>
 
             {localityMetrics.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No locality data available.</div>
+              <div className="h-56 flex items-center justify-center text-xs font-medium text-gray-400">No locality data available.</div>
             ) : (
               <div className="space-y-4">
-                <div className="h-60 w-full mt-2">
+                <div className="h-56 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={localityMetrics}
@@ -391,8 +391,8 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Class Demand Chart */}
-          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
+          {/* 2. Class Demand Chart */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4 flex flex-col justify-between">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#5091F8] to-[#78AAF9] text-white flex justify-between items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Class-Wise Demand</h6>
@@ -404,9 +404,9 @@ const Dashboard = () => {
             </div>
 
             {classDemandData.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-xs font-medium text-gray-400">No class demand metrics.</div>
+              <div className="h-56 flex items-center justify-center text-xs font-medium text-gray-400">No class demand metrics.</div>
             ) : (
-              <div className="h-60 w-full mt-2">
+              <div className="h-56 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={classDemandData}
@@ -449,17 +449,15 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </motion.div>
 
-        {/* ROW 5: TRENDS & SOURCES */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <div className="lg:col-span-2 bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
-            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#34D06D] to-[#60DF8F] text-white flex justify-between items-center z-10">
+          {/* 3. Monthly Admission Trends */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4 flex flex-col justify-between">
+            <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#34D06D] to-[#60DF8F] text-white flex justify-between items-center z-10 flex-wrap gap-2">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Monthly Admission Trends</h6>
                 <p className="text-[10px] opacity-90 font-medium mt-0.5">Enquiries vs confirmed admissions</p>
               </div>
-              <div className="flex items-center space-x-3 text-[11px] font-bold bg-white/20 px-3 py-1.5 rounded-md">
+              <div className="flex items-center space-x-3 text-[11px] font-bold bg-white/20 px-2.5 py-1 rounded-md">
                 <span className="flex items-center"><span className="h-2 w-2 rounded-full bg-white mr-1.5" /> Enquiries</span>
                 <span className="flex items-center"><span className="h-2 w-2 rounded-full bg-[#25C5B5] mr-1.5 shadow-sm" /> Admissions</span>
               </div>
@@ -489,7 +487,8 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4">
+          {/* 4. Admission Sources */}
+          <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative pt-12 px-5 pb-4 mt-4 flex flex-col justify-between">
             <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#F6A928] to-[#F8C15D] text-white flex items-center z-10">
               <div>
                 <h6 className="text-sm font-bold tracking-wide">Admission Sources</h6>
@@ -500,25 +499,25 @@ const Dashboard = () => {
             {sourceMetrics.length === 0 ? (
               <div className="h-56 flex items-center justify-center text-xs font-medium text-gray-400">No source attributes.</div>
             ) : (
-              <div className="flex flex-col h-full justify-center">
-                <div className="h-40 w-full flex items-center justify-center mt-2">
+              <div className="flex flex-col h-56 justify-between">
+                <div className="h-36 w-full flex items-center justify-center mt-1">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={sourceMetrics} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} innerRadius={40} paddingAngle={4} animationDuration={1500}>
+                      <Pie data={sourceMetrics} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={35} paddingAngle={4} animationDuration={1500}>
                         {sourceMetrics.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />)}
                       </Pie>
                       <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="space-y-2 pt-4 border-t border-[#E8ECF3] mt-2">
-                  {sourceMetrics.slice(0, 4).map((src, idx) => (
+                <div className="space-y-1.5 pt-2 border-t border-[#E8ECF3]">
+                  {sourceMetrics.slice(0, 3).map((src, idx) => (
                     <div key={src.name} className="flex justify-between items-center text-xs">
                       <span className="flex items-center text-gray-600 font-medium truncate pr-2">
                         <span className="h-2 w-2 rounded-full mr-2 shadow-sm shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                        <span className="truncate">{src.name}</span>
+                        <span className="truncate text-[11px]">{src.name}</span>
                       </span>
-                      <span className="font-bold text-gray-900 shrink-0">{src.value}</span>
+                      <span className="font-bold text-gray-900 shrink-0 text-[11px]">{src.value}</span>
                     </div>
                   ))}
                 </div>
@@ -719,8 +718,8 @@ const Dashboard = () => {
               </span>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link to="/settings" className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs transition-all shadow-sm block">
-                Manage Sub
+              <Link to="/subscription" className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs transition-all shadow-sm block">
+                Manage Subscription
               </Link>
             </motion.div>
           </div>

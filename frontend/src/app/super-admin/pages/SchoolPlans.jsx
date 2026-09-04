@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit, Check, X, Trash2, Award, Settings, ClipboardCheck, RefreshCw, Plus } from 'lucide-react';
+import { Edit, Check, X, Trash2, Award, Settings, ClipboardCheck, RefreshCw, Plus, ArrowUp, ArrowDown } from 'lucide-react';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import Modal from '../../../shared/components/Modal';
@@ -131,6 +131,9 @@ const SchoolPlans = () => {
     }
   };
 
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [editingText, setEditingText] = useState('');
+
   const handleEdit = (plan) => {
     setEditingPlan(plan);
     setPlanName(plan.planName);
@@ -139,6 +142,8 @@ const SchoolPlans = () => {
     setAssessmentEnabled(plan.assessmentEnabled);
     setFeatures([...plan.features]);
     setNewFeature('');
+    setEditingIdx(null);
+    setEditingText('');
     setModalOpen(true);
   };
 
@@ -155,6 +160,35 @@ const SchoolPlans = () => {
 
   const handleRemoveFeature = (index) => {
     setFeatures(features.filter((_, i) => i !== index));
+    if (editingIdx === index) {
+      setEditingIdx(null);
+    }
+  };
+
+  const handleStartEdit = (idx, text) => {
+    setEditingIdx(idx);
+    setEditingText(text);
+  };
+
+  const handleSaveEdit = (idx) => {
+    if (editingText.trim()) {
+      const updated = [...features];
+      updated[idx] = editingText.trim();
+      setFeatures(updated);
+    }
+    setEditingIdx(null);
+    setEditingText('');
+  };
+
+  const handleMoveFeature = (idx, direction) => {
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= features.length) return;
+    const updated = [...features];
+    const temp = updated[idx];
+    updated[idx] = updated[targetIdx];
+    updated[targetIdx] = temp;
+    setFeatures(updated);
+    if (editingIdx !== null) setEditingIdx(null);
   };
 
   const handleSave = async (e) => {
@@ -296,23 +330,85 @@ const SchoolPlans = () => {
                 </button>
               </div>
 
-              <div className="max-h-48 overflow-y-auto space-y-1.5 border border-slate-100 rounded-xl p-2.5 bg-slate-50">
+              <div className="max-h-56 overflow-y-auto space-y-1.5 border border-slate-100 rounded-xl p-2.5 bg-slate-50">
                 {features.length === 0 ? (
                   <p className="text-[10px] text-slate-400 font-semibold text-center py-4">No features added yet.</p>
                 ) : (
                   features.map((feat, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-100 text-xs font-medium text-slate-700 group">
-                      <div className="flex items-center gap-2">
-                        <Check className="h-3 w-3 text-emerald-500 shrink-0" />
-                        <span>{feat}</span>
+                    <div key={idx} className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-100 text-xs font-medium text-slate-700 group gap-2">
+                      {editingIdx === idx ? (
+                        <div className="flex items-center gap-1.5 flex-1">
+                          <input
+                            type="text"
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') { e.preventDefault(); handleSaveEdit(idx); }
+                              if (e.key === 'Escape') { setEditingIdx(null); }
+                            }}
+                            className="flex-1 px-2 py-1 border border-pink-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#E91E63]"
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEdit(idx)}
+                            className="text-emerald-600 hover:text-emerald-700 font-bold text-[11px] px-2 py-1 bg-emerald-50 rounded"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingIdx(null)}
+                            className="text-slate-400 hover:text-slate-600 font-medium text-[11px] px-1.5 py-1"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                          <span className="truncate">{feat}</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-1 shrink-0">
+                        {editingIdx !== idx && (
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(idx, feat)}
+                            className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+                            title="Edit feature text"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => handleMoveFeature(idx, -1)}
+                          className="text-slate-400 hover:text-slate-600 disabled:opacity-20 p-1 rounded hover:bg-slate-100 transition-colors"
+                          title="Move up"
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === features.length - 1}
+                          onClick={() => handleMoveFeature(idx, 1)}
+                          className="text-slate-400 hover:text-slate-600 disabled:opacity-20 p-1 rounded hover:bg-slate-100 transition-colors"
+                          title="Move down"
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFeature(idx)}
+                          className="text-slate-300 hover:text-rose-500 p-1 rounded hover:bg-rose-50 transition-colors"
+                          title="Delete feature"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveFeature(idx)}
-                        className="text-slate-300 hover:text-rose-500 transition-colors"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
                     </div>
                   ))
                 )}
