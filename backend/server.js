@@ -34,8 +34,35 @@ const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const collegeRoutes = require('./routes/collegeRoutes');
 
+const SuperAdmin = require('./models/SuperAdmin');
+
+// Auto-seed default Super Admin on server startup if not present
+const initSuperAdmin = async () => {
+  try {
+    const adminEmail = (process.env.SUPER_ADMIN_EMAIL || 'superadmin@crm.com').trim().toLowerCase();
+    const adminPassword = process.env.SUPER_ADMIN_PASSWORD || 'superadmin@08afupc4';
+    const existing = await SuperAdmin.findOne({ email: adminEmail });
+    if (!existing) {
+      await SuperAdmin.create({
+        name: 'Super Admin',
+        email: adminEmail,
+        password: adminPassword,
+        role: 'super-admin',
+        isActive: true,
+      });
+      console.log(`[SEED] Super Admin auto-initialized: ${adminEmail}`);
+    } else {
+      console.log(`[SEED] Super Admin verified: ${adminEmail}`);
+    }
+  } catch (err) {
+    console.error('[SEED] Super Admin check/init error:', err.message);
+  }
+};
+
 // Connect to Database
-connectDB();
+connectDB().then(() => {
+  initSuperAdmin();
+});
 
 const app = express();
 

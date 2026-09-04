@@ -250,7 +250,8 @@ const login = async (req, res) => {
     }
 
     // 1. First check if SuperAdmin exists with this email
-    const superAdmin = await SuperAdmin.findOne({ email }).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
+    const superAdmin = await SuperAdmin.findOne({ email: cleanEmail }).select('+password');
     if (superAdmin) {
       if (!superAdmin.isActive) {
         return res.status(401).json({ success: false, message: 'Account is deactivated' });

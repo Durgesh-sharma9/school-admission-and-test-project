@@ -24,7 +24,8 @@ const login = async (req, res) => {
       });
     }
 
-    const superAdmin = await SuperAdmin.findOne({ email }).select('+password');
+    const cleanEmail = email.trim().toLowerCase();
+    const superAdmin = await SuperAdmin.findOne({ email: cleanEmail }).select('+password');
 
     if (!superAdmin) {
       return res.status(401).json({
