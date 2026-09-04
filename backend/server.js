@@ -84,6 +84,7 @@ app.use('/api/v1/localities', localityRoutes);
 app.use('/api/v1/super-admin', superAdminRoutes);
 app.use('/api/v1', announcementRoutes);
 app.use('/api/v1/plans', planRoutes);
+app.use('/plans', planRoutes); // Fallback alias
 app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/college', collegeRoutes);

@@ -1,6 +1,15 @@
 import axios from 'axios';
 
-const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+const getNormalizedApiUrl = () => {
+  let url = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5001/api/v1';
+  url = url.trim().replace(/\/+$/, '');
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`;
+  }
+  return url;
+};
+
+const apiBase = getNormalizedApiUrl();
 
 const superAdminApi = axios.create({
   baseURL: apiBase.endsWith('/super-admin') ? apiBase : `${apiBase}/super-admin`,
