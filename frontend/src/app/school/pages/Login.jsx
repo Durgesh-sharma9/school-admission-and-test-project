@@ -53,7 +53,7 @@ const Login = () => {
     try {
       const result = await login(data.email, data.password);
 
-      if (result.success) {
+      if (result && result.success) {
         toast.success('Logged in successfully!');
         if (result.role === 'super-admin') {
           if (checkSuperAdminAuth) await checkSuperAdminAuth();
@@ -63,6 +63,8 @@ const Login = () => {
           const origin = location.state?.from?.pathname || defaultOrigin;
           navigate(origin, { replace: true });
         }
+      } else {
+        toast.error(result?.message || 'Invalid email or password');
       }
     } catch (error) {
       if (error.data?.requiresVerification) {

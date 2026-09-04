@@ -33,7 +33,15 @@ schoolApi.interceptors.request.use(
 
 // Global response interceptor to format errors
 schoolApi.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    // Check if server returned an HTML fallback page instead of JSON
+    if (typeof response.data === 'string' && response.data.trim().startsWith('<')) {
+      const htmlError = new Error('API URL misconfigured (received HTML instead of JSON). Check VITE_API_URL in Render.');
+      htmlError.status = 502;
+      return Promise.reject(htmlError);
+    }
+    return response.data;
+  },
   (error) => {
     const message =
       error.response?.data?.message ||
