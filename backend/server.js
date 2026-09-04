@@ -79,19 +79,29 @@ if (missingEnvVars.length > 0) {
 // Production & Development CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, ''))
-  : ['http://localhost:5173'];
+  : [];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     const normalizedOrigin = origin.replace(/\/$/, '');
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV !== 'production') {
+    
+    const isRenderApp = normalizedOrigin.endsWith('.onrender.com');
+    const isLocalhost = normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1');
+    const isExplicitlyAllowed = allowedOrigins.includes('*') || allowedOrigins.includes(normalizedOrigin);
+
+    if (isExplicitlyAllowed || isRenderApp || isLocalhost || process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    return callback(null, false);
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Handle preflight requests for all endpoints
+app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
