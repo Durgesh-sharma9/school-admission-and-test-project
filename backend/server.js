@@ -88,9 +88,19 @@ app.use('/api/v1/subscription', subscriptionRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/college', collegeRoutes);
 
-// Root Check
+// Root & Health Check
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    name: 'Campus CRM API',
+    status: 'online',
+    message: 'Campus CRM API is running smoothly 🚀',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/api/v1/health', (req, res) => {
-  res.json({ success: true, message: 'School Admission CRM API is running' });
+  res.json({ success: true, message: 'Campus CRM API is running' });
 });
 
 // Fallback for page not found
