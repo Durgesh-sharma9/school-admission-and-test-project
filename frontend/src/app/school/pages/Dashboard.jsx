@@ -734,7 +734,7 @@ const Dashboard = () => {
               { label: 'Add Enquiry', icon: FilePlus, link: '/admission-form', color: 'text-[#7E63F6] bg-[#7E63F6]/10 hover:bg-[#7E63F6] hover:text-white' },
               { label: 'Generate QR', icon: QrCode, link: '/qr-links', color: 'text-[#5091F8] bg-[#5091F8]/10 hover:bg-[#5091F8] hover:text-white' },
               { label: 'Public Form', icon: SchoolIcon, link: `/public/admission/${school?._id}`, color: 'text-[#34D06D] bg-[#34D06D]/10 hover:bg-[#34D06D] hover:text-white', external: true },
-              { label: 'Assign Test', icon: BookOpen, link: '/assessments', color: 'text-[#F6A928] bg-[#F6A928]/10 hover:bg-[#F6A928] hover:text-white' },
+              { label: 'Assessment Templates', icon: BookOpen, link: '/assessments', color: 'text-[#F6A928] bg-[#F6A928]/10 hover:bg-[#F6A928] hover:text-white' },
               { label: 'New Test', icon: FileQuestion, link: '/assessments/create', color: 'text-[#EE5EAA] bg-[#EE5EAA]/10 hover:bg-[#EE5EAA] hover:text-white' },
               { label: 'Enquiry Banner', icon: Sparkles, link: '/thank-you-cms', color: 'text-[#25C5B5] bg-[#25C5B5]/10 hover:bg-[#25C5B5] hover:text-white' },
               { label: 'Settings', icon: Filter, link: '/settings', color: 'text-gray-600 bg-gray-100 hover:bg-gray-800 hover:text-white' },

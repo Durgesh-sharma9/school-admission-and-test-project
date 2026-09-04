@@ -9,7 +9,7 @@ import {
   HelpCircle, FileText, AlertCircle, Award, BookOpen,
   Download, Printer, Share2, ArrowLeft,
   TrendingUp, Sparkles, Check, X, Target, Activity,
-  Star, Zap, Hash, Timer, ShieldCheck, AlertTriangle
+  Star, Zap, Hash, Timer, ShieldCheck, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -105,6 +105,20 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
         if (r.success) setAssignments(r.data);
       }
     } catch (e) { toast.error(e.message || 'Assignment failed'); }
+    finally { setLoading(false); }
+  };
+
+  const handleQuickReassign = async (assessmentId) => {
+    if (!assessmentId) return;
+    try {
+      setLoading(true);
+      const res = await api.post('/assessments/assign', { enquiryId: enquiry._id, assessmentId });
+      if (res.success) {
+        toast.success('Test re-assigned! New attempt generated.');
+        const r = await api.get(`/assessments/assignments/enquiry/${enquiry._id}`);
+        if (r.success) setAssignments(r.data);
+      }
+    } catch (e) { toast.error(e.message || 'Re-assignment failed'); }
     finally { setLoading(false); }
   };
 
@@ -878,9 +892,14 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
                                   <ClipboardCheck className="h-4 w-4 mr-1.5" />Grade Descriptive Answers
                                 </Button>
                               ) : (
-                                <Button variant="secondary" size="sm" className="w-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 border-none font-black text-[11px] uppercase tracking-wider py-3.5 rounded-xl transition-all" onClick={() => loadAssignmentDetails(asm._id, 'view')}>
-                                  <Award className="h-4 w-4 mr-1.5 text-indigo-600" />View Scorecard Report
-                                </Button>
+                                <div className="flex items-center gap-2 w-full">
+                                  <Button variant="secondary" size="sm" className="flex-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 border-none font-black text-[11px] uppercase tracking-wider py-3.5 rounded-xl transition-all cursor-pointer" onClick={() => loadAssignmentDetails(asm._id, 'view')}>
+                                    <Award className="h-4 w-4 mr-1.5 text-indigo-600" />View Report
+                                  </Button>
+                                  <Button variant="outline" size="sm" title="Re-assign this test to student" className="border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 font-black text-[10.5px] uppercase tracking-wider py-3.5 px-3.5 rounded-xl transition-all cursor-pointer shrink-0" onClick={() => handleQuickReassign(asm.assessmentId?._id)}>
+                                    <RefreshCw className="h-3.5 w-3.5 mr-1" />Re-test
+                                  </Button>
+                                </div>
                               )}
                             </div>
                           </div>
