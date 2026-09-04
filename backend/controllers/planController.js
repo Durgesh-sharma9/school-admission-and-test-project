@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const SubscriptionPlan = require('../models/SubscriptionPlan');
 
 // Seeding helper to ensure standard plans are present in DB
@@ -80,8 +81,12 @@ const seedDefaultPlans = async () => {
   }
 };
 
-// Auto run seeding on import
-seedDefaultPlans();
+// Auto run seeding once database connection is ready
+if (mongoose.connection.readyState === 1) {
+  seedDefaultPlans();
+} else {
+  mongoose.connection.once('connected', seedDefaultPlans);
+}
 
 // @desc    Get all plans (Super Admin or Public)
 // @route   GET /api/v1/plans

@@ -1139,10 +1139,12 @@ const AssessmentPortalModal = ({ enquiry, onClose }) => {
                               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                               <XAxis dataKey="name" tick={{ fontSize: 9, fontWeight: 700 }} tickLine={false} axisLine={false} />
                               <YAxis tick={{ fontSize: 9 }} tickLine={false} axisLine={false} />
-                              <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '10px' }} />
+                              <Tooltip 
+                                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '10px', fontSize: '11px', fontWeight: '700', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} 
+                              />
                               <Legend wrapperStyle={{ fontSize: '10px', fontWeight: '700' }} />
                               <Bar name="Obtained" dataKey="marksObtained" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                              <Bar name="Maximum" dataKey="totalMarks" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
+                              <Bar name="Maximum" dataKey="totalMarks" fill="#94a3b8" radius={[4, 4, 0, 0]} />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
