@@ -17,7 +17,8 @@ const VerifyOTP = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes total OTP validity
+  const [resendCooldown, setResendCooldown] = useState(60); // 60 seconds resend cooldown
   const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
   const inputRefs = useRef([]);
@@ -28,11 +29,22 @@ const VerifyOTP = () => {
       return;
     }
 
-    // Countdown timer
-    const timer = setInterval(() => {
+    // OTP expiry countdown (10 minutes)
+    const expiryTimer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
+          clearInterval(expiryTimer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // Resend cooldown timer (60s)
+    const resendTimer = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(resendTimer);
           setCanResend(true);
           return 0;
         }
@@ -40,7 +52,10 @@ const VerifyOTP = () => {
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(expiryTimer);
+      clearInterval(resendTimer);
+    };
   }, [email, navigate]);
 
   const formatTime = (seconds) => {
@@ -149,11 +164,12 @@ const VerifyOTP = () => {
       });
 
       if (data.success) {
-        toast.success('New OTP sent successfully');
+        toast.success('New OTP sent successfully to your email');
         setTimeLeft(600);
+        setResendCooldown(60);
         setCanResend(false);
         setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0].focus();
+        if (inputRefs.current[0]) inputRefs.current[0].focus();
       } else {
         toast.error(data.message || 'Failed to resend OTP');
       }
@@ -228,7 +244,7 @@ const VerifyOTP = () => {
               <span>{resending ? 'Sending...' : 'Resend OTP'}</span>
             </button>
             <p className="text-xs text-slate-400 mt-2">
-              {canResend ? 'You can request a new OTP now' : 'Wait for the timer to expire'}
+              {canResend ? 'You can request a new OTP now' : `Resend available in ${resendCooldown}s`}
             </p>
           </div>
 

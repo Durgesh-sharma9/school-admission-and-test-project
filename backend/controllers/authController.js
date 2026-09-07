@@ -176,14 +176,19 @@ const signup = async (req, res) => {
 
     // Send OTP email
     try {
+      const smtpPort = Number(process.env.SMTP_PORT) || 587;
+      const isSecure = smtpPort === 465 || process.env.SMTP_SECURE === 'true';
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: process.env.SMTP_PORT || 587,
-        secure: false,
+        port: smtpPort,
+        secure: isSecure,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
-        }
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       });
 
       const htmlContent = `
@@ -209,14 +214,16 @@ const signup = async (req, res) => {
         </div>
       `;
 
+      const mailFrom = (process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@campus-crm.com').replace(/"/g, '').trim();
       await transporter.sendMail({
-        from: `"School Admission CRM" <${process.env.SMTP_USER}>`,
+        from: `"School Admission CRM" <${mailFrom}>`,
         to: email,
         subject: `Verify Your Email - ${name}`,
         html: htmlContent
       });
+      console.log(`[Signup] Verification OTP email successfully dispatched to ${email}`);
     } catch (mailError) {
-      console.warn('Nodemailer error (continuing registration):', mailError.message);
+      console.error('[Signup] Nodemailer error sending verification OTP:', mailError);
     }
 
     return res.status(201).json({

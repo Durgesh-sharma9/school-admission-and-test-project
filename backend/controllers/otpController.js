@@ -174,7 +174,7 @@ exports.sendOTP = async (req, res) => {
       `;
     }
 
-    const mailFrom = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@campus-crm.com';
+    const mailFrom = (process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@campus-crm.com').replace(/"/g, '').trim();
     try {
       await transporter.sendMail({
         from: `"School Admission CRM" <${mailFrom}>`,
