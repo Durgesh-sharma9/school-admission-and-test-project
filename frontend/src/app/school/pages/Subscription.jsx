@@ -90,7 +90,7 @@ const PurchaseModal = ({ plan, planMeta, onConfirm, onClose, isLoading }) => {
 };
 
 // ─── Exact Plan Card Component ───────────────────────────────────────────────
-const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) => {
+const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, validityText, onBuy }) => {
   const meta = planMeta[plan.planCode] || SCHOOL_PLAN_META['school-basic'];
 
   return (
@@ -138,11 +138,21 @@ const PlanCard = ({ plan, planMeta, isCurrent, isPending, isLoading, onBuy }) =>
         </div>
 
         {/* Button */}
-        <div className="mt-8">
+        <div className="mt-8 space-y-2">
           {isCurrent ? (
-            <div className="w-full py-3 rounded-xl border border-[#10B981] text-[#10B981] bg-white font-semibold text-sm flex items-center justify-center gap-2">
-              <Check className="h-4 w-4" strokeWidth={2.5} /> Current Plan
-            </div>
+            <>
+              <div className="w-full py-3 rounded-xl border border-[#10B981] text-[#10B981] bg-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs">
+                <Check className="h-4 w-4" strokeWidth={2.5} /> Current Plan
+              </div>
+              {validityText && (
+                <div className="text-center pt-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                    <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+                    Valid till: {validityText}
+                  </span>
+                </div>
+              )}
+            </>
           ) : (
             <button
               onClick={() => onBuy(plan)}
@@ -324,18 +334,34 @@ const Subscription = () => {
   const expiryDate = currentSub?.expiryDate ? new Date(currentSub.expiryDate) : null;
   const isSubscriptionActive = isTrial ? (trialEnd && trialEnd >= new Date()) : (status === 'active' && expiryDate && expiryDate >= new Date());
 
+  const effectiveValidityDate = isTrial ? trialEnd : (expiryDate || trialEnd);
+  const validityDateFormatted = effectiveValidityDate 
+    ? effectiveValidityDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : null;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-10 flex flex-col justify-between">
 
       <div>
         {/* ── Exact Header ────────────────────────────────────────────────────── */}
-        <div className="text-center pt-8 pb-10 px-4">
+        <div className="text-center pt-8 pb-8 px-4">
           <h1 className="text-3xl md:text-[32px] font-bold text-[#A855F7] tracking-tight">
             Choose the Perfect Plan
           </h1>
           <p className="text-slate-500 text-[13px] mt-2 max-w-md mx-auto">
             Scale your school's records management with yearly plans.
           </p>
+          {isSubscriptionActive && (
+            <div className="mt-4 inline-flex items-center flex-wrap justify-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-800 text-xs sm:text-sm font-semibold shadow-xs">
+              <Sparkles className="h-4 w-4 text-[#8B5CF6]" />
+              <span>Current Plan: <strong className="capitalize">{plan.replace(/-/g, ' ')}</strong></span>
+              <span className="text-purple-300">•</span>
+              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
+                <Calendar className="h-3.5 w-3.5 text-emerald-600" />
+                Plan Validity: {validityDateFormatted || 'Active'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* ── Alerts ──────────────────────────────────────────────────────────── */}
@@ -372,6 +398,7 @@ const Subscription = () => {
                   isCurrent={isCurrent}
                   isPending={!!pendingRequest}
                   isLoading={requestingCode === p.planCode}
+                  validityText={validityDateFormatted}
                   onBuy={(selectedPlan) => setModalPlan(selectedPlan)}
                 />
               );

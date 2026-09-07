@@ -1001,7 +1001,7 @@ const TasksPage = ({ module = 'school' }) => {
               <option value="tomorrow">Tomorrow</option>
               <option value="week">Next 7 Days</option>
               <option value="all">All Dates</option>
-              <option value="custom">Custom Range</option>
+              <option value="custom">Date Range</option>
             </select>
           </div>
 

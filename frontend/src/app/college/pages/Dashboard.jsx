@@ -572,7 +572,13 @@ const Dashboard = () => {
                     <BarChart data={courseDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
                       <XAxis dataKey="code" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
-                      <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <YAxis 
+                        allowDecimals={false}
+                        domain={[0, (dataMax) => Math.max(1, Math.ceil(dataMax))]}
+                        tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} 
+                        tickLine={false} 
+                        axisLine={false} 
+                      />
                       <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={30} animationDuration={1500}>
                         {courseDistribution.map((entry, index) => (
@@ -639,7 +645,13 @@ const Dashboard = () => {
                   <LineChart data={computedMetrics.monthlyTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
                     <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <YAxis 
+                      allowDecimals={false}
+                      domain={[0, (dataMax) => Math.max(1, Math.ceil(dataMax))]}
+                      tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
                     <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                     <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', paddingTop: '10px' }} />
                     <Line type="monotone" dataKey="Applications" stroke="#7E63F6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} animationDuration={1500} />

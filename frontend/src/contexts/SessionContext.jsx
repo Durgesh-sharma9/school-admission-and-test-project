@@ -18,7 +18,7 @@ export const DATE_PRESETS = [
   { id: 'last30days', label: 'Last 30 Days' },
   { id: 'thisMonth', label: 'This Month' },
   { id: 'sessionStart', label: 'Start of Session' },
-  { id: 'custom', label: 'Custom Range' },
+  { id: 'custom', label: 'Date Range' },
 ];
 
 export const calculateDateRange = (preset, session = DEFAULT_SESSION, customStart = '', customEnd = '') => {

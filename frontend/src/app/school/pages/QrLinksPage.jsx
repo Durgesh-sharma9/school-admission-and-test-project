@@ -231,7 +231,7 @@ const QrLinksPage = () => {
   const [posterTheme, setPosterTheme] = useState('bw'); // 'bw' (default) or 'brand'
   const [selectedSize, setSelectedSize] = useState('A4 Portrait');
   const [zoomSetting, setZoomSetting] = useState('Fit Screen');
-  const [activeTab, setActiveTab] = useState('links'); // 'links', 'branding', 'preview' 
+  const [activeTab, setActiveTab] = useState('preview'); // 'preview', 'branding', 'links'
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [modalZoom, setModalZoom] = useState(0.45);
   const [modalFit, setModalFit] = useState('height');
@@ -294,8 +294,11 @@ const QrLinksPage = () => {
 
     // Fit Screen mode - dynamic scaling based on design height and width
     const { width, height } = getPosterDims();
-    const scaleHeight = 450 / height;
-    const scaleWidth = 360 / width;
+    const availableWidth = typeof window !== 'undefined' 
+      ? Math.min(window.innerWidth - 64, 380) 
+      : 360;
+    const scaleHeight = 460 / height;
+    const scaleWidth = Math.max(availableWidth, 260) / width;
     return Math.min(scaleHeight, scaleWidth, 0.85);
   };
 

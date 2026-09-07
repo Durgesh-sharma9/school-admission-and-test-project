@@ -11,7 +11,7 @@ import {
   ArrowRight, BookOpen, ClipboardCheck, Award, FileQuestion, Clock, TrendingUp,
   FileText, Activity, MapPin, Calendar, Zap, BarChart3, PieChart as PieIcon,
   ShieldCheck, Layers, PhoneCall, ArrowUpRight, ArrowDownRight, Filter,
-  School as SchoolIcon, CheckCircle2, AlertCircle, UserCheck, MoreVertical
+  School as SchoolIcon, CheckCircle2, AlertCircle, UserCheck, MoreVertical, Plus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -113,9 +113,17 @@ const Dashboard = () => {
   const notInterestedCount = enquiryStats?.notInterested || 0;
 
   const conversionRate = totalEnquiries > 0 ? Math.round((confirmedAdmissions / totalEnquiries) * 100) : 0;
+  const totalAssessments = assessmentStats?.totalAssessments || 0;
   const totalAssigned = assessmentStats?.totalAssigned || 0;
   const completedCount = assessmentStats?.completedCount || 0;
   const completionRate = totalAssigned > 0 ? Math.round((completedCount / totalAssigned) * 100) : 0;
+
+  const planValidityDate = school?.subscription?.expiryDate || school?.subscription?.trialEnd;
+  const formattedValidityDate = planValidityDate 
+    ? new Date(planValidityDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : null;
+
+  const publicFormLink = school?.admissionFormLink || (school?._id ? `/public/admission/${school._id}` : (school?.code ? `/public/admission/${school.code}` : '#'));
 
   const todayStr = new Date().toISOString().split('T')[0];
   const todayEnquiries = useMemo(() => recentEnquiriesList.filter(e => e.saveDate === todayStr), [recentEnquiriesList, todayStr]);
@@ -220,7 +228,7 @@ const Dashboard = () => {
               <QrCode className="h-3.5 w-3.5 mr-1.5 text-[#EE5EAA]" /> QR Poster
             </Link>
             <Link to="/assessments/create" className="inline-flex items-center px-3 py-2 rounded-lg text-xs font-semibold bg-white text-gray-700 border border-[#E8ECF3] hover:bg-gray-50 hover:shadow-sm transition-all duration-200">
-              <BookOpen className="h-3.5 w-3.5 mr-1.5 text-[#34D06D]" /> New Test
+              <BookOpen className="h-3.5 w-3.5 mr-1.5 text-[#34D06D]" /> Create Assessment
             </Link>
           </div>
         </motion.div>
@@ -282,42 +290,42 @@ const Dashboard = () => {
           })}
         </motion.div>
 
-        {/* ROW 2: CRM PIPELINE PROGRESS */}
+        {/* ROW 2: CRM PIPELINE PROGRESS - COMPACT SINGLE-ROW STRIP */}
         <motion.div variants={itemVariants} className="bg-white rounded-xl border border-[#E8ECF3] card-elevated relative mt-6">
-          <div className="absolute -top-4 left-4 right-4 px-4 py-2.5 rounded-lg shadow-md bg-gradient-to-br from-[#7E63F6] to-[#9781F8] text-white flex justify-between items-center z-10">
-            <div>
-              <h6 className="text-sm font-bold tracking-wide">CRM Admission Funnel Pipeline</h6>
-              <p className="text-[10px] opacity-90 font-medium">Real-time stage distribution</p>
+          <div className="absolute -top-4 left-4 right-4 px-4 py-2 rounded-lg shadow-md bg-gradient-to-br from-[#7E63F6] to-[#9781F8] text-white flex justify-between items-center z-10">
+            <div className="flex items-center gap-2">
+              <h6 className="text-xs sm:text-sm font-bold tracking-wide">CRM Admission Funnel Pipeline</h6>
+              <span className="hidden sm:inline-block text-[10px] opacity-85 font-medium">• Real-time stage distribution</span>
             </div>
-            <Link to="/enquiries" className="text-white hover:text-gray-100 transition-colors bg-white/20 px-2.5 py-1 rounded-md text-xs font-semibold flex items-center">
-              View All <ArrowRight className="h-3 w-3 ml-1.5" />
+            <Link to="/enquiries" className="text-white hover:text-gray-100 transition-colors bg-white/20 px-2.5 py-0.5 rounded-md text-xs font-semibold flex items-center">
+              View All <ArrowRight className="h-3 w-3 ml-1" />
             </Link>
           </div>
 
-          <div className="p-4 pt-12">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="p-3 pt-9">
+            <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
               {[
-                { label: 'Total Enquiries', count: totalEnquiries, pct: 100, color: 'bg-[#7E63F6]' },
-                { label: 'New Enquiries', count: newEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((newEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-[#5091F8]' },
-                { label: 'Follow Up / Hold', count: holdEnquiriesCount, pct: totalEnquiries > 0 ? Math.round((holdEnquiriesCount / totalEnquiries) * 100) : 0, color: 'bg-[#F6A928]' },
-                { label: 'Confirmed Admission', count: confirmedAdmissions, pct: conversionRate, color: 'bg-[#34D06D]' },
-                { label: 'Not Interested', count: notInterestedCount, pct: totalEnquiries > 0 ? Math.round((notInterestedCount / totalEnquiries) * 100) : 0, color: 'bg-[#F26464]' },
-                { label: 'Active Conversion', count: `${conversionRate}%`, pct: conversionRate, color: 'bg-[#EE5EAA]' },
-              ].map((stage) => (
-                <div key={stage.label} onClick={() => navigate('/enquiries')} className="space-y-2 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-500 text-xs truncate">{stage.label}</span>
+                { label: 'Total Enquiries', count: totalEnquiries, color: 'text-[#7E63F6]', dot: 'bg-[#7E63F6]' },
+                { label: 'New Enquiries', count: newEnquiriesCount, color: 'text-[#5091F8]', dot: 'bg-[#5091F8]' },
+                { label: 'Follow Up / Hold', count: holdEnquiriesCount, color: 'text-[#F6A928]', dot: 'bg-[#F6A928]' },
+                { label: 'Confirmed Admission', count: confirmedAdmissions, color: 'text-[#34D06D]', dot: 'bg-[#34D06D]' },
+                { label: 'Not Interested', count: notInterestedCount, color: 'text-[#F26464]', dot: 'bg-[#F26464]' },
+                { label: 'Active Conversion', count: `${conversionRate}%`, color: 'text-[#EE5EAA]', dot: 'bg-[#EE5EAA]' },
+              ].map((stage, idx, arr) => (
+                <div
+                  key={stage.label}
+                  onClick={() => navigate('/enquiries')}
+                  className={`flex-1 min-w-[105px] sm:min-w-0 p-2 rounded-lg hover:bg-slate-50 transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
+                    idx !== arr.length - 1 ? 'border-r border-slate-100' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className={`w-2 h-2 rounded-full ${stage.dot} shrink-0`} />
+                    <span className="font-semibold text-slate-500 text-[11px] whitespace-nowrap">{stage.label}</span>
                   </div>
-                  <h4 className="font-bold text-xl text-gray-800">{stage.count}</h4>
-                  <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.max(stage.pct, 2)}%` }}
-                      transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-                      className={`h-full rounded-full ${stage.color}`}
-                    />
-                  </div>
-                  <div className="text-[10px] text-gray-400 font-medium text-right">{stage.pct}% Share</div>
+                  <span className={`text-base sm:text-lg font-black tracking-tight ${stage.color}`}>
+                    {stage.count}
+                  </span>
                 </div>
               ))}
             </div>
@@ -380,7 +388,13 @@ const Dashboard = () => {
                           );
                         }}
                       />
-                      <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                      <YAxis 
+                        allowDecimals={false}
+                        domain={[0, (dataMax) => Math.max(1, Math.ceil(dataMax))]}
+                        tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} 
+                        tickLine={false} 
+                        axisLine={false} 
+                      />
                       <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                       <Bar dataKey="totalEnquiries" fill="#7E63F6" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
                       <Bar dataKey="confirmedAdmissions" fill="#34D06D" radius={[4, 4, 0, 0]} name="Admissions" maxBarSize={30} animationDuration={1500} />
@@ -441,7 +455,13 @@ const Dashboard = () => {
                         );
                       }}
                     />
-                    <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                    <YAxis 
+                      allowDecimals={false}
+                      domain={[0, (dataMax) => Math.max(1, Math.ceil(dataMax))]}
+                      tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
                     <Tooltip cursor={{ fill: '#F6F8FC' }} contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                     <Bar dataKey="enquiries" fill="#F6A928" radius={[4, 4, 0, 0]} name="Enquiries" maxBarSize={30} animationDuration={1500} />
                   </BarChart>
@@ -478,7 +498,13 @@ const Dashboard = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8ECF3" />
                   <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} tickLine={false} axisLine={false} />
+                  <YAxis 
+                    allowDecimals={false}
+                    domain={[0, (dataMax) => Math.max(1, Math.ceil(dataMax))]}
+                    tick={{ fontSize: 10, fill: '#6b7280', fontWeight: 500 }} 
+                    tickLine={false} 
+                    axisLine={false} 
+                  />
                   <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '11px', border: '1px solid #E8ECF3', padding: '8px' }} />
                   <Area type="monotone" dataKey="enquiries" stroke="#7E63F6" fill="url(#colorInq)" strokeWidth={2} activeDot={{ r: 4 }} animationDuration={1500} />
                   <Area type="monotone" dataKey="admissions" stroke="#34D06D" fill="url(#colorAdm)" strokeWidth={2} activeDot={{ r: 4 }} animationDuration={1500} />
@@ -657,23 +683,36 @@ const Dashboard = () => {
 
           {/* Assessment Analytics */}
           <div className="bg-white rounded-xl border border-[#E8ECF3] card-elevated p-4 space-y-4">
-            <div className="flex items-center space-x-2.5">
-              <div className="p-2 rounded-lg bg-[#5091F8]/10 text-[#5091F8]">
-                <Award className="h-4 w-4" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="p-2 rounded-lg bg-[#5091F8]/10 text-[#5091F8]">
+                  <Award className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Assessment Engine</h3>
+                  <p className="text-[10px] text-gray-500 font-medium">Student evaluation status</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-gray-900">Assessment Engine</h3>
-                <p className="text-[10px] text-gray-500 font-medium">Student evaluation status</p>
-              </div>
+              <Link
+                to="/assessments/create"
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-[#7E63F6] bg-[#7E63F6]/10 hover:bg-[#7E63F6] hover:text-white rounded-lg transition-colors shadow-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Create Assessment</span>
+              </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Assigned</span>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-3 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 truncate w-full" title="Available Assessments">Available</span>
+                <span className="text-xl font-black text-[#7E63F6]">{totalAssessments}</span>
+              </div>
+              <div className="p-3 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 truncate w-full">Assigned</span>
                 <span className="text-xl font-black text-[#5091F8]">{totalAssigned}</span>
               </div>
-              <div className="p-3.5 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Completed</span>
+              <div className="p-3 bg-gradient-to-br from-[#F6F8FC] to-white border border-[#E8ECF3] rounded-lg flex flex-col items-center justify-center text-center shadow-sm">
+                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1 truncate w-full">Completed</span>
                 <span className="text-xl font-black text-[#34D06D]">{completedCount}</span>
               </div>
             </div>
@@ -706,19 +745,31 @@ const Dashboard = () => {
               <h3 className="text-sm font-bold tracking-wide text-white">Subscription & Usage Meter</h3>
             </div>
             <p className="text-[11px] font-medium text-gray-400">
-              Current Tier: <strong className="text-white capitalize">{school?.subscription?.plan || 'Free Trial'}</strong> • Enterprise SLA • Unlimited Enquiries
+              Current Tier: <strong className="text-white capitalize">{school?.subscription?.plan || 'Free Trial'}</strong>
+              {formattedValidityDate && (
+                <> • Validity: <strong className="text-emerald-400">{formattedValidityDate}</strong></>
+              )}
+              {' '}• Enterprise SLA • Unlimited Enquiries
             </p>
           </div>
 
-          <div className="flex items-center gap-4 z-10">
-            <div className="text-right">
+          <div className="flex items-center gap-4 z-10 flex-wrap sm:flex-nowrap">
+            {formattedValidityDate && (
+              <div className="text-left sm:text-right">
+                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider block mb-0.5">Plan Validity</span>
+                <span className="text-[11px] font-bold text-white bg-white/10 px-2.5 py-0.5 rounded border border-white/20 inline-flex items-center">
+                  <Calendar className="h-3 w-3 mr-1 text-purple-300" /> {formattedValidityDate}
+                </span>
+              </div>
+            )}
+            <div className="text-left sm:text-right">
               <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider block mb-0.5">Status</span>
               <span className="text-[11px] font-bold text-[#34D06D] flex items-center bg-[#34D06D]/10 px-2 py-0.5 rounded border border-[#34D06D]/20">
                 <ShieldCheck className="h-3 w-3 mr-1" /> Active
               </span>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link to="/subscription" className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs transition-all shadow-sm block">
+              <Link to="/subscription" className="px-4 py-2 rounded-lg bg-white hover:bg-gray-50 text-gray-900 font-bold text-xs transition-all shadow-sm block whitespace-nowrap">
                 Manage Subscription
               </Link>
             </motion.div>
@@ -732,9 +783,9 @@ const Dashboard = () => {
             {[
               { label: 'Add Enquiry', icon: FilePlus, link: '/admission-form', color: 'text-[#7E63F6] bg-[#7E63F6]/10 hover:bg-[#7E63F6] hover:text-white' },
               { label: 'Generate QR', icon: QrCode, link: '/qr-links', color: 'text-[#5091F8] bg-[#5091F8]/10 hover:bg-[#5091F8] hover:text-white' },
-              { label: 'Public Form', icon: SchoolIcon, link: `/public/admission/${school?._id}`, color: 'text-[#34D06D] bg-[#34D06D]/10 hover:bg-[#34D06D] hover:text-white', external: true },
+              { label: 'Public Form', icon: SchoolIcon, link: publicFormLink, color: 'text-[#34D06D] bg-[#34D06D]/10 hover:bg-[#34D06D] hover:text-white', external: true },
               { label: 'Assessment Templates', icon: BookOpen, link: '/assessments', color: 'text-[#F6A928] bg-[#F6A928]/10 hover:bg-[#F6A928] hover:text-white' },
-              { label: 'New Test', icon: FileQuestion, link: '/assessments/create', color: 'text-[#EE5EAA] bg-[#EE5EAA]/10 hover:bg-[#EE5EAA] hover:text-white' },
+              { label: 'Create Assessment', icon: FileQuestion, link: '/assessments/create', color: 'text-[#EE5EAA] bg-[#EE5EAA]/10 hover:bg-[#EE5EAA] hover:text-white' },
               { label: 'Enquiry Banner', icon: Sparkles, link: '/thank-you-cms', color: 'text-[#25C5B5] bg-[#25C5B5]/10 hover:bg-[#25C5B5] hover:text-white' },
               { label: 'Settings', icon: Filter, link: '/settings', color: 'text-gray-600 bg-gray-100 hover:bg-gray-800 hover:text-white' },
             ].map((action) => {

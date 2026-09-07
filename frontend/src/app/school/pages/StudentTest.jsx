@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
@@ -48,7 +49,7 @@ const StudentTest = () => {
   const fetchTestDetails = async () => {
     try {
       setLoading(true);
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
       const res = await axios.get(`${apiBaseUrl}/assessments/assignments/${assignmentId}`);
       
       if (res.data.success) {
@@ -130,7 +131,7 @@ const StudentTest = () => {
 
     autoSaveTimeoutRef.current = setTimeout(async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const apiBaseUrl = getNormalizedApiUrl();
         await axios.put(`${apiBaseUrl}/assessments/assignments/${assignmentId}/save-progress`, {
           answers: studentAnswers,
         });
@@ -156,7 +157,7 @@ const StudentTest = () => {
   const handleStartTest = async () => {
     try {
       setLoading(true);
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
       // Post to save-progress to record the startTime on backend
       const res = await axios.put(`${apiBaseUrl}/assessments/assignments/${assignmentId}/save-progress`, {
         answers: studentAnswers,
@@ -213,7 +214,7 @@ const StudentTest = () => {
     setSubmitting(true);
     try {
       const elapsedSeconds = (assessment?.duration || 0) * 60 - timeLeft;
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
       const res = await axios.post(`${apiBaseUrl}/assessments/assignments/${assignmentId}/submit`, {
         answers: studentAnswers,
         timeTaken: elapsedSeconds > 0 ? elapsedSeconds : 0,
@@ -238,7 +239,7 @@ const StudentTest = () => {
   const handleAutoSubmit = async (answersList, totalDurationSeconds) => {
     setSubmitting(true);
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
       const res = await axios.post(`${apiBaseUrl}/assessments/assignments/${assignmentId}/submit`, {
         answers: answersList,
         timeTaken: totalDurationSeconds,

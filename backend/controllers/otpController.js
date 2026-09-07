@@ -3,19 +3,26 @@ const School = require('../models/School');
 const generateToken = require('../utils/generateToken');
 const nodemailer = require('nodemailer');
 
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
+const isSecure = smtpPort === 465 || process.env.SMTP_SECURE === 'true';
+
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false,
+  port: smtpPort,
+  secure: isSecure,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
-  }
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000
 });
 
 // Generate and send OTP
 exports.sendOTP = async (req, res) => {
+  let createdOtpId = null;
   try {
     const { email, purpose } = req.body;
 
@@ -27,6 +34,8 @@ exports.sendOTP = async (req, res) => {
       });
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+
     // Validate purpose
     if (!['EMAIL_VERIFICATION', 'PASSWORD_RESET'].includes(purpose)) {
       return res.status(400).json({
@@ -37,7 +46,7 @@ exports.sendOTP = async (req, res) => {
 
     // Check if email exists for EMAIL_VERIFICATION
     if (purpose === 'EMAIL_VERIFICATION') {
-      const school = await School.findOne({ email });
+      const school = await School.findOne({ email: cleanEmail });
       if (!school) {
         return res.status(404).json({
           success: false,
@@ -48,7 +57,7 @@ exports.sendOTP = async (req, res) => {
 
     // Check if email exists for PASSWORD_RESET
     if (purpose === 'PASSWORD_RESET') {
-      const school = await School.findOne({ email });
+      const school = await School.findOne({ email: cleanEmail });
       if (!school) {
         return res.status(404).json({
           success: false,
@@ -69,21 +78,23 @@ exports.sendOTP = async (req, res) => {
     const rateLimitSeconds = isDevelopment ? 5 : 60; // 5 seconds in dev, 60 seconds in production
     
     const recentOTP = await OTP.findOne({
-      email,
+      email: cleanEmail,
       purpose,
       createdAt: { $gte: new Date(Date.now() - rateLimitSeconds * 1000) }
     });
 
     if (recentOTP) {
+      const elapsedSeconds = Math.floor((Date.now() - new Date(recentOTP.createdAt).getTime()) / 1000);
+      const remainingSeconds = Math.max(1, rateLimitSeconds - elapsedSeconds);
       return res.status(429).json({
         success: false,
-        message: `Please wait ${rateLimitSeconds} seconds before requesting another OTP`
+        message: `Please wait ${remainingSeconds} seconds before requesting another OTP`
       });
     }
 
     // Invalidate any existing unverified OTPs for this email and purpose
     await OTP.updateMany(
-      { email, purpose, verified: false },
+      { email: cleanEmail, purpose, verified: false },
       { verified: true }
     );
 
@@ -96,7 +107,7 @@ exports.sendOTP = async (req, res) => {
 
     // Save OTP to database
     const otpRecord = new OTP({
-      email,
+      email: cleanEmail,
       otp: hashedOTP,
       purpose,
       expiresAt,
@@ -105,9 +116,10 @@ exports.sendOTP = async (req, res) => {
     });
 
     await otpRecord.save();
+    createdOtpId = otpRecord._id;
 
     // Send email
-    const school = await School.findOne({ email });
+    const school = await School.findOne({ email: cleanEmail });
     const schoolName = school ? school.name : 'School';
 
     let subject, htmlContent;
@@ -162,12 +174,25 @@ exports.sendOTP = async (req, res) => {
       `;
     }
 
-    await transporter.sendMail({
-      from: `"School Admission CRM" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject,
-      html: htmlContent
-    });
+    const mailFrom = process.env.MAIL_FROM || process.env.SMTP_USER || 'no-reply@campus-crm.com';
+    try {
+      await transporter.sendMail({
+        from: `"School Admission CRM" <${mailFrom}>`,
+        to: cleanEmail,
+        subject,
+        html: htmlContent
+      });
+    } catch (mailErr) {
+      // Rollback OTP record on mail send failure so user is not blocked by 429 rate-limit on retry
+      if (createdOtpId) {
+        await OTP.deleteOne({ _id: createdOtpId });
+      }
+      console.error('Mail delivery failure during sendOTP:', mailErr);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send OTP email. Please check your email address or SMTP configuration.'
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -175,10 +200,13 @@ exports.sendOTP = async (req, res) => {
     });
 
   } catch (error) {
+    if (createdOtpId) {
+      await OTP.deleteOne({ _id: createdOtpId }).catch(() => {});
+    }
     console.error('Error sending OTP:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to send OTP'
+      message: 'Failed to send OTP. Please try again later.'
     });
   }
 };
@@ -196,9 +224,11 @@ exports.verifyOTP = async (req, res) => {
       });
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+
     // Find valid OTP
     const otpRecord = await OTP.findOne({
-      email,
+      email: cleanEmail,
       purpose,
       verified: false,
       expiresAt: { $gt: new Date() }
@@ -228,7 +258,7 @@ exports.verifyOTP = async (req, res) => {
 
     if (purpose === 'EMAIL_VERIFICATION') {
       const school = await School.findOneAndUpdate(
-        { email },
+        { email: cleanEmail },
         { emailVerified: true },
         { new: true }
       );
@@ -291,31 +321,10 @@ exports.resendOTP = async (req, res) => {
       });
     }
 
-    // Check rate limiting (relaxed in development)
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const rateLimitSeconds = isDevelopment ? 5 : 60; // 5 seconds in dev, 60 seconds in production
-    
-    const recentOTP = await OTP.findOne({
-      email,
-      purpose,
-      createdAt: { $gte: new Date(Date.now() - rateLimitSeconds * 1000) }
-    });
+    const cleanEmail = email.trim().toLowerCase();
+    req.body.email = cleanEmail;
 
-    if (recentOTP) {
-      return res.status(429).json({
-        success: false,
-        message: `Please wait ${rateLimitSeconds} seconds before requesting another OTP`
-      });
-    }
-
-    // Invalidate existing OTPs
-    await OTP.updateMany(
-      { email, purpose, verified: false },
-      { verified: true }
-    );
-
-    // Generate and send new OTP
-    req.body = { email, purpose }; // Reuse sendOTP logic
+    // Delegate to sendOTP which handles rate-limiting, invalidating old OTPs, and sending mail safely
     return exports.sendOTP(req, res);
 
   } catch (error) {

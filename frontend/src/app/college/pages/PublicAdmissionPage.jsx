@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 import Loader from '../../../shared/components/Loader';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
@@ -72,7 +73,7 @@ const PublicAdmissionPage = () => {
     const fetchCollegeDetails = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const apiBaseUrl = getNormalizedApiUrl();
 
         const [infoRes, deptsRes, coursesRes, specsRes] = await Promise.all([
           axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`),
@@ -177,7 +178,7 @@ const PublicAdmissionPage = () => {
 
     setSubmitting(true);
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
 
       // Map to backward-compatible structure matching Mongoose requirements
       const payload = {

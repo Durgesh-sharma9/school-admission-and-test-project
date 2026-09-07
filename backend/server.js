@@ -108,10 +108,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static uploaded files with CORS enabled for canvas capture
 app.use('/uploads', cors(), express.static(path.join(__dirname, 'public/uploads')));
 
-// Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/auth', googleAuthRoutes);
-app.use('/api/v1/otp', otpRoutes);
+// Normalize accidental double /api prefixes from misconfigured proxies or baseURLs (e.g. /api/api/v1/...)
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/api/')) {
+    req.url = req.url.replace(/^\/api\/api\//, '/api/');
+  }
+  next();
+});
+
+// Routes (supports both /api/v1 and /api aliases)
+app.use(['/api/v1/auth', '/api/auth'], authRoutes);
+app.use(['/api/v1/auth', '/api/auth'], googleAuthRoutes);
+app.use(['/api/v1/otp', '/api/otp'], otpRoutes);
 app.use('/api/v1/enquiries', enquiryRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/assessments', assessmentRoutes);

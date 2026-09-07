@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 import Loader from '../../../shared/components/Loader';
 import EnquiryBannerPreview from '../../../shared/components/EnquiryBannerPreview';
 import { 
@@ -20,6 +21,7 @@ import {
 const PublicThankYouPage = () => {
   const { schoolId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [collegeInfo, setCollegeInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +34,7 @@ const PublicThankYouPage = () => {
     const fetchCollegeInfo = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const apiBaseUrl = getNormalizedApiUrl();
         const res = await axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`);
         if (res.data.success) {
           setCollegeInfo(res.data.school);

@@ -7,6 +7,7 @@ import AutocompleteSelect, { CLASS_SEEKING_OPTIONS, PREVIOUS_CLASS_OPTIONS } fro
 import { useAuth } from '../contexts/AuthContext';
 import { useSession } from '../../../contexts/SessionContext';
 import { useParams } from 'react-router-dom';
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 
 const INDIAN_STATES = [
   "Andhra Pradesh",
@@ -136,7 +137,7 @@ const AdmissionForm = ({
         }
         setRecognitionLoading(true);
         try {
-          const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+          const apiBaseUrl = getNormalizedApiUrl();
           const res = await fetch(`${apiBaseUrl}/enquiries/parent-recognition/${digitsOnly}?schoolId=${schoolId}`);
           const data = await res.json();
           if (res.ok && data.success && data.exists) {
@@ -219,7 +220,7 @@ const AdmissionForm = ({
   React.useEffect(() => {
     const fetchActiveLocalities = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const apiBaseUrl = getNormalizedApiUrl();
         const targetSchoolId = schoolId || '';
         const res = await fetch(`${apiBaseUrl}/localities/active?schoolId=${targetSchoolId}`);
         const data = await res.json();
@@ -317,7 +318,7 @@ const AdmissionForm = ({
       const digitsOnly = (data.mobile || '').replace(/\D/g, '');
       if (digitsOnly.length === 10 && !initialData) {
         if (hasSelectedOptionForMobile !== digitsOnly) {
-          const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+          const apiBaseUrl = getNormalizedApiUrl();
           const res = await fetch(`${apiBaseUrl}/enquiries/parent-recognition/${digitsOnly}?schoolId=${schoolId}`);
           const result = await res.json();
           if (res.ok && result.success && result.exists) {

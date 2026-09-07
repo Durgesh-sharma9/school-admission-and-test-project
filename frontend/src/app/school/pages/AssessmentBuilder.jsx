@@ -725,9 +725,10 @@ const AssessmentBuilder = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/assessments"
-            className="px-4 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 hover:bg-slate-800 transition-colors"
+            className="px-4 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 hover:bg-slate-800 text-slate-200 hover:text-white transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
-            Cancel Builder
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
           </Link>
           <Button
             onClick={handleSaveAssessment}

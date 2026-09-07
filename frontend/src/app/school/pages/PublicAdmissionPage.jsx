@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 import Loader from '../../../shared/components/Loader';
 import AdmissionForm from '../components/AdmissionForm';
 import { School, HelpCircle, Sparkles } from 'lucide-react';
@@ -22,7 +23,7 @@ const PublicAdmissionPage = () => {
     const fetchSchoolInfo = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+        const apiBaseUrl = getNormalizedApiUrl();
         const res = await axios.get(`${apiBaseUrl}/auth/public/school/${schoolId}`);
         if (res.data.success) {
           setSchoolInfo(res.data.school);
@@ -43,7 +44,7 @@ const PublicAdmissionPage = () => {
   const handlePublicSubmit = async (formData, resetForm) => {
     setSubmitting(true);
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+      const apiBaseUrl = getNormalizedApiUrl();
       const res = await axios.post(`${apiBaseUrl}/enquiries/public/${schoolId}`, formData);
       if (res.data.success) {
         // Form submitted successfully. Navigate to custom Thank You screen

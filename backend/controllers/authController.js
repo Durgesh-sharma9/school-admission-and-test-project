@@ -420,8 +420,10 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: passwordCheck.message });
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+
     // Find school by email
-    const school = await School.findOne({ email });
+    const school = await School.findOne({ email: cleanEmail });
     if (!school) {
       return res.status(404).json({ success: false, message: 'Email not registered' });
     }

@@ -1,13 +1,5 @@
 import axios from 'axios';
-
-const getNormalizedApiUrl = () => {
-  let url = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5001/api/v1';
-  url = url.replace(/[\[\]"']/g, '').trim().replace(/\/+$/, '');
-  if (!url.endsWith('/api/v1')) {
-    url = `${url}/api/v1`;
-  }
-  return url;
-};
+import { getNormalizedApiUrl } from '../../../shared/utils/apiUrl';
 
 // Default School API client configuration
 const schoolApi = axios.create({
