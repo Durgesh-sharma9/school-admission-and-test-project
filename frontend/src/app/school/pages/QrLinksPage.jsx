@@ -1163,194 +1163,174 @@ const QrLinksPage = () => {
         </div>
       </div>
 
-      {/* Mobile/Tablet Tab Switcher */}
-      <div className="lg:hidden flex border border-[#E8ECF3] bg-slate-50 p-1 rounded-[12px] gap-1 mb-6">
+      {/* Mobile/Tablet Responsive Tab Bar */}
+      <div className="lg:hidden flex bg-white/95 backdrop-blur-md border border-slate-200 p-1.5 rounded-xl gap-1.5 mb-5 sticky top-16 z-20 shadow-sm">
         <button
           type="button"
-          onClick={() => setActiveTab('links')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'links'
-            ? 'bg-[#E91E63] text-white shadow-sm'
-            : 'text-slate-650 hover:bg-white/50'
-            }`}
+          onClick={() => setActiveTab('preview')}
+          className={`flex-1 py-2.5 px-2 text-center text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === 'preview'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
         >
-          Links
+          <Eye className="h-4 w-4" />
+          <span>Poster Preview</span>
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('branding')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'branding'
-            ? 'bg-[#E91E63] text-white shadow-sm'
-            : 'text-slate-650 hover:bg-white/50'
-            }`}
+          className={`flex-1 py-2.5 px-2 text-center text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === 'branding'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
         >
-          Branding
+          <Sparkles className="h-4 w-4" />
+          <span>Customize</span>
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('preview')}
-          className={`flex-1 py-2 px-3 text-center text-xs font-semibold rounded-[10px] transition-all duration-200 cursor-pointer ${activeTab === 'preview'
-            ? 'bg-[#E91E63] text-white shadow-sm'
-            : 'text-slate-650 hover:bg-white/50'
-            }`}
+          onClick={() => setActiveTab('links')}
+          className={`flex-1 py-2.5 px-2 text-center text-xs font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 ${
+            activeTab === 'links'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
         >
-          Preview
+          <Link className="h-4 w-4" />
+          <span>CRM Links</span>
         </button>
       </div>
 
-      {/* Wrapping form across all columns so Submit save button in column 2 can submit input values from all sections */}
+      {/* Wrapping form across all columns so Submit save button can submit input values from all sections */}
       <form onSubmit={handleSaveBranding}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* COLUMN 1: LINKS & DOWNLOADS & SAVE ACTION (25% / 3 columns) */}
-          <div className={`col-span-12 md:col-span-4 lg:col-span-3 space-y-6 order-3 lg:order-1 ${activeTab === 'links' ? 'block' : 'hidden md:block lg:block'}`}>
+          {/* LEFT COLUMN: STUDIO CONTROLS & ADMISSION LINKS (7 columns on desktop) */}
+          <div className={`space-y-6 lg:col-span-7 ${activeTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
 
-            {/* Card 1: Links */}
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Link className="h-4 w-4 text-indigo-600" />
-                <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Admission CRM Links
-                </span>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-500">Public Portal CRM Link</label>
-                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-1 pl-2">
-                    <span className="truncate flex-1 font-mono text-xs text-slate-500 pr-1">{publicLink}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyLink(publicLink, setCopyingLink)}
-                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
-                    >
-                      {copyingLink ? <Check className="h-4 w-4 text-indigo-600 animate-scale-in" /> : <Copy className="h-4 w-4" />}
-                    </button>
-                    <a
-                      href={publicLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                    <button
-                      type="button"
-                      onClick={handleShare}
-                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </button>
+            {/* SECTION 1: ADMISSION CRM LINKS (Shown on desktop, or when activeTab === 'links' on mobile) */}
+            <div className={`${activeTab === 'branding' ? 'hidden lg:block' : 'block'}`}>
+              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                      <Link className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold text-slate-900 block leading-tight">
+                        Admission CRM Links
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        Direct parent enquiry & reception registration links
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleGenerateNew}
+                    disabled={generatingLink}
+                    className="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800 gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${generatingLink ? 'animate-spin' : ''}`} />
+                    <span>Sync Links</span>
+                  </button>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-500">Reception Entry Link</label>
-                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-1 pl-2">
-                    <span className="truncate flex-1 font-mono text-xs text-slate-500 pr-1">{receptionLink}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyLink(receptionLink, setCopyingReception)}
-                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
-                    >
-                      {copyingReception ? <Check className="h-4 w-4 text-indigo-600 animate-scale-in" /> : <Copy className="h-4 w-4" />}
-                    </button>
-                    <a
-                      href={receptionLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-2 hover:bg-slate-200/50 rounded-lg text-slate-500 shrink-0 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+                <div className="space-y-4">
+                  {/* Public Portal Link */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700">Public Portal Admission Link</label>
+                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">For Parents / WhatsApp</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl p-1.5 pl-3 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                      <span className="truncate flex-1 font-mono text-xs text-slate-600 select-all">{publicLink}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyLink(publicLink, setCopyingLink)}
+                        title="Copy Public Link"
+                        className="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold shrink-0 transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        {copyingLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-500" />}
+                        <span>{copyingLink ? 'Copied' : 'Copy'}</span>
+                      </button>
+                      <a
+                        href={publicLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Open in new tab"
+                        className="p-1.5 hover:bg-slate-200/60 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={handleShare}
+                        title="Share link"
+                        className="p-1.5 hover:bg-slate-200/60 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Reception Link */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700">Reception Entry Link</label>
+                      <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Front Desk Kiosk</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl p-1.5 pl-3 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                      <span className="truncate flex-1 font-mono text-xs text-slate-600 select-all">{receptionLink}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyLink(receptionLink, setCopyingReception)}
+                        title="Copy Reception Link"
+                        className="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold shrink-0 transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        {copyingReception ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-500" />}
+                        <span>{copyingReception ? 'Copied' : 'Copy'}</span>
+                      </button>
+                      <a
+                        href={receptionLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Open in new tab"
+                        className="p-1.5 hover:bg-slate-200/60 rounded-lg text-slate-500 shrink-0 transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="pt-2 flex justify-end border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={handleGenerateNew}
-                  disabled={generatingLink}
-                  className="inline-flex items-center text-xs font-semibold text-indigo-600 gap-1.5 hover:text-indigo-800 transition-colors"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 ${generatingLink ? 'animate-spin' : ''}`} />
-                  <span>Generate Links</span>
-                </button>
               </div>
             </div>
 
-            {/* Card 2: Export Flyer Buttons */}
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Download className="h-4 w-4 text-indigo-600" />
-                <span className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Export Flyer Poster
-                </span>
-              </div>
-              <div className="grid grid-cols-1 gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleDownload('png')}
-                  disabled={downloadingPng || downloadingPdf}
-                  className="w-full h-[46px] justify-center text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {downloadingPng ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      <span>Exporting PNG...</span>
-                    </span>
-                  ) : (
-                    <>
-                      <Download className="h-4 w-4" />
-                      <span>Download PNG Flyer</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDownload('pdf')}
-                  disabled={downloadingPng || downloadingPdf}
-                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  {downloadingPdf ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      <span>Exporting PDF...</span>
-                    </span>
-                  ) : (
-                    <>
-                      <FileText className="h-4 w-4 text-slate-500" />
-                      <span>Download PDF Document</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  disabled={downloadingPng || downloadingPdf}
-                  className="w-full h-[46px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  <Printer className="h-4 w-4 text-slate-500" />
-                  <span>Print High-Res Poster</span>
-                </button>
-              </div>
-            </div>
+            {/* SECTION 2: POSTER BRANDING STUDIO (Shown on desktop, or when activeTab === 'branding' on mobile) */}
+            <div className={`${activeTab === 'links' ? 'hidden lg:block' : 'block'}`}>
+              <div className="space-y-4 pb-12 relative">
 
-          </div>
+                {/* Studio Section Title */}
+                <div className="flex items-center justify-between px-1">
+                  <div>
+                    <h2 className="text-base font-bold text-slate-900">Poster Customization Studio</h2>
+                    <p className="text-xs text-slate-500 font-medium">Fine-tune flyer branding, titles, contact info and highlights</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('preview')}
+                    className="lg:hidden text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>View Preview</span>
+                  </button>
+                </div>
 
-          {/* COLUMN 2: POSTER BRANDING SETTINGS EDITOR (35% / 4 columns) */}
-          <div className={`col-span-12 md:col-span-8 lg:col-span-4 space-y-6 order-2 lg:order-2 ${activeTab === 'branding' ? 'block' : 'hidden md:block lg:block'}`}>
-            <div className="space-y-6 pb-20 relative">
-
-              {/* Group 1: Branding Accordion Card */}
-              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#7C3AED] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
-                <button
+                {/* Group 1: Branding Accordion Card */}
+                <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-[#7C3AED] shadow-sm overflow-hidden card-lift hover:border-slate-300 hover:shadow-md transition-all duration-200">
+                  <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'branding' ? '' : 'branding')}
                   className="w-full flex items-center justify-between h-[58px] px-5 text-slate-900 font-semibold hover:bg-slate-50 transition-all duration-200"
@@ -1689,54 +1669,162 @@ const QrLinksPage = () => {
               </div>
 
               {/* Sticky bottom Save bar docked inside the scrollable column */}
-              <div className="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-xl shadow-lg flex items-center justify-between mt-6">
-                <div className="text-xs font-semibold text-slate-500">
+              <div className="sticky bottom-4 z-20 bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-xl shadow-lg flex items-center justify-between mt-6 gap-3">
+                <div className="text-xs font-semibold text-slate-500 truncate">
                   Unsaved branding alterations
                 </div>
-                <Button
-                  type="submit"
-                  isLoading={savingBranding}
-                  className="h-[46px] px-6 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm transition-all duration-200 shrink-0"
-                >
-                  Save Studio Settings
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('preview')}
+                    className="lg:hidden h-[42px] px-3.5 border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 rounded-xl transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>Preview</span>
+                  </button>
+                  <Button
+                    type="submit"
+                    isLoading={savingBranding}
+                    className="h-[42px] px-6 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white rounded-xl shadow-sm transition-all shrink-0 cursor-pointer"
+                  >
+                    Save Studio Settings
+                  </Button>
+                </div>
               </div>
 
             </div>
           </div>
 
-          {/* COLUMN 3: STICKY LIVE PREVIEW WORKSPACE (40% / 5 columns) */}
-          <div className={`col-span-12 lg:col-span-5 lg:sticky lg:top-[20px] self-start order-1 lg:order-3 ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
+        </div>
 
-            {/* Canva Workspace backdrop: Clean white canvas */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 flex items-center justify-center min-h-[500px] max-h-[680px] overflow-auto shadow-sm relative mt-3 border border-slate-200">
+        {/* RIGHT COLUMN: STICKY LIVE PREVIEW & FLYER EXPORT (5 columns on desktop) */}
+        <div className={`space-y-4 lg:col-span-5 lg:sticky lg:top-4 self-start ${activeTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
 
-              {/* Full Screen Preview Button */}
+          {/* Poster Preview Card */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Layout className="h-4 w-4 text-indigo-600 shrink-0" />
+                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">Template:</span>
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => setSelectedTemplate(e.target.value)}
+                  className="rounded-lg border border-slate-200 py-1.5 px-2.5 text-xs font-bold bg-slate-50 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer hover:border-slate-300 transition-colors"
+                >
+                  <option value="modern-premium">Classic</option>
+                  <option value="corporate-split">Modern Premium</option>
+                  <option value="luxury-black">Luxury Black</option>
+                  <option value="color-burst">Color Gradient</option>
+                  <option value="creative-gradient">Minimal Elegant</option>
+                </select>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setIsFullScreen(true)}
                 title="Full Screen Preview"
-                className="absolute top-3 right-3 z-10 h-8 w-8 bg-white/90 hover:bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg shadow-xs flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105"
+                className="h-8 w-8 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
                 <Maximize2 className="h-4 w-4" />
               </button>
+            </div>
 
-              {/* Clutter-free scaling node boundary wrapper */}
+            {/* Canvas wrapper */}
+            <div className="bg-slate-50/80 rounded-xl p-3 sm:p-4 flex items-center justify-center min-h-[440px] max-h-[640px] overflow-auto border border-slate-200/80 relative">
               <div
                 style={{
                   width: `${posterDims.width * scale}px`,
                   height: `${posterDims.height * scale}px`,
                   overflow: 'hidden'
                 }}
-                className="rounded-xl shadow-md shadow-slate-900/8 relative border border-slate-200 bg-white shrink-0 transition-all duration-300"
+                className="rounded-xl shadow-md shadow-slate-900/10 relative border border-slate-200 bg-white shrink-0 transition-all duration-300"
               >
                 {renderPosterCanvas(scale, 'admission-poster-canvas')}
+              </div>
+            </div>
+
+            {/* Mobile quick button to switch to customize tab */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('branding')}
+              className="lg:hidden w-full py-2.5 px-4 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/60 rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Customize Poster Content & Logo</span>
+            </button>
+          </div>
+
+          {/* Export Flyer Buttons Card */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+              <Download className="h-4 w-4 text-indigo-600" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                Export Flyer Poster
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              <button
+                type="button"
+                onClick={() => handleDownload('png')}
+                disabled={downloadingPng || downloadingPdf}
+                className="w-full h-[46px] justify-center text-sm font-bold bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white flex items-center gap-2 rounded-xl shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {downloadingPng ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Exporting PNG...</span>
+                  </span>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" />
+                    <span>Download PNG Flyer</span>
+                  </>
+                )}
+              </button>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => handleDownload('pdf')}
+                  disabled={downloadingPng || downloadingPdf}
+                  className="w-full h-[42px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {downloadingPdf ? (
+                    <span className="flex items-center gap-1.5">
+                      <svg className="animate-spin h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>PDF...</span>
+                    </span>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4 text-slate-500" />
+                      <span>PDF Document</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  disabled={downloadingPng || downloadingPdf}
+                  className="w-full h-[42px] border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <Printer className="h-4 w-4 text-slate-500" />
+                  <span>Print Poster</span>
+                </button>
               </div>
             </div>
           </div>
 
         </div>
-      </form>
+
+      </div>
+    </form>
 
       {/* Off-screen dedicated 1:1 canvas for 100% reliable export across all devices & mobile tabs */}
       <div
